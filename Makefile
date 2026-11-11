@@ -1,4 +1,4 @@
-.PHONY: install dev migrate test content-check
+.PHONY: install dev bot-poll migrate test content-check
 
 install:
 	cd client && npm ci
@@ -6,6 +6,9 @@ install:
 
 dev:
 	bash scripts/dev.sh
+
+bot-poll:
+	cd server && uv run --locked python -m app.services.telegram_polling
 
 migrate:
 	uv run --project server --locked alembic -c server/alembic.ini upgrade head

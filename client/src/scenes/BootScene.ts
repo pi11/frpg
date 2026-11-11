@@ -1,4 +1,5 @@
 import * as Phaser from 'phaser';
+import { deleteAccount, session } from '../api/auth';
 import { getCatalog } from '../content/catalog';
 import { createPlaceholderTextures } from './textures';
 
@@ -28,11 +29,13 @@ export class BootScene extends Phaser.Scene {
       fontSize: '24px',
       color: '#99c78e',
     }).setOrigin(0.5);
-    this.add.text(240, 137, 'Нажми, чтобы выйти из убежища', {
+    const startButton = this.add.text(240, 137, 'ВЫЙТИ ИЗ УБЕЖИЩА', {
       fontFamily: 'monospace',
       fontSize: '12px',
       color: '#c6b791',
-    }).setOrigin(0.5);
+      backgroundColor: '#344835',
+      padding: { x: 12, y: 6 },
+    }).setOrigin(0.5).setInteractive({ useHandCursor: true });
     this.add.text(240, 165, 'WASD / стрелки · мышь / тач · P — пауза', {
       fontFamily: 'monospace', fontSize: '9px', color: '#7d9782',
     }).setOrigin(0.5);
@@ -48,8 +51,31 @@ export class BootScene extends Phaser.Scene {
       const wave = Number.isSafeInteger(parsedWave) && parsedWave >= 0 ? parsedWave : 0;
       this.scene.start('Run', { seed, locationId, heroId, wave });
     };
-    this.input.once('pointerdown', start);
+    startButton.once('pointerdown', start);
     this.input.keyboard?.once('keydown-SPACE', start);
+    const account = session();
+    if (account) {
+      this.add.text(240, 205, account.is_guest ? 'Привязать вход' : 'Способы входа', {
+        fontFamily: 'monospace', fontSize: '10px', color: '#9bbf9e',
+      }).setOrigin(0.5).setInteractive({ useHandCursor: true })
+        .on('pointerdown', () => this.scene.start('Auth', { linkAccount: true }));
+      this.add.text(240, 226, 'Удалить аккаунт и данные', {
+        fontFamily: 'monospace', fontSize: '9px', color: '#d38d7d',
+      }).setOrigin(0.5).setInteractive({ useHandCursor: true })
+        .on('pointerdown', () => void this.removeAccount());
+    }
     if (import.meta.env.DEV && new URLSearchParams(window.location.search).has('autostart')) start();
+  }
+
+  private async removeAccount(): Promise<void> {
+    if (!window.confirm('Удалить аккаунт, весь прогресс и способы входа? Это действие нельзя отменить.')) return;
+    try {
+      await deleteAccount();
+      this.scene.start('Auth');
+    } catch (error) {
+      this.add.text(240, 250, error instanceof Error ? error.message : 'Не удалось удалить аккаунт', {
+        fontFamily: 'monospace', fontSize: '9px', color: '#ff8877',
+      }).setOrigin(0.5);
+    }
   }
 }

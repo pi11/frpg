@@ -1,4 +1,5 @@
 import * as Phaser from 'phaser';
+import { AuthScene } from './scenes/AuthScene';
 import { BootScene } from './scenes/BootScene';
 import { HudScene } from './scenes/HudScene';
 import { LevelUpScene } from './scenes/LevelUpScene';
@@ -22,7 +23,7 @@ export const game = new Phaser.Game({
   physics: {
     default: 'arcade',
   },
-  scene: [BootScene, RunScene, HudScene, LevelUpScene, ResultScene],
+  scene: [AuthScene, BootScene, RunScene, HudScene, LevelUpScene, ResultScene],
 });
 
 if (import.meta.env.DEV) {

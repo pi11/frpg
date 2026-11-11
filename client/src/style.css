@@ -11,3 +11,48 @@ body,
 #game canvas {
   display: block;
 }
+
+.auth-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: grid;
+  place-items: center;
+  overflow-y: auto;
+  padding: 20px;
+  box-sizing: border-box;
+  color: #e6ddc3;
+  background: radial-gradient(circle at 50% 20%, #29392d, #101712 70%);
+  font-family: ui-monospace, 'Courier New', monospace;
+}
+
+.auth-card {
+  width: min(100%, 420px);
+  padding: clamp(20px, 5vw, 36px);
+  box-sizing: border-box;
+  border: 2px solid #71876b;
+  background: #19251d;
+  box-shadow: 0 20px 65px #080e0a;
+}
+
+.auth-eyebrow { color: #92ac88; font-size: 11px; letter-spacing: 0.18em; }
+.auth-card h1 { margin: 10px 0; color: #b3d899; font-size: clamp(30px, 8vw, 42px); letter-spacing: 0.08em; }
+.auth-intro { line-height: 1.5; }
+.auth-status { min-height: 2.5em; color: #b4cba7; font-size: 13px; line-height: 1.4; }
+.auth-error { color: #ff9b86; }
+.auth-warning { color: #e0bd78; font-size: 12px; line-height: 1.5; }
+.auth-form { margin: 20px 0; }
+.auth-form label { display: block; margin-bottom: 8px; color: #c4cfb3; font-size: 13px; }
+.auth-row { display: flex; gap: 8px; }
+.auth-row input { flex: 1; min-width: 0; padding: 10px; border: 1px solid #758872; border-radius: 2px; background: #0f1912; color: #f2ecd8; font: inherit; }
+.auth-card button { cursor: pointer; border: 1px solid #8fa78a; border-radius: 2px; background: #324937; color: #f2ecd8; padding: 10px 12px; font: inherit; font-size: 12px; }
+.auth-card button:hover, .auth-card button:focus-visible { background: #4b694e; }
+.auth-primary, .auth-secondary, .auth-back { display: block; width: 100%; }
+.auth-primary { margin-top: 16px; }
+.auth-secondary { margin-top: 20px; }
+.auth-back { margin-top: 12px; background: transparent !important; }
+.auth-telegram-details { text-align: center; padding-top: 16px; }
+.auth-telegram-details a { color: #b6daaa; }
+.auth-telegram-details img { display: block; width: 160px; height: 160px; margin: 12px auto; background: #f1ecda; }
+.auth-telegram-details small { display: block; line-height: 1.4; }
+[hidden] { display: none !important; }

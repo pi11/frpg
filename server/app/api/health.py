@@ -9,6 +9,7 @@ from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.api.errors import ErrorCode, ErrorResponse
 from app.db import get_session
 
 router = APIRouter()
@@ -17,11 +18,6 @@ router = APIRouter()
 class HealthResponse(BaseModel):
     status: str
     database: str
-
-
-class ErrorResponse(BaseModel):
-    code: str
-    message: str
 
 
 @router.get(
@@ -37,6 +33,9 @@ async def health(
     except SQLAlchemyError:
         return JSONResponse(
             status_code=503,
-            content={"code": "database_unavailable", "message": "База данных недоступна"},
+            content={
+                "code": ErrorCode.database_unavailable.value,
+                "message": "База данных недоступна",
+            },
         )
     return HealthResponse(status="ok", database="ok")

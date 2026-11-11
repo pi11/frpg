@@ -15,6 +15,12 @@ class Settings(BaseSettings):
     public_url: str = "http://localhost:5173"
     cors_origins: list[str] = ["http://localhost:5173"]
     mail_backend: str = "console"
+    mail_from: str = ""
+    resend_api_key: str = ""
+    jwt_secret: str = ""
+    telegram_bot_token: str = ""
+    telegram_bot_username: str = ""
+    telegram_webhook_secret: str = ""
 
 
 @lru_cache

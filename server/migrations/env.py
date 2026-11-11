@@ -3,10 +3,12 @@
 import asyncio
 from logging.config import fileConfig
 
+import app.models  # noqa: F401 - import registers tables in Base.metadata
 from alembic import context
 from app.config import get_settings
 from app.models.base import Base
 from sqlalchemy import pool
+from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
 config = context.config
@@ -37,13 +39,13 @@ def run_migrations_online() -> None:
     )
 
     async def migrate() -> None:
+        def run(connection: Connection) -> None:
+            context.configure(connection=connection, target_metadata=target_metadata)
+            with context.begin_transaction():
+                context.run_migrations()
+
         async with connectable.connect() as connection:
-            await connection.run_sync(
-                lambda sync_connection: context.configure(
-                    connection=sync_connection, target_metadata=target_metadata
-                )
-            )
-            await connection.run_sync(lambda _: context.run_migrations())
+            await connection.run_sync(run)
         await connectable.dispose()
 
     asyncio.run(migrate())
