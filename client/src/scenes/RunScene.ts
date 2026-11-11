@@ -1,4 +1,5 @@
 import * as Phaser from 'phaser';
+import { animationKey, ATLAS } from '../assets';
 import { enemyBehaviors, weaponBehaviors } from '../behaviors/registry';
 import type { FireContext } from '../behaviors/weapons/Projectile';
 import { getCatalog } from '../content/catalog';
@@ -7,6 +8,7 @@ import type {
   EnemyDefinition, HeroDefinition, LocationDefinition, StatKey,
 } from '../content/schemas';
 import { inputState } from '../inputState';
+import { playMusic, playSfx } from '../sound';
 import { Rng } from '../systems/rng';
 import type { ResultData } from './ResultScene';
 
@@ -29,6 +31,7 @@ export interface UpgradeChoice {
   id: string;
   name: string;
   description: string;
+  sprite: string;
 }
 
 export interface RunData {
@@ -41,6 +44,10 @@ export interface RunData {
   /** Shelter upgrade levels from the server profile. */
   upgrades: Record<string, number>;
 }
+
+/** Presentation constants (not balance): effect pool size and death animation pause. */
+const EFFECT_POOL_SIZE = 96;
+const HERO_DEATH_DELAY_MS = 900;
 
 interface OwnedWeapon {
   level: number;
@@ -62,6 +69,10 @@ export class RunScene extends Phaser.Scene {
   private projectiles!: Phaser.Physics.Arcade.Group;
   private crystals!: Phaser.Physics.Arcade.Group;
   private ground!: Phaser.GameObjects.TileSprite;
+  /** Death puffs and hit sparks: a fixed pool of plain sprites, never physics bodies. */
+  private effects!: Phaser.GameObjects.Group;
+  private pendingFireSound: string | null = null;
+  private spawnCount = 0;
   private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
   private keys!: { W: Phaser.Input.Keyboard.Key; A: Phaser.Input.Keyboard.Key;
     S: Phaser.Input.Keyboard.Key; D: Phaser.Input.Keyboard.Key };
@@ -117,7 +128,7 @@ export class RunScene extends Phaser.Scene {
     this.physics.world.setBounds(-100000, -100000, 200000, 200000);
     this.ground = this.add.tileSprite(0, 0, 480, 270, this.location.groundSprite)
       .setOrigin(0).setScrollFactor(0).setDepth(-100);
-    this.hero = this.physics.add.sprite(0, 0, this.heroDefinition.sprite).setDepth(10);
+    this.hero = this.physics.add.sprite(0, 0, ATLAS, this.heroDefinition.sprite).setDepth(10);
     (this.hero.body as Phaser.Physics.Arcade.Body).setSize(12, 12);
     this.cameras.main.startFollow(this.hero, true);
     this.cameras.main.setRoundPixels(true);
@@ -129,6 +140,14 @@ export class RunScene extends Phaser.Scene {
       firstWeapon.projectileSprite, this.catalog.balance.run.projectileLimit,
     );
     this.crystals = this.createPool('xp/green', this.catalog.balance.run.xpLimit);
+    this.effects = this.add.group({ maxSize: EFFECT_POOL_SIZE });
+    for (let index = 0; index < EFFECT_POOL_SIZE; index += 1) {
+      const effect = this.add.sprite(0, 0, ATLAS, 'fx/hit').setDepth(5);
+      effect.on(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+        effect.setActive(false).setVisible(false);
+      });
+      this.effects.add(effect.setActive(false).setVisible(false));
+    }
     this.fireContext = {
       x: 0, y: 0,
       nearestTarget: () => this.nearestTarget(),
@@ -146,12 +165,16 @@ export class RunScene extends Phaser.Scene {
       const hp = (enemy.getData('hp') as number) - (bullet.getData('damage') as number);
       if (hp <= 0) {
         const { x, y } = enemy;
+        this.playEffect(definition.sprite, 'death', x, y, enemy.flipX);
+        playSfx('sfx/enemy_death');
         enemy.disableBody(true, true);
         this.view.kills += 1;
         this.killsByType[definition.id] = (this.killsByType[definition.id] ?? 0) + 1;
         this.dropXp(x, y, definition.stats.xp);
       } else {
         enemy.setData('hp', hp);
+        this.playEffect('fx/hit', 'burst', bullet.x, bullet.y, false);
+        playSfx('sfx/enemy_hit', 0.6);
       }
     });
     this.physics.add.overlap(this.hero, this.enemies, (_hero, item) => {
@@ -165,12 +188,22 @@ export class RunScene extends Phaser.Scene {
     this.keys = this.input.keyboard!.addKeys('W,A,S,D') as typeof this.keys;
     this.scene.launch('Hud');
     this.scene.bringToTop('Hud');
+    playSfx('sfx/run_start');
+    playMusic(this.location.music);
+  }
+
+  private playEffect(sprite: string, animation: string, x: number, y: number, flipX: boolean): void {
+    const key = animationKey(sprite, animation);
+    if (!this.anims.exists(key)) return;
+    const effect = this.effects.getFirstDead(false) as Phaser.GameObjects.Sprite | null;
+    if (!effect) return;
+    effect.setActive(true).setVisible(true).setPosition(x, y).setFlipX(flipX).play(key);
   }
 
   private createPool(key: string, size: number): Phaser.Physics.Arcade.Group {
     const pool = this.physics.add.group({ maxSize: size, runChildUpdate: false });
     for (let index = 0; index < size; index += 1) {
-      const item = pool.create(0, 0, key) as Phaser.Physics.Arcade.Sprite;
+      const item = pool.create(0, 0, ATLAS, key) as Phaser.Physics.Arcade.Sprite;
       item.setData('hp', 0);
       item.setData('damage', 0);
       item.setData('expiresAt', 0);
@@ -244,6 +277,14 @@ export class RunScene extends Phaser.Scene {
     const speed = this.stat('moveSpeed');
     this.hero.setVelocity(length > 0 ? (x / length) * speed : 0,
       length > 0 ? (y / length) * speed : 0);
+    const sprite = this.heroDefinition.sprite;
+    if (length > 0) {
+      if (x !== 0) this.hero.setFlipX(x < 0);
+      this.hero.anims.play(animationKey(sprite, 'walk'), true);
+    } else if (this.hero.anims.isPlaying) {
+      this.hero.anims.stop();
+      this.hero.setFrame(sprite);
+    }
   }
 
   private selectEnemy(): EnemyDefinition {
@@ -264,13 +305,19 @@ export class RunScene extends Phaser.Scene {
     const definition = this.selectEnemy();
     const angle = this.rng.next() * Math.PI * 2;
     const distance = this.catalog.balance.run.spawnDistance;
-    enemy.setTexture(definition.sprite);
+    enemy.setTexture(ATLAS, definition.sprite);
     enemy.enableBody(true, this.hero.x + Math.cos(angle) * distance,
       this.hero.y + Math.sin(angle) * distance, true, true);
     (enemy.body as Phaser.Physics.Arcade.Body).setSize(enemy.width, enemy.height);
     enemy.setVelocity(0, 0);
     enemy.setData('enemyId', definition.id);
     enemy.setData('hp', definition.stats.hp);
+    const walk = animationKey(definition.sprite, 'walk');
+    if (this.anims.exists(walk)) {
+      // Visual-only phase offset: a counter, so the seeded gameplay RNG stream is untouched.
+      this.spawnCount += 1;
+      enemy.anims.play({ key: walk, startFrame: this.spawnCount % 4 });
+    }
   }
 
   private moveEnemies(delta: number): void {
@@ -280,6 +327,7 @@ export class RunScene extends Phaser.Scene {
       if (!enemy.active) continue;
       const dx = this.hero.x - enemy.x;
       const dy = this.hero.y - enemy.y;
+      enemy.setFlipX(dx < 0);
       if (dx * dx + dy * dy > maxDistanceSquared) {
         enemy.disableBody(true, true);
         continue;
@@ -318,7 +366,9 @@ export class RunScene extends Phaser.Scene {
       if (owned.clock < cooldown) continue;
       owned.clock -= cooldown;
       const behavior = weaponBehaviors[definition.behavior.type as keyof typeof weaponBehaviors];
+      this.pendingFireSound = definition.fireSound;
       behavior.fire(this.fireContext, definition, level, this.stat('damage'));
+      this.pendingFireSound = null;
     }
   }
 
@@ -326,7 +376,11 @@ export class RunScene extends Phaser.Scene {
     sprite: string): void {
     const bullet = this.projectiles.getFirstDead(false) as Phaser.Physics.Arcade.Sprite | null;
     if (!bullet) return;
-    bullet.setTexture(sprite);
+    bullet.setTexture(ATLAS, sprite);
+    if (this.pendingFireSound) {
+      playSfx(this.pendingFireSound);
+      this.pendingFireSound = null;
+    }
     bullet.enableBody(true, this.hero.x, this.hero.y, true, true);
     bullet.setData('damage', damage);
     bullet.setData('expiresAt', this.elapsedMs + lifetimeMs);
@@ -347,6 +401,7 @@ export class RunScene extends Phaser.Scene {
     if (!crystal) return;
     crystal.enableBody(true, x, y, true, true);
     crystal.setData('xp', amount);
+    crystal.anims.play({ key: animationKey('xp/green', 'idle'), startFrame: this.view.kills % 4 }, true);
   }
 
   private updateCrystals(): void {
@@ -359,6 +414,7 @@ export class RunScene extends Phaser.Scene {
       if (distance <= this.stat('pickupRadius')) {
         const amount = crystal.getData('xp') as number;
         crystal.disableBody(true, true);
+        playSfx('sfx/xp_pickup', 0.7);
         if (this.gainXp(amount * (1 + this.stat('xpGain')))) break;
         continue;
       }
@@ -376,14 +432,14 @@ export class RunScene extends Phaser.Scene {
     for (const weapon of Object.values(this.catalog.weapons)) {
       const owned = this.ownedWeapons.get(weapon.id);
       if (!owned || owned.level < weapon.levels.length) {
-        pool.push({ kind: 'weapon', id: weapon.id, name: weapon.name,
+        pool.push({ kind: 'weapon', id: weapon.id, name: weapon.name, sprite: weapon.sprite,
           description: owned ? `Уровень ${owned.level + 1}` : 'Новое оружие' });
       }
     }
     for (const passive of Object.values(this.catalog.passives)) {
       const level = this.ownedPassives.get(passive.id) ?? 0;
       if (level < passive.maxLevel) {
-        pool.push({ kind: 'passive', id: passive.id, name: passive.name,
+        pool.push({ kind: 'passive', id: passive.id, name: passive.name, sprite: passive.sprite,
           description: `${passive.description} · Ур. ${level + 1}` });
       }
     }
@@ -404,6 +460,7 @@ export class RunScene extends Phaser.Scene {
     );
     this.choices = this.rollChoices();
     if (!this.choices.length) return false;
+    playSfx('sfx/level_up');
     this.hero.setVelocity(0, 0);
     this.scene.launch('LevelUp');
     this.scene.bringToTop('LevelUp');
@@ -427,11 +484,23 @@ export class RunScene extends Phaser.Scene {
   private takeDamage(damage: number): void {
     if (this.elapsedMs - this.lastDamageAt < this.catalog.balance.run.contactCooldownMs) return;
     this.lastDamageAt = this.elapsedMs;
+    playSfx('sfx/hero_hurt');
     this.view.hp = Math.max(0, this.view.hp - Math.max(0, damage - this.stat('armor')));
     this.cameras.main.shake(80, 0.005);
     this.hero.setTint(0xff7777);
     this.time.delayedCall(100, () => this.hero.clearTint());
-    if (this.view.hp <= 0) this.finish('death');
+    if (this.view.hp <= 0) this.die();
+  }
+
+  private die(): void {
+    if (this.finished) return;
+    this.finished = true;
+    this.physics.pause();
+    this.hero.setVelocity(0, 0);
+    playSfx('sfx/hero_death');
+    const death = animationKey(this.heroDefinition.sprite, 'death');
+    if (this.anims.exists(death)) this.hero.anims.play(death);
+    this.time.delayedCall(HERO_DEATH_DELAY_MS, () => this.finish('death'));
   }
 
   private finish(reason: 'death' | 'survived'): void {

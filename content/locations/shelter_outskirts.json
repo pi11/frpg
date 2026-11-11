@@ -2,6 +2,7 @@
   "id": "shelter_outskirts",
   "name": "Пустошь у убежища",
   "groundSprite": "ground/wasteland",
+  "music": "music/wasteland",
   "durationSeconds": 900,
   "startingHero": "wanderer",
   "waves": [

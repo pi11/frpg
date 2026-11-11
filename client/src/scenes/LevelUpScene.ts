@@ -1,4 +1,7 @@
 import * as Phaser from 'phaser';
+import { ATLAS } from '../assets';
+import { playSfx } from '../sound';
+import { COLORS, textStyle } from '../ui/theme';
 import { RunScene } from './RunScene';
 import type { UpgradeChoice } from './RunScene';
 
@@ -9,24 +12,25 @@ export class LevelUpScene extends Phaser.Scene {
 
   create(): void {
     const choices = (this.scene.get('Run') as RunScene).choices;
-    this.add.rectangle(240, 135, 480, 270, 0x07100c, 0.9);
-    this.add.text(240, 27, 'НОВЫЙ УРОВЕНЬ — ВЫБЕРИ УЛУЧШЕНИЕ', {
-      fontFamily: 'monospace', fontSize: '14px', color: '#9acb9b',
-    }).setOrigin(0.5);
+    this.add.rectangle(240, 135, 480, 270, 0x030805, 0.86);
+    this.add.text(240, 34, 'НОВЫЙ УРОВЕНЬ', textStyle(16, COLORS.bright)).setOrigin(0.5);
+    this.add.text(240, 54, 'ВЫБЕРИ УЛУЧШЕНИЕ: 1–3 ИЛИ КАСАНИЕ', textStyle(8, COLORS.dim)).setOrigin(0.5);
 
     choices.forEach((upgrade, index) => {
-      const x = 82 + index * 158;
-      const card = this.add.rectangle(x, 138, 146, 160, 0x25352a)
-        .setStrokeStyle(2, 0x86ad83).setInteractive({ useHandCursor: true });
+      const x = 84 + index * 156;
+      const card = this.add.rectangle(x, 150, 144, 140, COLORS.panel, 0.95)
+        .setStrokeStyle(1, COLORS.panelBorder).setInteractive({ useHandCursor: true });
+      card.on('pointerover', () => card.setStrokeStyle(2, 0x9bff6e));
+      card.on('pointerout', () => card.setStrokeStyle(1, COLORS.panelBorder));
       card.on('pointerdown', () => this.choose(upgrade));
-      this.add.text(x, 91, `${index + 1}. ${upgrade.name}`, {
-        fontFamily: 'monospace', fontSize: '11px', color: '#e4dcba',
-        align: 'center', wordWrap: { width: 130 },
-      }).setOrigin(0.5);
-      this.add.text(x, 157, upgrade.description, {
-        fontFamily: 'monospace', fontSize: '10px', color: '#9acb9b',
-        align: 'center', wordWrap: { width: 130 },
-      }).setOrigin(0.5);
+      this.add.text(x - 64, 86, `[${index + 1}]`, textStyle(8, COLORS.dim));
+      this.add.image(x, 108, ATLAS, upgrade.sprite).setScale(2);
+      this.add.text(x, 138, upgrade.name.toUpperCase(), textStyle(8, COLORS.bright, {
+        align: 'center', wordWrap: { width: 132 },
+      })).setOrigin(0.5, 0);
+      this.add.text(x, 176, upgrade.description, textStyle(8, COLORS.text, {
+        align: 'center', wordWrap: { width: 132 },
+      })).setOrigin(0.5, 0);
     });
     const onKey = (event: KeyboardEvent): void => {
       const index = Number(event.key) - 1;
@@ -40,6 +44,7 @@ export class LevelUpScene extends Phaser.Scene {
   }
 
   private choose(choice: UpgradeChoice): void {
+    playSfx('sfx/ui_click');
     (this.scene.get('Run') as RunScene).applyUpgrade(choice);
     this.scene.resume('Run');
     this.scene.stop();

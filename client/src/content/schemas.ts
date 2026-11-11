@@ -29,6 +29,8 @@ const IdSchema = z.string().regex(/^[a-z][a-z0-9_]*$/);
 const spriteKey = (folder: string) => z.string().regex(
   new RegExp(`^${folder}/[a-z][a-z0-9_]*$`),
 );
+/** Audio keys map to client/public/assets/<key>.wav (sfx) or .ogg/.mp3 (music). */
+const soundKey = (folder: 'sfx' | 'music') => spriteKey(folder);
 
 export const HeroSchema = z.object({
   id: IdSchema,
@@ -53,6 +55,7 @@ export const WeaponSchema = z.object({
   name: z.string().min(1),
   sprite: spriteKey('weapons'),
   projectileSprite: spriteKey('projectiles'),
+  fireSound: soundKey('sfx'),
   behavior: z.object({ type: IdSchema, params: z.unknown() }).strict(),
   levels: z.array(WeaponLevelSchema).length(8),
   tags: z.array(z.string()),
@@ -63,6 +66,7 @@ export const PassiveSchema = z.object({
   id: IdSchema,
   name: z.string().min(1),
   description: z.string().min(1),
+  sprite: spriteKey('passives'),
   stat: StatKeySchema,
   mod: z.enum(['flat', 'percent']),
   perLevel: z.number(),
@@ -94,6 +98,7 @@ export const LocationSchema = z.object({
   id: IdSchema,
   name: z.string().min(1),
   groundSprite: spriteKey('ground'),
+  music: soundKey('music'),
   durationSeconds: z.number().positive(),
   startingHero: IdSchema,
   waves: z.array(z.object({

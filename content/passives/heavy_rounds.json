@@ -2,6 +2,7 @@
   "id": "heavy_rounds",
   "name": "Заряженные патроны",
   "description": "Повышает урон",
+  "sprite": "passives/heavy_rounds",
   "stat": "damage",
   "mod": "flat",
   "perLevel": 3,

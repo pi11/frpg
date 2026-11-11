@@ -3,6 +3,7 @@
   "name": "Самодельный пистолет",
   "sprite": "weapons/scrap_pistol",
   "projectileSprite": "projectiles/bullet",
+  "fireSound": "sfx/shot_pistol",
   "behavior": { "type": "projectile", "params": { "speed": 310, "lifetimeMs": 1200 } },
   "levels": [
     { "damage": 6, "cooldownMs": 450, "shots": 1, "spreadDegrees": 0 },

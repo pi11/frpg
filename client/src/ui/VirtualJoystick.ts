@@ -27,7 +27,7 @@ export class VirtualJoystick {
     this.pointerId = pointer.id;
     this.originX = pointer.x;
     this.originY = pointer.y;
-    this.base.clear().lineStyle(2, 0x9acb9b, 0.8)
+    this.base.clear().lineStyle(2, 0x4fa85a, 0.8)
       .fillStyle(0x17211c, 0.5).fillCircle(pointer.x, pointer.y, this.radius)
       .strokeCircle(pointer.x, pointer.y, this.radius).setVisible(true);
     this.thumb.setVisible(true);
@@ -44,7 +44,7 @@ export class VirtualJoystick {
     const y = dy * scale;
     inputState.x = x / this.radius;
     inputState.y = y / this.radius;
-    this.thumb.clear().fillStyle(0x9acb9b, 0.8)
+    this.thumb.clear().fillStyle(0x4fa85a, 0.8)
       .fillCircle(this.originX + x, this.originY + y, 15);
   }
 

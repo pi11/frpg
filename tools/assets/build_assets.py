@@ -1,0 +1,310 @@
+"""Build the game's original sprites, atlas, SFX and music.
+
+Usage: python3 tools/assets/build_assets.py [--preview DIR]
+
+Only the standard library is needed for images and SFX; music is encoded with
+ffmpeg (libvorbis + libmp3lame). Outputs go to client/public/assets and are
+committed, so CI and players never run this script. Re-running it gives
+byte-identical images and WAVs (all randomness is seeded).
+"""
+
+from __future__ import annotations
+
+import argparse
+import json
+import random
+import shutil
+import struct
+import subprocess
+import sys
+import tempfile
+import zlib
+from collections.abc import Sequence
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
+import art  # noqa: E402
+import audio  # noqa: E402
+
+ROOT = Path(__file__).resolve().parents[2]
+OUT = ROOT / "client" / "public" / "assets"
+
+Pixel = tuple[int, int, int, int]
+Image = list[list[Pixel]]
+CLEAR: Pixel = (0, 0, 0, 0)
+
+
+# --- image helpers -----------------------------------------------------------------
+
+def parse(source: str) -> Image:
+    rows = [line for line in source.strip("\n").split("\n")]
+    width = len(rows[0])
+    image: Image = []
+    for row in rows:
+        if len(row) != width:
+            raise ValueError(f"ragged pixel map row {row!r}")
+        image.append([CLEAR if char == "." else (*art.PALETTE[char], 255) for char in row])
+    return image
+
+
+def blank(width: int, height: int) -> Image:
+    return [[CLEAR] * width for _ in range(height)]
+
+
+def stack(*parts: Image) -> Image:
+    return [list(row) for part in parts for row in part]
+
+
+def overlay(base: Image, top: Image, x: int, y: int) -> Image:
+    result = [list(row) for row in base]
+    for dy, row in enumerate(top):
+        for dx, pixel in enumerate(row):
+            if pixel[3] and 0 <= y + dy < len(result) and 0 <= x + dx < len(result[0]):
+                result[y + dy][x + dx] = pixel
+    return result
+
+
+def lighten(image: Image, amount: float) -> Image:
+    def mix(pixel: Pixel) -> Pixel:
+        if not pixel[3]:
+            return pixel
+        r, g, b = (round(c + (255 - c) * amount) for c in pixel[:3])
+        return (r, g, b, pixel[3])
+
+    return [[mix(pixel) for pixel in row] for row in image]
+
+
+def squash(image: Image, keep: float) -> Image:
+    """Shrink vertically towards the bottom edge, keeping roughly `keep` of the rows."""
+    height = len(image)
+    rows = max(1, round(height * keep))
+    content = [image[min(height - 1, int(index * height / rows))] for index in range(rows)]
+    return blank(len(image[0]), height - rows) + [list(row) for row in content]
+
+
+def dissolve(image: Image, fraction: float, seed: int) -> Image:
+    rng = random.Random(seed)
+    return [[pixel if not pixel[3] or rng.random() > fraction else CLEAR for pixel in row]
+            for row in image]
+
+
+def puddle(width: int, height: int, color: str) -> Image:
+    image = blank(width, height)
+    rgb = art.PALETTE[color]
+    for y in range(height - 4, height - 1):
+        spread = 5 - abs(y - (height - 3)) * 2
+        for x in range(width // 2 - spread, width // 2 + spread):
+            image[y][x] = (*rgb, 255)
+    return image
+
+
+def death_frames(base: Image, residue: str, seed: int) -> list[Image]:
+    return [
+        lighten(base, 0.7),
+        squash(base, 0.75),
+        dissolve(squash(base, 0.45), 0.35, seed),
+        overlay(puddle(len(base[0]), len(base), residue),
+                dissolve(squash(base, 0.2), 0.6, seed + 1), 0, 0),
+    ]
+
+
+def png(image: Image) -> bytes:
+    height, width = len(image), len(image[0])
+    raw = b"".join(b"\x00" + bytes(c for pixel in row for c in pixel) for row in image)
+
+    def chunk(kind: bytes, data: bytes) -> bytes:
+        body = kind + data
+        return struct.pack(">I", len(data)) + body + struct.pack(">I", zlib.crc32(body))
+
+    header = struct.pack(">IIBBBBB", width, height, 8, 6, 0, 0, 0)
+    return (b"\x89PNG\r\n\x1a\n" + chunk(b"IHDR", header)
+            + chunk(b"IDAT", zlib.compress(raw, 9)) + chunk(b"IEND", b""))
+
+
+# --- sprites -------------------------------------------------------------------------
+
+def humanoid(top: str, legs: Sequence[str], residue: str, seed: int) -> dict[str, Image]:
+    walk = [stack(parse(top), parse(leg)) for leg in legs]
+    frames = {f"walk_{index}": frame for index, frame in enumerate(walk)}
+    for index, frame in enumerate(death_frames(walk[1], residue, seed)):
+        frames[f"death_{index}"] = frame
+    return frames
+
+
+def roach() -> dict[str, Image]:
+    body = parse(art.ROACH_BODY)
+    walk = []
+    for upper, lower in art.ROACH_LEGS:
+        frame = overlay(body, parse(upper), 0, 2)
+        walk.append(overlay(frame, parse(lower), 0, 11))
+    frames = {f"walk_{index}": frame for index, frame in enumerate(walk)}
+    for index, frame in enumerate(death_frames(walk[1], "b", 7)):
+        frames[f"death_{index}"] = frame
+    return frames
+
+
+def sprite_frames() -> dict[str, Image]:
+    """Atlas frame name -> image. `<key>` is always the idle/static frame."""
+    animated = {
+        "heroes/wanderer": humanoid(art.WANDERER_TOP, art.WANDERER_LEGS, "R", 3),
+        "enemies/ghoul": humanoid(art.GHOUL_TOP, art.GHOUL_LEGS, "Q", 5),
+        "enemies/roach": roach(),
+        "xp/green": {f"idle_{i}": parse(src) for i, src in enumerate(art.XP_FRAMES)},
+        "fx/hit": {f"burst_{i}": parse(src) for i, src in enumerate(art.HIT_FRAMES)},
+    }
+    frames: dict[str, Image] = {}
+    for key, animation in animated.items():
+        frames[key] = next(iter(animation.values()))
+        for name, image in animation.items():
+            frames[f"{key}/{name}"] = image
+    frames.update({
+        "weapons/scrap_pistol": parse(art.SCRAP_PISTOL),
+        "weapons/scattergun": parse(art.SCATTERGUN),
+        "passives/heavy_rounds": parse(art.HEAVY_ROUNDS),
+        "passives/quickstep": parse(art.QUICKSTEP),
+        "projectiles/bullet": parse(art.BULLET),
+        "projectiles/pellet": parse(art.PELLET),
+        "ui/cap": parse(art.CAP),
+    })
+    return frames
+
+
+def pack(frames: dict[str, Image], width: int = 256) -> tuple[Image, dict[str, object]]:
+    """Shelf packer with 1px transparent padding; returns the atlas and Phaser JSON Hash."""
+    placed: dict[str, tuple[int, int, int, int]] = {}
+    x = y = shelf = 1
+    for name, image in sorted(frames.items(), key=lambda item: (-len(item[1]), item[0])):
+        h, w = len(image), len(image[0])
+        if x + w + 1 > width:
+            x, y, shelf = 1, y + shelf + 1, 0
+        placed[name] = (x, y, w, h)
+        x += w + 1
+        shelf = max(shelf, h)
+    height = 1
+    while height < y + shelf + 1:
+        height *= 2
+    atlas = blank(width, height)
+    for name, (px, py, _w, _h) in placed.items():
+        atlas = overlay(atlas, frames[name], px, py)
+    data: dict[str, object] = {
+        "frames": {name: {
+            "frame": {"x": px, "y": py, "w": w, "h": h}, "rotated": False, "trimmed": False,
+            "spriteSourceSize": {"x": 0, "y": 0, "w": w, "h": h},
+            "sourceSize": {"w": w, "h": h},
+        } for name, (px, py, w, h) in sorted(placed.items())},
+        "meta": {"app": "tools/assets/build_assets.py", "image": "sprites.png",
+                 "format": "RGBA8888", "size": {"w": width, "h": height}, "scale": "1"},
+    }
+    return atlas, data
+
+
+def wasteland_ground(size: int = 128) -> Image:
+    """Seamless dusty ground: soft patches, sparse grit, cracks, pebbles and dry grass."""
+    rng = random.Random(1957)
+    cells = 4  # periodic value noise on a 4x4 grid keeps the tile seamless
+    grid = [[rng.random() for _ in range(cells)] for _ in range(cells)]
+
+    def noise(x: int, y: int) -> float:
+        fx, fy = x * cells / size, y * cells / size
+        x0, y0 = int(fx), int(fy)
+        tx, ty = fx - x0, fy - y0
+        tx, ty = tx * tx * (3 - 2 * tx), ty * ty * (3 - 2 * ty)
+        a = grid[y0 % cells][x0 % cells]
+        b = grid[y0 % cells][(x0 + 1) % cells]
+        c = grid[(y0 + 1) % cells][x0 % cells]
+        d = grid[(y0 + 1) % cells][(x0 + 1) % cells]
+        return (a * (1 - tx) + b * tx) * (1 - ty) + (c * (1 - tx) + d * tx) * ty
+
+    base, light, dark = art.PALETTE["d"], art.PALETTE["D"], art.PALETTE["e"]
+    image: Image = []
+    for y in range(size):
+        row: list[Pixel] = []
+        for x in range(size):
+            value = noise(x, y) + (rng.random() - 0.5) * 0.12
+            tone = light if value > 0.66 else base
+            row.append((*tone, 255))
+        image.append(row)
+    for _ in range(int(size * size * 0.02)):  # sparse grit
+        x, y = rng.randrange(size), rng.randrange(size)
+        image[y][x] = (*rng.choice((light, dark)), 255)
+    crack = (*art.PALETTE["k"], 255)
+    for _ in range(4):  # cracks: short random walks that wrap around the tile edges
+        x, y = rng.randrange(size), rng.randrange(size)
+        for _ in range(rng.randrange(7, 15)):
+            image[y % size][x % size] = crack
+            x += rng.choice((-1, 0, 1, 1))
+            y += rng.choice((-1, 0, 1))
+    for _ in range(6):  # pebbles with a lit top
+        x, y = rng.randrange(size), rng.randrange(size)
+        image[y][x] = (*dark, 255)
+        image[(y - 1) % size][x] = (*art.PALETTE["s"], 255)
+    grass = [(*art.PALETTE[c], 255) for c in "hH"]
+    for _ in range(3):  # dry grass tufts
+        x, y = rng.randrange(size), rng.randrange(size)
+        for dx, dy in ((0, 0), (-1, -1), (1, -1), (0, -2), (2, -2), (-2, -2)):
+            image[(y + dy) % size][(x + dx) % size] = grass[(dx + dy) % 2]
+    return image
+
+
+def scale(image: Image, factor: int) -> Image:
+    return [[pixel for pixel in row for _ in range(factor)] for row in image for _ in range(factor)]
+
+
+def build_images(preview: Path | None) -> None:
+    frames = sprite_frames()
+    atlas, data = pack(frames)
+    (OUT / "atlas").mkdir(parents=True, exist_ok=True)
+    (OUT / "atlas" / "sprites.png").write_bytes(png(atlas))
+    (OUT / "atlas" / "sprites.json").write_text(json.dumps(data, indent=1) + "\n")
+    (OUT / "ground").mkdir(parents=True, exist_ok=True)
+    ground = wasteland_ground()
+    (OUT / "ground" / "wasteland.png").write_bytes(png(ground))
+    if preview:
+        preview.mkdir(parents=True, exist_ok=True)
+        backdrop = [[(*art.PALETTE["S"], 255)] * len(atlas[0]) for _ in atlas]
+        (preview / "atlas_x4.png").write_bytes(png(scale(overlay(backdrop, atlas, 0, 0), 4)))
+        tiled = [row * 3 for row in ground] * 2
+        hero = frames["heroes/wanderer"]
+        for index, key in enumerate(("heroes/wanderer", "enemies/ghoul", "enemies/roach")):
+            tiled = overlay(tiled, frames[key], 100 + index * 24, 60)
+        tiled = overlay(tiled, frames["xp/green"], 180, 66)
+        del hero
+        (preview / "ground_x3.png").write_bytes(png(scale(tiled, 3)))
+
+
+# --- audio ---------------------------------------------------------------------------
+
+def build_audio() -> None:
+    (OUT / "sfx").mkdir(parents=True, exist_ok=True)
+    for name, samples in audio.sound_effects().items():
+        (OUT / "sfx" / f"{name}.wav").write_bytes(audio.wav(samples))
+    ffmpeg = shutil.which("ffmpeg")
+    if ffmpeg is None:
+        raise SystemExit("ffmpeg is required to encode music (libvorbis, libmp3lame)")
+    (OUT / "music").mkdir(parents=True, exist_ok=True)
+    with tempfile.TemporaryDirectory() as tmp:
+        for name, samples in audio.music_tracks().items():
+            source = Path(tmp) / f"{name}.wav"
+            source.write_bytes(audio.wav(samples))
+            for suffix, codec in (("ogg", ["-c:a", "libvorbis", "-q:a", "3"]),
+                                  ("mp3", ["-c:a", "libmp3lame", "-b:a", "96k"])):
+                subprocess.run([
+                    ffmpeg, "-loglevel", "error", "-y", "-i", str(source), *codec,
+                    "-map_metadata", "-1", "-fflags", "+bitexact", "-flags:a", "+bitexact",
+                    str(OUT / "music" / f"{name}.{suffix}"),
+                ], check=True)
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--preview", type=Path, help="also write enlarged previews here")
+    parser.add_argument("--images-only", action="store_true")
+    args = parser.parse_args()
+    build_images(args.preview)
+    if not args.images_only:
+        build_audio()
+
+
+if __name__ == "__main__":
+    main()

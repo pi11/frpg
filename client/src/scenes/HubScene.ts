@@ -4,7 +4,10 @@ import { buyUpgrade, getProfile, startRun, type Profile } from '../api/game';
 import { getCatalog } from '../content/catalog';
 import { bundledContentHash } from '../content/hash';
 import type { StatKey, UpgradeDefinition } from '../content/schemas';
+import { ATLAS, HUB_MUSIC } from '../assets';
 import { upgradeCost } from '../economy';
+import { applyCrt, settings, updateSettings, type Settings } from '../settings';
+import { playMusic, playSfx } from '../sound';
 import type { RunData } from './RunScene';
 
 const STAT_LABELS: Record<StatKey, string> = {
@@ -50,7 +53,7 @@ export class HubScene extends Phaser.Scene {
         <p id="hub-status" class="auth-status" role="status">Загружаем профиль…</p>
         <div id="hub-body" hidden>
           <dl class="hub-stats">
-            <div><dt>Крышки</dt><dd id="hub-caps"></dd></div>
+            <div><dt>Крышки</dt><dd><img id="hub-cap-icon" class="hub-cap" alt=""><span id="hub-caps"></span></dd></div>
             <div><dt>Лучшее время</dt><dd id="hub-best"></dd></div>
             <div><dt>Забегов</dt><dd id="hub-runs"></dd></div>
           </dl>
@@ -59,6 +62,12 @@ export class HubScene extends Phaser.Scene {
           <p id="hub-location" class="hub-note"></p>
           <h2>Улучшения убежища</h2>
           <ul id="hub-upgrades" class="hub-upgrades"></ul>
+          <fieldset class="hub-settings">
+            <legend>Настройки</legend>
+            <label><input type="checkbox" data-setting="music"> Музыка</label>
+            <label><input type="checkbox" data-setting="sfx"> Звуки</label>
+            <label><input type="checkbox" data-setting="crt"> ЭЛТ-эффект</label>
+          </fieldset>
           <div class="hub-account">
             <button id="hub-link" class="auth-secondary" type="button"></button>
             <button id="hub-delete" class="auth-back hub-danger" type="button">Удалить аккаунт и данные</button>
@@ -69,6 +78,18 @@ export class HubScene extends Phaser.Scene {
     document.body.append(this.overlay);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.cleanup());
 
+    this.el<HTMLImageElement>('hub-cap-icon').src = this.textures.getBase64(ATLAS, 'ui/cap');
+    this.overlay.querySelectorAll<HTMLInputElement>('input[data-setting]').forEach((input) => {
+      const key = input.dataset.setting as keyof Settings;
+      input.checked = settings()[key];
+      input.onchange = () => {
+        updateSettings({ [key]: input.checked });
+        applyCrt();
+        if (key === 'music' && input.checked) playMusic(HUB_MUSIC);
+        playSfx('sfx/ui_click');
+      };
+    });
+    playMusic(HUB_MUSIC);
     this.el<HTMLButtonElement>('hub-start').onclick = () => void this.act(() => this.beginRun());
     this.el<HTMLButtonElement>('hub-retry').onclick = () => void this.loadProfile();
     this.el<HTMLButtonElement>('hub-link').onclick = () => this.scene.start('Auth', { linkAccount: true });
@@ -146,6 +167,7 @@ export class HubScene extends Phaser.Scene {
     if (!this.profile) return;
     try {
       this.render(await buyUpgrade(id, this.profile.version));
+      playSfx('sfx/ui_buy');
       this.status('Улучшение установлено.');
     } catch (error) {
       if (error instanceof ApiRequestError && error.status === 409) {
@@ -160,6 +182,7 @@ export class HubScene extends Phaser.Scene {
     const catalog = getCatalog();
     const location = Object.values(catalog.locations)[0];
     if (!location) throw new Error('Нет локации');
+    playSfx('sfx/ui_click');
     this.status('Открываем шлюз…');
     const [run, contentHash] = await Promise.all([
       startRun(location.id, location.startingHero), bundledContentHash(),
@@ -189,7 +212,10 @@ export class HubScene extends Phaser.Scene {
     if (this.busy || !this.active) return;
     this.busy = true;
     try { await action(); }
-    catch (error) { this.status(this.message(error), true); }
+    catch (error) {
+      playSfx('sfx/ui_error');
+      this.status(this.message(error), true);
+    }
     finally { this.busy = false; }
   }
 

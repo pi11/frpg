@@ -3,6 +3,7 @@
   "name": "Кустарный обрез",
   "sprite": "weapons/scattergun",
   "projectileSprite": "projectiles/pellet",
+  "fireSound": "sfx/shot_scatter",
   "behavior": { "type": "projectile", "params": { "speed": 280, "lifetimeMs": 650 } },
   "levels": [
     { "damage": 4, "cooldownMs": 900, "shots": 3, "spreadDegrees": 30 },

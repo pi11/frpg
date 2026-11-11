@@ -1,3 +1,5 @@
+import '@fontsource/press-start-2p/cyrillic-400.css';
+import '@fontsource/press-start-2p/latin-400.css';
 import * as Phaser from 'phaser';
 import { AuthScene } from './scenes/AuthScene';
 import { BootScene } from './scenes/BootScene';
@@ -13,7 +15,7 @@ export const game = new Phaser.Game({
   parent: 'game',
   width: 480,
   height: 270,
-  backgroundColor: '#17211c',
+  backgroundColor: '#08120b',
   pixelArt: true,
   roundPixels: true,
   antialias: false,

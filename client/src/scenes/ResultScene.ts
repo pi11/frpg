@@ -1,7 +1,10 @@
 import * as Phaser from 'phaser';
 import { finishRun, type RunSummary } from '../api/game';
+import { ATLAS } from '../assets';
 import { getCatalog } from '../content/catalog';
 import { runReward } from '../economy';
+import { playSfx, stopMusic } from '../sound';
+import { COLORS, textStyle } from '../ui/theme';
 
 export interface ResultData {
   reason: 'death' | 'survived';
@@ -32,34 +35,34 @@ export class ResultScene extends Phaser.Scene {
   }
 
   create(): void {
-    this.cameras.main.setBackgroundColor('#17211c');
-    this.add.text(240, 52, this.result.reason === 'death' ? 'ЗАБЕГ ОКОНЧЕН' : 'ВЫЖИЛ!', {
-      fontFamily: 'monospace', fontSize: '24px', color: '#9acb9b',
-    }).setOrigin(0.5);
+    stopMusic();
+    this.cameras.main.setBackgroundColor('#08120b');
+    this.add.rectangle(240, 135, 456, 246, COLORS.panel, 1).setStrokeStyle(1, COLORS.panelBorder);
+    this.add.text(240, 40, this.result.reason === 'death' ? 'ЗАБЕГ ОКОНЧЕН' : 'ВЫЖИЛ!',
+      textStyle(24, this.result.reason === 'death' ? COLORS.danger : COLORS.bright)).setOrigin(0.5);
     const minutes = Math.floor(this.result.seconds / 60).toString().padStart(2, '0');
     const seconds = (this.result.seconds % 60).toString().padStart(2, '0');
-    this.add.text(240, 100,
-      `Время ${minutes}:${seconds}   Убийств ${this.result.kills}   Уровень ${this.result.level}\nSeed ${this.result.seed}`, {
-        fontFamily: 'monospace', fontSize: '12px', color: '#e4dcba', align: 'center',
-      }).setOrigin(0.5);
-    this.rewardLabel = this.add.text(240, 150, '', {
-      fontFamily: 'monospace', fontSize: '12px', color: '#e4dcba', align: 'center',
-      wordWrap: { width: 440 },
-    }).setOrigin(0.5);
-    this.actionLabel = this.add.text(240, 215, '', {
-      fontFamily: 'monospace', fontSize: '12px', color: '#9acb9b',
-      backgroundColor: '#344835', padding: { x: 12, y: 6 },
-    }).setOrigin(0.5).setInteractive({ useHandCursor: true });
+    this.add.text(240, 86,
+      `ВРЕМЯ ${minutes}:${seconds}   УБИТО ${this.result.kills}   УР.${this.result.level}`,
+      textStyle(8, COLORS.text, { align: 'center' })).setOrigin(0.5);
+    this.add.text(240, 102, `SEED ${this.result.seed}`, textStyle(8, COLORS.dim)).setOrigin(0.5);
+    this.add.image(240, 128, ATLAS, 'ui/cap').setScale(2);
+    this.rewardLabel = this.add.text(240, 166, '', textStyle(8, COLORS.bright, {
+      align: 'center', wordWrap: { width: 420 },
+    })).setOrigin(0.5);
+    this.actionLabel = this.add.text(240, 214, '', textStyle(8, COLORS.bright, {
+      backgroundColor: '#1d3322', padding: { x: 12, y: 7 },
+    })).setOrigin(0.5).setInteractive({ useHandCursor: true });
     this.actionLabel.on('pointerdown', () => this.onAction());
     this.input.keyboard?.on('keydown-SPACE', () => this.onAction());
-    this.leaveLabel = this.add.text(240, 250, 'Вернуться без награды', {
-      fontFamily: 'monospace', fontSize: '9px', color: '#7d9782',
-    }).setOrigin(0.5).setInteractive({ useHandCursor: true })
+    this.leaveLabel = this.add.text(240, 244, 'ВЕРНУТЬСЯ БЕЗ НАГРАДЫ', textStyle(8, COLORS.dim))
+      .setOrigin(0.5).setInteractive({ useHandCursor: true })
       .on('pointerdown', () => { if (!this.sending) this.scene.start('Hub'); });
     void this.settle();
   }
 
   private onAction(): void {
+    playSfx('sfx/ui_click');
     if (this.settled) this.scene.start('Hub');
     else void this.settle();
   }
@@ -74,7 +77,7 @@ export class ResultScene extends Phaser.Scene {
       wave: summary.wave_reached, bossKilled: summary.boss_killed, pickedCaps: summary.picked_caps,
     });
     this.rewardLabel.setText(`Сервер считает награду… (≈ ${estimate} крышек)`);
-    this.actionLabel.setText('Подождите…');
+    this.actionLabel.setText('ПОДОЖДИТЕ…');
     try {
       const response = await finishRun(this.result.runId, summary);
       if (!this.scene.isActive()) return;
@@ -85,12 +88,14 @@ export class ResultScene extends Phaser.Scene {
       this.rewardLabel.setText(
         `Награда: +${response.reward_caps} крышек\nВсего: ${response.profile.caps}${note}`,
       );
-      this.actionLabel.setText('В убежище');
+      this.actionLabel.setText('В УБЕЖИЩЕ');
+      playSfx('sfx/reward');
     } catch (error) {
       if (!this.scene.isActive()) return;
       const message = error instanceof Error ? error.message : 'Не удалось связаться с сервером.';
       this.rewardLabel.setText(`Награда не получена: ${message}`);
-      this.actionLabel.setText('Повторить');
+      this.actionLabel.setText('ПОВТОРИТЬ');
+      playSfx('sfx/ui_error');
     } finally {
       this.sending = false;
     }

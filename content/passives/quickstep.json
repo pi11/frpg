@@ -2,6 +2,7 @@
   "id": "quickstep",
   "name": "Лёгкие ботинки",
   "description": "Ускоряет передвижение",
+  "sprite": "passives/quickstep",
   "stat": "moveSpeed",
   "mod": "flat",
   "perLevel": 12,

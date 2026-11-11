@@ -12,6 +12,7 @@
     "content-check": "vitest run src/content/catalog.test.ts"
   },
   "dependencies": {
+    "@fontsource/press-start-2p": "5.2.7",
     "phaser": "4.2.1",
     "qrcode": "^1.5.4",
     "zod": "^4.0.0"
