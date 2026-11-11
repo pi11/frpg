@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: client/package-lock.json
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+      - name: Install and start PostgreSQL
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql
+          sudo service postgresql start
+          sudo -u postgres createuser -s "$USER"
+          createdb wasteland
+      - name: Install dependencies
+        run: make install
+      - name: Apply migrations
+        run: make migrate
+      - name: Check code and content
+        run: |
+          make test
+          make content-check
+      - name: Check live health endpoint
+        run: |
+          uv run --project server --locked uvicorn app.main:app --app-dir server --host 127.0.0.1 --port 8000 &
+          sleep 3
+          curl --fail --silent --show-error http://127.0.0.1:8000/api/v1/health
