@@ -1,0 +1,9 @@
+{
+  "id": "ghoul",
+  "name": "Пепельный бродяга",
+  "sprite": "enemies/ghoul",
+  "ai": { "type": "chaser", "params": { "turnRate": 4 } },
+  "stats": { "hp": 12, "speed": 55, "damage": 5, "xp": 1 },
+  "drops": [],
+  "tags": ["mutant"]
+}

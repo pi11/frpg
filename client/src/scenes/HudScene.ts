@@ -52,7 +52,7 @@ export class HudScene extends Phaser.Scene {
       .fillStyle(0x8ebba4).fillRect(8, 14, 145 * (view.xp / view.nextXp), 4);
     const minutes = Math.floor(view.seconds / 60).toString().padStart(2, '0');
     const seconds = (view.seconds % 60).toString().padStart(2, '0');
-    this.stats.setText(`HP ${view.hp}/${view.maxHp}   Ур. ${view.level}   ${minutes}:${seconds}   Убийств ${view.kills}`);
+    this.stats.setText(`HP ${Math.ceil(view.hp)}/${view.maxHp}  Ур.${view.level}  Волна ${view.wave}  ${minutes}:${seconds}  Убийств ${view.kills}`);
     if (import.meta.env.DEV) {
       this.fps.setText(`FPS ${Math.round(this.game.loop.actualFps)}  врагов ${view.enemyCount}  пуль ${view.projectileCount}  seed ${view.seed}`);
     }

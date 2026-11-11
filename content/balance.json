@@ -1,56 +1,16 @@
 {
   "run": {
-    "durationSeconds": 900,
     "enemyLimit": 300,
     "projectileLimit": 500,
     "xpLimit": 400,
-    "spawnIntervalMs": 260,
     "spawnDistance": 320,
     "despawnDistance": 650,
-    "contactCooldownMs": 500
-  },
-  "hero": {
-    "maxHp": 100,
-    "moveSpeed": 120,
-    "pickupRadius": 28,
+    "contactCooldownMs": 500,
     "magnetRadius": 84,
     "magnetSpeed": 240
-  },
-  "enemy": {
-    "hp": 12,
-    "moveSpeed": 55,
-    "damage": 5,
-    "xp": 1
-  },
-  "weapon": {
-    "damage": 6,
-    "cooldownMs": 450,
-    "projectileSpeed": 310,
-    "projectileLifetimeMs": 1200
   },
   "xp": {
     "base": 5,
     "growth": 1.4
-  },
-  "upgrades": [
-    {
-      "id": "damage",
-      "name": "Заряженные патроны",
-      "description": "+3 к урону",
-      "amount": 3
-    },
-    {
-      "id": "speed",
-      "name": "Лёгкие ботинки",
-      "description": "+12 к скорости",
-      "amount": 12
-    },
-    {
-      "id": "fire_rate",
-      "name": "Быстрый затвор",
-      "description": "-40 мс между выстрелами",
-      "amount": 40,
-      "minCooldownMs": 100
-    }
-  ]
+  }
 }

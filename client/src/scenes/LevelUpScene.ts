@@ -1,6 +1,6 @@
 import * as Phaser from 'phaser';
-import balance from '../../../content/balance.json';
 import { RunScene } from './RunScene';
+import type { UpgradeChoice } from './RunScene';
 
 export class LevelUpScene extends Phaser.Scene {
   constructor() {
@@ -8,16 +8,17 @@ export class LevelUpScene extends Phaser.Scene {
   }
 
   create(): void {
+    const choices = (this.scene.get('Run') as RunScene).choices;
     this.add.rectangle(240, 135, 480, 270, 0x07100c, 0.9);
     this.add.text(240, 27, 'НОВЫЙ УРОВЕНЬ — ВЫБЕРИ УЛУЧШЕНИЕ', {
       fontFamily: 'monospace', fontSize: '14px', color: '#9acb9b',
     }).setOrigin(0.5);
 
-    balance.upgrades.forEach((upgrade, index) => {
+    choices.forEach((upgrade, index) => {
       const x = 82 + index * 158;
       const card = this.add.rectangle(x, 138, 146, 160, 0x25352a)
         .setStrokeStyle(2, 0x86ad83).setInteractive({ useHandCursor: true });
-      card.on('pointerdown', () => this.choose(upgrade.id));
+      card.on('pointerdown', () => this.choose(upgrade));
       this.add.text(x, 91, `${index + 1}. ${upgrade.name}`, {
         fontFamily: 'monospace', fontSize: '11px', color: '#e4dcba',
         align: 'center', wordWrap: { width: 130 },
@@ -29,8 +30,8 @@ export class LevelUpScene extends Phaser.Scene {
     });
     const onKey = (event: KeyboardEvent): void => {
       const index = Number(event.key) - 1;
-      const choice = balance.upgrades[index];
-      if (choice) this.choose(choice.id);
+      const choice = choices[index];
+      if (choice) this.choose(choice);
     };
     this.input.keyboard?.on('keydown', onKey);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
@@ -38,8 +39,8 @@ export class LevelUpScene extends Phaser.Scene {
     });
   }
 
-  private choose(id: string): void {
-    (this.scene.get('Run') as RunScene).applyUpgrade(id);
+  private choose(choice: UpgradeChoice): void {
+    (this.scene.get('Run') as RunScene).applyUpgrade(choice);
     this.scene.resume('Run');
     this.scene.stop();
   }

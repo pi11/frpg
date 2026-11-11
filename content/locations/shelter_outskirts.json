@@ -1,0 +1,12 @@
+{
+  "id": "shelter_outskirts",
+  "name": "Пустошь у убежища",
+  "groundSprite": "ground/wasteland",
+  "durationSeconds": 900,
+  "startingHero": "wanderer",
+  "waves": [
+    { "atSecond": 0, "spawnIntervalMs": 260, "enemies": [{ "id": "ghoul", "weight": 1 }] },
+    { "atSecond": 120, "spawnIntervalMs": 220, "enemies": [{ "id": "ghoul", "weight": 3 }, { "id": "roach", "weight": 2 }] },
+    { "atSecond": 360, "spawnIntervalMs": 180, "enemies": [{ "id": "ghoul", "weight": 2 }, { "id": "roach", "weight": 3 }] }
+  ]
+}

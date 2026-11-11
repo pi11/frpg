@@ -1,0 +1,9 @@
+{
+  "id": "quickstep",
+  "name": "Лёгкие ботинки",
+  "description": "Ускоряет передвижение",
+  "stat": "moveSpeed",
+  "mod": "flat",
+  "perLevel": 12,
+  "maxLevel": 5
+}

@@ -1,0 +1,9 @@
+{
+  "id": "heavy_rounds",
+  "name": "Заряженные патроны",
+  "description": "Повышает урон",
+  "stat": "damage",
+  "mod": "flat",
+  "perLevel": 3,
+  "maxLevel": 5
+}

@@ -8,7 +8,8 @@
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
     "lint": "eslint src && tsc --noEmit",
-    "test": "vitest run --passWithNoTests"
+    "test": "vitest run --passWithNoTests",
+    "content-check": "vitest run src/content/catalog.test.ts"
   },
   "dependencies": {
     "phaser": "4.2.1",

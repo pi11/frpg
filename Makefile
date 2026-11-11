@@ -17,4 +17,4 @@ test:
 	cd client && npm run lint && npm run test && npm run build
 
 content-check:
-	python3 scripts/content_check.py
+	cd client && npm run content-check

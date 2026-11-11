@@ -1,0 +1,18 @@
+{
+  "id": "scattergun",
+  "name": "Кустарный обрез",
+  "sprite": "weapons/scattergun",
+  "projectileSprite": "projectiles/pellet",
+  "behavior": { "type": "projectile", "params": { "speed": 280, "lifetimeMs": 650 } },
+  "levels": [
+    { "damage": 4, "cooldownMs": 900, "shots": 3, "spreadDegrees": 30 },
+    { "damage": 5, "cooldownMs": 880, "shots": 3, "spreadDegrees": 30 },
+    { "damage": 6, "cooldownMs": 860, "shots": 4, "spreadDegrees": 36 },
+    { "damage": 7, "cooldownMs": 840, "shots": 4, "spreadDegrees": 36 },
+    { "damage": 8, "cooldownMs": 820, "shots": 5, "spreadDegrees": 42 },
+    { "damage": 9, "cooldownMs": 800, "shots": 5, "spreadDegrees": 42 },
+    { "damage": 10, "cooldownMs": 780, "shots": 6, "spreadDegrees": 48 },
+    { "damage": 11, "cooldownMs": 760, "shots": 7, "spreadDegrees": 54 }
+  ],
+  "tags": ["ballistic"]
+}

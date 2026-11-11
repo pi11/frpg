@@ -1,0 +1,18 @@
+{
+  "id": "scrap_pistol",
+  "name": "Самодельный пистолет",
+  "sprite": "weapons/scrap_pistol",
+  "projectileSprite": "projectiles/bullet",
+  "behavior": { "type": "projectile", "params": { "speed": 310, "lifetimeMs": 1200 } },
+  "levels": [
+    { "damage": 6, "cooldownMs": 450, "shots": 1, "spreadDegrees": 0 },
+    { "damage": 8, "cooldownMs": 440, "shots": 1, "spreadDegrees": 0 },
+    { "damage": 10, "cooldownMs": 430, "shots": 1, "spreadDegrees": 0 },
+    { "damage": 12, "cooldownMs": 420, "shots": 1, "spreadDegrees": 0 },
+    { "damage": 14, "cooldownMs": 410, "shots": 1, "spreadDegrees": 0 },
+    { "damage": 16, "cooldownMs": 400, "shots": 1, "spreadDegrees": 0 },
+    { "damage": 18, "cooldownMs": 390, "shots": 1, "spreadDegrees": 0 },
+    { "damage": 20, "cooldownMs": 380, "shots": 2, "spreadDegrees": 12 }
+  ],
+  "tags": ["ballistic"]
+}

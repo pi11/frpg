@@ -1,0 +1,9 @@
+{
+  "id": "roach",
+  "name": "Ржавый таракан",
+  "sprite": "enemies/roach",
+  "ai": { "type": "chaser", "params": { "turnRate": 7 } },
+  "stats": { "hp": 7, "speed": 85, "damage": 3, "xp": 1 },
+  "drops": [],
+  "tags": ["insect"]
+}
