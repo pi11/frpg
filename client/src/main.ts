@@ -1,8 +1,12 @@
 import * as Phaser from 'phaser';
 import { BootScene } from './scenes/BootScene';
+import { HudScene } from './scenes/HudScene';
+import { LevelUpScene } from './scenes/LevelUpScene';
+import { ResultScene } from './scenes/ResultScene';
+import { RunScene } from './scenes/RunScene';
 import './style.css';
 
-new Phaser.Game({
+export const game = new Phaser.Game({
   type: Phaser.AUTO,
   parent: 'game',
   width: 480,
@@ -18,5 +22,9 @@ new Phaser.Game({
   physics: {
     default: 'arcade',
   },
-  scene: [BootScene],
+  scene: [BootScene, RunScene, HudScene, LevelUpScene, ResultScene],
 });
+
+if (import.meta.env.DEV) {
+  (window as Window & { __wastelandGame?: Phaser.Game }).__wastelandGame = game;
+}
