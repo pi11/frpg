@@ -12,5 +12,15 @@
   "xp": {
     "base": 5,
     "growth": 1.4
+  },
+  "reward": {
+    "base": 5,
+    "perSecond": 0.25,
+    "perKill": 0.4,
+    "perWave": 2,
+    "bossBonus": 30,
+    "maxKillsPerSecond": 5,
+    "maxCapsPerSecond": 3,
+    "durationGraceSeconds": 30
   }
 }

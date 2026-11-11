@@ -53,7 +53,7 @@ export class ApiRequestError extends Error {
   constructor(public status: number, message: string) { super(message); }
 }
 
-async function request<T>(path: string, init: RequestInit = {}, authorized = false): Promise<T> {
+export async function request<T>(path: string, init: RequestInit = {}, authorized = false): Promise<T> {
   const headers = new Headers(init.headers);
   if (init.body) headers.set('Content-Type', 'application/json');
   if (authorized && session()) headers.set('Authorization', `Bearer ${session()!.access_token}`);
@@ -73,7 +73,9 @@ async function request<T>(path: string, init: RequestInit = {}, authorized = fal
   if (!response.ok) {
     const body: unknown = await response.json().catch(() => null);
     const message = body && typeof body === 'object' && 'message' in body &&
-      typeof body.message === 'string' ? body.message : `Ошибка сервера (${response.status})`;
+      typeof body.message === 'string' ? body.message
+      : response.status >= 502 && response.status <= 504
+        ? 'Сервер недоступен. Попробуйте ещё раз.' : `Ошибка сервера (${response.status})`;
     throw new ApiRequestError(response.status, message);
   }
   if (response.status === 204) return undefined as T;

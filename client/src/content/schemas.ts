@@ -127,5 +127,15 @@ export const BalanceSchema = z.object({
     magnetSpeed: z.number().positive(),
   }).strict(),
   xp: z.object({ base: z.number().positive(), growth: z.number().positive() }).strict(),
+  reward: z.object({
+    base: z.number().nonnegative(),
+    perSecond: z.number().nonnegative(),
+    perKill: z.number().nonnegative(),
+    perWave: z.number().nonnegative(),
+    bossBonus: z.number().nonnegative(),
+    maxKillsPerSecond: z.number().positive(),
+    maxCapsPerSecond: z.number().positive(),
+    durationGraceSeconds: z.number().nonnegative(),
+  }).strict(),
 }).strict();
 export type BalanceDefinition = z.infer<typeof BalanceSchema>;

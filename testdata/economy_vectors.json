@@ -1,0 +1,841 @@
+{
+ "upgradeCost": [
+  {
+   "cost": {
+    "base": 30,
+    "growth": 1.6
+   },
+   "level": 0,
+   "expected": 30
+  },
+  {
+   "cost": {
+    "base": 30,
+    "growth": 1.6
+   },
+   "level": 1,
+   "expected": 48
+  },
+  {
+   "cost": {
+    "base": 30,
+    "growth": 1.6
+   },
+   "level": 2,
+   "expected": 77
+  },
+  {
+   "cost": {
+    "base": 30,
+    "growth": 1.6
+   },
+   "level": 3,
+   "expected": 123
+  },
+  {
+   "cost": {
+    "base": 30,
+    "growth": 1.6
+   },
+   "level": 4,
+   "expected": 197
+  },
+  {
+   "cost": {
+    "base": 30,
+    "growth": 1.6
+   },
+   "level": 5,
+   "expected": 315
+  },
+  {
+   "cost": {
+    "base": 30,
+    "growth": 1.6
+   },
+   "level": 6,
+   "expected": 503
+  },
+  {
+   "cost": {
+    "base": 30,
+    "growth": 1.6
+   },
+   "level": 7,
+   "expected": 805
+  },
+  {
+   "cost": {
+    "base": 30,
+    "growth": 1.6
+   },
+   "level": 8,
+   "expected": 1288
+  },
+  {
+   "cost": {
+    "base": 30,
+    "growth": 1.6
+   },
+   "level": 9,
+   "expected": 2062
+  },
+  {
+   "cost": {
+    "base": 30,
+    "growth": 1.6
+   },
+   "level": 10,
+   "expected": 3299
+  },
+  {
+   "cost": {
+    "base": 40,
+    "growth": 1.5
+   },
+   "level": 0,
+   "expected": 40
+  },
+  {
+   "cost": {
+    "base": 40,
+    "growth": 1.5
+   },
+   "level": 1,
+   "expected": 60
+  },
+  {
+   "cost": {
+    "base": 40,
+    "growth": 1.5
+   },
+   "level": 2,
+   "expected": 90
+  },
+  {
+   "cost": {
+    "base": 40,
+    "growth": 1.5
+   },
+   "level": 3,
+   "expected": 135
+  },
+  {
+   "cost": {
+    "base": 40,
+    "growth": 1.5
+   },
+   "level": 4,
+   "expected": 203
+  },
+  {
+   "cost": {
+    "base": 40,
+    "growth": 1.5
+   },
+   "level": 5,
+   "expected": 304
+  },
+  {
+   "cost": {
+    "base": 40,
+    "growth": 1.5
+   },
+   "level": 6,
+   "expected": 456
+  },
+  {
+   "cost": {
+    "base": 40,
+    "growth": 1.5
+   },
+   "level": 7,
+   "expected": 683
+  },
+  {
+   "cost": {
+    "base": 40,
+    "growth": 1.5
+   },
+   "level": 8,
+   "expected": 1025
+  },
+  {
+   "cost": {
+    "base": 40,
+    "growth": 1.5
+   },
+   "level": 9,
+   "expected": 1538
+  },
+  {
+   "cost": {
+    "base": 40,
+    "growth": 1.5
+   },
+   "level": 10,
+   "expected": 2307
+  },
+  {
+   "cost": {
+    "base": 2.5,
+    "growth": 1
+   },
+   "level": 0,
+   "expected": 3
+  },
+  {
+   "cost": {
+    "base": 2.5,
+    "growth": 1
+   },
+   "level": 1,
+   "expected": 3
+  },
+  {
+   "cost": {
+    "base": 2.5,
+    "growth": 1
+   },
+   "level": 2,
+   "expected": 3
+  },
+  {
+   "cost": {
+    "base": 2.5,
+    "growth": 1
+   },
+   "level": 3,
+   "expected": 3
+  },
+  {
+   "cost": {
+    "base": 2.5,
+    "growth": 1
+   },
+   "level": 4,
+   "expected": 3
+  },
+  {
+   "cost": {
+    "base": 2.5,
+    "growth": 1
+   },
+   "level": 5,
+   "expected": 3
+  },
+  {
+   "cost": {
+    "base": 2.5,
+    "growth": 1
+   },
+   "level": 6,
+   "expected": 3
+  },
+  {
+   "cost": {
+    "base": 2.5,
+    "growth": 1
+   },
+   "level": 7,
+   "expected": 3
+  },
+  {
+   "cost": {
+    "base": 2.5,
+    "growth": 1
+   },
+   "level": 8,
+   "expected": 3
+  },
+  {
+   "cost": {
+    "base": 2.5,
+    "growth": 1
+   },
+   "level": 9,
+   "expected": 3
+  },
+  {
+   "cost": {
+    "base": 2.5,
+    "growth": 1
+   },
+   "level": 10,
+   "expected": 3
+  },
+  {
+   "cost": {
+    "base": 10,
+    "growth": 1.15
+   },
+   "level": 0,
+   "expected": 10
+  },
+  {
+   "cost": {
+    "base": 10,
+    "growth": 1.15
+   },
+   "level": 1,
+   "expected": 12
+  },
+  {
+   "cost": {
+    "base": 10,
+    "growth": 1.15
+   },
+   "level": 2,
+   "expected": 13
+  },
+  {
+   "cost": {
+    "base": 10,
+    "growth": 1.15
+   },
+   "level": 3,
+   "expected": 15
+  },
+  {
+   "cost": {
+    "base": 10,
+    "growth": 1.15
+   },
+   "level": 4,
+   "expected": 17
+  },
+  {
+   "cost": {
+    "base": 10,
+    "growth": 1.15
+   },
+   "level": 5,
+   "expected": 20
+  },
+  {
+   "cost": {
+    "base": 10,
+    "growth": 1.15
+   },
+   "level": 6,
+   "expected": 23
+  },
+  {
+   "cost": {
+    "base": 10,
+    "growth": 1.15
+   },
+   "level": 7,
+   "expected": 27
+  },
+  {
+   "cost": {
+    "base": 10,
+    "growth": 1.15
+   },
+   "level": 8,
+   "expected": 31
+  },
+  {
+   "cost": {
+    "base": 10,
+    "growth": 1.15
+   },
+   "level": 9,
+   "expected": 35
+  },
+  {
+   "cost": {
+    "base": 10,
+    "growth": 1.15
+   },
+   "level": 10,
+   "expected": 40
+  },
+  {
+   "cost": {
+    "base": 0.5,
+    "growth": 3
+   },
+   "level": 0,
+   "expected": 1
+  },
+  {
+   "cost": {
+    "base": 0.5,
+    "growth": 3
+   },
+   "level": 1,
+   "expected": 2
+  },
+  {
+   "cost": {
+    "base": 0.5,
+    "growth": 3
+   },
+   "level": 2,
+   "expected": 5
+  },
+  {
+   "cost": {
+    "base": 0.5,
+    "growth": 3
+   },
+   "level": 3,
+   "expected": 14
+  },
+  {
+   "cost": {
+    "base": 0.5,
+    "growth": 3
+   },
+   "level": 4,
+   "expected": 41
+  },
+  {
+   "cost": {
+    "base": 0.5,
+    "growth": 3
+   },
+   "level": 5,
+   "expected": 122
+  },
+  {
+   "cost": {
+    "base": 0.5,
+    "growth": 3
+   },
+   "level": 6,
+   "expected": 365
+  },
+  {
+   "cost": {
+    "base": 0.5,
+    "growth": 3
+   },
+   "level": 7,
+   "expected": 1094
+  },
+  {
+   "cost": {
+    "base": 0.5,
+    "growth": 3
+   },
+   "level": 8,
+   "expected": 3281
+  },
+  {
+   "cost": {
+    "base": 0.5,
+    "growth": 3
+   },
+   "level": 9,
+   "expected": 9842
+  },
+  {
+   "cost": {
+    "base": 0.5,
+    "growth": 3
+   },
+   "level": 10,
+   "expected": 29525
+  },
+  {
+   "cost": {
+    "base": 7,
+    "growth": 1.1
+   },
+   "level": 0,
+   "expected": 7
+  },
+  {
+   "cost": {
+    "base": 7,
+    "growth": 1.1
+   },
+   "level": 1,
+   "expected": 8
+  },
+  {
+   "cost": {
+    "base": 7,
+    "growth": 1.1
+   },
+   "level": 2,
+   "expected": 8
+  },
+  {
+   "cost": {
+    "base": 7,
+    "growth": 1.1
+   },
+   "level": 3,
+   "expected": 9
+  },
+  {
+   "cost": {
+    "base": 7,
+    "growth": 1.1
+   },
+   "level": 4,
+   "expected": 10
+  },
+  {
+   "cost": {
+    "base": 7,
+    "growth": 1.1
+   },
+   "level": 5,
+   "expected": 11
+  },
+  {
+   "cost": {
+    "base": 7,
+    "growth": 1.1
+   },
+   "level": 6,
+   "expected": 12
+  },
+  {
+   "cost": {
+    "base": 7,
+    "growth": 1.1
+   },
+   "level": 7,
+   "expected": 14
+  },
+  {
+   "cost": {
+    "base": 7,
+    "growth": 1.1
+   },
+   "level": 8,
+   "expected": 15
+  },
+  {
+   "cost": {
+    "base": 7,
+    "growth": 1.1
+   },
+   "level": 9,
+   "expected": 17
+  },
+  {
+   "cost": {
+    "base": 7,
+    "growth": 1.1
+   },
+   "level": 10,
+   "expected": 18
+  }
+ ],
+ "runReward": [
+  {
+   "rules": {
+    "base": 5,
+    "perSecond": 0.25,
+    "perKill": 0.4,
+    "perWave": 2,
+    "bossBonus": 30,
+    "maxKillsPerSecond": 5,
+    "maxCapsPerSecond": 3,
+    "durationGraceSeconds": 30
+   },
+   "duration": 0,
+   "kills": 0,
+   "wave": 1,
+   "boss_killed": false,
+   "picked_caps": 0,
+   "expected": 7
+  },
+  {
+   "rules": {
+    "base": 5,
+    "perSecond": 0.25,
+    "perKill": 0.4,
+    "perWave": 2,
+    "bossBonus": 30,
+    "maxKillsPerSecond": 5,
+    "maxCapsPerSecond": 3,
+    "durationGraceSeconds": 30
+   },
+   "duration": 1,
+   "kills": 1,
+   "wave": 1,
+   "boss_killed": false,
+   "picked_caps": 0,
+   "expected": 8
+  },
+  {
+   "rules": {
+    "base": 5,
+    "perSecond": 0.25,
+    "perKill": 0.4,
+    "perWave": 2,
+    "bossBonus": 30,
+    "maxKillsPerSecond": 5,
+    "maxCapsPerSecond": 3,
+    "durationGraceSeconds": 30
+   },
+   "duration": 3,
+   "kills": 3,
+   "wave": 1,
+   "boss_killed": false,
+   "picked_caps": 1,
+   "expected": 10
+  },
+  {
+   "rules": {
+    "base": 5,
+    "perSecond": 0.25,
+    "perKill": 0.4,
+    "perWave": 2,
+    "bossBonus": 30,
+    "maxKillsPerSecond": 5,
+    "maxCapsPerSecond": 3,
+    "durationGraceSeconds": 30
+   },
+   "duration": 60,
+   "kills": 25,
+   "wave": 1,
+   "boss_killed": false,
+   "picked_caps": 4,
+   "expected": 36
+  },
+  {
+   "rules": {
+    "base": 5,
+    "perSecond": 0.25,
+    "perKill": 0.4,
+    "perWave": 2,
+    "bossBonus": 30,
+    "maxKillsPerSecond": 5,
+    "maxCapsPerSecond": 3,
+    "durationGraceSeconds": 30
+   },
+   "duration": 125,
+   "kills": 333,
+   "wave": 2,
+   "boss_killed": false,
+   "picked_caps": 17,
+   "expected": 190
+  },
+  {
+   "rules": {
+    "base": 5,
+    "perSecond": 0.25,
+    "perKill": 0.4,
+    "perWave": 2,
+    "bossBonus": 30,
+    "maxKillsPerSecond": 5,
+    "maxCapsPerSecond": 3,
+    "durationGraceSeconds": 30
+   },
+   "duration": 479,
+   "kills": 1201,
+   "wave": 3,
+   "boss_killed": true,
+   "picked_caps": 99,
+   "expected": 740
+  },
+  {
+   "rules": {
+    "base": 5,
+    "perSecond": 0.25,
+    "perKill": 0.4,
+    "perWave": 2,
+    "bossBonus": 30,
+    "maxKillsPerSecond": 5,
+    "maxCapsPerSecond": 3,
+    "durationGraceSeconds": 30
+   },
+   "duration": 900,
+   "kills": 4500,
+   "wave": 3,
+   "boss_killed": true,
+   "picked_caps": 2700,
+   "expected": 4766
+  },
+  {
+   "rules": {
+    "base": 5,
+    "perSecond": 0.25,
+    "perKill": 0.4,
+    "perWave": 2,
+    "bossBonus": 30,
+    "maxKillsPerSecond": 5,
+    "maxCapsPerSecond": 3,
+    "durationGraceSeconds": 30
+   },
+   "duration": 7,
+   "kills": 0,
+   "wave": 2,
+   "boss_killed": true,
+   "picked_caps": 0,
+   "expected": 41
+  },
+  {
+   "rules": {
+    "base": 0.5,
+    "perSecond": 0.1,
+    "perKill": 0.35,
+    "perWave": 1.25,
+    "bossBonus": 12.5,
+    "maxKillsPerSecond": 1,
+    "maxCapsPerSecond": 1,
+    "durationGraceSeconds": 0
+   },
+   "duration": 0,
+   "kills": 0,
+   "wave": 1,
+   "boss_killed": false,
+   "picked_caps": 0,
+   "expected": 2
+  },
+  {
+   "rules": {
+    "base": 0.5,
+    "perSecond": 0.1,
+    "perKill": 0.35,
+    "perWave": 1.25,
+    "bossBonus": 12.5,
+    "maxKillsPerSecond": 1,
+    "maxCapsPerSecond": 1,
+    "durationGraceSeconds": 0
+   },
+   "duration": 1,
+   "kills": 1,
+   "wave": 1,
+   "boss_killed": false,
+   "picked_caps": 0,
+   "expected": 2
+  },
+  {
+   "rules": {
+    "base": 0.5,
+    "perSecond": 0.1,
+    "perKill": 0.35,
+    "perWave": 1.25,
+    "bossBonus": 12.5,
+    "maxKillsPerSecond": 1,
+    "maxCapsPerSecond": 1,
+    "durationGraceSeconds": 0
+   },
+   "duration": 3,
+   "kills": 3,
+   "wave": 1,
+   "boss_killed": false,
+   "picked_caps": 1,
+   "expected": 4
+  },
+  {
+   "rules": {
+    "base": 0.5,
+    "perSecond": 0.1,
+    "perKill": 0.35,
+    "perWave": 1.25,
+    "bossBonus": 12.5,
+    "maxKillsPerSecond": 1,
+    "maxCapsPerSecond": 1,
+    "durationGraceSeconds": 0
+   },
+   "duration": 60,
+   "kills": 25,
+   "wave": 1,
+   "boss_killed": false,
+   "picked_caps": 4,
+   "expected": 21
+  },
+  {
+   "rules": {
+    "base": 0.5,
+    "perSecond": 0.1,
+    "perKill": 0.35,
+    "perWave": 1.25,
+    "bossBonus": 12.5,
+    "maxKillsPerSecond": 1,
+    "maxCapsPerSecond": 1,
+    "durationGraceSeconds": 0
+   },
+   "duration": 125,
+   "kills": 333,
+   "wave": 2,
+   "boss_killed": false,
+   "picked_caps": 17,
+   "expected": 149
+  },
+  {
+   "rules": {
+    "base": 0.5,
+    "perSecond": 0.1,
+    "perKill": 0.35,
+    "perWave": 1.25,
+    "bossBonus": 12.5,
+    "maxKillsPerSecond": 1,
+    "maxCapsPerSecond": 1,
+    "durationGraceSeconds": 0
+   },
+   "duration": 479,
+   "kills": 1201,
+   "wave": 3,
+   "boss_killed": true,
+   "picked_caps": 99,
+   "expected": 584
+  },
+  {
+   "rules": {
+    "base": 0.5,
+    "perSecond": 0.1,
+    "perKill": 0.35,
+    "perWave": 1.25,
+    "bossBonus": 12.5,
+    "maxKillsPerSecond": 1,
+    "maxCapsPerSecond": 1,
+    "durationGraceSeconds": 0
+   },
+   "duration": 900,
+   "kills": 4500,
+   "wave": 3,
+   "boss_killed": true,
+   "picked_caps": 2700,
+   "expected": 4382
+  },
+  {
+   "rules": {
+    "base": 0.5,
+    "perSecond": 0.1,
+    "perKill": 0.35,
+    "perWave": 1.25,
+    "bossBonus": 12.5,
+    "maxKillsPerSecond": 1,
+    "maxCapsPerSecond": 1,
+    "durationGraceSeconds": 0
+   },
+   "duration": 7,
+   "kills": 0,
+   "wave": 2,
+   "boss_killed": true,
+   "picked_caps": 0,
+   "expected": 16
+  }
+ ],
+ "contentDigest": [
+  {
+   "files": {},
+   "expected": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "files": {
+    "content/a.json": "{\"x\": 1}\n"
+   },
+   "expected": "a153c970c4c58cda4739d9435f70ec71c8f18d5af26961e916efe5a70ee9c9c0"
+  },
+  {
+   "files": {
+    "content/b/z.json": "{\"name\": \"Пепельный бродяга\"}\n",
+    "content/a.json": "[1.0, 2e3]"
+   },
+   "expected": "97a8df368c7a7efbef64147574f47942ea850e7980beedaa598794f81c747e6e"
+  }
+ ]
+}

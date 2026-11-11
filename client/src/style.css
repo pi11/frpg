@@ -56,3 +56,19 @@ body,
 .auth-telegram-details img { display: block; width: 160px; height: 160px; margin: 12px auto; background: #f1ecda; }
 .auth-telegram-details small { display: block; line-height: 1.4; }
 [hidden] { display: none !important; }
+
+.hub-card { width: min(100%, 520px); }
+.hub-card h2 { margin: 22px 0 10px; color: #b3d899; font-size: 14px; letter-spacing: 0.12em; }
+.hub-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 0 0 16px; }
+.hub-stats div { padding: 8px; border: 1px solid #3d5240; background: #141d17; }
+.hub-stats dt { color: #92ac88; font-size: 11px; }
+.hub-stats dd { margin: 4px 0 0; color: #e6ddc3; font-size: 18px; }
+.hub-note { color: #7d9782; font-size: 11px; text-align: center; }
+.hub-upgrades { margin: 0; padding: 0; list-style: none; }
+.hub-upgrades li { display: flex; gap: 12px; align-items: center; justify-content: space-between; padding: 8px 0; border-top: 1px solid #2c3b2f; }
+.hub-upgrades small { display: block; margin-top: 3px; color: #92ac88; }
+.hub-upgrades button { flex: none; min-width: 112px; }
+.hub-level { color: #c6b791; font-size: 12px; }
+.hub-account { display: grid; gap: 8px; margin-top: 20px; }
+.hub-danger { color: #d38d7d; }
+.auth-card button:disabled { cursor: default; opacity: 0.45; background: #324937; }

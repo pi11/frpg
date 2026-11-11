@@ -1,0 +1,9 @@
+{
+  "id": "field_training",
+  "name": "Полевая подготовка",
+  "stat": "maxHp",
+  "mod": "flat",
+  "perLevel": 10,
+  "maxLevel": 5,
+  "cost": { "base": 40, "growth": 1.5 }
+}

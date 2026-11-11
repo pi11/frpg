@@ -8,6 +8,7 @@ import type {
 } from '../content/schemas';
 import { inputState } from '../inputState';
 import { Rng } from '../systems/rng';
+import type { ResultData } from './ResultScene';
 
 export interface RunView {
   hp: number;
@@ -30,11 +31,15 @@ export interface UpgradeChoice {
   description: string;
 }
 
-interface RunData {
+export interface RunData {
   seed: number;
   locationId: string;
   heroId: string;
   wave: number;
+  runId: string;
+  contentHash: string;
+  /** Shelter upgrade levels from the server profile. */
+  upgrades: Record<string, number>;
 }
 
 interface OwnedWeapon {
@@ -64,6 +69,10 @@ export class RunScene extends Phaser.Scene {
   private fireContext!: FireContext;
   private ownedWeapons = new Map<string, OwnedWeapon>();
   private ownedPassives = new Map<string, number>();
+  private shelterUpgrades: Record<string, number> = {};
+  private killsByType: Record<string, number> = {};
+  private runId = '';
+  private contentHash = '';
   private waveIndex = 0;
   private elapsedMs = 0;
   private spawnClock = 0;
@@ -84,6 +93,10 @@ export class RunScene extends Phaser.Scene {
     this.rng = new Rng(data.seed);
     this.ownedWeapons = new Map([[hero.startingWeapon, { level: 1, clock: 0 }]]);
     this.ownedPassives = new Map();
+    this.shelterUpgrades = { ...data.upgrades };
+    this.killsByType = {};
+    this.runId = data.runId;
+    this.contentHash = data.contentHash;
     this.waveIndex = Math.min(data.wave, location.waves.length - 1);
     this.elapsedMs = location.waves[this.waveIndex]!.atSecond * 1000;
     this.spawnClock = 0;
@@ -135,6 +148,7 @@ export class RunScene extends Phaser.Scene {
         const { x, y } = enemy;
         enemy.disableBody(true, true);
         this.view.kills += 1;
+        this.killsByType[definition.id] = (this.killsByType[definition.id] ?? 0) + 1;
         this.dropXp(x, y, definition.stats.xp);
       } else {
         enemy.setData('hp', hp);
@@ -209,6 +223,12 @@ export class RunScene extends Phaser.Scene {
       if (passive.stat !== key) continue;
       if (passive.mod === 'flat') flat += passive.perLevel * level;
       else percent += passive.perLevel * level;
+    }
+    for (const [id, level] of Object.entries(this.shelterUpgrades)) {
+      const upgrade = this.catalog.upgrades[id];
+      if (!upgrade || upgrade.stat !== key) continue;
+      if (upgrade.mod === 'flat') flat += upgrade.perLevel * level;
+      else percent += upgrade.perLevel * level;
     }
     return (this.heroDefinition.baseStats[key] + flat) * (1 + percent);
   }
@@ -418,9 +438,18 @@ export class RunScene extends Phaser.Scene {
     this.finished = true;
     this.hero.setVelocity(0, 0);
     this.scene.stop('Hud');
-    this.scene.start('Result', {
+    const result: ResultData = {
       reason, seconds: this.view.seconds, kills: this.view.kills,
-      level: this.view.level, seed: this.view.seed,
-    });
+      level: this.view.level, seed: this.view.seed, runId: this.runId,
+      summary: {
+        content_hash: this.contentHash,
+        duration_seconds: this.view.seconds,
+        kills_by_type: { ...this.killsByType },
+        wave_reached: this.view.wave,
+        boss_killed: false,
+        picked_caps: 0,
+      },
+    };
+    this.scene.start('Result', result);
   }
 }

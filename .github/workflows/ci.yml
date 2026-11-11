@@ -27,11 +27,14 @@ jobs:
           sudo service postgresql start
           sudo -u postgres createuser -s "$USER"
           createdb wasteland
+          createdb wasteland_test
       - name: Install dependencies
         run: make install
       - name: Apply migrations
         run: make migrate
       - name: Check code and content
+        env:
+          TEST_DATABASE_URL: postgresql+asyncpg:///wasteland_test
         run: |
           make test
           make content-check
