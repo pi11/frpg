@@ -1,0 +1,12 @@
+{
+  "id": "ammo_press",
+  "name": "Пресс для патронов",
+  "stat": "damage",
+  "mod": "flat",
+  "perLevel": 1,
+  "maxLevel": 5,
+  "cost": {
+    "base": 60,
+    "growth": 1.6
+  }
+}

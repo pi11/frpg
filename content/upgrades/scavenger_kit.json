@@ -1,0 +1,12 @@
+{
+  "id": "scavenger_kit",
+  "name": "Набор мусорщика",
+  "stat": "pickupRadius",
+  "mod": "flat",
+  "perLevel": 6,
+  "maxLevel": 5,
+  "cost": {
+    "base": 30,
+    "growth": 1.5
+  }
+}

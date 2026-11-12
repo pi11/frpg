@@ -1,0 +1,28 @@
+{
+  "id": "drone_swarm",
+  "name": "Рой дронов",
+  "sprite": "weapons/drone_swarm",
+  "projectileSprite": "projectiles/drone",
+  "fireSound": "sfx/drone",
+  "behavior": {
+    "type": "orbit",
+    "params": {
+      "orbitSpeed": 4.2,
+      "hitCooldownMs": 350
+    }
+  },
+  "levels": [
+    {
+      "damage": 26,
+      "cooldownMs": 1000,
+      "shots": 7,
+      "spreadDegrees": 0,
+      "radius": 60,
+      "durationMs": 1200
+    }
+  ],
+  "tags": [
+    "energy"
+  ],
+  "evolved": true
+}

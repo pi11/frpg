@@ -1,0 +1,87 @@
+{
+  "id": "orbit_drone",
+  "name": "Дрон-спутник",
+  "sprite": "weapons/orbit_drone",
+  "projectileSprite": "projectiles/drone",
+  "fireSound": "sfx/drone",
+  "behavior": {
+    "type": "orbit",
+    "params": {
+      "orbitSpeed": 3.4,
+      "hitCooldownMs": 450
+    }
+  },
+  "levels": [
+    {
+      "damage": 6,
+      "cooldownMs": 3200,
+      "shots": 1,
+      "spreadDegrees": 0,
+      "radius": 34,
+      "durationMs": 3200
+    },
+    {
+      "damage": 7,
+      "cooldownMs": 3100,
+      "shots": 2,
+      "spreadDegrees": 0,
+      "radius": 34,
+      "durationMs": 3400
+    },
+    {
+      "damage": 8,
+      "cooldownMs": 3000,
+      "shots": 2,
+      "spreadDegrees": 0,
+      "radius": 38,
+      "durationMs": 3600
+    },
+    {
+      "damage": 9,
+      "cooldownMs": 2900,
+      "shots": 3,
+      "spreadDegrees": 0,
+      "radius": 38,
+      "durationMs": 3800
+    },
+    {
+      "damage": 11,
+      "cooldownMs": 2800,
+      "shots": 3,
+      "spreadDegrees": 0,
+      "radius": 42,
+      "durationMs": 4000
+    },
+    {
+      "damage": 13,
+      "cooldownMs": 2700,
+      "shots": 4,
+      "spreadDegrees": 0,
+      "radius": 42,
+      "durationMs": 4300
+    },
+    {
+      "damage": 15,
+      "cooldownMs": 2500,
+      "shots": 4,
+      "spreadDegrees": 0,
+      "radius": 46,
+      "durationMs": 4600
+    },
+    {
+      "damage": 18,
+      "cooldownMs": 2300,
+      "shots": 5,
+      "spreadDegrees": 0,
+      "radius": 48,
+      "durationMs": 5000
+    }
+  ],
+  "tags": [
+    "energy"
+  ],
+  "evolution": {
+    "passive": "scrap_magnet",
+    "into": "drone_swarm"
+  }
+}

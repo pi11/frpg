@@ -1,4 +1,5 @@
 import * as Phaser from 'phaser';
+import { ATLAS } from '../assets';
 import { playSfx } from '../sound';
 import { VirtualJoystick } from '../ui/VirtualJoystick';
 import { COLORS, textStyle } from '../ui/theme';
@@ -12,6 +13,10 @@ export class HudScene extends Phaser.Scene {
   private level!: Phaser.GameObjects.Text;
   private timer!: Phaser.GameObjects.Text;
   private fps!: Phaser.GameObjects.Text;
+  private caps!: Phaser.GameObjects.Text;
+  private bossName!: Phaser.GameObjects.Text;
+  private bossBar!: Phaser.GameObjects.Graphics;
+  private warning!: Phaser.GameObjects.Text;
   private pausePanel!: Phaser.GameObjects.Container;
   private refreshAt = 0;
 
@@ -31,6 +36,13 @@ export class HudScene extends Phaser.Scene {
     this.timer = this.add.text(240, 31, '', textStyle(16, COLORS.bright)).setOrigin(0.5, 0);
     this.stats = this.add.text(166, 15, '', textStyle(8, COLORS.text));
     this.fps = this.add.text(6, 260, '', textStyle(8, COLORS.dim));
+    this.add.image(392, 9, ATLAS, 'ui/cap');
+    this.caps = this.add.text(402, 5, '0', textStyle(8, COLORS.warn));
+    this.bossName = this.add.text(240, 238, '', textStyle(8, COLORS.danger)).setOrigin(0.5);
+    this.bossBar = this.add.graphics();
+    this.warning = this.add.text(240, 90, '', textStyle(16, COLORS.danger, {
+      backgroundColor: '#1a0806', padding: { x: 8, y: 6 },
+    })).setOrigin(0.5).setDepth(80).setVisible(false);
 
     const panel = this.add.rectangle(0, 0, 200, 64, COLORS.panel, 0.92)
       .setStrokeStyle(1, COLORS.panelBorder);
@@ -65,13 +77,25 @@ export class HudScene extends Phaser.Scene {
     this.timer.setText(`${minutes}:${seconds}`);
     this.level.setText(`${Math.ceil(view.hp)}/${Math.round(view.maxHp)}  УР.${view.level}`);
     this.stats.setText(`ВОЛНА ${view.wave}  УБИТО ${view.kills}`);
+    this.caps.setText(String(view.caps));
+    this.bossBar.clear();
+    if (view.boss) {
+      this.bossName.setText(view.boss.name.toUpperCase()).setVisible(true);
+      this.bossBar.fillStyle(COLORS.barBack).fillRect(120, 248, 240, 6)
+        .fillStyle(COLORS.hp).fillRect(120, 248, Math.round(240 * view.boss.fraction), 6)
+        .lineStyle(1, COLORS.panelBorder).strokeRect(119.5, 247.5, 241, 7);
+    } else {
+      this.bossName.setVisible(false);
+    }
+    this.warning.setText(view.warning).setVisible(Boolean(view.warning)
+      && (view.warning === 'ПОБЕДА!' || Math.floor(time / 250) % 2 === 0));
     if (import.meta.env.DEV) {
       this.fps.setText(`FPS ${Math.round(this.game.loop.actualFps)} ВРАГОВ ${view.enemyCount} ПУЛЬ ${view.projectileCount} SEED ${view.seed}`);
     }
   }
 
   private togglePause(): void {
-    if (this.scene.isActive('LevelUp')) return;
+    if (this.scene.isActive('LevelUp') || this.scene.isActive('Chest')) return;
     playSfx('sfx/ui_click');
     if (this.scene.isPaused('Run')) {
       this.scene.resume('Run');

@@ -3,6 +3,7 @@ import '@fontsource/press-start-2p/latin-400.css';
 import * as Phaser from 'phaser';
 import { AuthScene } from './scenes/AuthScene';
 import { BootScene } from './scenes/BootScene';
+import { ChestScene } from './scenes/ChestScene';
 import { HubScene } from './scenes/HubScene';
 import { HudScene } from './scenes/HudScene';
 import { LevelUpScene } from './scenes/LevelUpScene';
@@ -26,7 +27,7 @@ export const game = new Phaser.Game({
   physics: {
     default: 'arcade',
   },
-  scene: [AuthScene, BootScene, HubScene, RunScene, HudScene, LevelUpScene, ResultScene],
+  scene: [AuthScene, BootScene, HubScene, RunScene, HudScene, LevelUpScene, ChestScene, ResultScene],
 });
 
 if (import.meta.env.DEV) {

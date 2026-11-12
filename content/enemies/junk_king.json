@@ -1,0 +1,71 @@
+{
+  "id": "junk_king",
+  "name": "Король свалки",
+  "sprite": "enemies/junk_king",
+  "role": "boss",
+  "ai": {
+    "type": "boss_phases",
+    "params": {
+      "phases": [
+        {
+          "hpBelow": 1,
+          "ai": {
+            "type": "chaser",
+            "params": {
+              "turnRate": 2.5
+            }
+          }
+        },
+        {
+          "hpBelow": 0.66,
+          "ai": {
+            "type": "ranged",
+            "params": {
+              "turnRate": 3,
+              "preferredRange": 140,
+              "fireCooldownMs": 1300,
+              "projectileSpeed": 140,
+              "projectileDamage": 12,
+              "projectileSprite": "projectiles/slug",
+              "lifetimeMs": 3000,
+              "shots": 7,
+              "spreadDegrees": 80
+            }
+          },
+          "summon": {
+            "enemy": "roach",
+            "count": 10
+          }
+        },
+        {
+          "hpBelow": 0.33,
+          "ai": {
+            "type": "charger",
+            "params": {
+              "turnRate": 4,
+              "chargeRange": 200,
+              "windupMs": 700,
+              "chargeSpeed": 210,
+              "chargeMs": 700,
+              "cooldownMs": 1600
+            }
+          },
+          "summon": {
+            "enemy": "cleaner_bot",
+            "count": 8
+          }
+        }
+      ]
+    }
+  },
+  "stats": {
+    "hp": 4000,
+    "speed": 66,
+    "damage": 22,
+    "xp": 0
+  },
+  "drops": [],
+  "tags": [
+    "boss"
+  ]
+}

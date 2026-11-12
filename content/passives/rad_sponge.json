@@ -1,0 +1,10 @@
+{
+  "id": "rad_sponge",
+  "name": "Радиогубка",
+  "description": "Восстанавливает здоровье",
+  "sprite": "passives/rad_sponge",
+  "stat": "regen",
+  "mod": "flat",
+  "perLevel": 0.3,
+  "maxLevel": 5
+}

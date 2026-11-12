@@ -1,0 +1,41 @@
+{
+  "id": "scorpion",
+  "name": "Пустынный скорпион",
+  "sprite": "enemies/scorpion",
+  "role": "normal",
+  "ai": {
+    "type": "charger",
+    "params": {
+      "turnRate": 5,
+      "chargeRange": 120,
+      "windupMs": 650,
+      "chargeSpeed": 230,
+      "chargeMs": 450,
+      "cooldownMs": 1900
+    }
+  },
+  "stats": {
+    "hp": 30,
+    "speed": 48,
+    "damage": 12,
+    "xp": 2
+  },
+  "drops": [
+    {
+      "item": "caps",
+      "chance": 0.03,
+      "amount": [
+        1,
+        3
+      ]
+    },
+    {
+      "item": "pickup",
+      "id": "medkit",
+      "chance": 0.006
+    }
+  ],
+  "tags": [
+    "insect"
+  ]
+}

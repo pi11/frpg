@@ -3,11 +3,315 @@
   "name": "Пустошь у убежища",
   "groundSprite": "ground/wasteland",
   "music": "music/wasteland",
+  "bossMusic": "music/boss",
   "durationSeconds": 900,
   "startingHero": "wanderer",
   "waves": [
-    { "atSecond": 0, "spawnIntervalMs": 260, "enemies": [{ "id": "ghoul", "weight": 1 }] },
-    { "atSecond": 120, "spawnIntervalMs": 220, "enemies": [{ "id": "ghoul", "weight": 3 }, { "id": "roach", "weight": 2 }] },
-    { "atSecond": 360, "spawnIntervalMs": 180, "enemies": [{ "id": "ghoul", "weight": 2 }, { "id": "roach", "weight": 3 }] }
-  ]
+    {
+      "atSecond": 0,
+      "spawnIntervalMs": 520,
+      "hpMultiplier": 1,
+      "speedMultiplier": 1,
+      "enemies": [
+        {
+          "id": "ghoul",
+          "weight": 1
+        }
+      ]
+    },
+    {
+      "atSecond": 60,
+      "spawnIntervalMs": 400,
+      "hpMultiplier": 1.1,
+      "speedMultiplier": 1,
+      "enemies": [
+        {
+          "id": "ghoul",
+          "weight": 3
+        },
+        {
+          "id": "roach",
+          "weight": 1
+        }
+      ]
+    },
+    {
+      "atSecond": 120,
+      "spawnIntervalMs": 320,
+      "hpMultiplier": 1.25,
+      "speedMultiplier": 1.05,
+      "enemies": [
+        {
+          "id": "ghoul",
+          "weight": 3
+        },
+        {
+          "id": "roach",
+          "weight": 2
+        }
+      ]
+    },
+    {
+      "atSecond": 240,
+      "spawnIntervalMs": 260,
+      "hpMultiplier": 1.6,
+      "speedMultiplier": 1.1,
+      "enemies": [
+        {
+          "id": "ghoul",
+          "weight": 3
+        },
+        {
+          "id": "roach",
+          "weight": 2
+        },
+        {
+          "id": "scorpion",
+          "weight": 1
+        }
+      ]
+    },
+    {
+      "atSecond": 360,
+      "spawnIntervalMs": 220,
+      "hpMultiplier": 2.0,
+      "speedMultiplier": 1.15,
+      "enemies": [
+        {
+          "id": "ghoul",
+          "weight": 2
+        },
+        {
+          "id": "roach",
+          "weight": 2
+        },
+        {
+          "id": "scorpion",
+          "weight": 1
+        },
+        {
+          "id": "raider",
+          "weight": 1
+        }
+      ]
+    },
+    {
+      "atSecond": 480,
+      "spawnIntervalMs": 175,
+      "hpMultiplier": 2.9,
+      "speedMultiplier": 1.25,
+      "enemies": [
+        {
+          "id": "ghoul",
+          "weight": 2
+        },
+        {
+          "id": "roach",
+          "weight": 2
+        },
+        {
+          "id": "scorpion",
+          "weight": 1
+        },
+        {
+          "id": "raider",
+          "weight": 1
+        },
+        {
+          "id": "cleaner_bot",
+          "weight": 1
+        }
+      ]
+    },
+    {
+      "atSecond": 600,
+      "spawnIntervalMs": 145,
+      "hpMultiplier": 3.7,
+      "speedMultiplier": 1.35,
+      "enemies": [
+        {
+          "id": "ghoul",
+          "weight": 2
+        },
+        {
+          "id": "roach",
+          "weight": 1
+        },
+        {
+          "id": "scorpion",
+          "weight": 2
+        },
+        {
+          "id": "raider",
+          "weight": 1
+        },
+        {
+          "id": "cleaner_bot",
+          "weight": 1
+        }
+      ]
+    },
+    {
+      "atSecond": 720,
+      "spawnIntervalMs": 125,
+      "hpMultiplier": 4.6,
+      "speedMultiplier": 1.45,
+      "enemies": [
+        {
+          "id": "ghoul",
+          "weight": 2
+        },
+        {
+          "id": "roach",
+          "weight": 1
+        },
+        {
+          "id": "scorpion",
+          "weight": 2
+        },
+        {
+          "id": "raider",
+          "weight": 2
+        },
+        {
+          "id": "cleaner_bot",
+          "weight": 2
+        }
+      ]
+    },
+    {
+      "atSecond": 780,
+      "spawnIntervalMs": 900,
+      "hpMultiplier": 4.6,
+      "speedMultiplier": 1.45,
+      "enemies": [
+        {
+          "id": "ghoul",
+          "weight": 2
+        },
+        {
+          "id": "roach",
+          "weight": 2
+        },
+        {
+          "id": "scorpion",
+          "weight": 1
+        },
+        {
+          "id": "raider",
+          "weight": 1
+        },
+        {
+          "id": "cleaner_bot",
+          "weight": 1
+        }
+      ]
+    }
+  ],
+  "events": [
+    {
+      "atSecond": 270,
+      "enemy": "brute",
+      "count": 1
+    },
+    {
+      "atSecond": 510,
+      "enemy": "war_bot",
+      "count": 1
+    },
+    {
+      "atSecond": 690,
+      "enemy": "brute",
+      "count": 2
+    }
+  ],
+  "boss": {
+    "atSecond": 780,
+    "enemy": "junk_king"
+  },
+  "decor": {
+    "chunkSize": 256,
+    "patches": {
+      "perChunk": [
+        1,
+        3
+      ],
+      "items": [
+        {
+          "sprite": "decor/asphalt",
+          "weight": 2
+        },
+        {
+          "sprite": "decor/crater",
+          "weight": 2
+        },
+        {
+          "sprite": "decor/rad_puddle",
+          "weight": 1
+        },
+        {
+          "sprite": "decor/dune",
+          "weight": 3
+        }
+      ]
+    },
+    "objects": {
+      "perChunk": [
+        3,
+        7
+      ],
+      "items": [
+        {
+          "sprite": "decor/car_wreck",
+          "weight": 1
+        },
+        {
+          "sprite": "decor/barrel",
+          "weight": 3
+        },
+        {
+          "sprite": "decor/dead_tree",
+          "weight": 3
+        },
+        {
+          "sprite": "decor/rocks",
+          "weight": 4
+        },
+        {
+          "sprite": "decor/bones",
+          "weight": 3
+        },
+        {
+          "sprite": "decor/tires",
+          "weight": 2
+        }
+      ]
+    },
+    "crates": {
+      "sprite": "decor/crate",
+      "hp": 10,
+      "perChunk": [
+        0,
+        1
+      ],
+      "drops": [
+        {
+          "pickup": "medkit",
+          "weight": 4
+        },
+        {
+          "pickup": "caps_stash",
+          "weight": 2
+        },
+        {
+          "pickup": "magnet",
+          "weight": 1
+        },
+        {
+          "pickup": "pulse_bomb",
+          "weight": 1
+        }
+      ]
+    }
+  }
 }

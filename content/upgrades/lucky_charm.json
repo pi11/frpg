@@ -1,0 +1,12 @@
+{
+  "id": "lucky_charm",
+  "name": "Талисман на удачу",
+  "stat": "luck",
+  "mod": "flat",
+  "perLevel": 0.05,
+  "maxLevel": 5,
+  "cost": {
+    "base": 45,
+    "growth": 1.6
+  }
+}

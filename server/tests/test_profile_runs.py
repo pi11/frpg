@@ -240,3 +240,36 @@ async def test_profile_and_run_endpoint_errors(api: dict[str, object]) -> None:
     assert priced.status_code == 200
     field = get_content().category("upgrades")["field_training"]
     assert priced.json()["caps"] == 10**6 - upgrade_cost(field, 0)
+
+
+@pytest.mark.anyio
+async def test_boss_kill_counts_only_after_the_boss_appears(api: dict[str, object]) -> None:
+    client: httpx.AsyncClient = api["client"]  # type: ignore[assignment]
+    factory: async_sessionmaker[AsyncSession] = api["factory"]  # type: ignore[assignment]
+    auth = headers((await client.post("/api/v1/auth/guest")).json())
+    location = get_content().category("locations")["shelter_outskirts"]
+    boss = location["boss"]
+    body = {"location_id": "shelter_outskirts", "hero_id": "wanderer"}
+    summary = {
+        "content_hash": get_content().hash, "kills_by_type": {boss["enemy"]: 1, "ghoul": 50},
+        "wave_reached": 1, "boss_killed": True, "picked_caps": 0,
+    }
+    early = (await client.post("/api/v1/runs/start", json=body, headers=auth)).json()
+    rejected = await client.post(f"/api/v1/runs/{early['run_id']}/finish",
+                                 json={**summary, "duration_seconds": 60}, headers=auth)
+    assert "boss_clamped" in rejected.json()["flags"]
+
+    late = (await client.post("/api/v1/runs/start", json=body, headers=auth)).json()
+    async with factory() as session:
+        run = await session.get(Run, UUID(late["run_id"]))
+        assert run is not None
+        run.started_at = run.started_at - timedelta(seconds=boss["atSecond"] + 20)
+        await session.commit()
+    waves = sum(1 for wave in location["waves"] if wave["atSecond"] <= boss["atSecond"] + 10)
+    accepted = await client.post(f"/api/v1/runs/{late['run_id']}/finish", json={
+        **summary, "duration_seconds": boss["atSecond"] + 10, "wave_reached": waves,
+    }, headers=auth)
+    data = accepted.json()
+    assert data["flags"] == []
+    rules = get_content().balance["reward"]
+    assert data["reward_caps"] == run_reward(rules, boss["atSecond"] + 10, 51, waves, True, 0)

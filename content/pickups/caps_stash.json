@@ -1,0 +1,16 @@
+{
+  "id": "caps_stash",
+  "name": "Заначка крышек",
+  "sprite": "pickups/caps_stash",
+  "sound": "sfx/cap",
+  "attract": false,
+  "effect": {
+    "type": "caps",
+    "params": {
+      "amount": [
+        4,
+        10
+      ]
+    }
+  }
+}

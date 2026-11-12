@@ -1,0 +1,10 @@
+{
+  "id": "lucky_cap",
+  "name": "Счастливая крышка",
+  "description": "Больше добычи из врагов и ящиков",
+  "sprite": "passives/lucky_cap",
+  "stat": "luck",
+  "mod": "flat",
+  "perLevel": 0.15,
+  "maxLevel": 5
+}

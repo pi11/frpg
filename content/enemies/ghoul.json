@@ -2,8 +2,35 @@
   "id": "ghoul",
   "name": "Пепельный бродяга",
   "sprite": "enemies/ghoul",
-  "ai": { "type": "chaser", "params": { "turnRate": 4 } },
-  "stats": { "hp": 12, "speed": 55, "damage": 5, "xp": 1 },
-  "drops": [],
-  "tags": ["mutant"]
+  "role": "normal",
+  "ai": {
+    "type": "chaser",
+    "params": {
+      "turnRate": 4
+    }
+  },
+  "stats": {
+    "hp": 12,
+    "speed": 55,
+    "damage": 7,
+    "xp": 1
+  },
+  "drops": [
+    {
+      "item": "caps",
+      "chance": 0.015,
+      "amount": [
+        1,
+        2
+      ]
+    },
+    {
+      "item": "pickup",
+      "id": "medkit",
+      "chance": 0.002
+    }
+  ],
+  "tags": [
+    "mutant"
+  ]
 }

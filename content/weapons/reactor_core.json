@@ -1,0 +1,24 @@
+{
+  "id": "reactor_core",
+  "name": "Сердце реактора",
+  "sprite": "weapons/reactor_core",
+  "projectileSprite": "projectiles/rad",
+  "fireSound": "sfx/aura",
+  "behavior": {
+    "type": "aura",
+    "params": {}
+  },
+  "levels": [
+    {
+      "damage": 18,
+      "cooldownMs": 380,
+      "shots": 1,
+      "spreadDegrees": 0,
+      "radius": 92
+    }
+  ],
+  "tags": [
+    "radiation"
+  ],
+  "evolved": true
+}

@@ -1,0 +1,12 @@
+{
+  "id": "vault_gym",
+  "name": "Беговая дорожка",
+  "stat": "moveSpeed",
+  "mod": "flat",
+  "perLevel": 5,
+  "maxLevel": 5,
+  "cost": {
+    "base": 35,
+    "growth": 1.5
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "id": "medkit",
+  "name": "Аптечка",
+  "sprite": "pickups/medkit",
+  "sound": "sfx/heal",
+  "attract": false,
+  "effect": {
+    "type": "heal",
+    "params": {
+      "fraction": 0.3
+    }
+  }
+}

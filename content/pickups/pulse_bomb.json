@@ -1,0 +1,14 @@
+{
+  "id": "pulse_bomb",
+  "name": "Импульсная граната",
+  "sprite": "pickups/pulse_bomb",
+  "sound": "sfx/explosion",
+  "attract": false,
+  "effect": {
+    "type": "blast",
+    "params": {
+      "damage": 120,
+      "radius": 220
+    }
+  }
+}

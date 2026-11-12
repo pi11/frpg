@@ -13,6 +13,7 @@ export interface ResultData {
   level: number;
   seed: number;
   runId: string;
+  bossKilled: boolean;
   summary: RunSummary;
 }
 
@@ -38,12 +39,13 @@ export class ResultScene extends Phaser.Scene {
     stopMusic();
     this.cameras.main.setBackgroundColor('#08120b');
     this.add.rectangle(240, 135, 456, 246, COLORS.panel, 1).setStrokeStyle(1, COLORS.panelBorder);
-    this.add.text(240, 40, this.result.reason === 'death' ? 'ЗАБЕГ ОКОНЧЕН' : 'ВЫЖИЛ!',
+    const title = this.result.bossKilled ? 'ПОБЕДА!' : this.result.reason === 'death' ? 'ЗАБЕГ ОКОНЧЕН' : 'ВЫЖИЛ!';
+    this.add.text(240, 40, title,
       textStyle(24, this.result.reason === 'death' ? COLORS.danger : COLORS.bright)).setOrigin(0.5);
     const minutes = Math.floor(this.result.seconds / 60).toString().padStart(2, '0');
     const seconds = (this.result.seconds % 60).toString().padStart(2, '0');
     this.add.text(240, 86,
-      `ВРЕМЯ ${minutes}:${seconds}   УБИТО ${this.result.kills}   УР.${this.result.level}`,
+      `ВРЕМЯ ${minutes}:${seconds}   УБИТО ${this.result.kills}   УР.${this.result.level}   КРЫШЕК ${this.result.summary.picked_caps}`,
       textStyle(8, COLORS.text, { align: 'center' })).setOrigin(0.5);
     this.add.text(240, 102, `SEED ${this.result.seed}`, textStyle(8, COLORS.dim)).setOrigin(0.5);
     this.add.image(240, 128, ATLAS, 'ui/cap').setScale(2);

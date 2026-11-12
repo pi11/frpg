@@ -1,0 +1,10 @@
+{
+  "id": "trigger_spring",
+  "name": "Пружинный спуск",
+  "description": "Ускоряет атаки",
+  "sprite": "passives/trigger_spring",
+  "stat": "attackSpeed",
+  "mod": "flat",
+  "perLevel": 0.08,
+  "maxLevel": 5
+}

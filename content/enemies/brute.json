@@ -1,0 +1,37 @@
+{
+  "id": "brute",
+  "name": "Громила-переросток",
+  "sprite": "enemies/brute",
+  "role": "elite",
+  "ai": {
+    "type": "chaser",
+    "params": {
+      "turnRate": 3
+    }
+  },
+  "stats": {
+    "hp": 650,
+    "speed": 46,
+    "damage": 14,
+    "xp": 30
+  },
+  "drops": [
+    {
+      "item": "pickup",
+      "id": "chest",
+      "chance": 1
+    },
+    {
+      "item": "caps",
+      "chance": 1,
+      "amount": [
+        8,
+        16
+      ]
+    }
+  ],
+  "tags": [
+    "mutant",
+    "elite"
+  ]
+}

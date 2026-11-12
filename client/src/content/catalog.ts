@@ -1,11 +1,11 @@
-import { enemyBehaviors, weaponBehaviors } from '../behaviors/registry';
+import { enemyBehaviors, pickupEffects, weaponBehaviors } from '../behaviors/registry';
 import {
-  BalanceSchema, EnemySchema, HeroSchema, LocationSchema, PassiveSchema, UpgradeSchema,
-  WeaponSchema,
+  BalanceSchema, EnemySchema, HeroSchema, LocationSchema, PassiveSchema, PickupSchema,
+  UpgradeSchema, WeaponSchema,
 } from './schemas';
 import type {
   BalanceDefinition, EnemyDefinition, HeroDefinition, LocationDefinition,
-  PassiveDefinition, UpgradeDefinition, WeaponDefinition,
+  PassiveDefinition, PickupDefinition, UpgradeDefinition, WeaponDefinition,
 } from './schemas';
 
 export interface Catalog {
@@ -16,6 +16,7 @@ export interface Catalog {
   enemies: Record<string, EnemyDefinition>;
   locations: Record<string, LocationDefinition>;
   upgrades: Record<string, UpgradeDefinition>;
+  pickups: Record<string, PickupDefinition>;
 }
 
 const bundledFiles = import.meta.glob<unknown>('../../../content/**/*.json', {
@@ -31,6 +32,7 @@ export function validateContent(files: Record<string, unknown>): Catalog {
   const enemies: Catalog['enemies'] = {};
   const locations: Catalog['locations'] = {};
   const upgrades: Catalog['upgrades'] = {};
+  const pickups: Catalog['pickups'] = {};
   let balance: BalanceDefinition | undefined;
 
   function add<T extends { id: string }>(target: Record<string, T>, value: T, path: string): void {
@@ -53,6 +55,7 @@ export function validateContent(files: Record<string, unknown>): Catalog {
       case 'enemies': add(enemies, EnemySchema.parse(raw), path); break;
       case 'locations': add(locations, LocationSchema.parse(raw), path); break;
       case 'upgrades': add(upgrades, UpgradeSchema.parse(raw), path); break;
+      case 'pickups': add(pickups, PickupSchema.parse(raw), path); break;
       default: throw new Error(`${path}: unknown content category`);
     }
   }
@@ -69,15 +72,65 @@ export function validateContent(files: Record<string, unknown>): Catalog {
     }
   }
   for (const weapon of Object.values(weapons)) {
-    const behavior = weaponBehaviors[weapon.behavior.type as keyof typeof weaponBehaviors];
+    const behavior = weaponBehaviors[weapon.behavior.type];
     if (!behavior) throw new Error(`weapon ${weapon.id}: unknown behavior ${weapon.behavior.type}`);
     behavior.paramsSchema.parse(weapon.behavior.params);
+    weapon.levels.forEach((level, index) => {
+      for (const field of behavior.requiredLevelFields) {
+        if (level[field] === undefined) {
+          throw new Error(`weapon ${weapon.id}: level ${index + 1} needs ${field}`);
+        }
+      }
+    });
   }
+  const evolutionTargets = new Set<string>();
+  for (const weapon of Object.values(weapons)) {
+    if (!weapon.evolution) continue;
+    const { passive, into } = weapon.evolution;
+    if (!passives[passive]) throw new Error(`weapon ${weapon.id}: unknown evolution passive ${passive}`);
+    if (!weapons[into]?.evolved) {
+      throw new Error(`weapon ${weapon.id}: evolution target ${into} must be an evolved weapon`);
+    }
+    if (evolutionTargets.has(into)) throw new Error(`weapon ${into}: more than one evolution source`);
+    evolutionTargets.add(into);
+  }
+  for (const weapon of Object.values(weapons)) {
+    if (weapon.evolved && !evolutionTargets.has(weapon.id)) {
+      throw new Error(`weapon ${weapon.id}: evolved weapon has no evolution source`);
+    }
+  }
+  for (const hero of Object.values(heroes)) {
+    if (weapons[hero.startingWeapon]!.evolved) {
+      throw new Error(`hero ${hero.id}: starting weapon cannot be evolved`);
+    }
+  }
+  for (const pickup of Object.values(pickups)) {
+    const effect = pickupEffects[pickup.effect.type];
+    if (!effect) throw new Error(`pickup ${pickup.id}: unknown effect ${pickup.effect.type}`);
+    effect.paramsSchema.parse(pickup.effect.params);
+  }
+  const needEnemy = (owner: string, id: string, role?: EnemyDefinition['role']): void => {
+    const enemy = enemies[id];
+    if (!enemy) throw new Error(`${owner}: unknown enemy ${id}`);
+    if (role && enemy.role !== role) throw new Error(`${owner}: enemy ${id} must have role ${role}`);
+  };
   for (const enemy of Object.values(enemies)) {
-    const behavior = enemyBehaviors[enemy.ai.type as keyof typeof enemyBehaviors];
+    const behavior = enemyBehaviors[enemy.ai.type];
     if (!behavior) throw new Error(`enemy ${enemy.id}: unknown AI ${enemy.ai.type}`);
-    behavior.paramsSchema.parse(enemy.ai.params);
+    behavior.validate?.(behavior.paramsSchema.parse(enemy.ai.params));
+    for (const drop of enemy.drops) {
+      if (drop.item === 'pickup' && !pickups[drop.id]) {
+        throw new Error(`enemy ${enemy.id}: unknown drop pickup ${drop.id}`);
+      }
+    }
+    if (enemy.ai.type === 'boss_phases') {
+      const params = enemy.ai.params as { phases: { summon?: { enemy: string } }[] };
+      for (const phase of params.phases) {
+        if (phase.summon) needEnemy(`enemy ${enemy.id}`, phase.summon.enemy, 'normal');
+      }
+    }
   }
+  if (!pickups.cap) throw new Error('content/pickups/cap.json is required for caps drops');
   for (const location of Object.values(locations)) {
     if (!heroes[location.startingHero]) {
       throw new Error(`location ${location.id}: unknown hero ${location.startingHero}`);
@@ -95,11 +148,27 @@ export function validateContent(files: Record<string, unknown>): Catalog {
         if (!enemies[entry.id]) {
           throw new Error(`location ${location.id}: unknown wave enemy ${entry.id}`);
         }
+        needEnemy(`location ${location.id} wave`, entry.id, 'normal');
+      }
+    }
+    for (const event of location.events) {
+      needEnemy(`location ${location.id} event`, event.enemy, 'elite');
+      if (event.atSecond >= location.durationSeconds) {
+        throw new Error(`location ${location.id}: event after the end at ${event.atSecond}`);
+      }
+    }
+    needEnemy(`location ${location.id} boss`, location.boss.enemy, 'boss');
+    if (location.boss.atSecond >= location.durationSeconds) {
+      throw new Error(`location ${location.id}: boss must appear before the end`);
+    }
+    for (const drop of location.decor.crates.drops) {
+      if (!pickups[drop.pickup]) {
+        throw new Error(`location ${location.id}: unknown crate pickup ${drop.pickup}`);
       }
     }
   }
 
-  return { balance, heroes, weapons, passives, enemies, locations, upgrades };
+  return { balance, heroes, weapons, passives, enemies, locations, upgrades, pickups };
 }
 
 let cached: Catalog | undefined;

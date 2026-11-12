@@ -6,8 +6,13 @@
     "spawnDistance": 320,
     "despawnDistance": 650,
     "contactCooldownMs": 500,
-    "magnetRadius": 84,
-    "magnetSpeed": 240
+    "enemyProjectileLimit": 120,
+    "pickupLimit": 160,
+    "zoneLimit": 24,
+    "crateLimit": 24,
+    "eliteWarningSeconds": 3,
+    "collectRadius": 14,
+    "magnetSpeed": 260
   },
   "xp": {
     "base": 5,
@@ -16,10 +21,10 @@
   "reward": {
     "base": 5,
     "perSecond": 0.25,
-    "perKill": 0.4,
+    "perKill": 0.15,
     "perWave": 2,
     "bossBonus": 30,
-    "maxKillsPerSecond": 5,
+    "maxKillsPerSecond": 8,
     "maxCapsPerSecond": 3,
     "durationGraceSeconds": 30
   }

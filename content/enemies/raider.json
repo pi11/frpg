@@ -1,0 +1,44 @@
+{
+  "id": "raider",
+  "name": "Рейдер-мародёр",
+  "sprite": "enemies/raider",
+  "role": "normal",
+  "ai": {
+    "type": "ranged",
+    "params": {
+      "turnRate": 4,
+      "preferredRange": 110,
+      "fireCooldownMs": 2400,
+      "projectileSpeed": 115,
+      "projectileDamage": 9,
+      "projectileSprite": "projectiles/slug",
+      "lifetimeMs": 2600,
+      "shots": 1,
+      "spreadDegrees": 0
+    }
+  },
+  "stats": {
+    "hp": 22,
+    "speed": 58,
+    "damage": 6,
+    "xp": 2
+  },
+  "drops": [
+    {
+      "item": "caps",
+      "chance": 0.05,
+      "amount": [
+        1,
+        4
+      ]
+    },
+    {
+      "item": "pickup",
+      "id": "magnet",
+      "chance": 0.003
+    }
+  ],
+  "tags": [
+    "human"
+  ]
+}

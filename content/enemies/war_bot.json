@@ -1,0 +1,45 @@
+{
+  "id": "war_bot",
+  "name": "Боевой автомат",
+  "sprite": "enemies/war_bot",
+  "role": "elite",
+  "ai": {
+    "type": "ranged",
+    "params": {
+      "turnRate": 3,
+      "preferredRange": 130,
+      "fireCooldownMs": 1500,
+      "projectileSpeed": 135,
+      "projectileDamage": 9,
+      "projectileSprite": "projectiles/slug",
+      "lifetimeMs": 2800,
+      "shots": 3,
+      "spreadDegrees": 30
+    }
+  },
+  "stats": {
+    "hp": 600,
+    "speed": 40,
+    "damage": 10,
+    "xp": 30
+  },
+  "drops": [
+    {
+      "item": "pickup",
+      "id": "chest",
+      "chance": 1
+    },
+    {
+      "item": "caps",
+      "chance": 1,
+      "amount": [
+        8,
+        16
+      ]
+    }
+  ],
+  "tags": [
+    "robot",
+    "elite"
+  ]
+}

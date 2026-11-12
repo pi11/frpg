@@ -1,0 +1,29 @@
+{
+  "id": "napalm",
+  "name": "Напалм",
+  "sprite": "weapons/napalm",
+  "projectileSprite": "projectiles/bottle",
+  "fireSound": "sfx/firebomb",
+  "behavior": {
+    "type": "zone",
+    "params": {
+      "range": 200,
+      "tickMs": 350,
+      "fireSprite": "fx/fire"
+    }
+  },
+  "levels": [
+    {
+      "damage": 15,
+      "cooldownMs": 1500,
+      "shots": 5,
+      "spreadDegrees": 0,
+      "radius": 46,
+      "durationMs": 5500
+    }
+  ],
+  "tags": [
+    "fire"
+  ],
+  "evolved": true
+}

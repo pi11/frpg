@@ -1,0 +1,10 @@
+{
+  "id": "scrap_magnet",
+  "name": "Магнит из лома",
+  "description": "Подбирает добычу издалека",
+  "sprite": "passives/scrap_magnet",
+  "stat": "pickupRadius",
+  "mod": "flat",
+  "perLevel": 10,
+  "maxLevel": 5
+}

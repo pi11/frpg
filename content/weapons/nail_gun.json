@@ -1,0 +1,27 @@
+{
+  "id": "nail_gun",
+  "name": "Гвоздемёт",
+  "sprite": "weapons/nail_gun",
+  "projectileSprite": "projectiles/bullet",
+  "fireSound": "sfx/shot_pistol",
+  "behavior": {
+    "type": "projectile",
+    "params": {
+      "speed": 380,
+      "lifetimeMs": 1200
+    }
+  },
+  "levels": [
+    {
+      "damage": 24,
+      "cooldownMs": 220,
+      "shots": 2,
+      "spreadDegrees": 10,
+      "pierce": 2
+    }
+  ],
+  "tags": [
+    "ballistic"
+  ],
+  "evolved": true
+}

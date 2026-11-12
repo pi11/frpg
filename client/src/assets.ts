@@ -8,6 +8,7 @@ export const ATLAS = 'sprites';
 export const UI_SOUNDS = [
   'sfx/enemy_hit', 'sfx/enemy_death', 'sfx/hero_hurt', 'sfx/hero_death', 'sfx/xp_pickup',
   'sfx/level_up', 'sfx/ui_click', 'sfx/ui_buy', 'sfx/ui_error', 'sfx/run_start', 'sfx/reward',
+  'sfx/enemy_shot', 'sfx/explosion', 'sfx/warning', 'sfx/crate_break',
 ] as const;
 export const HUB_MUSIC = 'music/shelter';
 
@@ -17,6 +18,9 @@ const ANIMATION_TIMING: Record<string, { frameRate: number; repeat: number }> = 
   idle: { frameRate: 6, repeat: -1 },
   death: { frameRate: 10, repeat: 0 },
   burst: { frameRate: 20, repeat: 0 },
+  spin: { frameRate: 12, repeat: -1 },
+  burn: { frameRate: 10, repeat: -1 },
+  break: { frameRate: 14, repeat: 0 },
 };
 
 export function animationKey(sprite: string, name: string): string {
@@ -31,8 +35,10 @@ export function preloadAssets(scene: Phaser.Scene, catalog: Catalog): void {
   }
   const sounds = new Set<string>(UI_SOUNDS);
   for (const weapon of Object.values(catalog.weapons)) sounds.add(weapon.fireSound);
+  for (const pickup of Object.values(catalog.pickups)) sounds.add(pickup.sound);
   for (const key of sounds) scene.load.audio(key, `${key}.wav`);
-  const music = new Set([HUB_MUSIC, ...Object.values(catalog.locations).map((item) => item.music)]);
+  const music = new Set([HUB_MUSIC, ...Object.values(catalog.locations)
+    .flatMap((item) => [item.music, item.bossMusic])]);
   for (const key of music) scene.load.audio(key, [`${key}.ogg`, `${key}.mp3`]);
   scene.load.setPath('');
 }

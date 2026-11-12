@@ -1,0 +1,11 @@
+{
+  "id": "magnet",
+  "name": "Магнит",
+  "sprite": "pickups/magnet",
+  "sound": "sfx/powerup",
+  "attract": false,
+  "effect": {
+    "type": "magnet",
+    "params": {}
+  }
+}

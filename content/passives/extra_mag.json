@@ -1,0 +1,10 @@
+{
+  "id": "extra_mag",
+  "name": "Сдвоенный магазин",
+  "description": "Ещё один снаряд, дрон или бутылка",
+  "sprite": "passives/extra_mag",
+  "stat": "projectileCount",
+  "mod": "flat",
+  "perLevel": 1,
+  "maxLevel": 2
+}

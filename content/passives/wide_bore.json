@@ -1,0 +1,10 @@
+{
+  "id": "wide_bore",
+  "name": "Широкий раструб",
+  "description": "Увеличивает область поражения",
+  "sprite": "passives/wide_bore",
+  "stat": "area",
+  "mod": "flat",
+  "perLevel": 0.1,
+  "maxLevel": 5
+}

@@ -25,7 +25,9 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 import art  # noqa: E402
+import art_world as world  # noqa: E402
 import audio  # noqa: E402
+import shapes  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[2]
 OUT = ROOT / "client" / "public" / "assets"
@@ -45,6 +47,16 @@ def parse(source: str) -> Image:
         if len(row) != width:
             raise ValueError(f"ragged pixel map row {row!r}")
         image.append([CLEAR if char == "." else (*art.PALETTE[char], 255) for char in row])
+    return image
+
+
+def evolved(source: str, recolor: dict[str, str]) -> Image:
+    """Evolved weapon icon: the base icon in new colours plus a gold star in the corner."""
+    table = str.maketrans(recolor)
+    image = parse("\n".join(line.translate(table) for line in source.strip("\n").split("\n")))
+    star = {(13, 0): "y", (12, 1): "y", (13, 1): "w", (14, 1): "y", (13, 2): "y"}
+    for (x, y), char in star.items():
+        image[y][x] = (*art.PALETTE[char], 255)
     return image
 
 
@@ -126,10 +138,18 @@ def png(image: Image) -> bytes:
 
 def humanoid(top: str, legs: Sequence[str], residue: str, seed: int) -> dict[str, Image]:
     walk = [stack(parse(top), parse(leg)) for leg in legs]
+    return with_death(walk, residue, seed)
+
+
+def with_death(walk: list[Image], residue: str, seed: int) -> dict[str, Image]:
     frames = {f"walk_{index}": frame for index, frame in enumerate(walk)}
     for index, frame in enumerate(death_frames(walk[1], residue, seed)):
         frames[f"death_{index}"] = frame
     return frames
+
+
+def numbered(name: str, images: Sequence[Image]) -> dict[str, Image]:
+    return {f"{name}_{index}": image for index, image in enumerate(images)}
 
 
 def roach() -> dict[str, Image]:
@@ -152,6 +172,18 @@ def sprite_frames() -> dict[str, Image]:
         "enemies/roach": roach(),
         "xp/green": {f"idle_{i}": parse(src) for i, src in enumerate(art.XP_FRAMES)},
         "fx/hit": {f"burst_{i}": parse(src) for i, src in enumerate(art.HIT_FRAMES)},
+        "enemies/scorpion": humanoid(world.SCORPION_TOP, world.SCORPION_LEGS, "d", 11),
+        "enemies/raider": humanoid(world.RAIDER_TOP, art.WANDERER_LEGS, "R", 13),
+        "enemies/cleaner_bot": humanoid(
+            world.CLEANER_BOT_TOP, world.CLEANER_BOT_TREADS * 2, "M", 17),
+        "enemies/brute": humanoid(world.BRUTE_TOP, world.BRUTE_LEGS, "H", 19),
+        "enemies/war_bot": humanoid(world.WAR_BOT_TOP, world.WAR_BOT_LEGS, "M", 23),
+        "enemies/junk_king": with_death([shapes.junk_king(i) for i in range(4)], "R", 29),
+        "projectiles/drone": numbered("spin", [parse(src) for src in world.DRONE_FRAMES]),
+        "fx/fire": numbered("burn", [parse(src) for src in world.FIRE_FRAMES]),
+        "fx/explosion": numbered("burst", [shapes.explosion(i) for i in range(5)]),
+        "pickups/chest": numbered("idle", [parse(src) for src in world.CHEST_FRAMES]),
+        "decor/crate": numbered("break", [parse(src) for src in world.CRATE_BREAK]),
     }
     frames: dict[str, Image] = {}
     for key, animation in animated.items():
@@ -166,6 +198,43 @@ def sprite_frames() -> dict[str, Image]:
         "projectiles/bullet": parse(art.BULLET),
         "projectiles/pellet": parse(art.PELLET),
         "ui/cap": parse(art.CAP),
+        "weapons/laser_rifle": parse(world.LASER_RIFLE),
+        "weapons/orbit_drone": parse(world.ORBIT_DRONE),
+        "weapons/rad_aura": parse(world.RAD_AURA),
+        "weapons/firebomb": parse(world.FIREBOMB),
+        "weapons/nail_gun": evolved(art.SCRAP_PISTOL, {"m": "w", "M": "m", "r": "y", "R": "o"}),
+        "weapons/scrap_cannon": evolved(art.SCATTERGUN, {"m": "y", "M": "o", "r": "B", "R": "b"}),
+        "weapons/prism_emitter": evolved(world.LASER_RIFLE, {"t": "y", "T": "o", "g": "w"}),
+        "weapons/drone_swarm": evolved(world.ORBIT_DRONE, {"m": "y", "M": "o", "g": "r"}),
+        "weapons/reactor_core": evolved(world.RAD_AURA, {"g": "y", "G": "o"}),
+        "weapons/napalm": evolved(world.FIREBOMB, {"t": "r", "T": "R", "o": "y", "y": "w"}),
+        "passives/trigger_spring": parse(world.TRIGGER_SPRING),
+        "passives/wide_bore": parse(world.WIDE_BORE),
+        "passives/extra_mag": parse(world.EXTRA_MAG),
+        "passives/rad_sponge": parse(world.RAD_SPONGE),
+        "passives/scrap_magnet": parse(world.SCRAP_MAGNET),
+        "passives/lucky_cap": parse(world.LUCKY_CAP),
+        "projectiles/laser": parse(world.LASER),
+        "projectiles/rad": parse(world.RAD),
+        "projectiles/bottle": parse(world.BOTTLE),
+        "projectiles/slug": parse(world.SLUG),
+        "pickups/cap": parse(art.CAP),
+        "pickups/caps_stash": parse(world.CAPS_STASH),
+        "pickups/medkit": parse(world.MEDKIT),
+        "pickups/magnet": parse(world.MAGNET),
+        "pickups/pulse_bomb": parse(world.PULSE_BOMB),
+        # The crate's static frame is intact; its break_N frames are the shatter animation.
+        "decor/crate": parse(world.CRATE),
+        "decor/barrel": parse(world.BARREL),
+        "decor/dead_tree": parse(world.DEAD_TREE),
+        "decor/rocks": parse(world.ROCKS),
+        "decor/bones": parse(world.BONES),
+        "decor/tires": parse(world.TIRES),
+        "decor/car_wreck": parse(world.CAR_WRECK),
+        "decor/asphalt": shapes.asphalt(),
+        "decor/crater": shapes.crater(),
+        "decor/rad_puddle": shapes.rad_puddle(0),
+        "decor/dune": shapes.dune(),
     })
     return frames
 

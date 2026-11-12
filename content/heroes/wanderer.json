@@ -3,7 +3,9 @@
   "name": "Скиталец",
   "sprite": "heroes/wanderer",
   "startingWeapon": "scrap_pistol",
-  "unlock": { "type": "default" },
+  "unlock": {
+    "type": "default"
+  },
   "baseStats": {
     "maxHp": 100,
     "armor": 0,
@@ -14,7 +16,7 @@
     "area": 0,
     "projectileCount": 0,
     "duration": 0,
-    "pickupRadius": 28,
+    "pickupRadius": 64,
     "xpGain": 0,
     "luck": 0,
     "radResist": 0

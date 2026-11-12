@@ -140,7 +140,11 @@ async def finish_run(
     wave = min(body.wave_reached, max(1, maximum_wave))
     if wave != body.wave_reached:
         flags.append("wave_clamped")
-    boss_killed = body.boss_killed and bool(location.get("boss"))
+    boss = location.get("boss")
+    boss_killed = (
+        body.boss_killed and boss is not None and duration >= boss["atSecond"]
+        and body.kills_by_type.get(boss["enemy"], 0) >= 1
+    )
     if body.boss_killed and not boss_killed:
         flags.append("boss_clamped")
 

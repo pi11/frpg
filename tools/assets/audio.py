@@ -119,6 +119,37 @@ def sound_effects() -> dict[str, list[float]]:
             tone(triangle, 55, 82, 0.7, volume=0.5, curve=1.0, attack=0.1),
         ), 3000),
         "reward": arpeggio(triangle, [523, 659, 784, 1047, 784, 1047], 0.08, 0.45),
+        "laser": mix(tone(pulse(0.125), 2400, 600, 0.16, volume=0.3),
+                     tone(sine, 1800, 300, 0.16, volume=0.2)),
+        "drone": tone(pulse(0.25), 180, 360, 0.25, volume=0.18, curve=0.8,
+                      vibrato_hz=40, vibrato_depth=0.1),
+        "aura": tone(triangle, 110, 100, 0.2, volume=0.2, curve=0.6),
+        "firebomb": lowpass(mix(
+            tone(Noise(6), 800, 4000, 0.18, volume=0.25, curve=0.5, attack=0.1),
+            tone(Noise(7), 2500, 600, 0.35, volume=0.3, curve=1.4),
+        ), 3500),
+        "enemy_shot": tone(pulse(0.5), 520, 260, 0.08, volume=0.18),
+        "explosion": lowpass(mix(
+            tone(Noise(8), 2500, 120, 0.6, volume=0.5, curve=1.6),
+            tone(sine, 90, 30, 0.5, volume=0.4, curve=1.2),
+        ), 2500),
+        "warning": mix(*[tone(pulse(0.5), 660 if i % 2 == 0 else 520, 660 if i % 2 == 0 else 520,
+                              0.14, volume=0.22, curve=0.3) for i in range(4)],
+                       offsets=tuple(i * 0.15 for i in range(4))),
+        "crate_break": lowpass(mix(
+            tone(Noise(9), 1800, 500, 0.16, volume=0.45, curve=1.8),
+            tone(pulse(0.5), 160, 90, 0.08, volume=0.2),
+        ), 3000),
+        "cap": mix(tone(pulse(0.25), 1568, 1568, 0.04, volume=0.15),
+                   tone(pulse(0.25), 2093, 2093, 0.08, volume=0.15), offsets=(0, 0.035)),
+        "heal": arpeggio(sine, [392, 523, 659, 784], 0.06, 0.35),
+        "powerup": tone(pulse(0.25), 300, 1500, 0.3, volume=0.25, curve=0.6,
+                        vibrato_hz=18, vibrato_depth=0.05),
+        "chest": mix(
+            tone(Noise(10), 400, 300, 0.12, volume=0.25),
+            arpeggio(pulse(0.25), [523, 659, 784, 1047, 1319, 1568], 0.06, 0.22),
+            offsets=(0, 0.1),
+        ),
     }
 
 
@@ -232,8 +263,25 @@ def wasteland_theme() -> list[float]:
     ], cutoff=5500)
 
 
+def boss_theme() -> list[float]:
+    """Tense boss loop in D minor with a chromatic bass, 148 BPM, 8 bars."""
+    step = 60 / 148 / 4
+    total = int(step * 16 * 8 * RATE)
+    bass = " ".join(["D2:2 D2:2 D3:2 D2:2 C#2:2 C#2:2 C#3:2 C#2:2 "
+                     "C2:2 C2:2 C3:2 C2:2 A#1:2 A#1:2 A2:2 A1:2"] * 4)
+    lead = ("D5:4 F5:4 A5:6 G#5:2 G5:4 F5:4 E5:8 "
+            "D5:4 F5:4 A5:4 D6:4 C#6:8 A5:8 "
+            "A#5:4 A5:4 G5:4 F5:4 E5:4 F5:4 G5:8 "
+            "A5:6 G5:2 F5:4 E5:4 D5:16")
+    return master([
+        sequence(bass, step, pulse(0.5), 0.15, total, curve=1.2, gate=0.85),
+        sequence(lead, step, pulse(0.25), 0.10, total, curve=0.6),
+        drums("k.hsk.hsk.hsk.ss", step, total, 31),
+    ], cutoff=5800)
+
+
 def music_tracks() -> dict[str, list[float]]:
-    return {"shelter": shelter_theme(), "wasteland": wasteland_theme()}
+    return {"shelter": shelter_theme(), "wasteland": wasteland_theme(), "boss": boss_theme()}
 
 
 def wav(samples: list[float]) -> bytes:

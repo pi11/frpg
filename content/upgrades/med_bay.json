@@ -1,0 +1,12 @@
+{
+  "id": "med_bay",
+  "name": "Медотсек",
+  "stat": "regen",
+  "mod": "flat",
+  "perLevel": 0.1,
+  "maxLevel": 5,
+  "cost": {
+    "base": 50,
+    "growth": 1.6
+  }
+}

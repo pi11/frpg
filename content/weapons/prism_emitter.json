@@ -1,0 +1,27 @@
+{
+  "id": "prism_emitter",
+  "name": "Призменный излучатель",
+  "sprite": "weapons/prism_emitter",
+  "projectileSprite": "projectiles/laser",
+  "fireSound": "sfx/laser",
+  "behavior": {
+    "type": "projectile",
+    "params": {
+      "speed": 480,
+      "lifetimeMs": 700
+    }
+  },
+  "levels": [
+    {
+      "damage": 38,
+      "cooldownMs": 650,
+      "shots": 5,
+      "spreadDegrees": 30,
+      "pierce": 8
+    }
+  ],
+  "tags": [
+    "energy"
+  ],
+  "evolved": true
+}

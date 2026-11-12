@@ -14,6 +14,7 @@ export const COLORS = {
   barBack: 0x1d3322,
   hp: 0xd8644f,
   xp: 0x9bff6e,
+  evolution: 0xf2c46b,
 } as const;
 
 export function textStyle(

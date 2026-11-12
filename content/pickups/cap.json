@@ -1,0 +1,16 @@
+{
+  "id": "cap",
+  "name": "Крышка",
+  "sprite": "pickups/cap",
+  "sound": "sfx/cap",
+  "attract": true,
+  "effect": {
+    "type": "caps",
+    "params": {
+      "amount": [
+        1,
+        1
+      ]
+    }
+  }
+}

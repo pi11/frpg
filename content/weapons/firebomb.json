@@ -1,0 +1,88 @@
+{
+  "id": "firebomb",
+  "name": "Бутылка с горючим",
+  "sprite": "weapons/firebomb",
+  "projectileSprite": "projectiles/bottle",
+  "fireSound": "sfx/firebomb",
+  "behavior": {
+    "type": "zone",
+    "params": {
+      "range": 170,
+      "tickMs": 400,
+      "fireSprite": "fx/fire"
+    }
+  },
+  "levels": [
+    {
+      "damage": 4,
+      "cooldownMs": 2700,
+      "shots": 1,
+      "spreadDegrees": 0,
+      "radius": 22,
+      "durationMs": 2500
+    },
+    {
+      "damage": 5,
+      "cooldownMs": 2600,
+      "shots": 1,
+      "spreadDegrees": 0,
+      "radius": 24,
+      "durationMs": 2700
+    },
+    {
+      "damage": 5,
+      "cooldownMs": 2500,
+      "shots": 2,
+      "spreadDegrees": 0,
+      "radius": 24,
+      "durationMs": 2900
+    },
+    {
+      "damage": 6,
+      "cooldownMs": 2400,
+      "shots": 2,
+      "spreadDegrees": 0,
+      "radius": 28,
+      "durationMs": 3100
+    },
+    {
+      "damage": 7,
+      "cooldownMs": 2300,
+      "shots": 2,
+      "spreadDegrees": 0,
+      "radius": 30,
+      "durationMs": 3300
+    },
+    {
+      "damage": 8,
+      "cooldownMs": 2200,
+      "shots": 3,
+      "spreadDegrees": 0,
+      "radius": 32,
+      "durationMs": 3500
+    },
+    {
+      "damage": 9,
+      "cooldownMs": 2000,
+      "shots": 3,
+      "spreadDegrees": 0,
+      "radius": 34,
+      "durationMs": 3700
+    },
+    {
+      "damage": 11,
+      "cooldownMs": 1800,
+      "shots": 4,
+      "spreadDegrees": 0,
+      "radius": 36,
+      "durationMs": 4000
+    }
+  ],
+  "tags": [
+    "fire"
+  ],
+  "evolution": {
+    "passive": "wide_bore",
+    "into": "napalm"
+  }
+}

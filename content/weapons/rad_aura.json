@@ -1,0 +1,76 @@
+{
+  "id": "rad_aura",
+  "name": "Радиационное поле",
+  "sprite": "weapons/rad_aura",
+  "projectileSprite": "projectiles/rad",
+  "fireSound": "sfx/aura",
+  "behavior": {
+    "type": "aura",
+    "params": {}
+  },
+  "levels": [
+    {
+      "damage": 3,
+      "cooldownMs": 650,
+      "shots": 1,
+      "spreadDegrees": 0,
+      "radius": 34
+    },
+    {
+      "damage": 4,
+      "cooldownMs": 640,
+      "shots": 1,
+      "spreadDegrees": 0,
+      "radius": 38
+    },
+    {
+      "damage": 4,
+      "cooldownMs": 600,
+      "shots": 1,
+      "spreadDegrees": 0,
+      "radius": 42
+    },
+    {
+      "damage": 5,
+      "cooldownMs": 580,
+      "shots": 1,
+      "spreadDegrees": 0,
+      "radius": 46
+    },
+    {
+      "damage": 6,
+      "cooldownMs": 550,
+      "shots": 1,
+      "spreadDegrees": 0,
+      "radius": 50
+    },
+    {
+      "damage": 7,
+      "cooldownMs": 520,
+      "shots": 1,
+      "spreadDegrees": 0,
+      "radius": 54
+    },
+    {
+      "damage": 8,
+      "cooldownMs": 480,
+      "shots": 1,
+      "spreadDegrees": 0,
+      "radius": 58
+    },
+    {
+      "damage": 10,
+      "cooldownMs": 440,
+      "shots": 1,
+      "spreadDegrees": 0,
+      "radius": 64
+    }
+  ],
+  "tags": [
+    "radiation"
+  ],
+  "evolution": {
+    "passive": "rad_sponge",
+    "into": "reactor_core"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "id": "scrap_cannon",
+  "name": "Ломовая пушка",
+  "sprite": "weapons/scrap_cannon",
+  "projectileSprite": "projectiles/pellet",
+  "fireSound": "sfx/shot_scatter",
+  "behavior": {
+    "type": "projectile",
+    "params": {
+      "speed": 300,
+      "lifetimeMs": 720
+    }
+  },
+  "levels": [
+    {
+      "damage": 18,
+      "cooldownMs": 620,
+      "shots": 11,
+      "spreadDegrees": 72,
+      "pierce": 1
+    }
+  ],
+  "tags": [
+    "ballistic"
+  ],
+  "evolved": true
+}

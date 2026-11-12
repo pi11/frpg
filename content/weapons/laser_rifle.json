@@ -1,0 +1,79 @@
+{
+  "id": "laser_rifle",
+  "name": "Лазерная винтовка",
+  "sprite": "weapons/laser_rifle",
+  "projectileSprite": "projectiles/laser",
+  "fireSound": "sfx/laser",
+  "behavior": {
+    "type": "projectile",
+    "params": {
+      "speed": 430,
+      "lifetimeMs": 650
+    }
+  },
+  "levels": [
+    {
+      "damage": 10,
+      "cooldownMs": 1150,
+      "shots": 1,
+      "spreadDegrees": 0,
+      "pierce": 1
+    },
+    {
+      "damage": 12,
+      "cooldownMs": 1100,
+      "shots": 1,
+      "spreadDegrees": 0,
+      "pierce": 1
+    },
+    {
+      "damage": 14,
+      "cooldownMs": 1050,
+      "shots": 1,
+      "spreadDegrees": 0,
+      "pierce": 2
+    },
+    {
+      "damage": 16,
+      "cooldownMs": 1000,
+      "shots": 2,
+      "spreadDegrees": 8,
+      "pierce": 2
+    },
+    {
+      "damage": 19,
+      "cooldownMs": 950,
+      "shots": 2,
+      "spreadDegrees": 8,
+      "pierce": 3
+    },
+    {
+      "damage": 22,
+      "cooldownMs": 900,
+      "shots": 2,
+      "spreadDegrees": 8,
+      "pierce": 3
+    },
+    {
+      "damage": 25,
+      "cooldownMs": 850,
+      "shots": 3,
+      "spreadDegrees": 14,
+      "pierce": 4
+    },
+    {
+      "damage": 30,
+      "cooldownMs": 800,
+      "shots": 3,
+      "spreadDegrees": 14,
+      "pierce": 5
+    }
+  ],
+  "tags": [
+    "energy"
+  ],
+  "evolution": {
+    "passive": "extra_mag",
+    "into": "prism_emitter"
+  }
+}

@@ -33,6 +33,8 @@ PALETTE: dict[str, tuple[int, int, int]] = {
     "c": (0xb7, 0x74, 0x3c),  # shell light
     "m": (0x92, 0x93, 0x98),  # metal
     "M": (0x55, 0x56, 0x5e),  # metal dark
+    "a": (0x4c, 0x4b, 0x4d),  # asphalt
+    "A": (0x37, 0x36, 0x39),  # asphalt dark
 }
 
 # --- Hero: wanderer in a wide hat, scarf and duster coat -------------------------
