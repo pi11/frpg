@@ -9,7 +9,12 @@ import { HudScene } from './scenes/HudScene';
 import { LevelUpScene } from './scenes/LevelUpScene';
 import { ResultScene } from './scenes/ResultScene';
 import { RunScene } from './scenes/RunScene';
+import { initSession } from './api/auth';
+import { platformTokenStore } from './platform/tokenStore';
+import { preparePlatform, setupPlatform } from './platform/native';
 import './style.css';
+
+await Promise.all([initSession(platformTokenStore()), preparePlatform()]);
 
 export const game = new Phaser.Game({
   type: Phaser.AUTO,
@@ -29,6 +34,8 @@ export const game = new Phaser.Game({
   },
   scene: [AuthScene, BootScene, HubScene, RunScene, HudScene, LevelUpScene, ChestScene, ResultScene],
 });
+
+setupPlatform(game);
 
 if (import.meta.env.DEV) {
   (window as Window & { __wastelandGame?: Phaser.Game }).__wastelandGame = game;

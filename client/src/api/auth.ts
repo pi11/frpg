@@ -1,3 +1,5 @@
+import { browserTokenStore, type TokenStore } from '../platform/tokenStore';
+
 export interface TokenPair {
   access_token: string;
   refresh_token: string;
@@ -18,12 +20,15 @@ export interface TelegramPoll {
 }
 
 const STORAGE_KEY = 'wasteland.auth.v1';
+/** Empty in the browser (same origin, Vite proxy); the server URL in the Android build. */
+const API_BASE = (import.meta.env.VITE_API_URL ?? '').replace(/\/$/, '');
+let store: TokenStore = browserTokenStore;
 let current: TokenPair | null = null;
 let refreshInFlight: Promise<TokenPair | null> | null = null;
 
-function readStored(): TokenPair | null {
+function parseStored(raw: string | null): TokenPair | null {
   try {
-    const value: unknown = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? 'null');
+    const value: unknown = JSON.parse(raw ?? 'null');
     if (value && typeof value === 'object' &&
       'access_token' in value && typeof value.access_token === 'string' &&
       'refresh_token' in value && typeof value.refresh_token === 'string' &&
@@ -34,19 +39,32 @@ function readStored(): TokenPair | null {
   return null;
 }
 
+/** Reads the stored session once at startup; afterwards `session()` is synchronous. */
+export async function initSession(tokenStore: TokenStore): Promise<void> {
+  store = tokenStore;
+  try {
+    current = parseStored(await store.get(STORAGE_KEY));
+  } catch {
+    current = null;
+  }
+}
+
 export function session(): TokenPair | null {
-  current ??= readStored();
   return current;
+}
+
+function persist(action: Promise<void>): void {
+  action.catch(() => { /* The in-memory session still works until the app restarts. */ });
 }
 
 export function saveSession(pair: TokenPair): void {
   current = pair;
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(pair));
+  persist(store.set(STORAGE_KEY, JSON.stringify(pair)));
 }
 
 export function clearSession(): void {
   current = null;
-  localStorage.removeItem(STORAGE_KEY);
+  persist(store.remove(STORAGE_KEY));
 }
 
 export class ApiRequestError extends Error {
@@ -59,15 +77,16 @@ export async function request<T>(path: string, init: RequestInit = {}, authorize
   if (authorized && session()) headers.set('Authorization', `Bearer ${session()!.access_token}`);
   let response: Response;
   try {
-    response = await fetch(`/api/v1${path}`, { ...init, headers });
+    response = await fetch(`${API_BASE}/api/v1${path}`, { ...init, headers });
   } catch {
-    throw new ApiRequestError(0, 'Сервер недоступен. Проверьте, что запущен make dev.');
+    throw new ApiRequestError(0, import.meta.env.DEV
+      ? 'Сервер недоступен. Проверьте, что запущен make dev.' : 'Сервер недоступен. Проверьте интернет.');
   }
   if (response.status === 401 && authorized && session()) {
     const renewed = await restoreSession();
     if (renewed) {
       headers.set('Authorization', `Bearer ${renewed.access_token}`);
-      response = await fetch(`/api/v1${path}`, { ...init, headers });
+      response = await fetch(`${API_BASE}/api/v1${path}`, { ...init, headers });
     }
   }
   if (!response.ok) {

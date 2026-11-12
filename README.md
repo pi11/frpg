@@ -72,7 +72,16 @@ make dev
 - **Интерфейс:** стиль ЭЛТ-терминала, шрифт Press Start 2P с кириллицей (OFL, npm-пакет `@fontsource/press-start-2p` — единственная новая зависимость, нужна, чтобы шрифт с кириллицей собирался Vite вместе с клиентом и работал офлайн и в Capacitor). Размеры шрифта кратны 8 px, чтобы пиксели оставались чёткими.
 - **Настройки** в убежище: музыка, звуки и ЭЛТ-эффект (сканлайны и виньетка поверх экрана); хранятся в `localStorage`.
 
-Android относится к следующим этапам.
+## Android
+
+Android-сборка — та же веб-сборка в Capacitor 8 (`client/android`, `client/capacitor.config.ts`). Новые зависимости: `@capacitor/core`, `@capacitor/android`, `@capacitor/cli` (сама обёртка), `@capacitor/preferences` (токены на устройстве), `@capacitor/app` (кнопка «назад», сворачивание, ссылки входа), `@capacitor/app-launcher` (открыть бота в приложении Telegram).
+
+- **Нужно:** JDK 21 (`JAVA_HOME`) и Android SDK с платформой 36 (`ANDROID_HOME`), лицензию SDK принимает пользователь (`sdkmanager --licenses`).
+- **Телефон для проверки:** `make dev`, телефон по USB с отладкой, затем `make android-debug` — сборка с API `http://localhost:8000`, `adb reverse` пробрасывает порт на компьютер, APK ставится и запускается. HTTP разрешён только в debug и только для localhost.
+- **Релиз одной командой:** `ANDROID_PUBLIC_URL=https://<домен> WASTELAND_KEYSTORE=<путь> WASTELAND_KEYSTORE_PASSWORD=… WASTELAND_KEY_ALIAS=… WASTELAND_KEY_PASSWORD=… make android-aab` → `client/android/app/build/outputs/bundle/release/app-release.aab`. Ключ и пароли — вне репозитория; без них сборка падает с подсказкой. Ключ создаётся так: `keytool -genkeypair -v -keystore upload.jks -alias upload -keyalg RSA -keysize 4096 -validity 10000`. Версия — `WASTELAND_VERSION_CODE` и `WASTELAND_VERSION_NAME`.
+- **Вход:** токены хранятся в `@capacitor/preferences` (в браузере — `localStorage`, общий интерфейс `TokenStore`). Ссылка из письма `https://<домен>/login?token=…` открывает приложение (App Links, хост берётся из `ANDROID_PUBLIC_URL`); сервер отдаёт `/.well-known/assetlinks.json` по `ANDROID_PACKAGE` и `ANDROID_CERT_FINGERPRINTS` (SHA-256 ключа подписи; при Play App Signing — ключа из консоли Play). Кнопка Telegram открывает бота в приложении Telegram. Сервер должен разрешать CORS для `https://localhost` — origin WebView.
+- **Поведение:** альбомная ориентация, полноэкранный режим (панели появляются по свайпу), отступы под вырез камеры через `env(safe-area-inset-*)`. «Назад» в забеге — пауза, в убежище и на экране входа — выход с подтверждением. Сворачивание ставит забег на паузу и выключает звук (в браузере уход со вкладки тоже ставит паузу).
+- Иконка и заставка генерируются `make assets` из спрайта героя.
 
 ## Проверка вручную
 

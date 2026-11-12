@@ -11,6 +11,7 @@ from app.api.health import router as health_router
 from app.api.profile import router as profile_router
 from app.api.runs import router as runs_router
 from app.api.telegram import router as telegram_router
+from app.api.wellknown import router as wellknown_router
 from app.config import get_settings
 
 app = FastAPI(title="Пустошь API", version="0.0.0")
@@ -32,3 +33,4 @@ app.include_router(telegram_router, prefix="/api/v1")
 app.include_router(content_router, prefix="/api/v1")
 app.include_router(profile_router, prefix="/api/v1")
 app.include_router(runs_router, prefix="/api/v1")
+app.include_router(wellknown_router)

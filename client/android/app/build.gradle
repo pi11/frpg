@@ -1,0 +1,84 @@
+apply plugin: 'com.android.application'
+
+// Release settings come from the environment (or -P gradle properties), never from the repo.
+def setting = { String name -> System.getenv(name) ?: (project.findProperty(name) ?: '') }
+// Host of PUBLIC_URL that opens magic links in the app (Android App Links).
+def appLinkHost = setting('WASTELAND_APP_LINK_HOST') ?: 'localhost'
+
+android {
+    namespace = "com.wasteland.game"
+    compileSdk = rootProject.ext.compileSdkVersion
+    defaultConfig {
+        applicationId "com.wasteland.game"
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode Integer.parseInt(setting('WASTELAND_VERSION_CODE') ?: '1')
+        versionName setting('WASTELAND_VERSION_NAME') ?: '0.7.0'
+        manifestPlaceholders = [appLinkHost: appLinkHost]
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        aaptOptions {
+             // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
+             // Default: https://android.googlesource.com/platform/frameworks/base/+/282e181b58cf72b6ca770dc7ca5f91f135444502/tools/aapt/AaptAssets.cpp#61
+            ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
+        }
+    }
+    signingConfigs {
+        release {
+            def keystore = setting('WASTELAND_KEYSTORE')
+            if (keystore) {
+                storeFile file(keystore)
+                storePassword setting('WASTELAND_KEYSTORE_PASSWORD')
+                keyAlias setting('WASTELAND_KEY_ALIAS')
+                keyPassword setting('WASTELAND_KEY_PASSWORD')
+            }
+        }
+    }
+    buildTypes {
+        release {
+            signingConfig signingConfigs.release
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+// A release bundle without the upload key would be useless for Play: fail early and clearly.
+tasks.configureEach { task ->
+    if (task.name in ['bundleRelease', 'assembleRelease']) {
+        task.doFirst {
+            if (!setting('WASTELAND_KEYSTORE')) {
+                throw new GradleException('Set WASTELAND_KEYSTORE, WASTELAND_KEYSTORE_PASSWORD, ' +
+                    'WASTELAND_KEY_ALIAS and WASTELAND_KEY_PASSWORD (see README, Android section)')
+            }
+        }
+    }
+}
+
+repositories {
+    flatDir{
+        dirs '../capacitor-cordova-android-plugins/src/main/libs', 'libs'
+    }
+}
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation "androidx.appcompat:appcompat:$androidxAppCompatVersion"
+    implementation "androidx.coordinatorlayout:coordinatorlayout:$androidxCoordinatorLayoutVersion"
+    implementation "androidx.core:core-splashscreen:$coreSplashScreenVersion"
+    implementation project(':capacitor-android')
+    testImplementation "junit:junit:$junitVersion"
+    androidTestImplementation "androidx.test.ext:junit:$androidxJunitVersion"
+    androidTestImplementation "androidx.test.espresso:espresso-core:$androidxEspressoCoreVersion"
+    implementation project(':capacitor-cordova-android-plugins')
+}
+
+apply from: 'capacitor.build.gradle'
+
+try {
+    def servicesJSON = file('google-services.json')
+    if (servicesJSON.text) {
+        apply plugin: 'com.google.gms.google-services'
+    }
+} catch(Exception e) {
+    logger.info("google-services.json not found, google-services plugin not applied. Push Notifications won't work")
+}

@@ -12,12 +12,18 @@
     "content-check": "vitest run src/content/catalog.test.ts"
   },
   "dependencies": {
+    "@capacitor/android": "8.6.0",
+    "@capacitor/app": "8.1.2",
+    "@capacitor/app-launcher": "8.0.1",
+    "@capacitor/core": "8.6.0",
+    "@capacitor/preferences": "8.0.1",
     "@fontsource/press-start-2p": "5.2.7",
     "phaser": "4.2.1",
     "qrcode": "^1.5.4",
     "zod": "^4.0.0"
   },
   "devDependencies": {
+    "@capacitor/cli": "8.6.0",
     "@eslint/js": "^10.0.1",
     "@types/qrcode": "^1.5.6",
     "eslint": "^10.14.0",

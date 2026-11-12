@@ -31,6 +31,9 @@ import shapes  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[2]
 OUT = ROOT / "client" / "public" / "assets"
+ANDROID_RES = ROOT / "client" / "android" / "app" / "src" / "main" / "res"
+# Launcher icon and splash background (terminal green-black, see client/src/ui/theme.ts).
+ICON_BACKGROUND: Pixel = (0x14, 0x2a, 0x1a, 255)
 
 Pixel = tuple[int, int, int, int]
 Image = list[list[Pixel]]
@@ -329,6 +332,7 @@ def build_images(preview: Path | None) -> None:
     (OUT / "ground").mkdir(parents=True, exist_ok=True)
     ground = wasteland_ground()
     (OUT / "ground" / "wasteland.png").write_bytes(png(ground))
+    build_android(frames)
     if preview:
         preview.mkdir(parents=True, exist_ok=True)
         backdrop = [[(*art.PALETTE["S"], 255)] * len(atlas[0]) for _ in atlas]
@@ -340,6 +344,43 @@ def build_images(preview: Path | None) -> None:
         tiled = overlay(tiled, frames["xp/green"], 180, 66)
         del hero
         (preview / "ground_x3.png").write_bytes(png(scale(tiled, 3)))
+
+
+# --- Android launcher icon and splash --------------------------------------------------
+
+DENSITIES = {"mdpi": 1, "hdpi": 1.5, "xhdpi": 2, "xxhdpi": 3, "xxxhdpi": 4}
+
+
+def centered(size: int, sprite: Image, factor: int, background: Pixel = CLEAR) -> Image:
+    big = scale(sprite, factor)
+    offset = (size - len(big)) // 2
+    return overlay([[background] * size for _ in range(size)], big, offset, offset)
+
+
+def circle(image: Image) -> Image:
+    size = len(image)
+    radius = size / 2
+    return [[pixel if (x + 0.5 - radius) ** 2 + (y + 0.5 - radius) ** 2 <= radius ** 2 else CLEAR
+             for x, pixel in enumerate(row)] for y, row in enumerate(image)]
+
+
+def build_android(frames: dict[str, Image]) -> None:
+    """Launcher icons (adaptive + legacy) and the splash logo from the hero sprite."""
+    if not ANDROID_RES.exists():
+        return
+    hero = frames["heroes/wanderer"]
+    for name, density in DENSITIES.items():
+        folder = ANDROID_RES / f"mipmap-{name}"
+        folder.mkdir(parents=True, exist_ok=True)
+        # Adaptive foreground is 108dp; the hero stays inside the 66dp safe zone.
+        foreground = centered(round(108 * density), hero, round(4 * density))
+        (folder / "ic_launcher_foreground.png").write_bytes(png(foreground))
+        legacy = centered(round(48 * density), hero, round(2 * density), ICON_BACKGROUND)
+        (folder / "ic_launcher.png").write_bytes(png(legacy))
+        (folder / "ic_launcher_round.png").write_bytes(png(circle(legacy)))
+    splash = ANDROID_RES / "drawable-xxhdpi"
+    splash.mkdir(parents=True, exist_ok=True)
+    (splash / "splash_logo.png").write_bytes(png(centered(192, hero, 12)))
 
 
 # --- audio ---------------------------------------------------------------------------

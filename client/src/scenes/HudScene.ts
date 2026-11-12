@@ -47,7 +47,7 @@ export class HudScene extends Phaser.Scene {
     const panel = this.add.rectangle(0, 0, 200, 64, COLORS.panel, 0.92)
       .setStrokeStyle(1, COLORS.panelBorder);
     const title = this.add.text(0, -12, 'ПАУЗА', textStyle(16, COLORS.bright)).setOrigin(0.5);
-    const hint = this.add.text(0, 14, 'P — продолжить', textStyle(8, COLORS.dim)).setOrigin(0.5);
+    const hint = this.add.text(0, 14, 'P или II — продолжить', textStyle(8, COLORS.dim)).setOrigin(0.5);
     this.pausePanel = this.add.container(240, 135, [panel, title, hint]).setDepth(90).setVisible(false);
 
     const pauseButton = this.add.text(452, 6, 'II', textStyle(8, COLORS.bright, {
@@ -94,15 +94,22 @@ export class HudScene extends Phaser.Scene {
     }
   }
 
-  private togglePause(): void {
+  togglePause(): void {
     if (this.scene.isActive('LevelUp') || this.scene.isActive('Chest')) return;
     playSfx('sfx/ui_click');
     if (this.scene.isPaused('Run')) {
       this.scene.resume('Run');
       this.pausePanel.setVisible(false);
     } else {
-      this.scene.pause('Run');
-      this.pausePanel.setVisible(true);
+      this.pause();
     }
+  }
+
+  /** Pauses the run with the panel shown (back button, app sent to background). */
+  pause(): void {
+    if (this.scene.isActive('LevelUp') || this.scene.isActive('Chest')) return;
+    if (!this.scene.isActive('Run')) return;
+    this.scene.pause('Run');
+    this.pausePanel.setVisible(true);
   }
 }

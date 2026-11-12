@@ -5,6 +5,7 @@ import {
   startEmail, startTelegram, verifyEmail,
   type TelegramStart, type TokenPair,
 } from '../api/auth';
+import { isNative, openExternal, takeLaunchToken } from '../platform/native';
 
 export class AuthScene extends Phaser.Scene {
   private overlay: HTMLElement | null = null;
@@ -12,11 +13,14 @@ export class AuthScene extends Phaser.Scene {
   private active = false;
   private linking = false;
   private busy = false;
+  /** Magic-link token passed by the Android App Link handler. */
+  private linkToken: string | null = null;
 
   constructor() { super('Auth'); }
 
-  init(data: { linkAccount?: boolean }): void {
+  init(data: { linkAccount?: boolean; token?: string }): void {
     this.linking = Boolean(data?.linkAccount);
+    this.linkToken = data?.token ?? null;
   }
 
   create(): void {
@@ -78,12 +82,24 @@ export class AuthScene extends Phaser.Scene {
     this.el<HTMLButtonElement>('auth-telegram').onclick = () => void this.act(async () => {
       this.stopPolling();
       const start = await startTelegram();
-      this.el<HTMLAnchorElement>('auth-telegram-link').href = start.deep_link;
-      this.el<HTMLImageElement>('auth-telegram-qr').src = await QRCode.toDataURL(start.deep_link, {
-        width: 160, margin: 1, color: { dark: '#17211c', light: '#f1ecda' },
-      });
+      const link = this.el<HTMLAnchorElement>('auth-telegram-link');
+      link.href = start.deep_link;
+      link.onclick = (event) => {
+        if (!isNative) return;
+        event.preventDefault();
+        void openExternal(start.deep_link);
+      };
+      const qr = this.el<HTMLImageElement>('auth-telegram-qr');
+      // On the phone the bot opens in the Telegram app; a QR code is for scanning from a desktop.
+      qr.hidden = isNative;
+      if (!isNative) {
+        qr.src = await QRCode.toDataURL(start.deep_link, {
+          width: 160, margin: 1, color: { dark: '#17211c', light: '#f1ecda' },
+        });
+      }
       this.el('auth-telegram-details').hidden = false;
       this.status('Откройте бота и подтвердите вход.');
+      if (isNative) void openExternal(start.deep_link);
       this.pollTimer = window.setInterval(() => void this.poll(start), 2000);
     });
     this.el<HTMLButtonElement>('auth-back').onclick = () => this.scene.start('Boot');
@@ -110,13 +126,16 @@ export class AuthScene extends Phaser.Scene {
   }
 
   private async initialize(): Promise<void> {
-    const magicToken = new URLSearchParams(window.location.search).get('token');
+    const magicToken = this.linkToken ?? takeLaunchToken()
+      ?? new URLSearchParams(window.location.search).get('token');
+    this.linkToken = null;
     if (magicToken) {
       this.status('Проверяем ссылку из письма…');
       try {
         this.finish(await verifyEmail({ token: magicToken }));
         const url = new URL(window.location.href);
         url.searchParams.delete('token');
+        if (url.pathname.replace(/\/+$/, '') === '/login') url.pathname = '/';
         window.history.replaceState({}, '', url);
         return;
       } catch (error) {

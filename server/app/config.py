@@ -21,6 +21,9 @@ class Settings(BaseSettings):
     telegram_bot_token: str = ""
     telegram_bot_username: str = ""
     telegram_webhook_secret: str = ""
+    # Android App Links: package name and SHA-256 fingerprints of the signing certificates.
+    android_package: str = ""
+    android_cert_fingerprints: list[str] = []
 
 
 @lru_cache
