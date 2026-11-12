@@ -41,5 +41,6 @@ jobs:
       - name: Check live health endpoint
         run: |
           uv run --project server --locked uvicorn app.main:app --app-dir server --host 127.0.0.1 --port 8000 &
-          sleep 3
-          curl --fail --silent --show-error http://127.0.0.1:8000/api/v1/health
+          # Startup time varies on runners: wait up to 30 s instead of a fixed sleep.
+          curl --fail --silent --show-error --retry 30 --retry-delay 1 --retry-all-errors \
+            http://127.0.0.1:8000/api/v1/health
