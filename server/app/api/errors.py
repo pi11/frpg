@@ -14,6 +14,7 @@ class ErrorCode(StrEnum):
     not_found = "not_found"
     rate_limited = "rate_limited"
     conflict = "conflict"
+    locked = "locked"
     not_configured = "not_configured"
     database_unavailable = "database_unavailable"
 

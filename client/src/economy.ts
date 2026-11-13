@@ -13,6 +13,8 @@ export interface RewardInput {
   wave: number;
   bossKilled: boolean;
   pickedCaps: number;
+  /** Location reward multiplier; picked caps are not multiplied. */
+  multiplier: number;
 }
 
 export function roundHalfUp(value: number): number {
@@ -31,6 +33,7 @@ export function runReward(rules: RewardRules, input: RewardInput): number {
   total += input.kills * rules.perKill;
   total += input.wave * rules.perWave;
   if (input.bossKilled) total += rules.bossBonus;
+  total *= input.multiplier;
   total += input.pickedCaps;
   return roundHalfUp(total);
 }

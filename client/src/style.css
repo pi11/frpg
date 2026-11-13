@@ -111,6 +111,14 @@ body.crt::after {
 .hub-stats dd { display: flex; align-items: center; gap: 6px; margin: 6px 0 0; color: var(--term-bright); font-size: 16px; }
 .hub-cap { width: 16px; height: 16px; image-rendering: pixelated; }
 .hub-note { color: var(--term-dim); font-size: 8px; text-align: center; }
+.hub-locations { display: grid; gap: 6px; margin: 0 0 12px; padding: 0; list-style: none; }
+.hub-locations button { display: block; width: 100%; padding: 8px 10px; border: 1px solid var(--term-line); background: var(--term-bg); color: var(--term-text); font: inherit; font-size: 8px; text-align: left; cursor: pointer; }
+.hub-locations button strong { color: var(--term-bright); font-weight: normal; }
+.hub-locations button small { display: block; margin-top: 6px; color: var(--term-dim); line-height: 1.5; }
+.hub-locations button:hover:not(:disabled) { border-color: var(--term-border); }
+.hub-locations .hub-location-chosen { border: 2px solid var(--term-border); box-shadow: var(--term-glow); }
+.hub-locations .hub-location-chosen strong::before { content: '> '; color: var(--term-warn); }
+.hub-locations button:disabled { cursor: not-allowed; opacity: 0.5; }
 .hub-upgrades { margin: 0; padding: 0; list-style: none; }
 .hub-upgrades li { display: flex; gap: 12px; align-items: center; justify-content: space-between; padding: 10px 0; border-top: 1px dashed var(--term-line); }
 .hub-upgrades small { display: block; margin-top: 4px; color: var(--term-dim); font-size: 8px; }

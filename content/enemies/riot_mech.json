@@ -1,0 +1,42 @@
+{
+  "id": "riot_mech",
+  "name": "Штурмовой мех",
+  "sprite": "enemies/riot_mech",
+  "role": "elite",
+  "ai": {
+    "type": "charger",
+    "params": {
+      "turnRate": 3,
+      "chargeRange": 170,
+      "windupMs": 800,
+      "chargeSpeed": 230,
+      "chargeMs": 650,
+      "cooldownMs": 1800
+    }
+  },
+  "stats": {
+    "hp": 1300,
+    "speed": 50,
+    "damage": 16,
+    "xp": 40
+  },
+  "drops": [
+    {
+      "item": "pickup",
+      "id": "chest",
+      "chance": 1
+    },
+    {
+      "item": "caps",
+      "chance": 1,
+      "amount": [
+        10,
+        20
+      ]
+    }
+  ],
+  "tags": [
+    "robot",
+    "elite"
+  ]
+}

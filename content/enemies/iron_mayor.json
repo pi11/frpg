@@ -1,0 +1,79 @@
+{
+  "id": "iron_mayor",
+  "name": "Железный мэр",
+  "sprite": "enemies/iron_mayor",
+  "role": "boss",
+  "ai": {
+    "type": "boss_phases",
+    "params": {
+      "phases": [
+        {
+          "hpBelow": 1,
+          "ai": {
+            "type": "ranged",
+            "params": {
+              "turnRate": 3,
+              "preferredRange": 100,
+              "fireCooldownMs": 1500,
+              "projectileSpeed": 150,
+              "projectileDamage": 14,
+              "projectileSprite": "projectiles/slug",
+              "lifetimeMs": 3000,
+              "shots": 5,
+              "spreadDegrees": 50
+            }
+          }
+        },
+        {
+          "hpBelow": 0.66,
+          "ai": {
+            "type": "charger",
+            "params": {
+              "turnRate": 4,
+              "chargeRange": 220,
+              "windupMs": 650,
+              "chargeSpeed": 240,
+              "chargeMs": 700,
+              "cooldownMs": 1400
+            }
+          },
+          "summon": {
+            "enemy": "wild_dog",
+            "count": 12
+          }
+        },
+        {
+          "hpBelow": 0.33,
+          "ai": {
+            "type": "ranged",
+            "params": {
+              "turnRate": 3,
+              "preferredRange": 90,
+              "fireCooldownMs": 900,
+              "projectileSpeed": 165,
+              "projectileDamage": 15,
+              "projectileSprite": "projectiles/slug",
+              "lifetimeMs": 3000,
+              "shots": 9,
+              "spreadDegrees": 120
+            }
+          },
+          "summon": {
+            "enemy": "rad_bat",
+            "count": 14
+          }
+        }
+      ]
+    }
+  },
+  "stats": {
+    "hp": 6000,
+    "speed": 70,
+    "damage": 26,
+    "xp": 0
+  },
+  "drops": [],
+  "tags": [
+    "boss"
+  ]
+}

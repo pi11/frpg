@@ -21,7 +21,7 @@ def test_run_reward_vectors() -> None:
     for case in VECTORS["runReward"]:
         assert run_reward(
             case["rules"], case["duration"], case["kills"], case["wave"],
-            case["boss_killed"], case["picked_caps"],
+            case["boss_killed"], case["picked_caps"], case["multiplier"],
         ) == case["expected"], case
 
 

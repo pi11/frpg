@@ -42,6 +42,7 @@ export class BossPhasesBehavior implements EnemyBehavior<BossPhasesParams> {
       for (const key of Object.keys(mob.memory)) mob.memory[key] = 0;
       mob.memory.phase = index + 1;
       mob.telegraph(false);
+      mob.setBurrowed(false);
       if (phase.summon && index > 0) context.summon(phase.summon.enemy, phase.summon.count, mob);
     }
     this.resolve(phase.ai.type)?.update(mob, context, phase.ai.params, deltaMs);

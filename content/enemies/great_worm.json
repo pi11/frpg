@@ -1,0 +1,44 @@
+{
+  "id": "great_worm",
+  "name": "Великий червь",
+  "sprite": "enemies/great_worm",
+  "role": "elite",
+  "ai": {
+    "type": "burrower",
+    "params": {
+      "turnRate": 3,
+      "surfaceMs": 3000,
+      "undergroundSpeed": 170,
+      "maxBurrowMs": 3500,
+      "emergeRange": 20,
+      "windupMs": 700,
+      "emergeRadius": 56,
+      "emergeDamage": 26
+    }
+  },
+  "stats": {
+    "hp": 2400,
+    "speed": 48,
+    "damage": 18,
+    "xp": 50
+  },
+  "drops": [
+    {
+      "item": "pickup",
+      "id": "chest",
+      "chance": 1
+    },
+    {
+      "item": "caps",
+      "chance": 1,
+      "amount": [
+        10,
+        20
+      ]
+    }
+  ],
+  "tags": [
+    "mutant",
+    "elite"
+  ]
+}

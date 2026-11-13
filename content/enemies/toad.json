@@ -1,0 +1,39 @@
+{
+  "id": "toad",
+  "name": "Ядожаба",
+  "sprite": "enemies/toad",
+  "role": "normal",
+  "ai": {
+    "type": "ranged",
+    "params": {
+      "turnRate": 4,
+      "preferredRange": 120,
+      "fireCooldownMs": 2200,
+      "projectileSpeed": 120,
+      "projectileDamage": 13,
+      "projectileSprite": "projectiles/spit",
+      "lifetimeMs": 2400,
+      "shots": 3,
+      "spreadDegrees": 24
+    }
+  },
+  "stats": {
+    "hp": 26,
+    "speed": 50,
+    "damage": 7,
+    "xp": 2
+  },
+  "drops": [
+    {
+      "item": "caps",
+      "chance": 0.04,
+      "amount": [
+        1,
+        4
+      ]
+    }
+  ],
+  "tags": [
+    "mutant"
+  ]
+}

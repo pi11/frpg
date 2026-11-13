@@ -16,6 +16,7 @@ describe('economy formulas match the server', () => {
       expect(runReward(item.rules, {
         duration: item.duration, kills: item.kills, wave: item.wave,
         bossKilled: item.boss_killed, pickedCaps: item.picked_caps,
+        multiplier: item.multiplier,
       }), JSON.stringify(item)).toBe(item.expected);
     }
   });

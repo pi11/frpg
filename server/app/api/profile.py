@@ -12,7 +12,7 @@ from app.api.errors import ApiError, ErrorCode, ErrorResponse
 from app.db import get_session
 from app.models.auth import AuthIdentity, Profile, User
 from app.services.content import get_content
-from app.services.economy import upgrade_cost
+from app.services.economy import unlocked_locations, upgrade_cost
 from app.services.tokens import current_user
 
 router = APIRouter(tags=["profile"], responses={
@@ -37,6 +37,8 @@ class ProfileResponse(BaseModel):
     best_time_s: int
     upgrades: dict[str, int]
     runs_count: int
+    bosses_killed: list[str]
+    unlocked_locations: list[str]
     identities: list[IdentityResponse]
 
 
@@ -54,6 +56,10 @@ async def profile_response(session: AsyncSession, user: User, profile: Profile) 
         version=profile.version, schema_version=profile.schema_version,
         best_time_s=profile.best_time_s, upgrades=data.get("upgrades", {}),
         runs_count=data.get("runs_count", 0),
+        bosses_killed=sorted(data.get("bosses_killed", [])),
+        unlocked_locations=unlocked_locations(
+            get_content().category("locations"), data.get("bosses_killed", []),
+        ),
         identities=[IdentityResponse(provider=item.provider, subject=item.subject)
                     for item in identities],
     )

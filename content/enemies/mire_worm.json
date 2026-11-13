@@ -1,0 +1,43 @@
+{
+  "id": "mire_worm",
+  "name": "Болотный червь",
+  "sprite": "enemies/mire_worm",
+  "role": "normal",
+  "ai": {
+    "type": "burrower",
+    "params": {
+      "turnRate": 4,
+      "surfaceMs": 2600,
+      "undergroundSpeed": 150,
+      "maxBurrowMs": 3200,
+      "emergeRange": 26,
+      "windupMs": 600,
+      "emergeRadius": 34,
+      "emergeDamage": 14
+    }
+  },
+  "stats": {
+    "hp": 30,
+    "speed": 52,
+    "damage": 8,
+    "xp": 3
+  },
+  "drops": [
+    {
+      "item": "caps",
+      "chance": 0.04,
+      "amount": [
+        1,
+        4
+      ]
+    },
+    {
+      "item": "pickup",
+      "id": "medkit",
+      "chance": 0.006
+    }
+  ],
+  "tags": [
+    "mutant"
+  ]
+}

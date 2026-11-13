@@ -14,6 +14,7 @@ export interface ResultData {
   seed: number;
   runId: string;
   bossKilled: boolean;
+  locationId: string;
   summary: RunSummary;
 }
 
@@ -73,10 +74,12 @@ export class ResultScene extends Phaser.Scene {
     if (this.sending || this.settled) return;
     this.sending = true;
     const summary = this.result.summary;
-    const estimate = runReward(getCatalog().balance.reward, {
+    const catalog = getCatalog();
+    const estimate = runReward(catalog.balance.reward, {
       duration: summary.duration_seconds,
       kills: Object.values(summary.kills_by_type).reduce((sum, value) => sum + value, 0),
       wave: summary.wave_reached, bossKilled: summary.boss_killed, pickedCaps: summary.picked_caps,
+      multiplier: catalog.locations[this.result.locationId]?.rewardMultiplier ?? 1,
     });
     this.rewardLabel.setText(`Сервер считает награду… (≈ ${estimate} крышек)`);
     this.actionLabel.setText('ПОДОЖДИТЕ…');

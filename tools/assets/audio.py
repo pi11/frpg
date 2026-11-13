@@ -280,8 +280,58 @@ def boss_theme() -> list[float]:
     ], cutoff=5800)
 
 
+def city_theme() -> list[float]:
+    """Mechanical run music for the dead city in A minor, 124 BPM, 16 bars."""
+    step = 60 / 124 / 4
+    total = int(step * 16 * 16 * RATE)
+    bass = " ".join(["A1:2 A1:2 A2:2 A1:2 A1:2 G1:2 A1:2 C2:2 "
+                     "F1:2 F1:2 F2:2 F1:2 G1:2 G1:2 G2:2 E1:2"] * 8)
+    lead = (
+        "A4:4 C5:4 E5:4 A5:4 G5:6 E5:2 D5:8 "
+        "F5:4 E5:4 C5:4 A4:4 B4:6 G4:2 E4:8 "
+        "A4:2 A4:2 C5:4 E5:4 D5:4 C5:4 B4:4 A4:8 "
+        "F4:4 A4:4 C5:4 F5:4 E5:12 -:4 "
+        "-:32 -:32 "
+        "E5:2 E5:2 D5:2 C5:2 D5:4 E5:4 A4:16 "
+        "F5:2 F5:2 E5:2 D5:2 E5:4 G5:4 E5:16"
+    )
+    return master([
+        sequence(bass, step, pulse(0.5), 0.15, total, curve=1.3, gate=0.7),
+        sequence(lead, step, pulse(0.125), 0.09, total, curve=0.8),
+        drums("k.hhs.hkk.hhs.hh", step, total, 47),
+    ], cutoff=5200)
+
+
+def marsh_theme() -> list[float]:
+    """Slow, eerie marsh music in D minor with a wandering lead, 100 BPM, 16 bars."""
+    step = 60 / 100 / 4
+    total = int(step * 16 * 16 * RATE)
+    bass = " ".join(
+        ["D2:6 D2:2 A1:8 ", "A#1:6 A#1:2 F1:8 ", "G1:6 G1:2 D2:8 ", "A1:6 A1:2 C#2:8 "] * 4
+    )
+    lead = (
+        "A4:8 G#4:4 A4:4 D5:12 C5:4 "
+        "A#4:8 A4:4 G4:4 F4:16 "
+        "G4:6 A4:2 A#4:8 D5:8 A#4:8 "
+        "A4:12 G4:4 E4:16 "
+        "-:32 -:32 "
+        "D5:4 F5:4 E5:8 D5:4 C#5:4 A4:8 "
+        "A#4:4 A4:4 G4:8 F4:4 E4:4 D4:8"
+    )
+    pads = " ".join(["D4:16 ", "A#3:16 ", "G3:16 ", "A3:16 "] * 4)
+    return master([
+        sequence(bass, step, triangle, 0.18, total, curve=1.0, gate=0.9),
+        sequence(lead, step, pulse(0.25), 0.08, total, curve=0.5),
+        sequence(pads, step, triangle, 0.09, total, curve=0.3),
+        drums("k...h.s.k.k.h.s.", step, total, 53),
+    ], cutoff=4200)
+
+
 def music_tracks() -> dict[str, list[float]]:
-    return {"shelter": shelter_theme(), "wasteland": wasteland_theme(), "boss": boss_theme()}
+    return {
+        "shelter": shelter_theme(), "wasteland": wasteland_theme(), "boss": boss_theme(),
+        "city": city_theme(), "marsh": marsh_theme(),
+    }
 
 
 def wav(samples: list[float]) -> bytes:

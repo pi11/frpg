@@ -35,6 +35,12 @@ PALETTE: dict[str, tuple[int, int, int]] = {
     "M": (0x55, 0x56, 0x5e),  # metal dark
     "a": (0x4c, 0x4b, 0x4d),  # asphalt
     "A": (0x37, 0x36, 0x39),  # asphalt dark
+    "n": (0xa3, 0xa0, 0x96),  # concrete light
+    "p": (0x8a, 0x55, 0x9c),  # mutant purple
+    "P": (0x52, 0x2f, 0x62),  # purple dark
+    "v": (0xc9, 0x93, 0xd9),  # violet light
+    "u": (0x3f, 0x44, 0x2a),  # marsh mud
+    "U": (0x2b, 0x30, 0x1d),  # marsh mud dark
 }
 
 # --- Hero: wanderer in a wide hat, scarf and duster coat -------------------------

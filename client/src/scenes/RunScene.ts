@@ -67,6 +67,9 @@ const FLAMES_PER_ZONE = 7;
 const HERO_DEATH_DELAY_MS = 900;
 const VICTORY_DELAY_MS = 1800;
 const SUMMON_RING = 36;
+/** Spacing of a pack spawned together and of the pieces of a split enemy (presentation). */
+const PACK_RING = 18;
+const SPLIT_RING = 10;
 const HIT_FLASH_MS = 50;
 const LABEL_POOL_SIZE = 8;
 const HIT_FLASH_GAP_MS = 120;
@@ -80,6 +83,7 @@ class SpriteMob implements Mob {
   maxHp = 1;
   speedMultiplier = 1;
   telegraphing = false;
+  burrowed = false;
   /** Run time when the white hit flash ends (0 = no flash). */
   flashUntil = 0;
 
@@ -100,12 +104,21 @@ class SpriteMob implements Mob {
     else this.sprite.clearTint();
   }
 
+  setBurrowed(on: boolean): void {
+    this.burrowed = on;
+    this.sprite.setAlpha(on ? 0.3 : 1);
+  }
+
+  /** Active and above ground: can be shot, hit and can hurt the hero. */
+  get targetable(): boolean { return this.sprite.active && !this.burrowed; }
+
   reset(definition: EnemyDefinition, hp: number, speedMultiplier: number): void {
     this.definition = definition;
     this.speedMultiplier = speedMultiplier;
     this.hp = hp;
     this.maxHp = hp;
     this.telegraphing = false;
+    this.setBurrowed(false);
     this.flashUntil = 0;
     for (const key of Object.keys(this.memory)) this.memory[key] = 0;
     for (const key of Object.keys(this.hitAt)) this.hitAt[key] = -Infinity;
@@ -268,7 +281,7 @@ export class RunScene extends Phaser.Scene {
     this.physics.add.overlap(this.projectiles, this.enemies, (first, second) => {
       const bullet = first as Phaser.Physics.Arcade.Sprite;
       const mob = (second as Phaser.Physics.Arcade.Sprite).getData('mob') as SpriteMob;
-      if (!bullet.active || !mob.sprite.active) return;
+      if (!bullet.active || !mob.targetable) return;
       const hits = bullet.getData('hits') as Set<number>;
       if (hits.has(mob.uid)) return;
       hits.add(mob.uid);
@@ -287,9 +300,9 @@ export class RunScene extends Phaser.Scene {
       if (sprite.active) this.hitCrate(sprite, Infinity);
     });
     this.physics.add.overlap(this.hero, this.enemies, (_hero, item) => {
-      const sprite = item as Phaser.Physics.Arcade.Sprite;
-      if (!sprite.active) return;
-      this.takeDamage((sprite.getData('mob') as SpriteMob).definition.stats.damage);
+      const mob = (item as Phaser.Physics.Arcade.Sprite).getData('mob') as SpriteMob;
+      if (!mob.targetable) return;
+      this.takeDamage(mob.definition.stats.damage);
     });
     this.physics.add.overlap(this.hero, this.hostileShots, (_hero, item) => {
       const shot = item as Phaser.Physics.Arcade.Sprite;
@@ -343,14 +356,26 @@ export class RunScene extends Phaser.Scene {
         sprite.clearTint();
         sprite.disableBody(true, true);
       },
-      summon: (enemyId, count, around) => {
-        const definition = this.catalog.enemies[enemyId];
-        if (!definition) return;
-        for (let index = 0; index < count; index += 1) {
-          const angle = (index / count) * Math.PI * 2;
-          this.spawnEnemy(definition, around.x + Math.cos(angle) * SUMMON_RING,
-            around.y + Math.sin(angle) * SUMMON_RING, this.currentWave().hpMultiplier);
+      summon: (enemyId, count, around) => this.summon(enemyId, count, around, SUMMON_RING),
+      shockwave: (center, radius, damage) => {
+        this.playEffect('fx/dust', 'burst', center.x, center.y, false);
+        playSfx('sfx/crate_break');
+        this.cameras.main.shake(80, 0.004);
+        if (Phaser.Math.Distance.Between(center.x, center.y, this.hero.x, this.hero.y) <= radius) {
+          this.takeDamage(damage, true);
         }
+      },
+      healAround: (healer, radius, fraction) => {
+        let healed = 0;
+        for (const mob of this.mobs) {
+          // Only ordinary enemies: healing elites or a boss by a share of their HP is far too strong.
+          if (mob === healer || !mob.targetable || mob.definition.role !== 'normal' || mob.hp >= mob.maxHp) continue;
+          if (Phaser.Math.Distance.Between(mob.x, mob.y, healer.x, healer.y) > radius) continue;
+          mob.hp = Math.min(mob.maxHp, mob.hp + mob.maxHp * fraction);
+          healed += 1;
+        }
+        this.playEffect('fx/heal', 'burst', healer.x, healer.y, false);
+        return healed;
       },
     };
     this.pickupContext = {
@@ -413,7 +438,7 @@ export class RunScene extends Phaser.Scene {
     this.spawnClock += delta;
     while (this.spawnClock >= interval) {
       this.spawnClock -= interval;
-      this.spawnEnemy(this.selectEnemy());
+      this.spawnWaveEntry();
     }
     this.moveEnemies(delta);
     this.expire(this.projectiles);
@@ -508,16 +533,33 @@ export class RunScene extends Phaser.Scene {
 
   // --- enemies -----------------------------------------------------------------------
 
-  private selectEnemy(): EnemyDefinition {
+  /** One weighted pick from the wave; a `group` entry arrives as a pack around one spot. */
+  private spawnWaveEntry(): void {
     const entries = this.currentWave().enemies;
     let total = 0;
     for (const entry of entries) total += entry.weight;
     let roll = this.rng.next() * total;
+    let picked = entries.at(-1)!;
     for (const entry of entries) {
       roll -= entry.weight;
-      if (roll < 0) return this.catalog.enemies[entry.id]!;
+      if (roll < 0) {
+        picked = entry;
+        break;
+      }
     }
-    return this.catalog.enemies[entries.at(-1)!.id]!;
+    const definition = this.catalog.enemies[picked.id]!;
+    if (picked.group <= 1) {
+      this.spawnEnemy(definition);
+      return;
+    }
+    const angle = this.rng.next() * Math.PI * 2;
+    const distance = this.catalog.balance.run.spawnDistance;
+    const x = this.hero.x + Math.cos(angle) * distance;
+    const y = this.hero.y + Math.sin(angle) * distance;
+    for (let index = 0; index < picked.group; index += 1) {
+      const offset = (index / picked.group) * Math.PI * 2;
+      this.spawnEnemy(definition, x + Math.cos(offset) * PACK_RING, y + Math.sin(offset) * PACK_RING);
+    }
   }
 
   private spawnEnemy(definition: EnemyDefinition, x?: number, y?: number, hpMultiplier?: number): void {
@@ -580,6 +622,16 @@ export class RunScene extends Phaser.Scene {
     }
   }
 
+  private summon(enemyId: string, count: number, around: Point, ring: number): void {
+    const definition = this.catalog.enemies[enemyId];
+    if (!definition) return;
+    for (let index = 0; index < count; index += 1) {
+      const angle = (index / count) * Math.PI * 2;
+      this.spawnEnemy(definition, around.x + Math.cos(angle) * ring,
+        around.y + Math.sin(angle) * ring, this.currentWave().hpMultiplier);
+    }
+  }
+
   private killMob(mob: SpriteMob): void {
     const { sprite, definition } = mob;
     const { x, y } = sprite;
@@ -596,6 +648,7 @@ export class RunScene extends Phaser.Scene {
     this.killsByType[definition.id] = (this.killsByType[definition.id] ?? 0) + 1;
     if (definition.stats.xp > 0) this.dropXp(x, y, definition.stats.xp);
     this.rollDrops(definition, x, y);
+    if (definition.split) this.summon(definition.split.enemy, definition.split.count, { x, y }, SPLIT_RING);
     if (definition.role === 'boss') this.winByBoss();
   }
 
@@ -642,11 +695,21 @@ export class RunScene extends Phaser.Scene {
 
   // --- player attacks ---------------------------------------------------------------
 
+  /** Nearest enemy, but an elite or boss inside `eliteFocusRange` comes first. */
   private nearestEnemy(): Point | null {
     let nearest: Point | null = null;
     let best = Infinity;
+    let focus: Point | null = null;
+    let focusBest = this.catalog.balance.run.eliteFocusRange ** 2;
     for (const mob of this.mobs) {
-      if (!mob.sprite.active) continue;
+      if (!mob.targetable) continue;
+      if (mob.definition.role !== 'normal') {
+        const distance = this.distanceSquared(mob.sprite);
+        if (distance <= focusBest) {
+          focus = mob.sprite;
+          focusBest = distance;
+        }
+      }
       const dx = mob.sprite.x - this.hero.x;
       const dy = mob.sprite.y - this.hero.y;
       const distanceSquared = dx * dx + dy * dy;
@@ -655,19 +718,19 @@ export class RunScene extends Phaser.Scene {
         best = distanceSquared;
       }
     }
-    return nearest;
+    return focus ?? nearest;
   }
 
   private randomEnemyWithin(range: number): Point | null {
     const rangeSquared = range * range;
     let count = 0;
     for (const mob of this.mobs) {
-      if (mob.sprite.active && this.distanceSquared(mob.sprite) <= rangeSquared) count += 1;
+      if (mob.targetable && this.distanceSquared(mob.sprite) <= rangeSquared) count += 1;
     }
     if (!count) return null;
     let pick = Math.floor(this.rng.next() * count);
     for (const mob of this.mobs) {
-      if (!mob.sprite.active || this.distanceSquared(mob.sprite) > rangeSquared) continue;
+      if (!mob.targetable || this.distanceSquared(mob.sprite) > rangeSquared) continue;
       if (pick === 0) return mob.sprite;
       pick -= 1;
     }
@@ -684,7 +747,7 @@ export class RunScene extends Phaser.Scene {
     let hits = 0;
     for (const mob of this.mobs) {
       const sprite = mob.sprite;
-      if (!sprite.active) continue;
+      if (!mob.targetable) continue;
       const reach = radius + sprite.width / 3;
       const dx = sprite.x - center.x;
       const dy = sprite.y - center.y;
@@ -1047,7 +1110,7 @@ export class RunScene extends Phaser.Scene {
     const result: ResultData = {
       reason, seconds: this.view.seconds, kills: this.view.kills,
       level: this.view.level, seed: this.view.seed, runId: this.runId,
-      bossKilled: this.bossKilled,
+      bossKilled: this.bossKilled, locationId: this.location.id,
       summary: {
         content_hash: this.contentHash,
         duration_seconds: this.view.seconds,

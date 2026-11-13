@@ -23,6 +23,8 @@ export interface Mob extends Point {
   readonly memory: Record<string, number>;
   /** Visual warning before a charge or explosion. */
   telegraph(on: boolean): void;
+  /** Underground: untargetable, no contact damage, drawn as a faint mound. */
+  setBurrowed(on: boolean): void;
 }
 
 export interface EnemyContext {
@@ -33,6 +35,10 @@ export interface EnemyContext {
   /** Blow the mob up: damages the hero inside `radius` and removes the mob without loot. */
   explode(mob: Mob, radius: number, damage: number): void;
   summon(enemyId: string, count: number, around: Point): void;
+  /** Ground burst at `center`: damages the hero inside `radius`. */
+  shockwave(center: Point, radius: number, damage: number): void;
+  /** Heals other ordinary (not elite or boss) enemies inside `radius` by `fraction` of their max HP. */
+  healAround(healer: Mob, radius: number, fraction: number): number;
 }
 
 export interface EnemyBehavior<P> {

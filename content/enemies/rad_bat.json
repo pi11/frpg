@@ -1,0 +1,34 @@
+{
+  "id": "rad_bat",
+  "name": "Радиомышь",
+  "sprite": "enemies/rad_bat",
+  "role": "normal",
+  "ai": {
+    "type": "weaver",
+    "params": {
+      "turnRate": 6,
+      "amplitude": 0.75,
+      "frequencyHz": 1.3
+    }
+  },
+  "stats": {
+    "hp": 10,
+    "speed": 78,
+    "damage": 7,
+    "xp": 1
+  },
+  "drops": [
+    {
+      "item": "caps",
+      "chance": 0.012,
+      "amount": [
+        1,
+        2
+      ]
+    }
+  ],
+  "tags": [
+    "mutant",
+    "flying"
+  ]
+}

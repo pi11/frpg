@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { getCatalog, validateContent } from './catalog';
+import { orderedLocations } from './locations';
 
 const rawFiles = import.meta.glob<unknown>('../../../content/**/*.json', {
   eager: true, import: 'default',
@@ -155,5 +156,31 @@ describe('assets referenced by content', () => {
     };
     walk(assets);
     expect(unlicensed).toEqual([]);
+  });
+});
+
+describe('locations', () => {
+  it('are listed in unlock order and each later one needs the previous boss', () => {
+    const ordered = orderedLocations(getCatalog());
+    expect(ordered.map((location) => location.id))
+      .toEqual(['shelter_outskirts', 'dead_city', 'toxic_marsh']);
+    ordered.slice(1).forEach((location, index) => {
+      expect(location.unlock).toEqual({ type: 'bossKilled', location: ordered[index]!.id });
+      expect(location.rewardMultiplier).toBeGreaterThan(ordered[index]!.rewardMultiplier);
+    });
+  });
+
+  it('rejects an unlock that points to an unknown location', () => {
+    const cityPath = Object.keys(rawFiles).find((path) => path.endsWith('dead_city.json'))!;
+    const city = structuredClone(rawFiles[cityPath] as { unlock: { location: string } });
+    city.unlock.location = 'moon_base';
+    expect(() => validateContent({ ...rawFiles, [cityPath]: city })).toThrow('unlocks after unknown location');
+  });
+
+  it('rejects a split into a non-normal enemy', () => {
+    const slimePath = Object.keys(rawFiles).find((path) => path.endsWith('glow_slime.json'))!;
+    const slime = structuredClone(rawFiles[slimePath] as { split: { enemy: string } });
+    slime.split.enemy = 'brute';
+    expect(() => validateContent({ ...rawFiles, [slimePath]: slime })).toThrow('role normal');
   });
 });

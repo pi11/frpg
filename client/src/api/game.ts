@@ -9,6 +9,10 @@ export interface Profile {
   best_time_s: number;
   upgrades: Record<string, number>;
   runs_count: number;
+  /** Locations whose boss was killed at least once. */
+  bosses_killed: string[];
+  /** Locations open for this profile (checked again by the server on run start). */
+  unlocked_locations: string[];
   identities: { provider: string; subject: string }[];
 }
 

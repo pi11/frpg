@@ -1,0 +1,31 @@
+{
+  "id": "wild_dog",
+  "name": "Одичавший пёс",
+  "sprite": "enemies/wild_dog",
+  "role": "normal",
+  "ai": {
+    "type": "chaser",
+    "params": {
+      "turnRate": 5
+    }
+  },
+  "stats": {
+    "hp": 14,
+    "speed": 92,
+    "damage": 8,
+    "xp": 1
+  },
+  "drops": [
+    {
+      "item": "caps",
+      "chance": 0.012,
+      "amount": [
+        1,
+        2
+      ]
+    }
+  ],
+  "tags": [
+    "animal"
+  ]
+}

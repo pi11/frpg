@@ -25,6 +25,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 import art  # noqa: E402
+import art_more as more  # noqa: E402
 import art_world as world  # noqa: E402
 import audio  # noqa: E402
 import shapes  # noqa: E402
@@ -187,6 +188,20 @@ def sprite_frames() -> dict[str, Image]:
         "fx/explosion": numbered("burst", [shapes.explosion(i) for i in range(5)]),
         "pickups/chest": numbered("idle", [parse(src) for src in world.CHEST_FRAMES]),
         "decor/crate": numbered("break", [parse(src) for src in world.CRATE_BREAK]),
+        "enemies/wild_dog": with_death([more.wild_dog(i) for i in range(4)], "R", 41),
+        "enemies/rad_bat": with_death([more.rad_bat(i) for i in range(4)], "P", 43),
+        "enemies/medic": with_death([more.medic(i) for i in range(4)], "R", 47),
+        "enemies/riot_mech": with_death([more.riot_mech(i) for i in range(4)], "M", 53),
+        "enemies/iron_mayor": with_death([more.iron_mayor(i) for i in range(4)], "M", 59),
+        "enemies/glow_slime": with_death([more.slime(i, 16) for i in range(4)], "G", 61),
+        "enemies/slimelet": with_death([more.slime(i, 10) for i in range(4)], "G", 67),
+        "enemies/slime_queen": with_death([more.slime_queen(i) for i in range(4)], "G", 71),
+        "enemies/mire_worm": with_death([more.worm(i, 16) for i in range(4)], "u", 73),
+        "enemies/great_worm": with_death([more.worm(i, 24) for i in range(4)], "u", 79),
+        "enemies/toad": with_death([more.toad(i) for i in range(4)], "T", 83),
+        "enemies/marsh_mother": with_death([more.marsh_mother(i) for i in range(4)], "P", 89),
+        "fx/dust": numbered("burst", [more.dust(i) for i in range(5)]),
+        "fx/heal": numbered("burst", [more.heal_ring(i) for i in range(4)]),
     }
     frames: dict[str, Image] = {}
     for key, animation in animated.items():
@@ -238,6 +253,17 @@ def sprite_frames() -> dict[str, Image]:
         "decor/crater": shapes.crater(),
         "decor/rad_puddle": shapes.rad_puddle(0),
         "decor/dune": shapes.dune(),
+        "projectiles/spit": more.spit(),
+        "decor/concrete_block": more.concrete_block(),
+        "decor/lamp_post": more.lamp_post(),
+        "decor/ruin_wall": more.ruin_wall(),
+        "decor/rubble": more.rubble(),
+        "decor/oil_puddle": more.oil_puddle(),
+        "decor/reeds": more.reeds(),
+        "decor/stump": more.stump(),
+        "decor/mushrooms": more.mushrooms(),
+        "decor/toxic_pool": more.toxic_pool(),
+        "decor/moss": more.moss(),
     })
     return frames
 
@@ -332,6 +358,8 @@ def build_images(preview: Path | None) -> None:
     (OUT / "ground").mkdir(parents=True, exist_ok=True)
     ground = wasteland_ground()
     (OUT / "ground" / "wasteland.png").write_bytes(png(ground))
+    (OUT / "ground" / "city.png").write_bytes(png(more.city_ground()))
+    (OUT / "ground" / "marsh.png").write_bytes(png(more.marsh_ground()))
     build_android(frames)
     if preview:
         preview.mkdir(parents=True, exist_ok=True)

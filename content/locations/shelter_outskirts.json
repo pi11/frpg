@@ -1,6 +1,11 @@
 {
   "id": "shelter_outskirts",
   "name": "Пустошь у убежища",
+  "description": "Свалки и дюны у ворот убежища. Гули, тараканы, рейдеры и Король свалки.",
+  "unlock": {
+    "type": "default"
+  },
+  "rewardMultiplier": 1,
   "groundSprite": "ground/wasteland",
   "music": "music/wasteland",
   "bossMusic": "music/boss",

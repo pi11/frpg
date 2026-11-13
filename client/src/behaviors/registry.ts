@@ -1,8 +1,11 @@
 import { BossPhasesBehavior } from './enemies/BossPhases';
+import { BurrowerEnemyBehavior } from './enemies/Burrower';
 import { ChargerEnemyBehavior } from './enemies/Charger';
 import { ChaserEnemyBehavior } from './enemies/Chaser';
 import { ExploderEnemyBehavior } from './enemies/Exploder';
+import { HealerEnemyBehavior } from './enemies/Healer';
 import { RangedEnemyBehavior } from './enemies/Ranged';
+import { WeaverEnemyBehavior } from './enemies/Weaver';
 import { BlastEffect, CapsEffect, ChestEffect, HealEffect, MagnetEffect } from './pickups/effects';
 import type { EnemyBehavior, PickupEffect, WeaponBehavior } from './types';
 import { AuraWeaponBehavior } from './weapons/Aura';
@@ -22,6 +25,9 @@ export const enemyBehaviors: Record<string, EnemyBehavior<unknown> | undefined> 
   charger: new ChargerEnemyBehavior() as EnemyBehavior<unknown>,
   ranged: new RangedEnemyBehavior() as EnemyBehavior<unknown>,
   exploder: new ExploderEnemyBehavior() as EnemyBehavior<unknown>,
+  weaver: new WeaverEnemyBehavior() as EnemyBehavior<unknown>,
+  burrower: new BurrowerEnemyBehavior() as EnemyBehavior<unknown>,
+  healer: new HealerEnemyBehavior() as EnemyBehavior<unknown>,
 };
 enemyBehaviors.boss_phases = new BossPhasesBehavior(
   (type) => enemyBehaviors[type],

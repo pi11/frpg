@@ -17,11 +17,11 @@ from app.db import get_session
 from app.models.auth import Profile, User
 from app.models.run import Run
 from app.services.content import get_content
-from app.services.economy import run_reward
+from app.services.economy import run_reward, unlocked_locations
 from app.services.tokens import as_utc, current_user, utcnow
 
 router = APIRouter(prefix="/runs", tags=["runs"], responses={
-    401: {"model": ErrorResponse}, 404: {"model": ErrorResponse},
+    401: {"model": ErrorResponse}, 403: {"model": ErrorResponse}, 404: {"model": ErrorResponse},
     409: {"model": ErrorResponse},
 })
 SessionDep = Annotated[AsyncSession, Depends(get_session)]
@@ -64,6 +64,10 @@ async def start_run(
         raise ApiError(404, ErrorCode.not_found, "Локация не найдена")
     if body.hero_id not in content.category("heroes"):
         raise ApiError(404, ErrorCode.not_found, "Герой не найден")
+    profile = await session.get(Profile, user.id)
+    bosses_killed = (profile.data or {}).get("bosses_killed", []) if profile else []
+    if body.location_id not in unlocked_locations(content.category("locations"), bosses_killed):
+        raise ApiError(403, ErrorCode.locked, "Локация ещё закрыта")
     await session.scalar(select(User).where(User.id == user.id).with_for_update())
     now = utcnow()
     active = (await session.scalars(
@@ -148,7 +152,10 @@ async def finish_run(
     if body.boss_killed and not boss_killed:
         flags.append("boss_clamped")
 
-    reward = run_reward(rules, duration, kills, wave, boss_killed, picked_caps)
+    reward = run_reward(
+        rules, duration, kills, wave, boss_killed, picked_caps,
+        float(location["rewardMultiplier"]),
+    )
     run.status = "finished"
     run.finished_at = now
     run.reward_caps = reward
@@ -164,7 +171,10 @@ async def finish_run(
     profile.version += 1
     profile.best_time_s = max(profile.best_time_s, duration)
     data = profile.data or {}
-    profile.data = {**data, "runs_count": data.get("runs_count", 0) + 1}
+    bosses = list(data.get("bosses_killed", []))
+    if boss_killed and run.location_id not in bosses:
+        bosses.append(run.location_id)
+    profile.data = {**data, "runs_count": data.get("runs_count", 0) + 1, "bosses_killed": bosses}
     await session.commit()
     return RunFinishResponse(
         reward_caps=reward, flags=flags,

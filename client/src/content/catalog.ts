@@ -123,6 +123,12 @@ export function validateContent(files: Record<string, unknown>): Catalog {
         throw new Error(`enemy ${enemy.id}: unknown drop pickup ${drop.id}`);
       }
     }
+    if (enemy.split) {
+      needEnemy(`enemy ${enemy.id} split`, enemy.split.enemy, 'normal');
+      if (enemies[enemy.split.enemy]?.split) {
+        throw new Error(`enemy ${enemy.id}: split pieces cannot split again`);
+      }
+    }
     if (enemy.ai.type === 'boss_phases') {
       const params = enemy.ai.params as { phases: { summon?: { enemy: string } }[] };
       for (const phase of params.phases) {
@@ -131,9 +137,15 @@ export function validateContent(files: Record<string, unknown>): Catalog {
     }
   }
   if (!pickups.cap) throw new Error('content/pickups/cap.json is required for caps drops');
+  if (!Object.values(locations).some((location) => location.unlock.type === 'default')) {
+    throw new Error('At least one location must be open from the start');
+  }
   for (const location of Object.values(locations)) {
     if (!heroes[location.startingHero]) {
       throw new Error(`location ${location.id}: unknown hero ${location.startingHero}`);
+    }
+    if (location.unlock.type === 'bossKilled' && !locations[location.unlock.location]) {
+      throw new Error(`location ${location.id}: unlocks after unknown location`);
     }
     if (location.waves[0]?.atSecond !== 0) {
       throw new Error(`location ${location.id}: first wave must start at second 0`);

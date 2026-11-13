@@ -273,3 +273,65 @@ async def test_boss_kill_counts_only_after_the_boss_appears(api: dict[str, objec
     assert data["flags"] == []
     rules = get_content().balance["reward"]
     assert data["reward_caps"] == run_reward(rules, boss["atSecond"] + 10, 51, waves, True, 0)
+
+
+@pytest.mark.anyio
+async def test_locations_unlock_after_their_boss_and_scale_the_reward(
+    api: dict[str, object],
+) -> None:
+    client: httpx.AsyncClient = api["client"]  # type: ignore[assignment]
+    factory: async_sessionmaker[AsyncSession] = api["factory"]  # type: ignore[assignment]
+    guest = (await client.post("/api/v1/auth/guest")).json()
+    auth = headers(guest)
+    profile = (await client.get("/api/v1/profile", headers=auth)).json()
+    assert profile["unlocked_locations"] == ["shelter_outskirts"]
+    assert profile["bosses_killed"] == []
+    locked = await client.post("/api/v1/runs/start", json={
+        "location_id": "dead_city", "hero_id": "wanderer"}, headers=auth)
+    assert locked.status_code == 403
+    assert locked.json()["code"] == "locked"
+
+    # Beat the first boss: the city opens, the marsh stays closed.
+    outskirts = get_content().category("locations")["shelter_outskirts"]
+    boss = outskirts["boss"]
+    started = (await client.post("/api/v1/runs/start", json={
+        "location_id": "shelter_outskirts", "hero_id": "wanderer"}, headers=auth)).json()
+    async with factory() as session:
+        run = await session.get(Run, UUID(started["run_id"]))
+        assert run is not None
+        run.started_at = run.started_at - timedelta(seconds=boss["atSecond"] + 20)
+        await session.commit()
+    duration = boss["atSecond"] + 10
+    waves = sum(1 for wave in outskirts["waves"] if wave["atSecond"] <= duration)
+    finished = (await client.post(f"/api/v1/runs/{started['run_id']}/finish", json={
+        "content_hash": get_content().hash, "duration_seconds": duration,
+        "kills_by_type": {boss["enemy"]: 1}, "wave_reached": waves,
+        "boss_killed": True, "picked_caps": 0,
+    }, headers=auth)).json()
+    assert finished["flags"] == []
+    assert finished["profile"]["bosses_killed"] == ["shelter_outskirts"]
+    assert finished["profile"]["unlocked_locations"] == ["dead_city", "shelter_outskirts"]
+    marsh = await client.post("/api/v1/runs/start", json={
+        "location_id": "toxic_marsh", "hero_id": "wanderer"}, headers=auth)
+    assert marsh.status_code == 403
+
+    city = get_content().category("locations")["dead_city"]
+    started = (await client.post("/api/v1/runs/start", json={
+        "location_id": "dead_city", "hero_id": "wanderer"}, headers=auth)).json()
+    async with factory() as session:
+        run = await session.get(Run, UUID(started["run_id"]))
+        assert run is not None
+        run.started_at = run.started_at - timedelta(seconds=150)
+        await session.commit()
+    result = (await client.post(f"/api/v1/runs/{started['run_id']}/finish", json={
+        "content_hash": get_content().hash, "duration_seconds": 130,
+        "kills_by_type": {"wild_dog": 100}, "wave_reached": 2,
+        "boss_killed": False, "picked_caps": 12,
+    }, headers=auth)).json()
+    rules = get_content().balance["reward"]
+    assert result["flags"] == []
+    assert city["rewardMultiplier"] > 1
+    assert result["reward_caps"] == run_reward(
+        rules, 130, 100, 2, False, 12, float(city["rewardMultiplier"]),
+    )
+    assert result["reward_caps"] > run_reward(rules, 130, 100, 2, False, 12)

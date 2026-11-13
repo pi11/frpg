@@ -1,0 +1,344 @@
+{
+  "id": "dead_city",
+  "name": "Мёртвый город",
+  "description": "Руины улиц: стаи псов, радиомыши, лекари рейдеров и Железный мэр.",
+  "unlock": {
+    "type": "bossKilled",
+    "location": "shelter_outskirts"
+  },
+  "rewardMultiplier": 1.5,
+  "groundSprite": "ground/city",
+  "music": "music/city",
+  "bossMusic": "music/boss",
+  "durationSeconds": 900,
+  "startingHero": "wanderer",
+  "waves": [
+    {
+      "atSecond": 0,
+      "spawnIntervalMs": 560,
+      "hpMultiplier": 1.8,
+      "speedMultiplier": 1,
+      "enemies": [
+        {
+          "id": "wild_dog",
+          "weight": 1,
+          "group": 3
+        },
+        {
+          "id": "roach",
+          "weight": 2
+        }
+      ]
+    },
+    {
+      "atSecond": 60,
+      "spawnIntervalMs": 440,
+      "hpMultiplier": 2.04,
+      "speedMultiplier": 1,
+      "enemies": [
+        {
+          "id": "wild_dog",
+          "weight": 2,
+          "group": 3
+        },
+        {
+          "id": "rad_bat",
+          "weight": 2
+        },
+        {
+          "id": "roach",
+          "weight": 1
+        }
+      ]
+    },
+    {
+      "atSecond": 120,
+      "spawnIntervalMs": 360,
+      "hpMultiplier": 2.4,
+      "speedMultiplier": 1.05,
+      "enemies": [
+        {
+          "id": "wild_dog",
+          "weight": 2,
+          "group": 3
+        },
+        {
+          "id": "rad_bat",
+          "weight": 3
+        },
+        {
+          "id": "raider",
+          "weight": 1
+        }
+      ]
+    },
+    {
+      "atSecond": 240,
+      "spawnIntervalMs": 300,
+      "hpMultiplier": 3.0,
+      "speedMultiplier": 1.1,
+      "enemies": [
+        {
+          "id": "wild_dog",
+          "weight": 2,
+          "group": 3
+        },
+        {
+          "id": "rad_bat",
+          "weight": 3
+        },
+        {
+          "id": "raider",
+          "weight": 2
+        },
+        {
+          "id": "medic",
+          "weight": 1
+        }
+      ]
+    },
+    {
+      "atSecond": 360,
+      "spawnIntervalMs": 250,
+      "hpMultiplier": 3.84,
+      "speedMultiplier": 1.15,
+      "enemies": [
+        {
+          "id": "wild_dog",
+          "weight": 2,
+          "group": 4
+        },
+        {
+          "id": "rad_bat",
+          "weight": 3
+        },
+        {
+          "id": "raider",
+          "weight": 2
+        },
+        {
+          "id": "medic",
+          "weight": 1
+        },
+        {
+          "id": "cleaner_bot",
+          "weight": 1
+        }
+      ]
+    },
+    {
+      "atSecond": 480,
+      "spawnIntervalMs": 200,
+      "hpMultiplier": 5.04,
+      "speedMultiplier": 1.2,
+      "enemies": [
+        {
+          "id": "wild_dog",
+          "weight": 2,
+          "group": 4
+        },
+        {
+          "id": "rad_bat",
+          "weight": 3
+        },
+        {
+          "id": "raider",
+          "weight": 2
+        },
+        {
+          "id": "medic",
+          "weight": 1
+        },
+        {
+          "id": "cleaner_bot",
+          "weight": 2
+        }
+      ]
+    },
+    {
+      "atSecond": 600,
+      "spawnIntervalMs": 165,
+      "hpMultiplier": 6.48,
+      "speedMultiplier": 1.3,
+      "enemies": [
+        {
+          "id": "wild_dog",
+          "weight": 2,
+          "group": 5
+        },
+        {
+          "id": "rad_bat",
+          "weight": 3
+        },
+        {
+          "id": "raider",
+          "weight": 2
+        },
+        {
+          "id": "medic",
+          "weight": 2
+        },
+        {
+          "id": "cleaner_bot",
+          "weight": 2
+        }
+      ]
+    },
+    {
+      "atSecond": 720,
+      "spawnIntervalMs": 140,
+      "hpMultiplier": 7.92,
+      "speedMultiplier": 1.4,
+      "enemies": [
+        {
+          "id": "wild_dog",
+          "weight": 3,
+          "group": 5
+        },
+        {
+          "id": "rad_bat",
+          "weight": 3
+        },
+        {
+          "id": "raider",
+          "weight": 2
+        },
+        {
+          "id": "medic",
+          "weight": 2
+        },
+        {
+          "id": "cleaner_bot",
+          "weight": 2
+        }
+      ]
+    },
+    {
+      "atSecond": 780,
+      "spawnIntervalMs": 900,
+      "hpMultiplier": 7.92,
+      "speedMultiplier": 1.4,
+      "enemies": [
+        {
+          "id": "wild_dog",
+          "weight": 1,
+          "group": 3
+        },
+        {
+          "id": "rad_bat",
+          "weight": 2
+        },
+        {
+          "id": "medic",
+          "weight": 1
+        }
+      ]
+    }
+  ],
+  "events": [
+    {
+      "atSecond": 270,
+      "enemy": "riot_mech",
+      "count": 1
+    },
+    {
+      "atSecond": 510,
+      "enemy": "war_bot",
+      "count": 2
+    },
+    {
+      "atSecond": 690,
+      "enemy": "riot_mech",
+      "count": 2
+    }
+  ],
+  "boss": {
+    "atSecond": 780,
+    "enemy": "iron_mayor"
+  },
+  "decor": {
+    "chunkSize": 256,
+    "patches": {
+      "perChunk": [
+        1,
+        3
+      ],
+      "items": [
+        {
+          "sprite": "decor/asphalt",
+          "weight": 4
+        },
+        {
+          "sprite": "decor/rubble",
+          "weight": 3
+        },
+        {
+          "sprite": "decor/oil_puddle",
+          "weight": 2
+        },
+        {
+          "sprite": "decor/crater",
+          "weight": 1
+        }
+      ]
+    },
+    "objects": {
+      "perChunk": [
+        3,
+        7
+      ],
+      "items": [
+        {
+          "sprite": "decor/ruin_wall",
+          "weight": 2
+        },
+        {
+          "sprite": "decor/concrete_block",
+          "weight": 3
+        },
+        {
+          "sprite": "decor/lamp_post",
+          "weight": 2
+        },
+        {
+          "sprite": "decor/car_wreck",
+          "weight": 2
+        },
+        {
+          "sprite": "decor/barrel",
+          "weight": 2
+        },
+        {
+          "sprite": "decor/tires",
+          "weight": 2
+        }
+      ]
+    },
+    "crates": {
+      "sprite": "decor/crate",
+      "hp": 10,
+      "perChunk": [
+        0,
+        1
+      ],
+      "drops": [
+        {
+          "pickup": "medkit",
+          "weight": 4
+        },
+        {
+          "pickup": "caps_stash",
+          "weight": 2
+        },
+        {
+          "pickup": "magnet",
+          "weight": 1
+        },
+        {
+          "pickup": "pulse_bomb",
+          "weight": 1
+        }
+      ]
+    }
+  }
+}

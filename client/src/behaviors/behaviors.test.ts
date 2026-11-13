@@ -7,12 +7,14 @@ import type {
   CombatContext, EnemyContext, Mob, PickupContext, Point, ProjectileSpec, WeaponState, ZoneSpec,
 } from './types';
 
-function mob(x: number, y: number, speed = 50, hpFraction = 1): Mob & { telegraphs: boolean[]; hpFraction: number } {
+function mob(x: number, y: number, speed = 50, hpFraction = 1):
+  Mob & { telegraphs: boolean[]; hpFraction: number; burrowed: boolean } {
   const state = {
     x, y, velocityX: 0, velocityY: 0, speed, hpFraction, memory: {} as Record<string, number>,
-    telegraphs: [] as boolean[],
+    telegraphs: [] as boolean[], burrowed: false,
     setVelocity(vx: number, vy: number) { state.velocityX = vx; state.velocityY = vy; },
     telegraph(on: boolean) { state.telegraphs.push(on); },
+    setBurrowed(on: boolean) { state.burrowed = on; },
   };
   return state;
 }
@@ -22,12 +24,16 @@ function enemyContext(hero: Point, now = 0) {
     shots: [] as { vx: number; vy: number; damage: number }[],
     explosions: [] as { radius: number; damage: number }[],
     summons: [] as { id: string; count: number }[],
+    shockwaves: [] as { radius: number; damage: number }[],
+    heals: [] as { radius: number; fraction: number }[],
   };
   const context: EnemyContext & { now: number } = {
     hero, now,
     shoot: (_from, vx, vy, damage) => { log.shots.push({ vx, vy, damage }); },
     explode: (_mob, radius, damage) => { log.explosions.push({ radius, damage }); },
     summon: (id, count) => { log.summons.push({ id, count }); },
+    shockwave: (_center, radius, damage) => { log.shockwaves.push({ radius, damage }); },
+    healAround: (_healer, radius, fraction) => { log.heals.push({ radius, fraction }); return 1; },
   };
   return { context, log };
 }
@@ -91,6 +97,62 @@ describe('enemy behaviors', () => {
     context.now = 800;
     enemy('exploder').update(target, context, params, 16);
     expect(log.explosions).toEqual([{ radius: 34, damage: 16 }]);
+  });
+
+  it('weaver zigzags towards the hero at full speed', () => {
+    const params = { turnRate: 1000, amplitude: 0.8, frequencyHz: 1 };
+    const target = mob(0, 0, 100);
+    const { context } = enemyContext({ x: 500, y: 0 });
+    const sideways: number[] = [];
+    for (let now = 0; now < 1000; now += 125) {
+      context.now = now;
+      enemy('weaver').update(target, context, params, 1000);
+      expect(target.velocityX).toBeGreaterThan(0);
+      expect(Math.hypot(target.velocityX, target.velocityY)).toBeCloseTo(100);
+      sideways.push(target.velocityY);
+    }
+    expect(Math.max(...sideways)).toBeGreaterThan(50);
+    expect(Math.min(...sideways)).toBeLessThan(-50);
+  });
+
+  it('burrower digs in, tunnels to the hero and bursts out with a shockwave', () => {
+    const params = {
+      turnRate: 10, surfaceMs: 1000, undergroundSpeed: 200, maxBurrowMs: 3000,
+      emergeRange: 30, windupMs: 400, emergeRadius: 40, emergeDamage: 15,
+    };
+    const target = mob(0, 0);
+    const { context, log } = enemyContext({ x: 300, y: 0 });
+    enemy('burrower').update(target, context, params, 16);
+    expect(target.burrowed).toBe(false);
+    context.now = 1000;
+    enemy('burrower').update(target, context, params, 16);
+    expect(target.burrowed).toBe(true);
+    target.x = 280;
+    context.now = 1200;
+    enemy('burrower').update(target, context, params, 16);
+    expect(target.telegraphs).toEqual([true]);
+    context.now = 1599;
+    enemy('burrower').update(target, context, params, 16);
+    expect(log.shockwaves).toHaveLength(0);
+    context.now = 1600;
+    enemy('burrower').update(target, context, params, 16);
+    expect(target.burrowed).toBe(false);
+    expect(log.shockwaves).toEqual([{ radius: 40, damage: 15 }]);
+  });
+
+  it('healer keeps back and heals allies on cooldown', () => {
+    const params = { turnRate: 100, preferredRange: 150, healRadius: 90, healFraction: 0.2, cooldownMs: 2000 };
+    const target = mob(0, 0);
+    const { context, log } = enemyContext({ x: 50, y: 0 });
+    enemy('healer').update(target, context, params, 1000);
+    expect(target.velocityX).toBeLessThan(0);
+    expect(log.heals).toHaveLength(0);
+    context.now = 1000;
+    enemy('healer').update(target, context, params, 16);
+    expect(log.heals).toEqual([{ radius: 90, fraction: 0.2 }]);
+    context.now = 2000;
+    enemy('healer').update(target, context, params, 16);
+    expect(log.heals).toHaveLength(1);
   });
 
   it('boss changes AI by HP and summons once per new phase', () => {

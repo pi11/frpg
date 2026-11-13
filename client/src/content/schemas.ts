@@ -119,6 +119,8 @@ export const EnemySchema = z.object({
       chance: z.number().min(0).max(1),
     }).strict(),
   ])),
+  /** On death it breaks into `count` smaller enemies (role normal). */
+  split: z.object({ enemy: IdSchema, count: z.number().int().positive() }).strict().optional(),
   tags: z.array(z.string()),
 }).strict();
 export type EnemyDefinition = z.infer<typeof EnemySchema>;
@@ -143,6 +145,14 @@ export type PickupDefinition = z.infer<typeof PickupSchema>;
 export const LocationSchema = z.object({
   id: IdSchema,
   name: z.string().min(1),
+  description: z.string().min(1),
+  /** Open from the start, or after the boss of another location was killed once. */
+  unlock: z.discriminatedUnion('type', [
+    z.object({ type: z.literal('default') }).strict(),
+    z.object({ type: z.literal('bossKilled'), location: IdSchema }).strict(),
+  ]),
+  /** Multiplies the earned reward (not the picked-up caps); checked by the server. */
+  rewardMultiplier: z.number().positive(),
   groundSprite: spriteKey('ground'),
   music: soundKey('music'),
   durationSeconds: z.number().positive(),
@@ -154,7 +164,12 @@ export const LocationSchema = z.object({
     hpMultiplier: z.number().positive(),
     /** Multiplies the speed of enemies spawned during this wave. */
     speedMultiplier: z.number().positive(),
-    enemies: z.array(z.object({ id: IdSchema, weight: z.number().positive() }).strict()).min(1),
+    enemies: z.array(z.object({
+      id: IdSchema,
+      weight: z.number().positive(),
+      /** How many arrive together as a pack (1 = alone). */
+      group: z.number().int().positive().default(1),
+    }).strict()).min(1),
   }).strict()).min(1),
   /** Mini-bosses at fixed times; they appear with a warning and drop their loot. */
   events: z.array(z.object({
@@ -207,6 +222,8 @@ export const BalanceSchema = z.object({
     crateLimit: z.number().int().positive(),
     /** Seconds of the warning banner before a mini-boss or the boss appears. */
     eliteWarningSeconds: z.number().nonnegative(),
+    /** Aimed weapons shoot an elite or boss inside this range before the nearest enemy. */
+    eliteFocusRange: z.number().nonnegative(),
   }).strict(),
   xp: z.object({ base: z.number().positive(), growth: z.number().positive() }).strict(),
   reward: z.object({

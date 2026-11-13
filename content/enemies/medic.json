@@ -1,0 +1,40 @@
+{
+  "id": "medic",
+  "name": "Полевой лекарь",
+  "sprite": "enemies/medic",
+  "role": "normal",
+  "ai": {
+    "type": "healer",
+    "params": {
+      "turnRate": 4,
+      "preferredRange": 150,
+      "healRadius": 90,
+      "healFraction": 0.2,
+      "cooldownMs": 2600
+    }
+  },
+  "stats": {
+    "hp": 30,
+    "speed": 56,
+    "damage": 5,
+    "xp": 3
+  },
+  "drops": [
+    {
+      "item": "caps",
+      "chance": 0.06,
+      "amount": [
+        2,
+        5
+      ]
+    },
+    {
+      "item": "pickup",
+      "id": "medkit",
+      "chance": 0.02
+    }
+  ],
+  "tags": [
+    "human"
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "id": "slime_queen",
+  "name": "Королева слизи",
+  "sprite": "enemies/slime_queen",
+  "role": "elite",
+  "ai": {
+    "type": "chaser",
+    "params": {
+      "turnRate": 2.5
+    }
+  },
+  "stats": {
+    "hp": 2600,
+    "speed": 44,
+    "damage": 18,
+    "xp": 50
+  },
+  "drops": [
+    {
+      "item": "pickup",
+      "id": "chest",
+      "chance": 1
+    },
+    {
+      "item": "caps",
+      "chance": 1,
+      "amount": [
+        10,
+        20
+      ]
+    }
+  ],
+  "split": {
+    "enemy": "slimelet",
+    "count": 10
+  },
+  "tags": [
+    "mutant",
+    "elite"
+  ]
+}

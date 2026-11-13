@@ -11,6 +11,7 @@
     "zoneLimit": 24,
     "crateLimit": 24,
     "eliteWarningSeconds": 3,
+    "eliteFocusRange": 200,
     "collectRadius": 14,
     "magnetSpeed": 260
   },

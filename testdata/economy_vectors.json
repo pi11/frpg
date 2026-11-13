@@ -546,7 +546,8 @@
    "wave": 1,
    "boss_killed": false,
    "picked_caps": 0,
-   "expected": 7
+   "expected": 7,
+   "multiplier": 1
   },
   {
    "rules": {
@@ -564,7 +565,8 @@
    "wave": 1,
    "boss_killed": false,
    "picked_caps": 0,
-   "expected": 8
+   "expected": 8,
+   "multiplier": 1
   },
   {
    "rules": {
@@ -582,7 +584,8 @@
    "wave": 1,
    "boss_killed": false,
    "picked_caps": 1,
-   "expected": 10
+   "expected": 10,
+   "multiplier": 1
   },
   {
    "rules": {
@@ -600,7 +603,8 @@
    "wave": 1,
    "boss_killed": false,
    "picked_caps": 4,
-   "expected": 36
+   "expected": 36,
+   "multiplier": 1
   },
   {
    "rules": {
@@ -618,7 +622,8 @@
    "wave": 2,
    "boss_killed": false,
    "picked_caps": 17,
-   "expected": 190
+   "expected": 190,
+   "multiplier": 1
   },
   {
    "rules": {
@@ -636,7 +641,8 @@
    "wave": 3,
    "boss_killed": true,
    "picked_caps": 99,
-   "expected": 740
+   "expected": 740,
+   "multiplier": 1
   },
   {
    "rules": {
@@ -654,7 +660,8 @@
    "wave": 3,
    "boss_killed": true,
    "picked_caps": 2700,
-   "expected": 4766
+   "expected": 4766,
+   "multiplier": 1
   },
   {
    "rules": {
@@ -672,7 +679,8 @@
    "wave": 2,
    "boss_killed": true,
    "picked_caps": 0,
-   "expected": 41
+   "expected": 41,
+   "multiplier": 1
   },
   {
    "rules": {
@@ -690,7 +698,8 @@
    "wave": 1,
    "boss_killed": false,
    "picked_caps": 0,
-   "expected": 2
+   "expected": 2,
+   "multiplier": 1
   },
   {
    "rules": {
@@ -708,7 +717,8 @@
    "wave": 1,
    "boss_killed": false,
    "picked_caps": 0,
-   "expected": 2
+   "expected": 2,
+   "multiplier": 1
   },
   {
    "rules": {
@@ -726,7 +736,8 @@
    "wave": 1,
    "boss_killed": false,
    "picked_caps": 1,
-   "expected": 4
+   "expected": 4,
+   "multiplier": 1
   },
   {
    "rules": {
@@ -744,7 +755,8 @@
    "wave": 1,
    "boss_killed": false,
    "picked_caps": 4,
-   "expected": 21
+   "expected": 21,
+   "multiplier": 1
   },
   {
    "rules": {
@@ -762,7 +774,8 @@
    "wave": 2,
    "boss_killed": false,
    "picked_caps": 17,
-   "expected": 149
+   "expected": 149,
+   "multiplier": 1
   },
   {
    "rules": {
@@ -780,7 +793,8 @@
    "wave": 3,
    "boss_killed": true,
    "picked_caps": 99,
-   "expected": 584
+   "expected": 584,
+   "multiplier": 1
   },
   {
    "rules": {
@@ -798,7 +812,8 @@
    "wave": 3,
    "boss_killed": true,
    "picked_caps": 2700,
-   "expected": 4382
+   "expected": 4382,
+   "multiplier": 1
   },
   {
    "rules": {
@@ -816,7 +831,122 @@
    "wave": 2,
    "boss_killed": true,
    "picked_caps": 0,
-   "expected": 16
+   "expected": 16,
+   "multiplier": 1
+  },
+  {
+   "rules": {
+    "base": 0.5,
+    "perSecond": 0.1,
+    "perKill": 0.35,
+    "perWave": 1.25,
+    "bossBonus": 12.5,
+    "maxKillsPerSecond": 1,
+    "maxCapsPerSecond": 1,
+    "durationGraceSeconds": 0
+   },
+   "duration": 300,
+   "kills": 700,
+   "wave": 6,
+   "boss_killed": false,
+   "picked_caps": 40,
+   "multiplier": 1.5,
+   "expected": 465
+  },
+  {
+   "rules": {
+    "base": 0.5,
+    "perSecond": 0.1,
+    "perKill": 0.35,
+    "perWave": 1.25,
+    "bossBonus": 12.5,
+    "maxKillsPerSecond": 1,
+    "maxCapsPerSecond": 1,
+    "durationGraceSeconds": 0
+   },
+   "duration": 781,
+   "kills": 2100,
+   "wave": 9,
+   "boss_killed": true,
+   "picked_caps": 180,
+   "multiplier": 1.5,
+   "expected": 1436
+  },
+  {
+   "rules": {
+    "base": 0.5,
+    "perSecond": 0.1,
+    "perKill": 0.35,
+    "perWave": 1.25,
+    "bossBonus": 12.5,
+    "maxKillsPerSecond": 1,
+    "maxCapsPerSecond": 1,
+    "durationGraceSeconds": 0
+   },
+   "duration": 900,
+   "kills": 3000,
+   "wave": 9,
+   "boss_killed": true,
+   "picked_caps": 250,
+   "multiplier": 2,
+   "expected": 2579
+  },
+  {
+   "rules": {
+    "base": 0.5,
+    "perSecond": 0.1,
+    "perKill": 0.35,
+    "perWave": 1.25,
+    "bossBonus": 12.5,
+    "maxKillsPerSecond": 1,
+    "maxCapsPerSecond": 1,
+    "durationGraceSeconds": 0
+   },
+   "duration": 457,
+   "kills": 1311,
+   "wave": 7,
+   "boss_killed": false,
+   "picked_caps": 77,
+   "multiplier": 2,
+   "expected": 1105
+  },
+  {
+   "rules": {
+    "base": 0.5,
+    "perSecond": 0.1,
+    "perKill": 0.35,
+    "perWave": 1.25,
+    "bossBonus": 12.5,
+    "maxKillsPerSecond": 1,
+    "maxCapsPerSecond": 1,
+    "durationGraceSeconds": 0
+   },
+   "duration": 123,
+   "kills": 401,
+   "wave": 3,
+   "boss_killed": false,
+   "picked_caps": 9,
+   "multiplier": 1.25,
+   "expected": 205
+  },
+  {
+   "rules": {
+    "base": 0.5,
+    "perSecond": 0.1,
+    "perKill": 0.35,
+    "perWave": 1.25,
+    "bossBonus": 12.5,
+    "maxKillsPerSecond": 1,
+    "maxCapsPerSecond": 1,
+    "durationGraceSeconds": 0
+   },
+   "duration": 59,
+   "kills": 77,
+   "wave": 1,
+   "boss_killed": false,
+   "picked_caps": 0,
+   "multiplier": 1.5,
+   "expected": 52
   }
  ],
  "contentDigest": [
