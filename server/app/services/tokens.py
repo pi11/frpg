@@ -147,6 +147,8 @@ async def rotate_refresh(
     if user is None:
         raise ApiError(401, ErrorCode.invalid_token, "Аккаунт не найден")
     record.revoked_at = utcnow()
+    # Inactive guests are cleaned up by this date.
+    user.last_seen_at = utcnow()
     raw_next = secrets.token_urlsafe(32)
     replacement = new_refresh_record(user, raw_next, user_agent, record.family_id)
     session.add(replacement)

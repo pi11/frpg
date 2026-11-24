@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex" />
+    <title>Удаление аккаунта — Пустошь</title>
+  </head>
+  <body class="page">
+    <main class="auth-card">
+      <div class="auth-eyebrow">ПУСТОШЬ · АККАУНТ</div>
+      <h1>Удаление аккаунта</h1>
+      <p>Удаляются сразу и без возможности восстановления: способы входа (почта, Telegram), прогресс, крышки, улучшения и история забегов. В резервных копиях данные исчезают в течение %CONTACT_BACKUP_DAYS% дней.</p>
+      <p id="delete-status" class="auth-status" role="status">Подтвердите, что аккаунт ваш.</p>
+      <div id="delete-login">
+        <button id="delete-current" class="auth-secondary" type="button" hidden>Удалить аккаунт, открытый в этом браузере</button>
+        <form id="delete-email-form" class="auth-form">
+          <label for="delete-email">Почта аккаунта</label>
+          <div class="auth-row"><input id="delete-email" type="email" autocomplete="email" required placeholder="you@example.com"><button type="submit">Отправить код</button></div>
+        </form>
+        <form id="delete-code-form" class="auth-form" hidden>
+          <label for="delete-code">Код из письма</label>
+          <div class="auth-row"><input id="delete-code" type="text" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" required placeholder="000000"><button type="submit">Далее</button></div>
+        </form>
+        <button id="delete-telegram" class="auth-secondary" type="button">Подтвердить через Telegram</button>
+        <p id="delete-telegram-link" hidden><a target="_blank" rel="noopener noreferrer">Открыть бота в Telegram</a></p>
+      </div>
+      <button id="delete-confirm" class="auth-primary hub-danger" type="button" hidden>Удалить аккаунт навсегда</button>
+      <p>Гостевой аккаунт без почты и Telegram удаляется в самой игре: «Убежище» → «Удалить аккаунт и данные». Вопросы: %CONTACT_EMAIL%. <a href="/privacy">Политика конфиденциальности</a>.</p>
+    </main>
+    <script type="module" src="/src/pages/deleteAccount.ts"></script>
+  </body>
+</html>

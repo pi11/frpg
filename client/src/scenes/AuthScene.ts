@@ -3,7 +3,7 @@ import QRCode from 'qrcode';
 import {
   createGuest, isTransientError, pollTelegram, restoreSession, saveSession, session,
   startEmail, startTelegram, verifyEmail,
-  type TelegramStart, type TokenPair,
+  webPage, type TelegramStart, type TokenPair,
 } from '../api/auth';
 import { isNative, openExternal, takeLaunchToken } from '../platform/native';
 
@@ -53,6 +53,7 @@ export class AuthScene extends Phaser.Scene {
           </div>
           <button id="auth-back" class="auth-back" type="button" hidden>Вернуться в игру</button>
         </div>
+        <button id="auth-privacy" class="auth-back" type="button">Политика конфиденциальности</button>
       </section>`;
     document.body.append(this.overlay);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.cleanup());
@@ -103,6 +104,7 @@ export class AuthScene extends Phaser.Scene {
       this.pollTimer = window.setInterval(() => void this.poll(start), 2000);
     });
     this.el<HTMLButtonElement>('auth-back').onclick = () => this.scene.start('Boot');
+    this.el('auth-privacy').onclick = () => void openExternal(webPage('/privacy'));
     void this.initialize();
   }
 

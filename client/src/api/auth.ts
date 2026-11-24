@@ -67,6 +67,16 @@ export function clearSession(): void {
   persist(store.remove(STORAGE_KEY));
 }
 
+/** Drops the saved session of a deleted account, leaving any other account signed in. */
+export async function forgetStoredSession(target: TokenStore, userId: string): Promise<void> {
+  if (parseStored(await target.get(STORAGE_KEY))?.user_id === userId) await target.remove(STORAGE_KEY);
+}
+
+/** Absolute address of a web page of the game; the Android build needs the server's domain. */
+export function webPage(path: string): string {
+  return `${API_BASE}${path}`;
+}
+
 export class ApiRequestError extends Error {
   constructor(public status: number, message: string) { super(message); }
 }

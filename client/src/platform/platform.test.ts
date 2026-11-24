@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import {
-  ApiRequestError, clearSession, initSession, isTransientError, saveSession, session, type TokenPair,
+  ApiRequestError, clearSession, forgetStoredSession, initSession, isTransientError,
+  saveSession, session, type TokenPair,
 } from '../api/auth';
+import { memoryTokenStore } from '../pages/memoryStore';
 import { magicTokenFrom } from './links';
 import type { TokenStore } from './tokenStore';
 
@@ -62,5 +64,25 @@ describe('Telegram login polling', () => {
       expect(isTransientError(new ApiRequestError(status, ''))).toBe(false);
     }
     expect(isTransientError(new Error('bug'))).toBe(false);
+  });
+});
+
+describe('account deletion page', () => {
+  it('forgets only the session of the deleted account', async () => {
+    const store = memoryStore({ 'wasteland.auth.v1': JSON.stringify(pair) });
+    await forgetStoredSession(store, 'other');
+    expect(store.data['wasteland.auth.v1']).toBeDefined();
+    await forgetStoredSession(store, pair.user_id);
+    expect(store.data['wasteland.auth.v1']).toBeUndefined();
+  });
+
+  it('keeps its sign-in apart from the game session', async () => {
+    const game = memoryStore({ 'wasteland.auth.v1': JSON.stringify(pair) });
+    await initSession(game);
+    expect(session()?.user_id).toBe('u1');
+    await initSession(memoryTokenStore());
+    expect(session()).toBeNull();
+    saveSession({ ...pair, user_id: 'u2' });
+    expect(JSON.parse(game.data['wasteland.auth.v1']!).user_id).toBe('u1');
   });
 });

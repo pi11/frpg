@@ -1,0 +1,10 @@
+/* Document pages scroll and use a readable font, unlike the full-screen game. */
+html:has(.page), .page { height: auto; overflow: auto; }
+.page { min-height: 100vh; padding: 16px; box-sizing: border-box; color: var(--term-text); font: 16px/1.6 ui-monospace, 'Courier New', monospace; }
+.page .auth-card { width: min(100%, 720px); margin: 0 auto; }
+.page .auth-card h1 { font: 16px/1.6 var(--term-font); overflow-wrap: anywhere; }
+.page .auth-card h2 { margin-top: 24px; color: var(--term-bright); font: 8px/1.6 var(--term-font); }
+.page a, .page strong { color: var(--term-bright); }
+.page li { margin-bottom: 8px; }
+.page .auth-form label, .page .auth-row input, .page .auth-card button { font-size: 14px !important; }
+@media (max-width: 480px) { .page .auth-row { flex-direction: column; } }
