@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { clearSession, initSession, saveSession, session, type TokenPair } from '../api/auth';
+import {
+  ApiRequestError, clearSession, initSession, isTransientError, saveSession, session, type TokenPair,
+} from '../api/auth';
 import { magicTokenFrom } from './links';
 import type { TokenStore } from './tokenStore';
 
@@ -48,5 +50,17 @@ describe('session token store', () => {
     expect(session()).toBeNull();
     await initSession({ ...memoryStore(), get: () => Promise.reject(new Error('io')) });
     expect(session()).toBeNull();
+  });
+});
+
+describe('Telegram login polling', () => {
+  it('survives connection loss and server trouble but not a rejected request', () => {
+    for (const status of [0, 429, 500, 503]) {
+      expect(isTransientError(new ApiRequestError(status, ''))).toBe(true);
+    }
+    for (const status of [400, 401, 404]) {
+      expect(isTransientError(new ApiRequestError(status, ''))).toBe(false);
+    }
+    expect(isTransientError(new Error('bug'))).toBe(false);
   });
 });

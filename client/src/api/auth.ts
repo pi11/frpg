@@ -71,6 +71,12 @@ export class ApiRequestError extends Error {
   constructor(public status: number, message: string) { super(message); }
 }
 
+/** Worth retrying: no connection (status 0), rate limit or a server failure. */
+export function isTransientError(error: unknown): boolean {
+  return error instanceof ApiRequestError &&
+    (error.status === 0 || error.status === 429 || error.status >= 500);
+}
+
 export async function request<T>(path: string, init: RequestInit = {}, authorized = false): Promise<T> {
   const headers = new Headers(init.headers);
   if (init.body) headers.set('Content-Type', 'application/json');

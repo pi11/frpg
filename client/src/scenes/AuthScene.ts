@@ -1,7 +1,7 @@
 import * as Phaser from 'phaser';
 import QRCode from 'qrcode';
 import {
-  createGuest, pollTelegram, restoreSession, saveSession, session,
+  createGuest, isTransientError, pollTelegram, restoreSession, saveSession, session,
   startEmail, startTelegram, verifyEmail,
   type TelegramStart, type TokenPair,
 } from '../api/auth';
@@ -177,7 +177,8 @@ export class AuthScene extends Phaser.Scene {
         this.status('Время ожидания истекло. Запросите новую ссылку.', true);
       }
     } catch (error) {
-      if (this.active) {
+      // Switching to Telegram and back can drop the connection on a phone: keep polling.
+      if (this.active && !isTransientError(error)) {
         this.stopPolling();
         this.status(this.message(error), true);
       }
