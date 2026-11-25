@@ -18,6 +18,8 @@ export class HudScene extends Phaser.Scene {
   private bossBar!: Phaser.GameObjects.Graphics;
   private warning!: Phaser.GameObjects.Text;
   private pausePanel!: Phaser.GameObjects.Container;
+  private buffIcons: Phaser.GameObjects.Image[] = [];
+  private buffBars!: Phaser.GameObjects.Graphics;
   private refreshAt = 0;
 
   constructor() {
@@ -40,6 +42,8 @@ export class HudScene extends Phaser.Scene {
     this.caps = this.add.text(402, 5, '0', textStyle(8, COLORS.warn));
     this.bossName = this.add.text(240, 238, '', textStyle(8, COLORS.danger)).setOrigin(0.5);
     this.bossBar = this.add.graphics();
+    this.buffIcons = [];
+    this.buffBars = this.add.graphics();
     this.warning = this.add.text(240, 90, '', textStyle(16, COLORS.danger, {
       backgroundColor: '#1a0806', padding: { x: 8, y: 6 },
     })).setOrigin(0.5).setDepth(80).setVisible(false);
@@ -76,8 +80,20 @@ export class HudScene extends Phaser.Scene {
     const seconds = (view.seconds % 60).toString().padStart(2, '0');
     this.timer.setText(`${minutes}:${seconds}`);
     this.level.setText(`${Math.ceil(view.hp)}/${Math.round(view.maxHp)}  УР.${view.level}`);
-    this.stats.setText(`ВОЛНА ${view.wave}  УБИТО ${view.kills}`);
+    this.stats.setText(`ВОЛНА ${view.wave}  УБИТО ${view.kills}${view.revives ? '  ♥' : ''}`);
     this.caps.setText(String(view.caps));
+    this.buffBars.clear();
+    while (this.buffIcons.length < view.buffs.length) {
+      this.buffIcons.push(this.add.image(16 + this.buffIcons.length * 22, 40, ATLAS, 'ui/cap'));
+    }
+    this.buffIcons.forEach((icon, index) => {
+      const buff = view.buffs[index];
+      icon.setVisible(Boolean(buff));
+      if (!buff) return;
+      icon.setFrame(buff.sprite);
+      this.buffBars.fillStyle(COLORS.barBack).fillRect(8 + index * 22, 50, 16, 2)
+        .fillStyle(COLORS.xp).fillRect(8 + index * 22, 50, Math.round(16 * buff.fraction), 2);
+    });
     this.bossBar.clear();
     if (view.boss) {
       this.bossName.setText(view.boss.name.toUpperCase()).setVisible(true);

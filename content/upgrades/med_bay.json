@@ -1,6 +1,7 @@
 {
   "id": "med_bay",
   "name": "Медотсек",
+  "category": "survival",
   "stat": "regen",
   "mod": "flat",
   "perLevel": 0.1,

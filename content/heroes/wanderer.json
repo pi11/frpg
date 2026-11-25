@@ -19,6 +19,9 @@
     "pickupRadius": 64,
     "xpGain": 0,
     "luck": 0,
-    "radResist": 0
+    "radResist": 0,
+    "critChance": 0.02,
+    "rerolls": 1,
+    "revives": 0
   }
 }

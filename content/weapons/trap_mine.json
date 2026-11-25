@@ -1,0 +1,86 @@
+{
+  "id": "trap_mine",
+  "name": "Самодельная мина",
+  "sprite": "weapons/trap_mine",
+  "projectileSprite": "projectiles/mine",
+  "fireSound": "sfx/mine",
+  "behavior": {
+    "type": "mine",
+    "params": {
+      "scatter": 26
+    }
+  },
+  "levels": [
+    {
+      "damage": 13,
+      "cooldownMs": 2400,
+      "shots": 1,
+      "spreadDegrees": 0,
+      "radius": 30,
+      "durationMs": 9000
+    },
+    {
+      "damage": 16,
+      "cooldownMs": 2300,
+      "shots": 1,
+      "spreadDegrees": 0,
+      "radius": 32,
+      "durationMs": 9000
+    },
+    {
+      "damage": 19,
+      "cooldownMs": 2200,
+      "shots": 2,
+      "spreadDegrees": 0,
+      "radius": 32,
+      "durationMs": 9500
+    },
+    {
+      "damage": 23,
+      "cooldownMs": 2100,
+      "shots": 2,
+      "spreadDegrees": 0,
+      "radius": 36,
+      "durationMs": 10000
+    },
+    {
+      "damage": 27,
+      "cooldownMs": 2000,
+      "shots": 2,
+      "spreadDegrees": 0,
+      "radius": 38,
+      "durationMs": 10500
+    },
+    {
+      "damage": 32,
+      "cooldownMs": 1900,
+      "shots": 3,
+      "spreadDegrees": 0,
+      "radius": 40,
+      "durationMs": 11000
+    },
+    {
+      "damage": 38,
+      "cooldownMs": 1800,
+      "shots": 3,
+      "spreadDegrees": 0,
+      "radius": 42,
+      "durationMs": 11500
+    },
+    {
+      "damage": 46,
+      "cooldownMs": 1650,
+      "shots": 3,
+      "spreadDegrees": 0,
+      "radius": 46,
+      "durationMs": 12000
+    }
+  ],
+  "tags": [
+    "explosive"
+  ],
+  "evolution": {
+    "passive": "thick_hide",
+    "into": "minefield"
+  }
+}

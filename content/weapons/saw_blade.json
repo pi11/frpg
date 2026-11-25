@@ -1,0 +1,73 @@
+{
+  "id": "saw_blade",
+  "name": "Пила-бумеранг",
+  "sprite": "weapons/saw_blade",
+  "projectileSprite": "projectiles/saw",
+  "fireSound": "sfx/saw",
+  "behavior": {
+    "type": "boomerang",
+    "params": {
+      "speed": 230,
+      "outMs": 480,
+      "returnSpeed": 260,
+      "lifetimeMs": 2600
+    }
+  },
+  "levels": [
+    {
+      "damage": 7,
+      "cooldownMs": 1700,
+      "shots": 1,
+      "spreadDegrees": 0
+    },
+    {
+      "damage": 8,
+      "cooldownMs": 1650,
+      "shots": 1,
+      "spreadDegrees": 0
+    },
+    {
+      "damage": 10,
+      "cooldownMs": 1600,
+      "shots": 1,
+      "spreadDegrees": 0
+    },
+    {
+      "damage": 11,
+      "cooldownMs": 1500,
+      "shots": 2,
+      "spreadDegrees": 40
+    },
+    {
+      "damage": 13,
+      "cooldownMs": 1450,
+      "shots": 2,
+      "spreadDegrees": 40
+    },
+    {
+      "damage": 15,
+      "cooldownMs": 1400,
+      "shots": 2,
+      "spreadDegrees": 40
+    },
+    {
+      "damage": 17,
+      "cooldownMs": 1300,
+      "shots": 3,
+      "spreadDegrees": 60
+    },
+    {
+      "damage": 20,
+      "cooldownMs": 1200,
+      "shots": 3,
+      "spreadDegrees": 60
+    }
+  ],
+  "tags": [
+    "ballistic"
+  ],
+  "evolution": {
+    "passive": "scrap_plating",
+    "into": "buzz_storm"
+  }
+}

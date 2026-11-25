@@ -1,0 +1,33 @@
+{
+  "id": "workbench",
+  "name": "Верстак",
+  "hint": "Стойте рядом, чтобы собрать полезное",
+  "sprite": "landmarks/workbench",
+  "trigger": {
+    "radius": 28,
+    "holdMs": 3500,
+    "caps": 0
+  },
+  "rolls": [
+    1,
+    2
+  ],
+  "rewards": [
+    {
+      "pickup": "ammo_belt",
+      "weight": 3
+    },
+    {
+      "pickup": "rage_shot",
+      "weight": 3
+    },
+    {
+      "pickup": "data_disk",
+      "weight": 3
+    },
+    {
+      "pickup": "cryo_bomb",
+      "weight": 2
+    }
+  ]
+}

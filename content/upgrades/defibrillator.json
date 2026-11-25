@@ -1,0 +1,13 @@
+{
+  "id": "defibrillator",
+  "name": "Дефибриллятор",
+  "category": "survival",
+  "stat": "revives",
+  "mod": "flat",
+  "perLevel": 1,
+  "maxLevel": 1,
+  "cost": {
+    "base": 450,
+    "growth": 1
+  }
+}

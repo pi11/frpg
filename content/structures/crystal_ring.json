@@ -1,0 +1,47 @@
+{
+  "id": "crystal_ring",
+  "items": [
+    {
+      "kind": "patch",
+      "sprite": "decor/moss",
+      "x": 0,
+      "y": 0
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/crystal",
+      "x": 0,
+      "y": -44
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/crystal",
+      "x": 42,
+      "y": -14
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/crystal",
+      "x": -42,
+      "y": -14
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/crystal",
+      "x": -26,
+      "y": 34
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/crystal",
+      "x": 26,
+      "y": 34
+    },
+    {
+      "kind": "landmark",
+      "landmark": "generator",
+      "x": 0,
+      "y": 0
+    }
+  ]
+}

@@ -1,0 +1,46 @@
+{
+  "id": "swamp_clinic",
+  "items": [
+    {
+      "kind": "patch",
+      "sprite": "decor/moss",
+      "x": 0,
+      "y": 0
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/tent",
+      "x": -34,
+      "y": -20
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/barrel",
+      "x": -58,
+      "y": 12
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/mangrove",
+      "x": 48,
+      "y": -20
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/fence",
+      "x": -20,
+      "y": 40
+    },
+    {
+      "kind": "crate",
+      "x": 38,
+      "y": 30
+    },
+    {
+      "kind": "landmark",
+      "landmark": "med_station",
+      "x": 6,
+      "y": 4
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "id": "data_disk",
+  "name": "Диск с данными",
+  "sprite": "pickups/data_disk",
+  "sound": "sfx/level_up",
+  "attract": false,
+  "effect": {
+    "type": "xp",
+    "params": {
+      "fraction": 0.5
+    }
+  }
+}

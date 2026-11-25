@@ -1,0 +1,65 @@
+{
+  "id": "graveyard",
+  "items": [
+    {
+      "kind": "patch",
+      "sprite": "decor/dry_grass",
+      "x": 0,
+      "y": 0
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/grave",
+      "x": -40,
+      "y": -20
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/grave",
+      "x": -8,
+      "y": -24
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/grave",
+      "x": 26,
+      "y": -20
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/grave",
+      "x": -30,
+      "y": 16
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/grave",
+      "x": 8,
+      "y": 14
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/dead_tree",
+      "x": 50,
+      "y": 0
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/fence",
+      "x": -34,
+      "y": 42
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/fence",
+      "x": 6,
+      "y": 42
+    },
+    {
+      "kind": "landmark",
+      "landmark": "hatch",
+      "x": 44,
+      "y": 30
+    }
+  ]
+}

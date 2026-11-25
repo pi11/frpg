@@ -1,0 +1,13 @@
+{
+  "id": "focus_lens",
+  "name": "Фокусирующая линза",
+  "category": "combat",
+  "stat": "area",
+  "mod": "flat",
+  "perLevel": 0.04,
+  "maxLevel": 5,
+  "cost": {
+    "base": 55,
+    "growth": 1.6
+  }
+}

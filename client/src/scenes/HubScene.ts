@@ -4,19 +4,17 @@ import { buyUpgrade, getProfile, startRun, type Profile } from '../api/game';
 import { getCatalog } from '../content/catalog';
 import { orderedLocations } from '../content/locations';
 import { bundledContentHash } from '../content/hash';
-import type { StatKey, UpgradeDefinition } from '../content/schemas';
+import type { UpgradeDefinition } from '../content/schemas';
+import { statBonus } from '../content/statText';
 import { ATLAS, HUB_MUSIC } from '../assets';
 import { upgradeCost } from '../economy';
 import { applyCrt, settings, updateSettings, type Settings } from '../settings';
 import { playMusic, playSfx } from '../sound';
 import type { RunData } from './RunScene';
 
-const STAT_LABELS: Record<StatKey, string> = {
-  maxHp: 'здоровье', armor: 'броня', regen: 'регенерация', moveSpeed: 'скорость',
-  damage: 'урон', attackSpeed: 'скорость атаки', area: 'область', projectileCount: 'снаряды',
-  duration: 'длительность', pickupRadius: 'радиус сбора', xpGain: 'опыт', luck: 'удача',
-  radResist: 'защита от радиации',
-};
+const CATEGORIES: readonly [UpgradeDefinition['category'], string][] = [
+  ['survival', 'Выживание'], ['combat', 'Бой'], ['scavenge', 'Добыча и опыт'],
+];
 
 function escapeHtml(value: string): string {
   return value.replace(/[&<>"']/g, (char) => `&#${char.charCodeAt(0)};`);
@@ -37,10 +35,11 @@ function saveSelectedLocation(id: string): void {
   try { localStorage.setItem(LOCATION_KEY, id); } catch { /* only a convenience */ }
 }
 
-function effectText(upgrade: UpgradeDefinition): string {
-  const value = upgrade.mod === 'percent'
-    ? `${Math.round(upgrade.perLevel * 100)}%` : String(upgrade.perLevel);
-  return `+${value} ${STAT_LABELS[upgrade.stat]} за уровень`;
+function effectText(upgrade: UpgradeDefinition, level: number): string {
+  const now = level ? statBonus(upgrade.stat, upgrade.perLevel * level, upgrade.mod) : '';
+  if (level >= upgrade.maxLevel) return now;
+  const next = statBonus(upgrade.stat, upgrade.perLevel * (level + 1), upgrade.mod);
+  return now ? `${now} > ${next}` : next;
 }
 
 export class HubScene extends Phaser.Scene {
@@ -189,17 +188,19 @@ export class HubScene extends Phaser.Scene {
     const hero = location ? catalog.heroes[location.startingHero] : undefined;
     this.el('hub-location').textContent = location && hero
       ? `${location.name} · ${hero.name} · WASD / стрелки · тач · P — пауза` : '';
-    this.el('hub-upgrades').innerHTML = Object.values(catalog.upgrades).map((upgrade) => {
+    this.el('hub-upgrades').innerHTML = CATEGORIES.map(([category, title]) =>
+      `<li class="hub-category">${title}</li>${Object.values(catalog.upgrades)
+        .filter((upgrade) => upgrade.category === category).map((upgrade) => {
       const level = profile.upgrades[upgrade.id] ?? 0;
       const maxed = level >= upgrade.maxLevel;
       const cost = maxed ? 0 : upgradeCost(upgrade, level);
       const label = maxed ? 'Максимум' : `Купить · ${cost}`;
       return `<li>
         <div><strong>${escapeHtml(upgrade.name)}</strong> <span class="hub-level">${level}/${upgrade.maxLevel}</span>
-        <small>${escapeHtml(effectText(upgrade))}</small></div>
+        <small>${escapeHtml(effectText(upgrade, level))}</small></div>
         <button type="button" data-upgrade="${escapeHtml(upgrade.id)}" ${maxed || cost > profile.caps ? 'disabled' : ''}>${label}</button>
       </li>`;
-    }).join('');
+    }).join('')}`).join('');
   }
 
   private async buy(id: string): Promise<void> {

@@ -52,3 +52,40 @@ export class ChestEffect implements PickupEffect<z.infer<typeof ChestParamsSchem
     context.openChest(rollRange(params.items, roll), rollRange(params.caps, context.rng()));
   }
 }
+
+/** Stats a temporary bonus may change; run-long ones (max HP, rerolls, revives) are excluded. */
+export const BUFF_STATS = [
+  'armor', 'regen', 'moveSpeed', 'damage', 'attackSpeed', 'area', 'duration', 'pickupRadius',
+  'xpGain', 'luck', 'radResist', 'critChance',
+] as const;
+
+export const BuffParamsSchema = z.object({
+  stat: z.enum(BUFF_STATS),
+  amount: z.number().positive(),
+  durationMs: z.number().positive(),
+}).strict();
+/** Raises a stat for a while; taking the same bonus again restarts its timer. */
+export class BuffEffect implements PickupEffect<z.infer<typeof BuffParamsSchema>> {
+  readonly paramsSchema = BuffParamsSchema;
+  apply(context: PickupContext, params: z.infer<typeof BuffParamsSchema>, pickupId: string): void {
+    context.addBuff(pickupId, params.stat, params.amount, params.durationMs);
+  }
+}
+
+export const XpParamsSchema = z.object({ fraction: z.number().gt(0).max(1) }).strict();
+/** Grants a fraction of the experience needed for the next level. */
+export class XpEffect implements PickupEffect<z.infer<typeof XpParamsSchema>> {
+  readonly paramsSchema = XpParamsSchema;
+  apply(context: PickupContext, params: z.infer<typeof XpParamsSchema>): void {
+    context.addXpFraction(params.fraction);
+  }
+}
+
+export const FreezeParamsSchema = z.object({ durationMs: z.number().positive() }).strict();
+/** Stops ordinary enemies in place; elites and bosses shrug it off. */
+export class FreezeEffect implements PickupEffect<z.infer<typeof FreezeParamsSchema>> {
+  readonly paramsSchema = FreezeParamsSchema;
+  apply(context: PickupContext, params: z.infer<typeof FreezeParamsSchema>): void {
+    context.freezeEnemies(params.durationMs);
+  }
+}

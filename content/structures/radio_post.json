@@ -1,0 +1,41 @@
+{
+  "id": "radio_post",
+  "items": [
+    {
+      "kind": "patch",
+      "sprite": "decor/salt_flat",
+      "x": 0,
+      "y": 14
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/radio_mast",
+      "x": 0,
+      "y": -12
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/fence",
+      "x": -44,
+      "y": 26
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/fence",
+      "x": 44,
+      "y": 26
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/sandbags",
+      "x": -46,
+      "y": -14
+    },
+    {
+      "kind": "landmark",
+      "landmark": "generator",
+      "x": 30,
+      "y": 14
+    }
+  ]
+}

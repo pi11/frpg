@@ -1,0 +1,29 @@
+{
+  "id": "med_station",
+  "name": "Медпост",
+  "hint": "Стойте рядом, чтобы взять аптечки",
+  "sprite": "landmarks/med_station",
+  "trigger": {
+    "radius": 26,
+    "holdMs": 2000,
+    "caps": 0
+  },
+  "rolls": [
+    2,
+    2
+  ],
+  "rewards": [
+    {
+      "pickup": "medkit",
+      "weight": 4
+    },
+    {
+      "pickup": "adrenaline",
+      "weight": 1
+    },
+    {
+      "pickup": "shield_cell",
+      "weight": 1
+    }
+  ]
+}

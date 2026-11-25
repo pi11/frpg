@@ -1,0 +1,27 @@
+{
+  "id": "minefield",
+  "name": "Минное поле",
+  "sprite": "weapons/minefield",
+  "projectileSprite": "projectiles/mine",
+  "fireSound": "sfx/mine",
+  "behavior": {
+    "type": "mine",
+    "params": {
+      "scatter": 70
+    }
+  },
+  "levels": [
+    {
+      "damage": 62,
+      "cooldownMs": 1300,
+      "shots": 5,
+      "spreadDegrees": 0,
+      "radius": 56,
+      "durationMs": 12000
+    }
+  ],
+  "tags": [
+    "explosive"
+  ],
+  "evolved": true
+}

@@ -267,58 +267,173 @@
   },
   "decor": {
     "chunkSize": 256,
-    "patches": {
-      "perChunk": [
-        1,
-        3
-      ],
-      "items": [
-        {
-          "sprite": "decor/moss",
-          "weight": 4
+    "biomeChunks": 3,
+    "biomes": [
+      {
+        "id": "reedbed",
+        "weight": 3,
+        "patches": {
+          "perChunk": [
+            2,
+            4
+          ],
+          "items": [
+            {
+              "sprite": "decor/moss",
+              "weight": 4
+            },
+            {
+              "sprite": "decor/shallow_water",
+              "weight": 2
+            }
+          ]
         },
-        {
-          "sprite": "decor/toxic_pool",
-          "weight": 2
-        },
-        {
-          "sprite": "decor/rad_puddle",
-          "weight": 2
+        "objects": {
+          "perChunk": [
+            5,
+            9
+          ],
+          "items": [
+            {
+              "sprite": "decor/reeds",
+              "weight": 6
+            },
+            {
+              "sprite": "decor/stump",
+              "weight": 2
+            },
+            {
+              "sprite": "decor/boat",
+              "weight": 1
+            }
+          ]
         }
-      ]
-    },
-    "objects": {
-      "perChunk": [
-        3,
-        7
-      ],
-      "items": [
-        {
-          "sprite": "decor/reeds",
-          "weight": 4
+      },
+      {
+        "id": "mangroves",
+        "weight": 3,
+        "patches": {
+          "perChunk": [
+            2,
+            3
+          ],
+          "items": [
+            {
+              "sprite": "decor/moss",
+              "weight": 3
+            },
+            {
+              "sprite": "decor/lily_pads",
+              "weight": 2
+            }
+          ]
         },
-        {
-          "sprite": "decor/stump",
-          "weight": 2
-        },
-        {
-          "sprite": "decor/mushrooms",
-          "weight": 3
-        },
-        {
-          "sprite": "decor/dead_tree",
-          "weight": 2
-        },
-        {
-          "sprite": "decor/bones",
-          "weight": 2
-        },
-        {
-          "sprite": "decor/barrel",
-          "weight": 1
+        "objects": {
+          "perChunk": [
+            4,
+            7
+          ],
+          "items": [
+            {
+              "sprite": "decor/mangrove",
+              "weight": 5
+            },
+            {
+              "sprite": "decor/dead_tree",
+              "weight": 1
+            },
+            {
+              "sprite": "decor/mushrooms",
+              "weight": 3
+            },
+            {
+              "sprite": "decor/reeds",
+              "weight": 2
+            }
+          ]
         }
-      ]
-    },
+      },
+      {
+        "id": "toxic_flats",
+        "weight": 2,
+        "patches": {
+          "perChunk": [
+            3,
+            5
+          ],
+          "items": [
+            {
+              "sprite": "decor/toxic_pool",
+              "weight": 4
+            },
+            {
+              "sprite": "decor/rad_puddle",
+              "weight": 2
+            },
+            {
+              "sprite": "decor/moss",
+              "weight": 1
+            }
+          ]
+        },
+        "objects": {
+          "perChunk": [
+            2,
+            4
+          ],
+          "items": [
+            {
+              "sprite": "decor/bones",
+              "weight": 3
+            },
+            {
+              "sprite": "decor/barrel",
+              "weight": 3
+            },
+            {
+              "sprite": "decor/stump",
+              "weight": 1
+            }
+          ]
+        }
+      },
+      {
+        "id": "crystal_grove",
+        "weight": 1,
+        "patches": {
+          "perChunk": [
+            2,
+            3
+          ],
+          "items": [
+            {
+              "sprite": "decor/violet_slime",
+              "weight": 3
+            },
+            {
+              "sprite": "decor/moss",
+              "weight": 2
+            }
+          ]
+        },
+        "objects": {
+          "perChunk": [
+            4,
+            7
+          ],
+          "items": [
+            {
+              "sprite": "decor/crystal",
+              "weight": 5
+            },
+            {
+              "sprite": "decor/mushrooms",
+              "weight": 4
+            }
+          ]
+        }
+      }
+    ],
     "crates": {
       "sprite": "decor/crate",
       "hp": 10,
@@ -329,21 +444,98 @@
       "drops": [
         {
           "pickup": "medkit",
-          "weight": 4
+          "weight": 8
         },
         {
           "pickup": "caps_stash",
-          "weight": 2
+          "weight": 4
         },
         {
           "pickup": "magnet",
-          "weight": 1
+          "weight": 2
         },
         {
           "pickup": "pulse_bomb",
+          "weight": 2
+        },
+        {
+          "pickup": "rage_shot",
+          "weight": 1
+        },
+        {
+          "pickup": "adrenaline",
+          "weight": 1
+        },
+        {
+          "pickup": "shield_cell",
+          "weight": 1
+        },
+        {
+          "pickup": "ammo_belt",
+          "weight": 1
+        },
+        {
+          "pickup": "cryo_bomb",
+          "weight": 1
+        },
+        {
+          "pickup": "data_disk",
           "weight": 1
         }
       ]
-    }
+    },
+    "structures": {
+      "chance": 0.2,
+      "items": [
+        {
+          "structure": "fisher_hut",
+          "weight": 3
+        },
+        {
+          "structure": "crystal_ring",
+          "weight": 2
+        },
+        {
+          "structure": "sunken_jetty",
+          "weight": 3
+        },
+        {
+          "structure": "swamp_clinic",
+          "weight": 2
+        }
+      ]
+    },
+    "hazards": [
+      {
+        "sprite": "decor/toxic_pool",
+        "radius": 17,
+        "damagePerSecond": 7,
+        "slow": 0.25
+      },
+      {
+        "sprite": "decor/rad_puddle",
+        "radius": 12,
+        "damagePerSecond": 5,
+        "slow": 0
+      },
+      {
+        "sprite": "decor/violet_slime",
+        "radius": 17,
+        "damagePerSecond": 4,
+        "slow": 0.3
+      },
+      {
+        "sprite": "decor/shallow_water",
+        "radius": 24,
+        "damagePerSecond": 0,
+        "slow": 0.3
+      },
+      {
+        "sprite": "decor/lily_pads",
+        "radius": 18,
+        "damagePerSecond": 0,
+        "slow": 0.25
+      }
+    ]
   }
 }

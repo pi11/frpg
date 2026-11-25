@@ -236,62 +236,213 @@
   },
   "decor": {
     "chunkSize": 256,
-    "patches": {
-      "perChunk": [
-        1,
-        3
-      ],
-      "items": [
-        {
-          "sprite": "decor/asphalt",
-          "weight": 2
+    "biomeChunks": 3,
+    "biomes": [
+      {
+        "id": "dunes",
+        "weight": 3,
+        "patches": {
+          "perChunk": [
+            2,
+            4
+          ],
+          "items": [
+            {
+              "sprite": "decor/dune",
+              "weight": 4
+            },
+            {
+              "sprite": "decor/salt_flat",
+              "weight": 2
+            },
+            {
+              "sprite": "decor/dry_grass",
+              "weight": 2
+            }
+          ]
         },
-        {
-          "sprite": "decor/crater",
-          "weight": 2
-        },
-        {
-          "sprite": "decor/rad_puddle",
-          "weight": 1
-        },
-        {
-          "sprite": "decor/dune",
-          "weight": 3
+        "objects": {
+          "perChunk": [
+            2,
+            5
+          ],
+          "items": [
+            {
+              "sprite": "decor/cactus",
+              "weight": 3
+            },
+            {
+              "sprite": "decor/rocks",
+              "weight": 4
+            },
+            {
+              "sprite": "decor/bones",
+              "weight": 3
+            },
+            {
+              "sprite": "decor/dead_tree",
+              "weight": 1
+            }
+          ]
         }
-      ]
-    },
-    "objects": {
-      "perChunk": [
-        3,
-        7
-      ],
-      "items": [
-        {
-          "sprite": "decor/car_wreck",
-          "weight": 1
+      },
+      {
+        "id": "junkyard",
+        "weight": 3,
+        "patches": {
+          "perChunk": [
+            1,
+            3
+          ],
+          "items": [
+            {
+              "sprite": "decor/scorch",
+              "weight": 2
+            },
+            {
+              "sprite": "decor/oil_puddle",
+              "weight": 2
+            },
+            {
+              "sprite": "decor/tracks",
+              "weight": 2
+            },
+            {
+              "sprite": "decor/asphalt",
+              "weight": 1
+            }
+          ]
         },
-        {
-          "sprite": "decor/barrel",
-          "weight": 3
-        },
-        {
-          "sprite": "decor/dead_tree",
-          "weight": 3
-        },
-        {
-          "sprite": "decor/rocks",
-          "weight": 4
-        },
-        {
-          "sprite": "decor/bones",
-          "weight": 3
-        },
-        {
-          "sprite": "decor/tires",
-          "weight": 2
+        "objects": {
+          "perChunk": [
+            5,
+            9
+          ],
+          "items": [
+            {
+              "sprite": "decor/car_wreck",
+              "weight": 3
+            },
+            {
+              "sprite": "decor/tires",
+              "weight": 4
+            },
+            {
+              "sprite": "decor/barrel",
+              "weight": 4
+            },
+            {
+              "sprite": "decor/pipe",
+              "weight": 2
+            },
+            {
+              "sprite": "decor/container",
+              "weight": 1
+            }
+          ]
         }
-      ]
-    },
+      },
+      {
+        "id": "dead_grove",
+        "weight": 2,
+        "patches": {
+          "perChunk": [
+            2,
+            3
+          ],
+          "items": [
+            {
+              "sprite": "decor/dry_grass",
+              "weight": 4
+            },
+            {
+              "sprite": "decor/ash",
+              "weight": 1
+            },
+            {
+              "sprite": "decor/dune",
+              "weight": 1
+            }
+          ]
+        },
+        "objects": {
+          "perChunk": [
+            5,
+            9
+          ],
+          "items": [
+            {
+              "sprite": "decor/dead_tree",
+              "weight": 6
+            },
+            {
+              "sprite": "decor/rocks",
+              "weight": 2
+            },
+            {
+              "sprite": "decor/bones",
+              "weight": 2
+            },
+            {
+              "sprite": "decor/grave",
+              "weight": 1
+            }
+          ]
+        }
+      },
+      {
+        "id": "crater_field",
+        "weight": 2,
+        "patches": {
+          "perChunk": [
+            3,
+            5
+          ],
+          "items": [
+            {
+              "sprite": "decor/crater",
+              "weight": 4
+            },
+            {
+              "sprite": "decor/rad_puddle",
+              "weight": 2
+            },
+            {
+              "sprite": "decor/scorch",
+              "weight": 2
+            },
+            {
+              "sprite": "decor/ash",
+              "weight": 2
+            },
+            {
+              "sprite": "decor/lava_crack",
+              "weight": 1
+            }
+          ]
+        },
+        "objects": {
+          "perChunk": [
+            1,
+            4
+          ],
+          "items": [
+            {
+              "sprite": "decor/rocks",
+              "weight": 4
+            },
+            {
+              "sprite": "decor/bones",
+              "weight": 2
+            },
+            {
+              "sprite": "decor/barrel",
+              "weight": 1
+            }
+          ]
+        }
+      }
+    ],
     "crates": {
       "sprite": "decor/crate",
       "hp": 10,
@@ -302,21 +453,90 @@
       "drops": [
         {
           "pickup": "medkit",
-          "weight": 4
+          "weight": 8
         },
         {
           "pickup": "caps_stash",
-          "weight": 2
+          "weight": 4
         },
         {
           "pickup": "magnet",
-          "weight": 1
+          "weight": 2
         },
         {
           "pickup": "pulse_bomb",
+          "weight": 2
+        },
+        {
+          "pickup": "rage_shot",
+          "weight": 1
+        },
+        {
+          "pickup": "adrenaline",
+          "weight": 1
+        },
+        {
+          "pickup": "shield_cell",
+          "weight": 1
+        },
+        {
+          "pickup": "ammo_belt",
+          "weight": 1
+        },
+        {
+          "pickup": "cryo_bomb",
+          "weight": 1
+        },
+        {
+          "pickup": "data_disk",
           "weight": 1
         }
       ]
-    }
+    },
+    "structures": {
+      "chance": 0.2,
+      "items": [
+        {
+          "structure": "raider_camp",
+          "weight": 3
+        },
+        {
+          "structure": "bus_stop",
+          "weight": 3
+        },
+        {
+          "structure": "crash_site",
+          "weight": 2
+        },
+        {
+          "structure": "graveyard",
+          "weight": 2
+        },
+        {
+          "structure": "radio_post",
+          "weight": 2
+        }
+      ]
+    },
+    "hazards": [
+      {
+        "sprite": "decor/rad_puddle",
+        "radius": 12,
+        "damagePerSecond": 5,
+        "slow": 0
+      },
+      {
+        "sprite": "decor/oil_puddle",
+        "radius": 13,
+        "damagePerSecond": 0,
+        "slow": 0.4
+      },
+      {
+        "sprite": "decor/lava_crack",
+        "radius": 18,
+        "damagePerSecond": 12,
+        "slow": 0
+      }
+    ]
   }
 }

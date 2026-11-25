@@ -1,0 +1,10 @@
+{
+  "id": "capacitor",
+  "name": "Конденсатор",
+  "description": "Дроны, огонь и мины держатся дольше",
+  "sprite": "passives/capacitor",
+  "stat": "duration",
+  "mod": "flat",
+  "perLevel": 0.12,
+  "maxLevel": 5
+}

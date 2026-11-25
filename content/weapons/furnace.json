@@ -1,0 +1,27 @@
+{
+  "id": "furnace",
+  "name": "Горнило",
+  "sprite": "weapons/furnace",
+  "projectileSprite": "projectiles/flame",
+  "fireSound": "sfx/flame",
+  "behavior": {
+    "type": "projectile",
+    "params": {
+      "speed": 220,
+      "lifetimeMs": 520
+    }
+  },
+  "levels": [
+    {
+      "damage": 12,
+      "cooldownMs": 150,
+      "shots": 4,
+      "spreadDegrees": 50,
+      "pierce": 8
+    }
+  ],
+  "tags": [
+    "fire"
+  ],
+  "evolved": true
+}

@@ -1,0 +1,10 @@
+{
+  "id": "scope",
+  "name": "Самодельный прицел",
+  "description": "Шанс нанести критический урон",
+  "sprite": "passives/scope",
+  "stat": "critChance",
+  "mod": "flat",
+  "perLevel": 0.05,
+  "maxLevel": 5
+}

@@ -1,0 +1,57 @@
+{
+  "id": "cargo_yard",
+  "items": [
+    {
+      "kind": "patch",
+      "sprite": "decor/plaza",
+      "x": 0,
+      "y": 0
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/container",
+      "x": -38,
+      "y": -30
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/container",
+      "x": 34,
+      "y": -34
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/container",
+      "x": -30,
+      "y": 30
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/barrel",
+      "x": 20,
+      "y": 18
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/barrel",
+      "x": 30,
+      "y": 24
+    },
+    {
+      "kind": "crate",
+      "x": 46,
+      "y": 10
+    },
+    {
+      "kind": "crate",
+      "x": 0,
+      "y": -2
+    },
+    {
+      "kind": "landmark",
+      "landmark": "workbench",
+      "x": 36,
+      "y": 44
+    }
+  ]
+}

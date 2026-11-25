@@ -1,0 +1,10 @@
+{
+  "id": "thick_hide",
+  "name": "Стёганая куртка",
+  "description": "Больше здоровья",
+  "sprite": "passives/thick_hide",
+  "stat": "maxHp",
+  "mod": "flat",
+  "perLevel": 15,
+  "maxLevel": 5
+}

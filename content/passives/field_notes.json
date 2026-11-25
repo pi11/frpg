@@ -1,0 +1,10 @@
+{
+  "id": "field_notes",
+  "name": "Полевой дневник",
+  "description": "Больше опыта",
+  "sprite": "passives/field_notes",
+  "stat": "xpGain",
+  "mod": "flat",
+  "perLevel": 0.08,
+  "maxLevel": 5
+}

@@ -1,0 +1,15 @@
+{
+  "id": "ammo_belt",
+  "name": "Усиленная лента",
+  "sprite": "pickups/ammo_belt",
+  "sound": "sfx/powerup",
+  "attract": false,
+  "effect": {
+    "type": "buff",
+    "params": {
+      "stat": "damage",
+      "amount": 8,
+      "durationMs": 15000
+    }
+  }
+}

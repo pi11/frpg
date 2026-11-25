@@ -1,6 +1,7 @@
 {
   "id": "ammo_press",
   "name": "Пресс для патронов",
+  "category": "combat",
   "stat": "damage",
   "mod": "flat",
   "perLevel": 1,

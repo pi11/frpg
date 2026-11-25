@@ -1,0 +1,57 @@
+{
+  "id": "raider_camp",
+  "items": [
+    {
+      "kind": "patch",
+      "sprite": "decor/scorch",
+      "x": 0,
+      "y": 6
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/campfire",
+      "x": 0,
+      "y": 0
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/tent",
+      "x": -44,
+      "y": -22
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/tent",
+      "x": 42,
+      "y": -26
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/sandbags",
+      "x": -40,
+      "y": 34
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/sandbags",
+      "x": 38,
+      "y": 36
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/barrel",
+      "x": 62,
+      "y": 2
+    },
+    {
+      "kind": "crate",
+      "x": -66,
+      "y": 4
+    },
+    {
+      "kind": "crate",
+      "x": 12,
+      "y": -42
+    }
+  ]
+}

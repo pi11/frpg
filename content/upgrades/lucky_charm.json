@@ -1,6 +1,7 @@
 {
   "id": "lucky_charm",
   "name": "Талисман на удачу",
+  "category": "scavenge",
   "stat": "luck",
   "mod": "flat",
   "perLevel": 0.05,

@@ -1,0 +1,40 @@
+{
+  "id": "generator",
+  "name": "Генератор",
+  "hint": "Запустите: удержите позицию",
+  "sprite": "landmarks/generator",
+  "trigger": {
+    "radius": 52,
+    "holdMs": 9000,
+    "caps": 0
+  },
+  "rolls": [
+    2,
+    3
+  ],
+  "rewards": [
+    {
+      "pickup": "data_disk",
+      "weight": 4
+    },
+    {
+      "pickup": "caps_stash",
+      "weight": 3
+    },
+    {
+      "pickup": "ammo_belt",
+      "weight": 2
+    },
+    {
+      "pickup": "rage_shot",
+      "weight": 2
+    },
+    {
+      "pickup": "chest",
+      "weight": 1
+    }
+  ],
+  "ambush": {
+    "count": 14
+  }
+}

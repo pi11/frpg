@@ -25,6 +25,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 import art  # noqa: E402
+import art_extra as extra  # noqa: E402
 import art_more as more  # noqa: E402
 import art_world as world  # noqa: E402
 import audio  # noqa: E402
@@ -202,6 +203,7 @@ def sprite_frames() -> dict[str, Image]:
         "enemies/marsh_mother": with_death([more.marsh_mother(i) for i in range(4)], "P", 89),
         "fx/dust": numbered("burst", [more.dust(i) for i in range(5)]),
         "fx/heal": numbered("burst", [more.heal_ring(i) for i in range(4)]),
+        **extra.animations(),
     }
     frames: dict[str, Image] = {}
     for key, animation in animated.items():
@@ -265,6 +267,7 @@ def sprite_frames() -> dict[str, Image]:
         "decor/toxic_pool": more.toxic_pool(),
         "decor/moss": more.moss(),
     })
+    frames.update(extra.frames())
     return frames
 
 

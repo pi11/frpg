@@ -1,11 +1,11 @@
 import { enemyBehaviors, pickupEffects, weaponBehaviors } from '../behaviors/registry';
 import {
-  BalanceSchema, EnemySchema, HeroSchema, LocationSchema, PassiveSchema, PickupSchema,
-  UpgradeSchema, WeaponSchema,
+  BalanceSchema, EnemySchema, HeroSchema, LandmarkSchema, LocationSchema, PassiveSchema, PickupSchema,
+  StructureSchema, UpgradeSchema, WeaponSchema,
 } from './schemas';
 import type {
-  BalanceDefinition, EnemyDefinition, HeroDefinition, LocationDefinition,
-  PassiveDefinition, PickupDefinition, UpgradeDefinition, WeaponDefinition,
+  BalanceDefinition, EnemyDefinition, HeroDefinition, LandmarkDefinition, LocationDefinition,
+  PassiveDefinition, PickupDefinition, StructureDefinition, UpgradeDefinition, WeaponDefinition,
 } from './schemas';
 
 export interface Catalog {
@@ -17,6 +17,8 @@ export interface Catalog {
   locations: Record<string, LocationDefinition>;
   upgrades: Record<string, UpgradeDefinition>;
   pickups: Record<string, PickupDefinition>;
+  landmarks: Record<string, LandmarkDefinition>;
+  structures: Record<string, StructureDefinition>;
 }
 
 const bundledFiles = import.meta.glob<unknown>('../../../content/**/*.json', {
@@ -33,6 +35,8 @@ export function validateContent(files: Record<string, unknown>): Catalog {
   const locations: Catalog['locations'] = {};
   const upgrades: Catalog['upgrades'] = {};
   const pickups: Catalog['pickups'] = {};
+  const landmarks: Catalog['landmarks'] = {};
+  const structures: Catalog['structures'] = {};
   let balance: BalanceDefinition | undefined;
 
   function add<T extends { id: string }>(target: Record<string, T>, value: T, path: string): void {
@@ -56,6 +60,8 @@ export function validateContent(files: Record<string, unknown>): Catalog {
       case 'locations': add(locations, LocationSchema.parse(raw), path); break;
       case 'upgrades': add(upgrades, UpgradeSchema.parse(raw), path); break;
       case 'pickups': add(pickups, PickupSchema.parse(raw), path); break;
+      case 'landmarks': add(landmarks, LandmarkSchema.parse(raw), path); break;
+      case 'structures': add(structures, StructureSchema.parse(raw), path); break;
       default: throw new Error(`${path}: unknown content category`);
     }
   }
@@ -108,6 +114,20 @@ export function validateContent(files: Record<string, unknown>): Catalog {
     const effect = pickupEffects[pickup.effect.type];
     if (!effect) throw new Error(`pickup ${pickup.id}: unknown effect ${pickup.effect.type}`);
     effect.paramsSchema.parse(pickup.effect.params);
+  }
+  for (const landmark of Object.values(landmarks)) {
+    for (const reward of landmark.rewards) {
+      if (!pickups[reward.pickup]) {
+        throw new Error(`landmark ${landmark.id}: unknown reward ${reward.pickup}`);
+      }
+    }
+  }
+  for (const structure of Object.values(structures)) {
+    for (const item of structure.items) {
+      if (item.kind === 'landmark' && !landmarks[item.landmark]) {
+        throw new Error(`structure ${structure.id}: unknown landmark ${item.landmark}`);
+      }
+    }
   }
   const needEnemy = (owner: string, id: string, role?: EnemyDefinition['role']): void => {
     const enemy = enemies[id];
@@ -173,6 +193,23 @@ export function validateContent(files: Record<string, unknown>): Catalog {
     if (location.boss.atSecond >= location.durationSeconds) {
       throw new Error(`location ${location.id}: boss must appear before the end`);
     }
+    for (const item of location.decor.structures.items) {
+      if (!structures[item.structure]) {
+        throw new Error(`location ${location.id}: unknown structure ${item.structure}`);
+      }
+    }
+    const structureItems = location.decor.structures.items
+      .flatMap((item) => structures[item.structure]!.items);
+    const patches = new Set<string>();
+    for (const biome of location.decor.biomes) {
+      for (const item of biome.patches.items) patches.add(item.sprite);
+    }
+    for (const item of structureItems) if (item.kind === 'patch') patches.add(item.sprite);
+    for (const hazard of location.decor.hazards) {
+      if (!patches.has(hazard.sprite)) {
+        throw new Error(`location ${location.id}: hazard ${hazard.sprite} is never placed`);
+      }
+    }
     for (const drop of location.decor.crates.drops) {
       if (!pickups[drop.pickup]) {
         throw new Error(`location ${location.id}: unknown crate pickup ${drop.pickup}`);
@@ -180,7 +217,7 @@ export function validateContent(files: Record<string, unknown>): Catalog {
     }
   }
 
-  return { balance, heroes, weapons, passives, enemies, locations, upgrades, pickups };
+  return { balance, heroes, weapons, passives, enemies, locations, upgrades, pickups, landmarks, structures };
 }
 
 let cached: Catalog | undefined;

@@ -6,11 +6,17 @@ import { ExploderEnemyBehavior } from './enemies/Exploder';
 import { HealerEnemyBehavior } from './enemies/Healer';
 import { RangedEnemyBehavior } from './enemies/Ranged';
 import { WeaverEnemyBehavior } from './enemies/Weaver';
-import { BlastEffect, CapsEffect, ChestEffect, HealEffect, MagnetEffect } from './pickups/effects';
+import {
+  BlastEffect, BuffEffect, CapsEffect, ChestEffect, FreezeEffect, HealEffect, MagnetEffect, XpEffect,
+} from './pickups/effects';
 import type { EnemyBehavior, PickupEffect, WeaponBehavior } from './types';
 import { AuraWeaponBehavior } from './weapons/Aura';
+import { BoomerangWeaponBehavior } from './weapons/Boomerang';
+import { ChainWeaponBehavior } from './weapons/Chain';
+import { MineWeaponBehavior } from './weapons/Mine';
 import { OrbitWeaponBehavior } from './weapons/Orbit';
 import { ProjectileWeaponBehavior } from './weapons/Projectile';
+import { RocketWeaponBehavior } from './weapons/Rocket';
 import { ZoneWeaponBehavior } from './weapons/Zone';
 
 export const weaponBehaviors: Record<string, WeaponBehavior<unknown> | undefined> = {
@@ -18,6 +24,10 @@ export const weaponBehaviors: Record<string, WeaponBehavior<unknown> | undefined
   orbit: new OrbitWeaponBehavior() as WeaponBehavior<unknown>,
   aura: new AuraWeaponBehavior() as WeaponBehavior<unknown>,
   zone: new ZoneWeaponBehavior() as WeaponBehavior<unknown>,
+  chain: new ChainWeaponBehavior() as WeaponBehavior<unknown>,
+  boomerang: new BoomerangWeaponBehavior() as WeaponBehavior<unknown>,
+  mine: new MineWeaponBehavior() as WeaponBehavior<unknown>,
+  rocket: new RocketWeaponBehavior() as WeaponBehavior<unknown>,
 };
 
 export const enemyBehaviors: Record<string, EnemyBehavior<unknown> | undefined> = {
@@ -39,4 +49,7 @@ export const pickupEffects: Record<string, PickupEffect<unknown> | undefined> = 
   magnet: new MagnetEffect() as PickupEffect<unknown>,
   blast: new BlastEffect() as PickupEffect<unknown>,
   chest: new ChestEffect() as PickupEffect<unknown>,
+  buff: new BuffEffect() as PickupEffect<unknown>,
+  xp: new XpEffect() as PickupEffect<unknown>,
+  freeze: new FreezeEffect() as PickupEffect<unknown>,
 };

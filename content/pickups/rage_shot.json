@@ -1,0 +1,15 @@
+{
+  "id": "rage_shot",
+  "name": "Боевой стимулятор",
+  "sprite": "pickups/rage_shot",
+  "sound": "sfx/powerup",
+  "attract": false,
+  "effect": {
+    "type": "buff",
+    "params": {
+      "stat": "attackSpeed",
+      "amount": 0.5,
+      "durationMs": 15000
+    }
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "id": "shield_cell",
+  "name": "Силовая капсула",
+  "sprite": "pickups/shield_cell",
+  "sound": "sfx/powerup",
+  "attract": false,
+  "effect": {
+    "type": "buff",
+    "params": {
+      "stat": "armor",
+      "amount": 8,
+      "durationMs": 12000
+    }
+  }
+}

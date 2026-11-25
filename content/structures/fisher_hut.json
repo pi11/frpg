@@ -1,0 +1,51 @@
+{
+  "id": "fisher_hut",
+  "items": [
+    {
+      "kind": "patch",
+      "sprite": "decor/moss",
+      "x": 0,
+      "y": 10
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/hut",
+      "x": -20,
+      "y": -20
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/walkway",
+      "x": 36,
+      "y": 4
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/boat",
+      "x": 60,
+      "y": 32
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/stump",
+      "x": -54,
+      "y": 20
+    },
+    {
+      "kind": "crate",
+      "x": -52,
+      "y": -18
+    },
+    {
+      "kind": "crate",
+      "x": 14,
+      "y": 34
+    },
+    {
+      "kind": "landmark",
+      "landmark": "workbench",
+      "x": 24,
+      "y": -28
+    }
+  ]
+}

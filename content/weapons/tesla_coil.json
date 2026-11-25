@@ -1,0 +1,80 @@
+{
+  "id": "tesla_coil",
+  "name": "Катушка-разрядник",
+  "sprite": "weapons/tesla_coil",
+  "projectileSprite": "projectiles/spark",
+  "fireSound": "sfx/tesla",
+  "behavior": {
+    "type": "chain",
+    "params": {
+      "range": 200,
+      "jumpRange": 95,
+      "falloff": 0.85
+    }
+  },
+  "levels": [
+    {
+      "damage": 9,
+      "cooldownMs": 1300,
+      "shots": 1,
+      "spreadDegrees": 0,
+      "jumps": 2
+    },
+    {
+      "damage": 11,
+      "cooldownMs": 1250,
+      "shots": 1,
+      "spreadDegrees": 0,
+      "jumps": 3
+    },
+    {
+      "damage": 13,
+      "cooldownMs": 1200,
+      "shots": 1,
+      "spreadDegrees": 0,
+      "jumps": 3
+    },
+    {
+      "damage": 15,
+      "cooldownMs": 1150,
+      "shots": 1,
+      "spreadDegrees": 0,
+      "jumps": 4
+    },
+    {
+      "damage": 18,
+      "cooldownMs": 1100,
+      "shots": 2,
+      "spreadDegrees": 0,
+      "jumps": 4
+    },
+    {
+      "damage": 21,
+      "cooldownMs": 1050,
+      "shots": 2,
+      "spreadDegrees": 0,
+      "jumps": 5
+    },
+    {
+      "damage": 25,
+      "cooldownMs": 1000,
+      "shots": 2,
+      "spreadDegrees": 0,
+      "jumps": 5
+    },
+    {
+      "damage": 30,
+      "cooldownMs": 920,
+      "shots": 2,
+      "spreadDegrees": 0,
+      "jumps": 6
+    }
+  ],
+  "tags": [
+    "energy"
+  ],
+  "evolution": {
+    "passive": "capacitor",
+    "into": "storm_core"
+  }
+}

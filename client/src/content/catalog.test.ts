@@ -126,7 +126,9 @@ describe('assets referenced by content', () => {
         needFile(`${music}.mp3`);
       }
       const { decor } = location;
-      for (const item of [...decor.patches.items, ...decor.objects.items]) needFrame(item.sprite);
+      for (const biome of decor.biomes) {
+        for (const item of [...biome.patches.items, ...biome.objects.items]) needFrame(item.sprite);
+      }
       needFrame(decor.crates.sprite);
       needFrame(`${decor.crates.sprite}/break_0`);
     }
@@ -134,6 +136,15 @@ describe('assets referenced by content', () => {
       if (weapon.behavior.type === 'orbit') needFrame(`${weapon.projectileSprite}/spin_0`);
       const fire = (weapon.behavior.params as { fireSprite?: string }).fireSprite;
       if (fire) needFrame(`${fire}/burn_0`);
+    }
+    for (const landmark of Object.values(content.landmarks)) {
+      needFrame(landmark.sprite);
+      needFrame(`${landmark.sprite}_used`);
+    }
+    for (const structure of Object.values(content.structures)) {
+      for (const item of structure.items) {
+        if (item.kind === 'patch' || item.kind === 'object') needFrame(item.sprite);
+      }
     }
     for (const frame of ['xp/green', 'xp/green/idle_0', 'ui/cap', 'fx/hit/burst_0',
       'fx/explosion/burst_0']) needFrame(frame);
@@ -156,6 +167,44 @@ describe('assets referenced by content', () => {
     };
     walk(assets);
     expect(unlicensed).toEqual([]);
+  });
+});
+
+describe('landmarks and structures', () => {
+  const changed = (name: string, edit: (raw: never) => void): Record<string, unknown> => {
+    const path = Object.keys(rawFiles).find((key) => key.endsWith(name))!;
+    const copy = structuredClone(rawFiles[path]);
+    edit(copy as never);
+    return { ...rawFiles, [path]: copy };
+  };
+
+  it('reject unknown rewards, landmarks and structures', () => {
+    expect(() => validateContent(changed('landmarks/vending.json',
+      (raw: { rewards: { pickup: string }[] }) => { raw.rewards[0]!.pickup = 'gold'; })))
+      .toThrow('unknown reward');
+    expect(() => validateContent(changed('structures/radio_post.json',
+      (raw: { items: { landmark?: string }[] }) => { raw.items.at(-1)!.landmark = 'castle'; })))
+      .toThrow('unknown landmark');
+    expect(() => validateContent(changed('locations/dead_city.json',
+      (raw: { decor: { structures: { items: { structure: string }[] } } }) => {
+        raw.decor.structures.items[0]!.structure = 'castle';
+      }))).toThrow('unknown structure');
+  });
+
+  it('reject a hazard that is never placed', () => {
+    expect(() => validateContent(changed('locations/dead_city.json',
+      (raw: { decor: { hazards: { sprite: string }[] } }) => {
+        raw.decor.hazards[0]!.sprite = 'decor/toxic_pool';
+      }))).toThrow('never placed');
+  });
+
+  it('every location has places with rewards and at least three biomes', () => {
+    const { locations, structures } = getCatalog();
+    for (const location of Object.values(locations)) {
+      expect(location.decor.biomes.length).toBeGreaterThanOrEqual(3);
+      expect(location.decor.structures.items.some((item) =>
+        structures[item.structure]!.items.some((part) => part.kind === 'landmark'))).toBe(true);
+    }
   });
 });
 

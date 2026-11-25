@@ -55,6 +55,15 @@ export interface ProjectileSpec {
   lifetimeMs: number;
   sprite: string;
   pierce: number;
+  /** Start point; the hero by default. */
+  at?: Point;
+  /** Explodes on the first hit and damages everything inside. */
+  blastRadius?: number;
+  /** Homing towards the nearest enemy, radians per second. */
+  turnRate?: number;
+  /** Turns back to the hero after this time; hits may repeat on the way back. */
+  returnAfterMs?: number;
+  returnSpeed?: number;
 }
 
 export interface ZoneSpec extends Point {
@@ -78,6 +87,11 @@ export interface CombatContext {
   stat(key: StatKey): number;
   nearestEnemy(): Point | null;
   randomEnemyWithin(range: number): Point | null;
+  /** Nearest enemy to any point, ignoring the skipped ones. */
+  nearestTo(center: Point, range: number, skip: ReadonlySet<Point>): Point | null;
+  /** Damage one enemy returned by the searches above. */
+  strike(target: Point, damage: number): void;
+  drawBolt(path: readonly Point[], sprite: string): void;
   /** Damage every enemy (and crate) inside the circle; returns how many were hit. */
   damageInRadius(center: Point, radius: number, damage: number, limit?: HitLimit): number;
   spawnProjectile(spec: ProjectileSpec): void;
@@ -98,7 +112,7 @@ export interface WeaponState {
 /** 'fired' plays the weapon sound, 'silent' consumes the cooldown quietly, 'skip' waits. */
 export type FireResult = 'fired' | 'silent' | 'skip';
 
-export type LevelField = 'radius' | 'durationMs' | 'pierce';
+export type LevelField = 'radius' | 'durationMs' | 'pierce' | 'jumps';
 
 export interface WeaponBehavior<P> {
   readonly paramsSchema: z.ZodType<P>;
@@ -120,11 +134,24 @@ export interface PickupContext {
   blast(center: Point, radius: number, damage: number): void;
   addCaps(amount: number): void;
   openChest(items: number, caps: number): void;
+  /** One timed bonus per id; a repeat restarts it. */
+  addBuff(id: string, stat: StatKey, amount: number, durationMs: number): void;
+  addXpFraction(fraction: number): void;
+  freezeEnemies(durationMs: number): void;
 }
 
 export interface PickupEffect<P> {
   readonly paramsSchema: z.ZodType<P>;
-  apply(context: PickupContext, params: P): void;
+  apply(context: PickupContext, params: P, pickupId: string): void;
+}
+
+/** Angles of a volley towards the target; extra projectiles widen it so they do not overlap. */
+export function fan(context: CombatContext, level: WeaponLevel, target: Point): number[] {
+  const shots = level.shots + Math.floor(context.stat('projectileCount'));
+  const base = Math.atan2(target.y - context.hero.y, target.x - context.hero.x);
+  const spread = (level.spreadDegrees + (shots - level.shots) * 8) * (Math.PI / 180);
+  return Array.from({ length: shots }, (_, index) =>
+    (shots === 1 ? base : base + (index / (shots - 1) - 0.5) * spread));
 }
 
 /** Inclusive integer in [min, max] from a 0..1 random value. */

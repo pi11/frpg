@@ -1,0 +1,13 @@
+{
+  "id": "bandolier",
+  "name": "Патронташ",
+  "category": "combat",
+  "stat": "projectileCount",
+  "mod": "flat",
+  "perLevel": 1,
+  "maxLevel": 1,
+  "cost": {
+    "base": 600,
+    "growth": 1
+  }
+}

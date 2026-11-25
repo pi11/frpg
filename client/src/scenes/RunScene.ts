@@ -15,7 +15,8 @@ import { playMusic, playSfx } from '../sound';
 import { Rng } from '../systems/rng';
 import { availableEvolutions, evolutionSource } from '../systems/evolutions';
 import { COLORS, textStyle } from '../ui/theme';
-import { WorldDecor } from '../systems/WorldDecor';
+import { levelChanges, statBonus } from '../content/statText';
+import { WorldDecor, type ActiveLandmark } from '../systems/WorldDecor';
 import type { ResultData } from './ResultScene';
 
 export interface RunView {
@@ -35,6 +36,10 @@ export interface RunView {
   boss: { name: string; fraction: number } | null;
   /** Banner text shown before an elite or the boss arrives. */
   warning: string;
+  rerolls: number;
+  revives: number;
+  /** Timed bonuses for the HUD, remaining share 0..1. */
+  buffs: { sprite: string; fraction: number }[];
 }
 
 export interface UpgradeChoice {
@@ -43,6 +48,15 @@ export interface UpgradeChoice {
   name: string;
   description: string;
   sprite: string;
+  /** Icons of the other halves of evolutions this card leads to. */
+  pairs: string[];
+}
+
+/** Owned weapons and perks for the level-up screen. */
+export interface LoadoutItem {
+  sprite: string;
+  level: number;
+  max: number;
 }
 
 export interface ChestData {
@@ -73,6 +87,8 @@ const SPLIT_RING = 10;
 const HIT_FLASH_MS = 50;
 const LABEL_POOL_SIZE = 8;
 const HIT_FLASH_GAP_MS = 120;
+const REWARD_RING = 20;
+const NO_POINTS: ReadonlySet<Point> = new Set();
 
 /** Adapts a pooled enemy sprite to the Mob interface used by AI behaviors. */
 class SpriteMob implements Mob {
@@ -86,6 +102,7 @@ class SpriteMob implements Mob {
   burrowed = false;
   /** Run time when the white hit flash ends (0 = no flash). */
   flashUntil = 0;
+  frozen = false;
 
   constructor(readonly sprite: Phaser.Physics.Arcade.Sprite, readonly uid: number) {}
 
@@ -120,6 +137,7 @@ class SpriteMob implements Mob {
     this.telegraphing = false;
     this.setBurrowed(false);
     this.flashUntil = 0;
+    this.frozen = false;
     for (const key of Object.keys(this.memory)) this.memory[key] = 0;
     for (const key of Object.keys(this.hitAt)) this.hitAt[key] = -Infinity;
   }
@@ -136,6 +154,7 @@ export class RunScene extends Phaser.Scene {
   readonly view: RunView = {
     hp: 0, maxHp: 0, xp: 0, nextXp: 0, level: 1, kills: 0, caps: 0, seconds: 0,
     wave: 1, enemyCount: 0, projectileCount: 0, seed: 0, boss: null, warning: '',
+    rerolls: 0, revives: 0, buffs: [],
   };
   choices: UpgradeChoice[] = [];
   chest: ChestData = { granted: [], caps: 0 };
@@ -184,6 +203,13 @@ export class RunScene extends Phaser.Scene {
   private spawnClock = 0;
   private lastDamageAt = -Infinity;
   private finished = false;
+  private buffs = new Map<string, { stat: StatKey; amount: number; until: number; durationMs: number }>();
+  private frozenUntil = 0;
+  private hazardClock = 0;
+  private invulnerableUntil = 0;
+  private hazardSlow = 0;
+  private prompt!: Phaser.GameObjects.Text;
+  private hintGraphics!: Phaser.GameObjects.Graphics;
 
   constructor() {
     super('Run');
@@ -217,11 +243,17 @@ export class RunScene extends Phaser.Scene {
     this.orbiters = new Map();
     this.auras = new Map();
     this.mobs = [];
+    this.buffs = new Map();
+    this.frozenUntil = 0;
+    this.hazardClock = 0;
+    this.hazardSlow = 0;
+    this.invulnerableUntil = 0;
     Object.assign(this.view, {
       hp: this.stat('maxHp'), maxHp: this.stat('maxHp'), xp: 0,
       nextXp: this.catalog.balance.xp.base, level: 1, kills: 0, caps: 0,
       seconds: Math.floor(this.elapsedMs / 1000), wave: this.waveIndex + 1,
       enemyCount: 0, projectileCount: 0, seed: data.seed, boss: null, warning: '',
+      rerolls: Math.floor(this.stat('rerolls')), revives: Math.floor(this.stat('revives')), buffs: [],
     });
     inputState.x = 0;
     inputState.y = 0;
@@ -255,7 +287,7 @@ export class RunScene extends Phaser.Scene {
     this.crates.getChildren().forEach((item) => {
       (item as Phaser.Physics.Arcade.Sprite).setDepth(-10).setImmovable(true);
     });
-    this.decor = new WorldDecor(this, this.view.seed, this.location.decor, this.crates);
+    this.decor = new WorldDecor(this, this.view.seed, this.location.decor, this.crates, this.catalog);
 
     this.effects = this.add.group({ maxSize: EFFECT_POOL_SIZE });
     for (let index = 0; index < EFFECT_POOL_SIZE; index += 1) {
@@ -276,6 +308,9 @@ export class RunScene extends Phaser.Scene {
         sprite: 'fx/fire', nextTick: 0, until: 0, flames,
       });
     }
+    this.prompt = this.add.text(0, 0, '', textStyle(8, COLORS.bright, { align: 'center' }))
+      .setOrigin(0.5, 1).setDepth(31).setVisible(false);
+    this.hintGraphics = this.add.graphics().setScrollFactor(0).setDepth(32);
     this.createContexts();
 
     this.physics.add.overlap(this.projectiles, this.enemies, (first, second) => {
@@ -286,6 +321,7 @@ export class RunScene extends Phaser.Scene {
       if (hits.has(mob.uid)) return;
       hits.add(mob.uid);
       this.consumeBullet(bullet);
+      if (this.blast(bullet)) return;
       this.damageMob(mob, bullet.getData('damage') as number, bullet.x, bullet.y);
     });
     this.physics.add.overlap(this.projectiles, this.crates, (first, second) => {
@@ -293,6 +329,7 @@ export class RunScene extends Phaser.Scene {
       const crate = second as Phaser.Physics.Arcade.Sprite;
       if (!bullet.active || !crate.active) return;
       this.consumeBullet(bullet);
+      if (this.blast(bullet)) return;
       this.hitCrate(crate, bullet.getData('damage') as number);
     });
     this.physics.add.overlap(this.hero, this.crates, (_hero, crate) => {
@@ -329,6 +366,9 @@ export class RunScene extends Phaser.Scene {
       stat: (key) => this.stat(key),
       nearestEnemy: () => this.nearestEnemy(),
       randomEnemyWithin: (range) => this.randomEnemyWithin(range),
+      nearestTo: (center, range, skip) => this.nearestTo(center, range, skip),
+      strike: (target, damage) => this.strike(target, damage),
+      drawBolt: (path, sprite) => this.drawBolt(path, sprite),
       damageInRadius: (center, radius, damage, limit) => this.damageInRadius(center, radius, damage, limit),
       spawnProjectile: (spec) => this.spawnProjectile(spec),
       spawnZone: (spec) => this.spawnZone(spec),
@@ -402,6 +442,14 @@ export class RunScene extends Phaser.Scene {
       },
       addCaps: (amount) => { this.view.caps += amount; },
       openChest: (items, caps) => this.openChest(items, caps),
+      addBuff: (id, stat, amount, durationMs) => {
+        this.buffs.set(id, { stat, amount, until: this.elapsedMs + durationMs, durationMs });
+      },
+      addXpFraction: (fraction) => { this.gainXp(this.view.nextXp * fraction); },
+      freezeEnemies: (durationMs) => {
+        this.frozenUntil = this.elapsedMs + durationMs;
+        this.cameras.main.flash(160, 160, 220, 255);
+      },
     };
   }
 
@@ -428,6 +476,9 @@ export class RunScene extends Phaser.Scene {
 
     const regen = this.stat('regen');
     if (regen > 0) this.view.hp = Math.min(this.view.maxHp, this.view.hp + regen * delta / 1000);
+    this.updateBuffs();
+    this.updateHazards(delta);
+    if (this.finished) return;
     this.moveHero();
     const camera = this.cameras.main;
     this.ground.tilePositionX = camera.scrollX;
@@ -441,10 +492,12 @@ export class RunScene extends Phaser.Scene {
       this.spawnWaveEntry();
     }
     this.moveEnemies(delta);
+    this.steerProjectiles(delta);
     this.expire(this.projectiles);
     this.expire(this.hostileShots);
     this.updateZones();
     this.updateLoot();
+    if (!this.finished && this.scene.isActive()) this.updateLandmarks(delta);
     this.auras.clear();
     this.updateWeapons(delta);
     this.drawAreas();
@@ -507,6 +560,9 @@ export class RunScene extends Phaser.Scene {
       if (upgrade.mod === 'flat') flat += upgrade.perLevel * level;
       else percent += upgrade.perLevel * level;
     }
+    for (const buff of this.buffs.values()) {
+      if (buff.stat === key && buff.until > this.elapsedMs) flat += buff.amount;
+    }
     return (this.heroDefinition.baseStats[key] + flat) * (1 + percent);
   }
 
@@ -518,7 +574,7 @@ export class RunScene extends Phaser.Scene {
     if (this.keys.W.isDown || this.cursors.up.isDown) y -= 1;
     if (this.keys.S.isDown || this.cursors.down.isDown) y += 1;
     const length = Math.hypot(x, y);
-    const speed = this.stat('moveSpeed');
+    const speed = this.stat('moveSpeed') * (1 - this.hazardSlow);
     this.hero.setVelocity(length > 0 ? (x / length) * speed : 0,
       length > 0 ? (y / length) * speed : 0);
     const sprite = this.heroDefinition.sprite;
@@ -579,6 +635,8 @@ export class RunScene extends Phaser.Scene {
     const speed = definition.role === 'normal' ? this.currentWave().speedMultiplier : 1;
     (sprite.getData('mob') as SpriteMob).reset(definition, definition.stats.hp * multiplier, speed);
     const walk = animationKey(definition.sprite, 'walk');
+    // A frozen enemy dies with its animation paused; the pooled sprite must start clean.
+    sprite.anims.resume();
     if (this.anims.exists(walk)) {
       // Visual-only phase offset: a counter, so the seeded gameplay RNG stream is untouched.
       this.spawnCount += 1;
@@ -600,14 +658,35 @@ export class RunScene extends Phaser.Scene {
       sprite.setFlipX(dx < 0);
       if (mob.flashUntil && this.elapsedMs >= mob.flashUntil) {
         mob.flashUntil = 0;
-        if (!mob.telegraphing) sprite.clearTint();
+        if (mob.frozen) sprite.setTint(0x8ad0ff).setTintMode(Phaser.TintModes.MULTIPLY);
+        else if (!mob.telegraphing) sprite.clearTint();
       }
       const definition = mob.definition;
+      const frozen = this.elapsedMs < this.frozenUntil && definition.role === 'normal' && !mob.burrowed;
+      if (frozen !== mob.frozen) {
+        mob.frozen = frozen;
+        if (frozen) {
+          sprite.setTint(0x8ad0ff).setTintMode(Phaser.TintModes.MULTIPLY);
+          sprite.anims.pause();
+        } else {
+          sprite.clearTint();
+          sprite.anims.resume();
+        }
+      }
+      if (frozen) {
+        mob.setVelocity(0, 0);
+        continue;
+      }
       enemyBehaviors[definition.ai.type]!.update(mob, this.enemyContext, definition.ai.params, delta);
     }
   }
 
   private damageMob(mob: SpriteMob, amount: number, x: number, y: number): void {
+    const chance = this.stat('critChance');
+    if (chance > 0 && this.rng.next() < chance) {
+      amount *= this.catalog.balance.run.critMultiplier;
+      this.playEffect('fx/hit', 'burst', x, y - 4, true);
+    }
     mob.hp -= amount;
     if (mob.hp <= 0) {
       this.killMob(mob);
@@ -737,6 +816,52 @@ export class RunScene extends Phaser.Scene {
     return null;
   }
 
+  private nearestTo(center: Point, range: number, skip: ReadonlySet<Point>): Point | null {
+    let nearest: Point | null = null;
+    let best = range * range;
+    for (const mob of this.mobs) {
+      if (!mob.targetable || skip.has(mob.sprite)) continue;
+      const dx = mob.sprite.x - center.x;
+      const dy = mob.sprite.y - center.y;
+      const distance = dx * dx + dy * dy;
+      if (distance > best) continue;
+      nearest = mob.sprite;
+      best = distance;
+    }
+    return nearest;
+  }
+
+  private strike(target: Point, damage: number): void {
+    // Targets are the enemy sprites handed out by the searches above.
+    const mob = (target as Phaser.Physics.Arcade.Sprite).getData('mob') as SpriteMob;
+    if (mob.targetable) this.damageMob(mob, damage, target.x, target.y);
+  }
+
+  /** Jagged lightning that fades out; the jitter is visual only and does not use the run RNG. */
+  private drawBolt(path: readonly Point[], sprite: string): void {
+    const bolt = this.add.graphics().setDepth(13);
+    for (const [width, color, alpha] of [[3, 0x649388, 0.5], [1, 0xf0e8cf, 1]] as const) {
+      bolt.lineStyle(width, color, alpha).beginPath().moveTo(path[0]!.x, path[0]!.y);
+      for (let index = 1; index < path.length; index += 1) {
+        const from = path[index - 1]!;
+        const to = path[index]!;
+        for (let step = 1; step < 4; step += 1) {
+          const wobble = ((index * 7 + step * 5) % 9) - 4;
+          const t = step / 4;
+          bolt.lineTo(from.x + (to.x - from.x) * t + wobble, from.y + (to.y - from.y) * t - wobble);
+        }
+        bolt.lineTo(to.x, to.y);
+      }
+      bolt.strokePath();
+    }
+    const tip = path.at(-1)!;
+    const spark = this.add.image(tip.x, tip.y, ATLAS, sprite).setDepth(13);
+    this.tweens.add({
+      targets: [bolt, spark], alpha: 0, duration: 160,
+      onComplete: () => { bolt.destroy(); spark.destroy(); },
+    });
+  }
+
   private distanceSquared(point: Point): number {
     const dx = point.x - this.hero.x;
     const dy = point.y - this.hero.y;
@@ -793,10 +918,19 @@ export class RunScene extends Phaser.Scene {
     const bullet = this.projectiles.getFirstDead(false) as Phaser.Physics.Arcade.Sprite | null;
     if (!bullet) return;
     bullet.setTexture(ATLAS, spec.sprite);
-    bullet.enableBody(true, this.hero.x, this.hero.y, true, true);
+    bullet.enableBody(true, spec.at?.x ?? this.hero.x, spec.at?.y ?? this.hero.y, true, true);
+    (bullet.body as Phaser.Physics.Arcade.Body).setSize(bullet.width, bullet.height);
     (bullet.getData('hits') as Set<number>).clear();
     bullet.setData('damage', spec.damage).setData('pierce', spec.pierce)
-      .setData('expiresAt', this.elapsedMs + spec.lifetimeMs);
+      .setData('expiresAt', this.elapsedMs + spec.lifetimeMs)
+      .setData('blastRadius', spec.blastRadius ?? 0).setData('turnRate', spec.turnRate ?? 0)
+      .setData('returnAt', spec.returnAfterMs === undefined ? 0 : this.elapsedMs + spec.returnAfterMs)
+      .setData('returnSpeed', spec.returnSpeed ?? 0).setData('returning', false);
+    bullet.stop();
+    for (const name of ['spin', 'idle', 'burn']) {
+      const key = animationKey(spec.sprite, name);
+      if (this.anims.exists(key)) bullet.play({ key, repeat: -1 });
+    }
     bullet.setVelocity(spec.vx, spec.vy).setRotation(Math.atan2(spec.vy, spec.vx));
   }
 
@@ -804,6 +938,49 @@ export class RunScene extends Phaser.Scene {
     const pierce = bullet.getData('pierce') as number;
     if (pierce > 0) bullet.setData('pierce', pierce - 1);
     else bullet.disableBody(true, true);
+  }
+
+  /** Explosive projectiles damage an area instead of one target. */
+  private blast(bullet: Phaser.Physics.Arcade.Sprite): boolean {
+    const radius = bullet.getData('blastRadius') as number;
+    if (!radius) return false;
+    this.playEffect('fx/explosion', 'burst', bullet.x, bullet.y, false);
+    playSfx('sfx/explosion', 0.5);
+    this.damageInRadius({ x: bullet.x, y: bullet.y }, radius, bullet.getData('damage') as number);
+    return true;
+  }
+
+  /** Homing rockets turn to the nearest enemy; boomerangs fly back to the hero. */
+  private steerProjectiles(delta: number): void {
+    for (const item of this.projectiles.getChildren()) {
+      const bullet = item as Phaser.Physics.Arcade.Sprite;
+      if (!bullet.active) continue;
+      const turnRate = bullet.getData('turnRate') as number;
+      const returnAt = bullet.getData('returnAt') as number;
+      if (turnRate) {
+        const target = this.nearestTo(bullet, Infinity, NO_POINTS);
+        if (!target) continue;
+        const { velocity } = bullet.body as Phaser.Physics.Arcade.Body;
+        const speed = velocity.length();
+        const angle = Phaser.Math.Angle.RotateTo(velocity.angle(),
+          Math.atan2(target.y - bullet.y, target.x - bullet.x), turnRate * delta / 1000);
+        bullet.setVelocity(Math.cos(angle) * speed, Math.sin(angle) * speed).setRotation(angle);
+      } else if (returnAt && this.elapsedMs >= returnAt) {
+        if (!bullet.getData('returning')) {
+          bullet.setData('returning', true);
+          (bullet.getData('hits') as Set<number>).clear();
+        }
+        const dx = this.hero.x - bullet.x;
+        const dy = this.hero.y - bullet.y;
+        const distance = Math.hypot(dx, dy);
+        if (distance <= this.catalog.balance.run.collectRadius) {
+          bullet.disableBody(true, true);
+          continue;
+        }
+        const speed = bullet.getData('returnSpeed') as number;
+        bullet.setVelocity((dx / distance) * speed, (dy / distance) * speed);
+      }
+    }
   }
 
   private spawnZone(spec: ZoneSpec): void {
@@ -862,6 +1039,119 @@ export class RunScene extends Phaser.Scene {
     for (const zone of this.zones) {
       if (zone.active) graphics.fillStyle(0xd9602a, 0.18).fillCircle(zone.x, zone.y, zone.radius);
     }
+    this.decor.eachLandmark((landmark) => {
+      if (landmark.used) return;
+      const { radius } = landmark.definition.trigger;
+      graphics.lineStyle(1, 0xf2c46b, 0.25 + 0.25 * pulse).strokeCircle(landmark.x, landmark.y, radius);
+      if (landmark.progress <= 0) return;
+      graphics.lineStyle(3, 0xf2c46b, 0.9).beginPath()
+        .arc(landmark.x, landmark.y, radius, -Math.PI / 2, -Math.PI / 2 + landmark.progress * Math.PI * 2)
+        .strokePath();
+    });
+  }
+
+  // --- map: bonuses, hazards, landmarks -----------------------------------------------
+
+  private updateBuffs(): void {
+    const buffs: RunView['buffs'] = [];
+    for (const [id, buff] of this.buffs) {
+      const left = buff.until - this.elapsedMs;
+      if (left <= 0) this.buffs.delete(id);
+      else buffs.push({ sprite: this.catalog.pickups[id]!.sprite, fraction: left / buff.durationMs });
+    }
+    this.view.buffs = buffs;
+  }
+
+  /** Hazards hurt through armor but not through radResist, and never on the contact cooldown. */
+  private updateHazards(delta: number): void {
+    const { damagePerSecond, slow } = this.decor.hazardAt(this.hero.x, this.hero.y);
+    const resist = Math.min(1, Math.max(0, this.stat('radResist')));
+    this.hazardSlow = slow * (1 - resist);
+    const tick = this.catalog.balance.run.hazardTickMs;
+    const damage = damagePerSecond * (1 - resist) * tick / 1000;
+    if (damage <= 0) {
+      this.hazardClock = 0;
+      return;
+    }
+    this.hazardClock += delta;
+    while (this.hazardClock >= tick && !this.finished) {
+      this.hazardClock -= tick;
+      this.hurt(damage);
+    }
+  }
+
+  private updateLandmarks(delta: number): void {
+    const { landmarkDecayRate, landmarkHintRange } = this.catalog.balance.run;
+    const hints = this.hintGraphics.clear();
+    const view = this.cameras.main.worldView;
+    const nearby: ActiveLandmark[] = [];
+    this.decor.eachLandmark((landmark) => {
+      if (landmark.used) return;
+      const distance = Math.hypot(landmark.x - this.hero.x, landmark.y - this.hero.y);
+      const { trigger } = landmark.definition;
+      if (distance <= trigger.radius) {
+        nearby.push(landmark);
+        if (this.view.caps >= trigger.caps) landmark.progress += delta / trigger.holdMs;
+      } else {
+        landmark.progress = Math.max(0, landmark.progress - landmarkDecayRate * delta / trigger.holdMs);
+        if (distance <= landmarkHintRange && !view.contains(landmark.x, landmark.y)) {
+          this.drawHint(hints, landmark);
+        }
+      }
+    });
+    const closest = nearby[0];
+    this.prompt.setVisible(Boolean(closest));
+    if (!closest) return;
+    const { definition } = closest;
+    const { caps } = definition.trigger;
+    const price = caps ? `\n${caps} крышек${this.view.caps < caps ? ' — не хватает' : ''}` : '';
+    const text = `${definition.name.toUpperCase()}\n${definition.hint}${price}`;
+    if (this.prompt.text !== text) this.prompt.setText(text);
+    this.prompt.setPosition(closest.x, closest.y - definition.trigger.radius - 4);
+    for (const landmark of nearby) {
+      // Two landmarks may finish together: the price is checked again for each.
+      if (landmark.progress >= 1 && this.view.caps >= landmark.definition.trigger.caps) {
+        this.completeLandmark(landmark);
+      }
+    }
+  }
+
+  private completeLandmark(landmark: ActiveLandmark): void {
+    const { definition } = landmark;
+    this.decor.useLandmark(landmark);
+    this.prompt.setVisible(false);
+    this.view.caps -= definition.trigger.caps;
+    playSfx('sfx/landmark');
+    const [min, max] = definition.rolls;
+    const count = min + Math.floor(this.rng.next() * (max - min + 1));
+    const total = definition.rewards.reduce((sum, reward) => sum + reward.weight, 0);
+    for (let index = 0; index < count; index += 1) {
+      let roll = this.rng.next() * total;
+      const reward = definition.rewards.find((item) => (roll -= item.weight) < 0)
+        ?? definition.rewards.at(-1)!;
+      const angle = Math.PI / 2 + (index - (count - 1) / 2);
+      this.spawnPickup(reward.pickup, landmark.x + Math.cos(angle) * REWARD_RING,
+        landmark.y + Math.sin(angle) * REWARD_RING);
+    }
+    if (definition.ambush) {
+      this.warn('!! ЗАСАДА !!');
+      this.warningUntil = this.elapsedMs + 1200;
+      for (let index = 0; index < definition.ambush.count; index += 1) this.spawnWaveEntry();
+    }
+  }
+
+  /** Arrow at the screen edge towards an off-screen landmark. */
+  private drawHint(graphics: Phaser.GameObjects.Graphics, target: Point): void {
+    const { width, height } = this.cameras.main;
+    const angle = Math.atan2(target.y - this.hero.y, target.x - this.hero.x);
+    const scale = Math.min((width / 2 - 12) / Math.max(0.001, Math.abs(Math.cos(angle))),
+      (height / 2 - 36) / Math.max(0.001, Math.abs(Math.sin(angle))));
+    const x = width / 2 + Math.cos(angle) * scale;
+    const y = height / 2 + Math.sin(angle) * scale;
+    const corner = (turn: number, size: number): [number, number] =>
+      [x + Math.cos(angle + turn) * size, y + Math.sin(angle + turn) * size];
+    graphics.fillStyle(0xf2c46b, 0.85)
+      .fillTriangle(...corner(0, 6), ...corner(2.5, 5), ...corner(-2.5, 5));
   }
 
   // --- loot --------------------------------------------------------------------------
@@ -950,13 +1240,13 @@ export class RunScene extends Phaser.Scene {
     }
     if (definition.effect.type !== 'chest') {
       const caps = this.view.caps;
-      pickupEffects[definition.effect.type]!.apply(this.pickupContext, definition.effect.params);
+      pickupEffects[definition.effect.type]!.apply(this.pickupContext, definition.effect.params, definition.id);
       const gained = this.view.caps - caps;
       this.label(gained > 0 ? `+${gained}` : `+${definition.name.toUpperCase()}`,
         gained > 0 ? COLORS.warn : COLORS.bright);
-      return false;
+      return !this.scene.isActive();
     }
-    pickupEffects[definition.effect.type]!.apply(this.pickupContext, definition.effect.params);
+    pickupEffects[definition.effect.type]!.apply(this.pickupContext, definition.effect.params, definition.id);
     return !this.scene.isActive();
   }
 
@@ -966,26 +1256,49 @@ export class RunScene extends Phaser.Scene {
     return { level: 1, clock: 0, activeUntil: 0, angle: 0 };
   }
 
+  /** Everything that can be offered; new items need a free slot. */
   private upgradePool(ownedOnly: boolean): UpgradeChoice[] {
+    const { maxWeapons, maxPassives } = this.catalog.balance.run;
     const pool: UpgradeChoice[] = [];
     for (const weapon of Object.values(this.catalog.weapons)) {
       const owned = this.weapons.get(weapon.id);
-      if (ownedOnly && !owned) continue;
-      if (weapon.evolved && !owned) continue;
-      if (!owned || owned.level < weapon.levels.length) {
-        pool.push({ kind: 'weapon', id: weapon.id, name: weapon.name, sprite: weapon.sprite,
-          description: owned ? `Уровень ${owned.level + 1}` : 'Новое оружие' });
-      }
+      if (!owned && (ownedOnly || weapon.evolved || this.weapons.size >= maxWeapons
+        || this.hasEvolved(weapon))) continue;
+      if (owned && owned.level >= weapon.levels.length) continue;
+      const changes = owned
+        ? levelChanges(weapon.levels[owned.level - 1]!, weapon.levels[owned.level]!) : [];
+      pool.push({ kind: 'weapon', id: weapon.id, name: weapon.name, sprite: weapon.sprite,
+        description: owned ? [`Уровень ${owned.level + 1}`, ...changes].join('\n') : 'Новое оружие',
+        pairs: weapon.evolution ? [this.catalog.passives[weapon.evolution.passive]!.sprite] : [] });
     }
     for (const passive of Object.values(this.catalog.passives)) {
       const level = this.ownedPassives.get(passive.id) ?? 0;
-      if (ownedOnly && !level) continue;
-      if (level < passive.maxLevel) {
-        pool.push({ kind: 'passive', id: passive.id, name: passive.name, sprite: passive.sprite,
-          description: `${passive.description} · Ур. ${level + 1}` });
-      }
+      if (!level && (ownedOnly || this.ownedPassives.size >= maxPassives)) continue;
+      if (level >= passive.maxLevel) continue;
+      pool.push({ kind: 'passive', id: passive.id, name: passive.name, sprite: passive.sprite,
+        description: `${level ? `Уровень ${level + 1}` : 'Новый перк'}\n${
+          statBonus(passive.stat, passive.perLevel, passive.mod)}`,
+        pairs: [...this.weapons.keys()].map((id) => this.catalog.weapons[id]!)
+          .filter((weapon) => weapon.evolution?.passive === passive.id).map((weapon) => weapon.sprite) });
     }
     return pool;
+  }
+
+  /** The evolved form is already in hand, so the base weapon must not come back. */
+  private hasEvolved(weapon: { evolution?: { into: string } | undefined }): boolean {
+    return weapon.evolution !== undefined && this.weapons.has(weapon.evolution.into);
+  }
+
+  loadout(): { weapons: LoadoutItem[]; passives: LoadoutItem[] } {
+    return {
+      weapons: [...this.weapons].map(([id, state]) => ({
+        sprite: this.catalog.weapons[id]!.sprite, level: state.level,
+        max: this.catalog.weapons[id]!.levels.length,
+      })),
+      passives: [...this.ownedPassives].map(([id, level]) => ({
+        sprite: this.catalog.passives[id]!.sprite, level, max: this.catalog.passives[id]!.maxLevel,
+      })),
+    };
   }
 
   private evolutionChoices(): UpgradeChoice[] {
@@ -993,7 +1306,7 @@ export class RunScene extends Phaser.Scene {
     return availableEvolutions(weapons, this.weapons, this.ownedPassives).map((option) => {
       const target = weapons[option.into]!;
       return { kind: 'evolution', id: target.id, name: target.name, sprite: target.sprite,
-        description: `${weapons[option.from]!.name} + ${passives[option.passive]!.name}` };
+        description: `${weapons[option.from]!.name} + ${passives[option.passive]!.name}`, pairs: [] };
     });
   }
 
@@ -1022,6 +1335,14 @@ export class RunScene extends Phaser.Scene {
     this.scene.launch('LevelUp');
     this.scene.bringToTop('LevelUp');
     this.scene.pause();
+    return true;
+  }
+
+  /** Replaces the three cards; returns false when no rerolls are left. */
+  reroll(): boolean {
+    if (this.view.rerolls <= 0 || !this.choices.length) return false;
+    this.view.rerolls -= 1;
+    this.choices = this.rollChoices();
     return true;
   }
 
@@ -1084,16 +1405,39 @@ export class RunScene extends Phaser.Scene {
     if (!ignoreCooldown &&
       this.elapsedMs - this.lastDamageAt < this.catalog.balance.run.contactCooldownMs) return;
     this.lastDamageAt = this.elapsedMs;
+    this.hurt(Math.max(1, damage - this.stat('armor')));
+  }
+
+  private hurt(damage: number): void {
+    if (this.finished || this.elapsedMs < this.invulnerableUntil) return;
     playSfx('sfx/hero_hurt');
-    this.view.hp = Math.max(0, this.view.hp - Math.max(1, damage - this.stat('armor')));
+    this.view.hp = Math.max(0, this.view.hp - damage);
     this.cameras.main.shake(80, 0.005);
     this.hero.setTint(0xff7777);
     this.time.delayedCall(100, () => this.hero.clearTint());
     if (this.view.hp <= 0) this.die();
   }
 
+  private revive(): void {
+    const run = this.catalog.balance.run;
+    this.view.revives -= 1;
+    this.view.hp = this.view.maxHp * run.reviveHpFraction;
+    this.invulnerableUntil = this.elapsedMs + run.reviveInvulnerableMs;
+    playSfx('sfx/revive');
+    this.cameras.main.flash(260, 155, 255, 110);
+    this.label('ДЕФИБРИЛЛЯТОР!', COLORS.warn);
+    this.playEffect('fx/explosion', 'burst', this.hero.x, this.hero.y, false);
+    this.tweens.add({ targets: this.hero, alpha: 0.3, duration: 120, yoyo: true,
+      repeat: Math.floor(run.reviveInvulnerableMs / 240), onComplete: () => this.hero.setAlpha(1) });
+    this.damageInRadius(this.hero, run.reviveBlastRadius, run.reviveBlastDamage);
+  }
+
   private die(): void {
     if (this.finished) return;
+    if (this.view.revives > 0) {
+      this.revive();
+      return;
+    }
     this.finished = true;
     this.physics.pause();
     this.hero.setVelocity(0, 0);

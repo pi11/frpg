@@ -1,0 +1,46 @@
+{
+  "id": "bus_stop",
+  "items": [
+    {
+      "kind": "patch",
+      "sprite": "decor/road",
+      "x": -64,
+      "y": 10
+    },
+    {
+      "kind": "patch",
+      "sprite": "decor/road",
+      "x": 64,
+      "y": 10
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/bus",
+      "x": -30,
+      "y": 0
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/signpost",
+      "x": 42,
+      "y": -16
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/car_wreck",
+      "x": 62,
+      "y": 22
+    },
+    {
+      "kind": "crate",
+      "x": 8,
+      "y": 38
+    },
+    {
+      "kind": "landmark",
+      "landmark": "vending",
+      "x": 30,
+      "y": -26
+    }
+  ]
+}

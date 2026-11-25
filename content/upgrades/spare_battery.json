@@ -1,0 +1,13 @@
+{
+  "id": "spare_battery",
+  "name": "Запасные батареи",
+  "category": "combat",
+  "stat": "duration",
+  "mod": "flat",
+  "perLevel": 0.06,
+  "maxLevel": 5,
+  "cost": {
+    "base": 45,
+    "growth": 1.6
+  }
+}

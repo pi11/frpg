@@ -1,0 +1,56 @@
+{
+  "id": "crash_site",
+  "items": [
+    {
+      "kind": "patch",
+      "sprite": "decor/crater",
+      "x": -6,
+      "y": 10
+    },
+    {
+      "kind": "patch",
+      "sprite": "decor/scorch",
+      "x": 30,
+      "y": 4
+    },
+    {
+      "kind": "patch",
+      "sprite": "decor/tracks",
+      "x": 70,
+      "y": 8
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/plane_tail",
+      "x": 0,
+      "y": 0
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/rocks",
+      "x": -48,
+      "y": 20
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/barrel",
+      "x": 44,
+      "y": -16
+    },
+    {
+      "kind": "crate",
+      "x": -30,
+      "y": -30
+    },
+    {
+      "kind": "crate",
+      "x": 58,
+      "y": 28
+    },
+    {
+      "kind": "crate",
+      "x": -60,
+      "y": -4
+    }
+  ]
+}

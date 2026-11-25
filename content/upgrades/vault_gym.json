@@ -1,6 +1,7 @@
 {
   "id": "vault_gym",
   "name": "Беговая дорожка",
+  "category": "survival",
   "stat": "moveSpeed",
   "mod": "flat",
   "perLevel": 5,

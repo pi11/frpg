@@ -1,0 +1,58 @@
+{
+  "id": "sunken_jetty",
+  "items": [
+    {
+      "kind": "patch",
+      "sprite": "decor/shallow_water",
+      "x": 0,
+      "y": 0
+    },
+    {
+      "kind": "patch",
+      "sprite": "decor/lily_pads",
+      "x": 54,
+      "y": 26
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/walkway",
+      "x": -48,
+      "y": 0
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/walkway",
+      "x": 0,
+      "y": 0
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/boat",
+      "x": 50,
+      "y": -12
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/reeds",
+      "x": -30,
+      "y": 30
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/reeds",
+      "x": 24,
+      "y": 32
+    },
+    {
+      "kind": "crate",
+      "x": -70,
+      "y": -8
+    },
+    {
+      "kind": "landmark",
+      "landmark": "hatch",
+      "x": 0,
+      "y": -36
+    }
+  ]
+}

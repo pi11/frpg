@@ -1,0 +1,28 @@
+{
+  "id": "buzz_storm",
+  "name": "Циркулярный вихрь",
+  "sprite": "weapons/buzz_storm",
+  "projectileSprite": "projectiles/saw",
+  "fireSound": "sfx/saw",
+  "behavior": {
+    "type": "boomerang",
+    "params": {
+      "speed": 270,
+      "outMs": 560,
+      "returnSpeed": 300,
+      "lifetimeMs": 2800
+    }
+  },
+  "levels": [
+    {
+      "damage": 26,
+      "cooldownMs": 850,
+      "shots": 6,
+      "spreadDegrees": 300
+    }
+  ],
+  "tags": [
+    "ballistic"
+  ],
+  "evolved": true
+}

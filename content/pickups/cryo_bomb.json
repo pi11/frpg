@@ -1,0 +1,13 @@
+{
+  "id": "cryo_bomb",
+  "name": "Криограната",
+  "sprite": "pickups/cryo_bomb",
+  "sound": "sfx/freeze",
+  "attract": false,
+  "effect": {
+    "type": "freeze",
+    "params": {
+      "durationMs": 4500
+    }
+  }
+}

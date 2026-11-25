@@ -1,0 +1,10 @@
+{
+  "id": "scrap_plating",
+  "name": "Обшивка из лома",
+  "description": "Снижает урон по герою",
+  "sprite": "passives/scrap_plating",
+  "stat": "armor",
+  "mod": "flat",
+  "perLevel": 1,
+  "maxLevel": 3
+}

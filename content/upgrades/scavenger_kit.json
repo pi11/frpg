@@ -1,6 +1,7 @@
 {
   "id": "scavenger_kit",
   "name": "Набор мусорщика",
+  "category": "scavenge",
   "stat": "pickupRadius",
   "mod": "flat",
   "perLevel": 6,

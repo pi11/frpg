@@ -121,6 +121,8 @@ body.crt::after {
 .hub-locations button:disabled { cursor: not-allowed; opacity: 0.5; }
 .hub-upgrades { margin: 0; padding: 0; list-style: none; }
 .hub-upgrades li { display: flex; gap: 12px; align-items: center; justify-content: space-between; padding: 10px 0; border-top: 1px dashed var(--term-line); }
+
+.hub-upgrades .hub-category { justify-content: flex-start; padding: 16px 0 6px; border-top: 0; color: var(--term-warn); font-size: 8px; }
 .hub-upgrades small { display: block; margin-top: 4px; color: var(--term-dim); font-size: 8px; }
 .hub-upgrades button { flex: none; min-width: 112px; }
 .hub-level { color: var(--term-warn); font-size: 8px; }

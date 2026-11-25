@@ -1,0 +1,40 @@
+{
+  "id": "hatch",
+  "name": "Тайник",
+  "hint": "Открыть — будет засада",
+  "sprite": "landmarks/hatch",
+  "trigger": {
+    "radius": 24,
+    "holdMs": 1200,
+    "caps": 0
+  },
+  "rolls": [
+    2,
+    3
+  ],
+  "rewards": [
+    {
+      "pickup": "caps_stash",
+      "weight": 5
+    },
+    {
+      "pickup": "data_disk",
+      "weight": 2
+    },
+    {
+      "pickup": "magnet",
+      "weight": 1
+    },
+    {
+      "pickup": "pulse_bomb",
+      "weight": 2
+    },
+    {
+      "pickup": "cryo_bomb",
+      "weight": 2
+    }
+  ],
+  "ambush": {
+    "count": 10
+  }
+}

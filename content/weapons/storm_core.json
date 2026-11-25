@@ -1,0 +1,28 @@
+{
+  "id": "storm_core",
+  "name": "Грозовой контур",
+  "sprite": "weapons/storm_core",
+  "projectileSprite": "projectiles/spark",
+  "fireSound": "sfx/tesla",
+  "behavior": {
+    "type": "chain",
+    "params": {
+      "range": 240,
+      "jumpRange": 115,
+      "falloff": 0.92
+    }
+  },
+  "levels": [
+    {
+      "damage": 34,
+      "cooldownMs": 620,
+      "shots": 3,
+      "spreadDegrees": 0,
+      "jumps": 9
+    }
+  ],
+  "tags": [
+    "energy"
+  ],
+  "evolved": true
+}

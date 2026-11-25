@@ -1,0 +1,15 @@
+{
+  "id": "adrenaline",
+  "name": "Адреналин",
+  "sprite": "pickups/adrenaline",
+  "sound": "sfx/powerup",
+  "attract": false,
+  "effect": {
+    "type": "buff",
+    "params": {
+      "stat": "moveSpeed",
+      "amount": 45,
+      "durationMs": 15000
+    }
+  }
+}

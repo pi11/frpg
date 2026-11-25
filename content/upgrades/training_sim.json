@@ -1,6 +1,7 @@
 {
   "id": "training_sim",
   "name": "Боевой симулятор",
+  "category": "scavenge",
   "stat": "xpGain",
   "mod": "flat",
   "perLevel": 0.05,

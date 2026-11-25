@@ -3,6 +3,7 @@ import { z } from 'zod';
 export const STAT_KEYS = [
   'maxHp', 'armor', 'regen', 'moveSpeed', 'damage', 'attackSpeed', 'area',
   'projectileCount', 'duration', 'pickupRadius', 'xpGain', 'luck', 'radResist',
+  'critChance', 'rerolls', 'revives',
 ] as const;
 
 export const StatKeySchema = z.enum(STAT_KEYS);
@@ -22,6 +23,10 @@ export const StatsSchema = z.object({
   xpGain: z.number(),
   luck: z.number(),
   radResist: z.number(),
+  critChance: z.number().min(0).max(1),
+  /** Level-up rerolls and extra lives per run. */
+  rerolls: z.number().int().nonnegative(),
+  revives: z.number().int().nonnegative(),
 }).strict();
 export type Stats = z.infer<typeof StatsSchema>;
 
@@ -54,6 +59,8 @@ export const WeaponLevelSchema = z.object({
   radius: z.number().positive().optional(),
   durationMs: z.number().positive().optional(),
   pierce: z.number().int().nonnegative().optional(),
+  /** Extra enemies a lightning bolt jumps to. */
+  jumps: z.number().int().nonnegative().optional(),
 }).strict();
 export type WeaponLevel = z.infer<typeof WeaponLevelSchema>;
 
@@ -142,6 +149,40 @@ export const PickupSchema = z.object({
 }).strict();
 export type PickupDefinition = z.infer<typeof PickupSchema>;
 
+/**
+ * A place on the map with a one-time reward. The hero stands inside `radius` for `holdMs`
+ * (and pays `caps` collected in this run); an ambush comes from the current wave.
+ */
+export const LandmarkSchema = z.object({
+  id: IdSchema,
+  name: z.string().min(1),
+  hint: z.string().min(1),
+  /** The atlas also needs `<sprite>_used`. */
+  sprite: spriteKey('landmarks'),
+  trigger: z.object({
+    radius: z.number().positive(),
+    holdMs: z.number().positive(),
+    caps: z.number().int().nonnegative(),
+  }).strict(),
+  rolls: RangeSchema,
+  rewards: z.array(z.object({ pickup: IdSchema, weight: z.number().positive() }).strict()).min(1),
+  ambush: z.object({ count: z.number().int().positive() }).strict().optional(),
+}).strict();
+export type LandmarkDefinition = z.infer<typeof LandmarkSchema>;
+
+const offset = { x: z.number().int(), y: z.number().int() };
+/** A hand-made group of decor, crates and landmarks around its centre. */
+export const StructureSchema = z.object({
+  id: IdSchema,
+  items: z.array(z.discriminatedUnion('kind', [
+    z.object({ kind: z.literal('patch'), sprite: spriteKey('decor'), ...offset }).strict(),
+    z.object({ kind: z.literal('object'), sprite: spriteKey('decor'), ...offset }).strict(),
+    z.object({ kind: z.literal('crate'), ...offset }).strict(),
+    z.object({ kind: z.literal('landmark'), landmark: IdSchema, ...offset }).strict(),
+  ])).min(1),
+}).strict();
+export type StructureDefinition = z.infer<typeof StructureSchema>;
+
 export const LocationSchema = z.object({
   id: IdSchema,
   name: z.string().min(1),
@@ -182,8 +223,26 @@ export const LocationSchema = z.object({
   bossMusic: soundKey('music'),
   decor: z.object({
     chunkSize: z.number().int().positive(),
-    patches: WeightedSpritesSchema,
-    objects: WeightedSpritesSchema,
+    /** A region of biomeChunks × biomeChunks chunks shares one biome. */
+    biomeChunks: z.number().int().positive(),
+    biomes: z.array(z.object({
+      id: IdSchema,
+      weight: z.number().positive(),
+      patches: WeightedSpritesSchema,
+      objects: WeightedSpritesSchema,
+    }).strict()).min(1),
+    structures: z.object({
+      /** Chance of a structure in a chunk. */
+      chance: z.number().min(0).max(1),
+      items: z.array(z.object({ structure: IdSchema, weight: z.number().positive() }).strict()).min(1),
+    }).strict(),
+    /** Patches that hurt (reduced by radResist) or slow the hero. */
+    hazards: z.array(z.object({
+      sprite: spriteKey('decor'),
+      radius: z.number().positive(),
+      damagePerSecond: z.number().nonnegative(),
+      slow: z.number().min(0).max(0.9),
+    }).strict()),
     crates: z.object({
       sprite: spriteKey('decor'),
       hp: z.number().positive(),
@@ -197,6 +256,7 @@ export type LocationDefinition = z.infer<typeof LocationSchema>;
 export const UpgradeSchema = z.object({
   id: IdSchema,
   name: z.string().min(1),
+  category: z.enum(['survival', 'combat', 'scavenge']),
   stat: StatKeySchema,
   mod: z.enum(['flat', 'percent']),
   perLevel: z.number(),
@@ -224,6 +284,19 @@ export const BalanceSchema = z.object({
     eliteWarningSeconds: z.number().nonnegative(),
     /** Aimed weapons shoot an elite or boss inside this range before the nearest enemy. */
     eliteFocusRange: z.number().nonnegative(),
+    /** Slots: new weapons and perks are not offered when these are full. */
+    maxWeapons: z.number().int().positive(),
+    maxPassives: z.number().int().positive(),
+    critMultiplier: z.number().min(1),
+    reviveHpFraction: z.number().gt(0).max(1),
+    reviveInvulnerableMs: z.number().nonnegative(),
+    reviveBlastRadius: z.number().positive(),
+    reviveBlastDamage: z.number().positive(),
+    hazardTickMs: z.number().positive(),
+    /** How fast landmark progress is lost outside its circle (1 = as fast as it grows). */
+    landmarkDecayRate: z.number().nonnegative(),
+    /** Off-screen landmarks closer than this get an arrow at the screen edge. */
+    landmarkHintRange: z.number().nonnegative(),
   }).strict(),
   xp: z.object({ base: z.number().positive(), growth: z.number().positive() }).strict(),
   reward: z.object({

@@ -1,0 +1,58 @@
+{
+  "id": "checkpoint",
+  "items": [
+    {
+      "kind": "patch",
+      "sprite": "decor/road",
+      "x": -64,
+      "y": 0
+    },
+    {
+      "kind": "patch",
+      "sprite": "decor/road",
+      "x": 64,
+      "y": 0
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/concrete_block",
+      "x": -20,
+      "y": -18
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/concrete_block",
+      "x": 20,
+      "y": 18
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/sandbags",
+      "x": -52,
+      "y": -28
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/sandbags",
+      "x": 52,
+      "y": 28
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/signpost",
+      "x": 0,
+      "y": -36
+    },
+    {
+      "kind": "crate",
+      "x": -60,
+      "y": 24
+    },
+    {
+      "kind": "landmark",
+      "landmark": "med_station",
+      "x": 56,
+      "y": -26
+    }
+  ]
+}

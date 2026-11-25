@@ -1,6 +1,7 @@
 {
   "id": "armor_plates",
   "name": "Бронепластины",
+  "category": "survival",
   "stat": "armor",
   "mod": "flat",
   "perLevel": 1,

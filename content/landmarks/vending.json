@@ -1,0 +1,37 @@
+{
+  "id": "vending",
+  "name": "Торговый автомат",
+  "hint": "Стойте рядом, чтобы купить",
+  "sprite": "landmarks/vending",
+  "trigger": {
+    "radius": 26,
+    "holdMs": 1500,
+    "caps": 12
+  },
+  "rolls": [
+    2,
+    2
+  ],
+  "rewards": [
+    {
+      "pickup": "rage_shot",
+      "weight": 2
+    },
+    {
+      "pickup": "adrenaline",
+      "weight": 2
+    },
+    {
+      "pickup": "shield_cell",
+      "weight": 2
+    },
+    {
+      "pickup": "ammo_belt",
+      "weight": 2
+    },
+    {
+      "pickup": "medkit",
+      "weight": 3
+    }
+  ]
+}

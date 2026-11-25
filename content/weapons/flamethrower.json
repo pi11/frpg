@@ -1,0 +1,79 @@
+{
+  "id": "flamethrower",
+  "name": "Огнемёт",
+  "sprite": "weapons/flamethrower",
+  "projectileSprite": "projectiles/flame",
+  "fireSound": "sfx/flame",
+  "behavior": {
+    "type": "projectile",
+    "params": {
+      "speed": 190,
+      "lifetimeMs": 420
+    }
+  },
+  "levels": [
+    {
+      "damage": 3,
+      "cooldownMs": 260,
+      "shots": 1,
+      "spreadDegrees": 0,
+      "pierce": 2
+    },
+    {
+      "damage": 3,
+      "cooldownMs": 250,
+      "shots": 1,
+      "spreadDegrees": 0,
+      "pierce": 2
+    },
+    {
+      "damage": 4,
+      "cooldownMs": 240,
+      "shots": 1,
+      "spreadDegrees": 0,
+      "pierce": 3
+    },
+    {
+      "damage": 4,
+      "cooldownMs": 230,
+      "shots": 2,
+      "spreadDegrees": 16,
+      "pierce": 3
+    },
+    {
+      "damage": 5,
+      "cooldownMs": 220,
+      "shots": 2,
+      "spreadDegrees": 16,
+      "pierce": 3
+    },
+    {
+      "damage": 6,
+      "cooldownMs": 210,
+      "shots": 2,
+      "spreadDegrees": 20,
+      "pierce": 4
+    },
+    {
+      "damage": 7,
+      "cooldownMs": 200,
+      "shots": 2,
+      "spreadDegrees": 20,
+      "pierce": 4
+    },
+    {
+      "damage": 8,
+      "cooldownMs": 180,
+      "shots": 2,
+      "spreadDegrees": 24,
+      "pierce": 5
+    }
+  ],
+  "tags": [
+    "fire"
+  ],
+  "evolution": {
+    "passive": "quickstep",
+    "into": "furnace"
+  }
+}

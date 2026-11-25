@@ -1,0 +1,47 @@
+{
+  "id": "billboard_square",
+  "items": [
+    {
+      "kind": "patch",
+      "sprite": "decor/plaza",
+      "x": 0,
+      "y": 10
+    },
+    {
+      "kind": "patch",
+      "sprite": "decor/oil_puddle",
+      "x": -36,
+      "y": 30
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/billboard",
+      "x": 0,
+      "y": -26
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/lamp_post",
+      "x": -48,
+      "y": 0
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/lamp_post",
+      "x": 48,
+      "y": 0
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/bus",
+      "x": 20,
+      "y": 40
+    },
+    {
+      "kind": "landmark",
+      "landmark": "vending",
+      "x": -28,
+      "y": 16
+    }
+  ]
+}

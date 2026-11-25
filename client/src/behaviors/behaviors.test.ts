@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { getCatalog } from '../content/catalog';
 import type { WeaponDefinition, WeaponLevel } from '../content/schemas';
-import { generateChunk } from '../systems/WorldDecor';
+import { biomeAt, generateChunk } from '../systems/WorldDecor';
 import { enemyBehaviors, pickupEffects, weaponBehaviors } from './registry';
 import type {
   CombatContext, EnemyContext, Mob, PickupContext, Point, ProjectileSpec, WeaponState, ZoneSpec,
@@ -176,12 +176,18 @@ function combat(stats: Partial<Record<string, number>> = {}, enemies: Point[] = 
   const log = {
     projectiles: [] as ProjectileSpec[], zones: [] as ZoneSpec[], hits: [] as number[],
     orbiters: [] as number[], auras: [] as number[],
+    strikes: [] as { target: Point; damage: number }[], bolts: [] as number[],
   };
   const lastHit = new Map<string, number>();
   const context: CombatContext & { now: number } = {
     hero: { x: 0, y: 0 }, now: 0,
     rng: () => 0,
     stat: (key) => stats[key] ?? 0,
+    nearestTo: (center, range, skip) => enemies
+      .filter((item) => !skip.has(item) && Math.hypot(item.x - center.x, item.y - center.y) <= range)
+      .sort((a, b) => Math.hypot(a.x - center.x, a.y - center.y) - Math.hypot(b.x - center.x, b.y - center.y))[0] ?? null,
+    strike: (target, damage) => { log.strikes.push({ target, damage }); },
+    drawBolt: (path) => { log.bolts.push(path.length); },
     nearestEnemy: () => enemies[0] ?? null,
     randomEnemyWithin: () => enemies[0] ?? null,
     damageInRadius: (_center, _radius, damage, limit) => {
@@ -264,9 +270,63 @@ describe('weapon behaviors', () => {
   });
 });
 
+describe('extra weapon behaviors', () => {
+  const fire = (id: string, n: number, context: CombatContext) => {
+    const { definition, level } = weapon(id);
+    return weaponBehaviors[definition.behavior.type]!
+      .fire(context, definition, level(n), definition.behavior.params, state());
+  };
+
+  it('chain strikes each enemy once, weaker with every jump', () => {
+    const enemies = [{ x: 50, y: 0 }, { x: 100, y: 0 }, { x: 150, y: 0 }, { x: 500, y: 0 }];
+    const { context, log } = combat({ damage: 2 }, enemies);
+    expect(fire('tesla_coil', 1, context)).toBe('fired');
+    const base = weapon('tesla_coil').level(1).damage + 2;
+    expect(log.strikes.map((hit) => hit.target)).toEqual(enemies.slice(0, 3));
+    expect(log.strikes[0]!.damage).toBe(base);
+    expect(log.strikes[2]!.damage).toBeCloseTo(base * 0.85 ** 2);
+    expect(log.bolts).toEqual([4]);
+    expect(fire('tesla_coil', 1, combat({}, []).context)).toBe('skip');
+  });
+
+  it('chain stops after its jumps', () => {
+    const enemies = Array.from({ length: 12 }, (_, index) => ({ x: 10 + index * 5, y: 0 }));
+    const { context, log } = combat({}, enemies);
+    fire('tesla_coil', 1, context);
+    expect(log.strikes).toHaveLength(weapon('tesla_coil').level(1).jumps! + 1);
+  });
+
+  it('boomerang pierces everything and comes back', () => {
+    const { context, log } = combat({ projectileCount: 1, duration: 0.5 });
+    expect(fire('saw_blade', 1, context)).toBe('fired');
+    expect(log.projectiles).toHaveLength(2);
+    expect(log.projectiles[0]).toMatchObject({ pierce: Infinity, returnAfterMs: 720, returnSpeed: 260 });
+    expect(fire('saw_blade', 1, combat({}, []).context)).toBe('skip');
+  });
+
+  it('mines lie still near the hero and scale with area and duration', () => {
+    const { context, log } = combat({ area: 0.5, duration: 1 }, []);
+    expect(fire('trap_mine', 3, context)).toBe('fired');
+    const level = weapon('trap_mine').level(3);
+    expect(log.projectiles).toHaveLength(level.shots);
+    expect(log.projectiles[0]).toMatchObject({
+      vx: 0, vy: 0, blastRadius: level.radius! * 1.5, lifetimeMs: level.durationMs! * 2,
+    });
+  });
+
+  it('rockets home in and explode', () => {
+    const { context, log } = combat({ area: 1 });
+    expect(fire('rocket_tube', 1, context)).toBe('fired');
+    expect(log.projectiles[0]!.turnRate).toBeGreaterThan(0);
+    expect(log.projectiles[0]!.blastRadius).toBe(weapon('rocket_tube').level(1).radius! * 2);
+    expect(fire('rocket_tube', 1, combat({}, []).context)).toBe('skip');
+  });
+});
+
 describe('pickup effects', () => {
   function pickupContext(random: number, luck = 0) {
-    const log = { caps: 0, heal: 0, attract: 0, blast: 0, chest: [] as number[][] };
+    const log = { caps: 0, heal: 0, attract: 0, blast: 0, chest: [] as number[][],
+      buffs: [] as unknown[][], xp: 0, freeze: 0 };
     const context: PickupContext = {
       rng: () => random, luck: () => luck, hero: { x: 0, y: 0 },
       heal: (fraction) => { log.heal += fraction; },
@@ -274,12 +334,15 @@ describe('pickup effects', () => {
       blast: (_center, _radius, damage) => { log.blast += damage; },
       addCaps: (amount) => { log.caps += amount; },
       openChest: (items, caps) => { log.chest.push([items, caps]); },
+      addBuff: (...args) => { log.buffs.push(args); },
+      addXpFraction: (fraction) => { log.xp += fraction; },
+      freezeEnemies: (durationMs) => { log.freeze += durationMs; },
     };
     return { context, log };
   }
   const apply = (id: string, context: PickupContext) => {
     const pickup = getCatalog().pickups[id]!;
-    pickupEffects[pickup.effect.type]!.apply(context, pickup.effect.params);
+    pickupEffects[pickup.effect.type]!.apply(context, pickup.effect.params, id);
   };
 
   it('applies caps, heal, magnet and blast', () => {
@@ -295,6 +358,23 @@ describe('pickup effects', () => {
     expect(log.blast).toBe(params('pulse_bomb').damage);
   });
 
+  it('applies timed bonuses, experience and freeze', () => {
+    const { context, log } = pickupContext(0);
+    apply('rage_shot', context);
+    apply('data_disk', context);
+    apply('cryo_bomb', context);
+    const params = (id: string) => getCatalog().pickups[id]!.effect.params as Record<string, number>;
+    expect(log.buffs).toEqual([['rage_shot', 'attackSpeed', params('rage_shot').amount, params('rage_shot').durationMs]]);
+    expect(log.xp).toBe(params('data_disk').fraction);
+    expect(log.freeze).toBe(params('cryo_bomb').durationMs);
+  });
+
+  it('a bonus cannot change run-long stats', () => {
+    const schema = pickupEffects.buff!.paramsSchema;
+    expect(schema.safeParse({ stat: 'maxHp', amount: 1, durationMs: 1 }).success).toBe(false);
+    expect(schema.safeParse({ stat: 'damage', amount: 1, durationMs: 1 }).success).toBe(true);
+  });
+
   it('chest rolls more items with luck', () => {
     const unlucky = pickupContext(0.4, 0);
     const lucky = pickupContext(0.4, 1);
@@ -306,23 +386,53 @@ describe('pickup effects', () => {
 });
 
 describe('world decor', () => {
-  const decor = getCatalog().locations.shelter_outskirts!.decor;
+  const { locations, structures } = getCatalog();
+  const decor = locations.shelter_outskirts!.decor;
 
   it('generates the same chunk for the same seed and different ones otherwise', () => {
-    expect(generateChunk(42, 3, -2, decor)).toEqual(generateChunk(42, 3, -2, decor));
-    expect(generateChunk(42, 3, -2, decor)).not.toEqual(generateChunk(43, 3, -2, decor));
+    expect(generateChunk(42, 3, -2, decor, structures)).toEqual(generateChunk(42, 3, -2, decor, structures));
+    expect(generateChunk(42, 3, -2, decor, structures)).not.toEqual(generateChunk(43, 3, -2, decor, structures));
   });
 
   it('keeps items inside their chunk and within the configured counts', () => {
+    const mostCrates = Math.max(...Object.values(structures)
+      .map((item) => item.items.filter((part) => part.kind === 'crate').length));
     for (let cx = -3; cx <= 3; cx += 1) {
-      const items = generateChunk(7, cx, 1, decor);
+      const items = generateChunk(7, cx, 1, decor, structures);
       for (const item of items) {
         expect(item.x).toBeGreaterThanOrEqual(cx * decor.chunkSize);
         expect(item.x).toBeLessThanOrEqual((cx + 1) * decor.chunkSize);
       }
       const crates = items.filter((item) => item.kind === 'crate').length;
-      expect(crates).toBeLessThanOrEqual(decor.crates.perChunk[1]);
+      expect(crates).toBeLessThanOrEqual(Math.max(decor.crates.perChunk[1], mostCrates));
       expect(new Set(items.map((item) => item.key)).size).toBe(items.length);
+    }
+  });
+
+  it('shares a biome inside a region and uses every biome across the map', () => {
+    const region = decor.biomeChunks;
+    expect(biomeAt(5, 0, 0, decor)).toBe(biomeAt(5, region - 1, region - 1, decor));
+    expect(biomeAt(5, -1, -1, decor)).toBe(biomeAt(5, -region, -region, decor));
+    const seen = new Set<string>();
+    for (let index = 0; index < 60; index += 1) seen.add(biomeAt(5, index * region, 0, decor).id);
+    expect(seen.size).toBe(decor.biomes.length);
+  });
+
+  it('scatters landmarks over every location, never near the start', () => {
+    for (const location of Object.values(locations)) {
+      let landmarks = 0;
+      for (let cx = -8; cx <= 8; cx += 1) {
+        for (let cy = -8; cy <= 8; cy += 1) {
+          for (const item of generateChunk(11, cx, cy, location.decor, structures)) {
+            const hazard = location.decor.hazards.some((entry) => entry.sprite === item.sprite);
+            if (item.kind === 'landmark') landmarks += 1;
+            if (item.kind === 'landmark' || hazard) {
+              expect(Math.hypot(item.x, item.y), item.sprite).toBeGreaterThan(80);
+            }
+          }
+        }
+      }
+      expect(landmarks, location.id).toBeGreaterThan(5);
     }
   });
 });

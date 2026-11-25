@@ -1,0 +1,28 @@
+{
+  "id": "rocket_barrage",
+  "name": "Ракетный шквал",
+  "sprite": "weapons/rocket_barrage",
+  "projectileSprite": "projectiles/rocket",
+  "fireSound": "sfx/rocket",
+  "behavior": {
+    "type": "rocket",
+    "params": {
+      "speed": 200,
+      "lifetimeMs": 2600,
+      "turnRate": 6
+    }
+  },
+  "levels": [
+    {
+      "damage": 56,
+      "cooldownMs": 1200,
+      "shots": 5,
+      "spreadDegrees": 120,
+      "radius": 46
+    }
+  ],
+  "tags": [
+    "explosive"
+  ],
+  "evolved": true
+}

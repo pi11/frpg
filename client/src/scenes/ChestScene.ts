@@ -28,7 +28,7 @@ export class ChestScene extends Phaser.Scene {
       this.add.image(108, y, ATLAS, choice.sprite);
       const title = evolution ? `ЭВОЛЮЦИЯ: ${choice.name.toUpperCase()}` : choice.name.toUpperCase();
       this.add.text(124, y - 8, title, textStyle(8, evolution ? COLORS.warn : COLORS.bright));
-      this.add.text(124, y + 3, choice.description, textStyle(8, COLORS.dim));
+      this.add.text(124, y + 3, choice.description.replaceAll('\n', ' · '), textStyle(8, COLORS.dim));
     });
     if (!rows.length) {
       this.add.text(240, 130, 'ВСЁ УЖЕ НА МАКСИМУМЕ', textStyle(8, COLORS.dim)).setOrigin(0.5);
