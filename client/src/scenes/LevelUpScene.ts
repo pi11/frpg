@@ -1,6 +1,7 @@
 import * as Phaser from 'phaser';
 import { ATLAS } from '../assets';
 import { playSfx } from '../sound';
+import { Tooltip } from '../ui/Tooltip';
 import { COLORS, textStyle } from '../ui/theme';
 import { RunScene } from './RunScene';
 import type { UpgradeChoice } from './RunScene';
@@ -43,11 +44,15 @@ export class LevelUpScene extends Phaser.Scene {
         align: 'center', wordWrap: { width: 132 },
       })).setOrigin(0.5, 0);
     });
-    const { weapons, passives } = run.loadout();
-    [weapons, passives].forEach((items, row) => items.forEach((item, index) => {
+    const { weapons, heavy, passives } = run.loadout();
+    const tooltip = new Tooltip(this);
+    [[...weapons, ...heavy], passives].forEach((items, row) => items.forEach((item, index) => {
       const x = 14 + index * 34;
       const y = 226 + row * 22;
-      this.add.image(x, y, ATLAS, item.sprite);
+      this.add.image(x, y, ATLAS, item.sprite).setInteractive()
+        .on('pointerover', (pointer: Phaser.Input.Pointer) => {
+          if (!pointer.wasTouch) tooltip.show({ x, y }, item.name, item.details);
+        }).on('pointerout', () => tooltip.hide());
       this.add.text(x + 9, y - 2, item.level >= item.max ? '*' : String(item.level),
         textStyle(8, item.level >= item.max ? COLORS.warn : COLORS.dim));
     }));

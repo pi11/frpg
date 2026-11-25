@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import vectors from '../../testdata/economy_vectors.json';
 import { bundledContentHash, contentDigest } from './content/hash';
-import { runReward, upgradeCost } from './economy';
+import { emeraldReward, runReward, upgradeCost } from './economy';
 
 // The same file is checked by server/tests/test_economy.py.
 describe('economy formulas match the server', () => {
@@ -17,6 +17,15 @@ describe('economy formulas match the server', () => {
         duration: item.duration, kills: item.kills, wave: item.wave,
         bossKilled: item.boss_killed, pickedCaps: item.picked_caps,
         multiplier: item.multiplier,
+      }), JSON.stringify(item)).toBe(item.expected);
+    }
+  });
+
+  it('grants emeralds like the server', () => {
+    for (const item of vectors.emeraldReward) {
+      expect(emeraldReward(item.rates, item.milestones, {
+        elites: item.elites, bossKilled: item.boss_killed, firstBoss: item.first_boss,
+        passed: item.passed,
       }), JSON.stringify(item)).toBe(item.expected);
     }
   });

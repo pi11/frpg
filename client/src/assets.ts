@@ -9,7 +9,8 @@ export const UI_SOUNDS = [
   'sfx/enemy_hit', 'sfx/enemy_death', 'sfx/hero_hurt', 'sfx/hero_death', 'sfx/xp_pickup',
   'sfx/level_up', 'sfx/ui_click', 'sfx/ui_buy', 'sfx/ui_error', 'sfx/run_start', 'sfx/reward',
   'sfx/enemy_shot', 'sfx/explosion', 'sfx/warning', 'sfx/crate_break',
-  'sfx/landmark', 'sfx/revive',
+  'sfx/landmark', 'sfx/revive', 'sfx/chest_shake', 'sfx/chest_tick', 'sfx/chest_reveal',
+  'sfx/chest_jackpot', 'sfx/emerald', 'sfx/elite_roar',
 ] as const;
 export const HUB_MUSIC = 'music/shelter';
 

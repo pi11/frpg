@@ -1,0 +1,61 @@
+{
+  "id": "rail_gun",
+  "name": "Рельсотрон",
+  "description": "Выстрел прошивает всё до края экрана",
+  "sprite": "weapons/rail_gun",
+  "projectileSprite": "projectiles/rail_slug",
+  "fireSound": "sfx/rail",
+  "behavior": {
+    "type": "projectile",
+    "params": {
+      "speed": 760,
+      "lifetimeMs": 600
+    }
+  },
+  "levels": [
+    {
+      "damage": 120,
+      "cooldownMs": 1900,
+      "shots": 1,
+      "spreadDegrees": 0,
+      "pierce": 20
+    },
+    {
+      "damage": 155,
+      "cooldownMs": 1750,
+      "shots": 1,
+      "spreadDegrees": 2,
+      "pierce": 25
+    },
+    {
+      "damage": 190,
+      "cooldownMs": 1600,
+      "shots": 2,
+      "spreadDegrees": 5,
+      "pierce": 30
+    },
+    {
+      "damage": 225,
+      "cooldownMs": 1450,
+      "shots": 2,
+      "spreadDegrees": 8,
+      "pierce": 35
+    },
+    {
+      "damage": 260,
+      "cooldownMs": 1300,
+      "shots": 2,
+      "spreadDegrees": 10,
+      "pierce": 40
+    }
+  ],
+  "tags": [
+    "heavy"
+  ],
+  "heavy": true,
+  "minHeroLevel": 12,
+  "unlock": {
+    "type": "emeralds",
+    "emeralds": 20
+  }
+}

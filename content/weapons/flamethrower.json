@@ -1,6 +1,7 @@
 {
   "id": "flamethrower",
   "name": "Огнемёт",
+  "description": "Струя огня на короткой дистанции",
   "sprite": "weapons/flamethrower",
   "projectileSprite": "projectiles/flame",
   "fireSound": "sfx/flame",

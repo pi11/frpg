@@ -1,6 +1,7 @@
 {
   "id": "firebomb",
   "name": "Бутылка с горючим",
+  "description": "Поджигает землю под врагами",
   "sprite": "weapons/firebomb",
   "projectileSprite": "projectiles/bottle",
   "fireSound": "sfx/firebomb",

@@ -1,0 +1,14 @@
+{
+  "id": "keen_edge",
+  "name": "Заточка",
+  "description": "Криты бьют сильнее",
+  "sprite": "passives/keen_edge",
+  "stat": "critDamage",
+  "mod": "flat",
+  "perLevel": 0.25,
+  "maxLevel": 5,
+  "unlock": {
+    "type": "emeralds",
+    "emeralds": 3
+  }
+}

@@ -1,0 +1,62 @@
+{
+  "id": "mortar",
+  "name": "Миномёт",
+  "description": "Мины падают на толпу с неба",
+  "sprite": "weapons/mortar",
+  "projectileSprite": "projectiles/shell",
+  "fireSound": "sfx/mortar",
+  "behavior": {
+    "type": "barrage",
+    "params": {
+      "range": 200,
+      "delayMs": 700,
+      "staggerMs": 140
+    }
+  },
+  "levels": [
+    {
+      "damage": 55,
+      "cooldownMs": 2400,
+      "shots": 2,
+      "spreadDegrees": 0,
+      "radius": 38
+    },
+    {
+      "damage": 69,
+      "cooldownMs": 2220,
+      "shots": 3,
+      "spreadDegrees": 0,
+      "radius": 42
+    },
+    {
+      "damage": 82,
+      "cooldownMs": 2050,
+      "shots": 4,
+      "spreadDegrees": 0,
+      "radius": 46
+    },
+    {
+      "damage": 96,
+      "cooldownMs": 1880,
+      "shots": 4,
+      "spreadDegrees": 0,
+      "radius": 50
+    },
+    {
+      "damage": 110,
+      "cooldownMs": 1700,
+      "shots": 5,
+      "spreadDegrees": 0,
+      "radius": 54
+    }
+  ],
+  "tags": [
+    "heavy"
+  ],
+  "heavy": true,
+  "minHeroLevel": 9,
+  "unlock": {
+    "type": "emeralds",
+    "emeralds": 10
+  }
+}

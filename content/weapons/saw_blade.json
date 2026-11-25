@@ -1,6 +1,7 @@
 {
   "id": "saw_blade",
   "name": "Пила-бумеранг",
+  "description": "Пила режет всех и возвращается",
   "sprite": "weapons/saw_blade",
   "projectileSprite": "projectiles/saw",
   "fireSound": "sfx/saw",

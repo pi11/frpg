@@ -7,6 +7,8 @@ export const ZoneParamsSchema = z.object({
   range: z.number().positive(),
   tickMs: z.number().positive(),
   fireSprite: z.string().regex(/^fx\/[a-z][a-z0-9_]*$/),
+  /** Drags ordinary enemies to the centre, pixels per second. */
+  pull: z.number().positive().optional(),
 }).strict();
 type ZoneParams = z.infer<typeof ZoneParamsSchema>;
 
@@ -29,6 +31,7 @@ export class ZoneWeaponBehavior implements WeaponBehavior<ZoneParams> {
         tickMs: params.tickMs,
         durationMs: level.durationMs! * (1 + context.stat('duration')),
         sprite: params.fireSprite,
+        ...(params.pull === undefined ? {} : { pull: params.pull }),
       });
       thrown += 1;
     }

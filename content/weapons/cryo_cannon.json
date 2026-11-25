@@ -1,0 +1,62 @@
+{
+  "id": "cryo_cannon",
+  "name": "Криопушка",
+  "description": "Ледяные осколки морозят врагов",
+  "sprite": "weapons/cryo_cannon",
+  "projectileSprite": "projectiles/ice_shard",
+  "fireSound": "sfx/freeze",
+  "behavior": {
+    "type": "projectile",
+    "params": {
+      "speed": 280,
+      "lifetimeMs": 750,
+      "chillMs": 1400
+    }
+  },
+  "levels": [
+    {
+      "damage": 20,
+      "cooldownMs": 1000,
+      "shots": 3,
+      "spreadDegrees": 30,
+      "pierce": 2
+    },
+    {
+      "damage": 24,
+      "cooldownMs": 920,
+      "shots": 4,
+      "spreadDegrees": 36,
+      "pierce": 3
+    },
+    {
+      "damage": 29,
+      "cooldownMs": 850,
+      "shots": 4,
+      "spreadDegrees": 43,
+      "pierce": 4
+    },
+    {
+      "damage": 34,
+      "cooldownMs": 780,
+      "shots": 5,
+      "spreadDegrees": 50,
+      "pierce": 4
+    },
+    {
+      "damage": 38,
+      "cooldownMs": 700,
+      "shots": 6,
+      "spreadDegrees": 56,
+      "pierce": 5
+    }
+  ],
+  "tags": [
+    "heavy"
+  ],
+  "heavy": true,
+  "minHeroLevel": 9,
+  "unlock": {
+    "type": "emeralds",
+    "emeralds": 10
+  }
+}

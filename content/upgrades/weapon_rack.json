@@ -1,0 +1,14 @@
+{
+  "id": "weapon_rack",
+  "name": "Оружейная стойка",
+  "category": "slots",
+  "currency": "emeralds",
+  "stat": "weaponSlots",
+  "mod": "flat",
+  "perLevel": 1,
+  "maxLevel": 3,
+  "cost": {
+    "base": 4,
+    "growth": 2
+  }
+}

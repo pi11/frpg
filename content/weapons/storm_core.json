@@ -1,6 +1,7 @@
 {
   "id": "storm_core",
   "name": "Грозовой контур",
+  "description": "Сразу несколько длинных молний",
   "sprite": "weapons/storm_core",
   "projectileSprite": "projectiles/spark",
   "fireSound": "sfx/tesla",

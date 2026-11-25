@@ -1,0 +1,14 @@
+{
+  "id": "trophy_hunter",
+  "name": "Охотник за трофеями",
+  "description": "Больше урона мини-боссам и боссам",
+  "sprite": "passives/trophy_hunter",
+  "stat": "eliteDamage",
+  "mod": "flat",
+  "perLevel": 0.1,
+  "maxLevel": 5,
+  "unlock": {
+    "type": "emeralds",
+    "emeralds": 4
+  }
+}

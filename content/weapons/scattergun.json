@@ -1,6 +1,7 @@
 {
   "id": "scattergun",
   "name": "Кустарный обрез",
+  "description": "Залп дробью веером",
   "sprite": "weapons/scattergun",
   "projectileSprite": "projectiles/pellet",
   "fireSound": "sfx/shot_scatter",

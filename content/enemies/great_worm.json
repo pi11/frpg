@@ -17,10 +17,10 @@
     }
   },
   "stats": {
-    "hp": 2400,
-    "speed": 48,
-    "damage": 18,
-    "xp": 50
+    "hp": 6200,
+    "speed": 62,
+    "damage": 26,
+    "xp": 65
   },
   "drops": [
     {

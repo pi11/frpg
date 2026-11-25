@@ -1,6 +1,7 @@
 {
   "id": "scrap_cannon",
   "name": "Ломовая пушка",
+  "description": "Широкий залп тяжёлым ломом",
   "sprite": "weapons/scrap_cannon",
   "projectileSprite": "projectiles/pellet",
   "fireSound": "sfx/shot_scatter",

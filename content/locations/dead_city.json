@@ -7,6 +7,11 @@
     "location": "shelter_outskirts"
   },
   "rewardMultiplier": 1.5,
+  "emeralds": {
+    "elite": 2,
+    "boss": 5,
+    "firstBoss": 8
+  },
   "groundSprite": "ground/city",
   "music": "music/city",
   "bossMusic": "music/boss",
@@ -130,7 +135,7 @@
       "atSecond": 480,
       "spawnIntervalMs": 200,
       "hpMultiplier": 5.04,
-      "speedMultiplier": 1.2,
+      "speedMultiplier": 1.15,
       "enemies": [
         {
           "id": "wild_dog",
@@ -158,8 +163,8 @@
     {
       "atSecond": 600,
       "spawnIntervalMs": 165,
-      "hpMultiplier": 6.48,
-      "speedMultiplier": 1.3,
+      "hpMultiplier": 7.26,
+      "speedMultiplier": 1.18,
       "enemies": [
         {
           "id": "wild_dog",
@@ -187,8 +192,8 @@
     {
       "atSecond": 720,
       "spawnIntervalMs": 140,
-      "hpMultiplier": 7.92,
-      "speedMultiplier": 1.4,
+      "hpMultiplier": 8.87,
+      "speedMultiplier": 1.2,
       "enemies": [
         {
           "id": "wild_dog",
@@ -216,8 +221,8 @@
     {
       "atSecond": 780,
       "spawnIntervalMs": 900,
-      "hpMultiplier": 7.92,
-      "speedMultiplier": 1.4,
+      "hpMultiplier": 8.87,
+      "speedMultiplier": 1.2,
       "enemies": [
         {
           "id": "wild_dog",

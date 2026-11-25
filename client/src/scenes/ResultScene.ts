@@ -7,7 +7,7 @@ import { playSfx, stopMusic } from '../sound';
 import { COLORS, textStyle } from '../ui/theme';
 
 export interface ResultData {
-  reason: 'death' | 'survived';
+  reason: 'death' | 'survived' | 'quit';
   seconds: number;
   kills: number;
   level: number;
@@ -40,7 +40,7 @@ export class ResultScene extends Phaser.Scene {
     stopMusic();
     this.cameras.main.setBackgroundColor('#08120b');
     this.add.rectangle(240, 135, 456, 246, COLORS.panel, 1).setStrokeStyle(1, COLORS.panelBorder);
-    const title = this.result.bossKilled ? 'ПОБЕДА!' : this.result.reason === 'death' ? 'ЗАБЕГ ОКОНЧЕН' : 'ВЫЖИЛ!';
+    const title = this.result.bossKilled ? 'ПОБЕДА!' : { death: 'ЗАБЕГ ОКОНЧЕН', survived: 'ВЫЖИЛ!', quit: 'ВОЗВРАЩЕНИЕ' }[this.result.reason];
     this.add.text(240, 40, title,
       textStyle(24, this.result.reason === 'death' ? COLORS.danger : COLORS.bright)).setOrigin(0.5);
     const minutes = Math.floor(this.result.seconds / 60).toString().padStart(2, '0');
@@ -91,7 +91,9 @@ export class ResultScene extends Phaser.Scene {
       const note = response.flags.length
         ? '\nСервер скорректировал сводку забега, награда урезана.' : '';
       this.rewardLabel.setText(
-        `Награда: +${response.reward_caps} крышек\nВсего: ${response.profile.caps}${note}`,
+        `Награда: +${response.reward_caps} крышек${
+          response.reward_emeralds ? `, +${response.reward_emeralds} изумрудов` : ''
+        }\nВсего: ${response.profile.caps} крышек, ${response.profile.emeralds} изумрудов${note}`,
       );
       this.actionLabel.setText('В УБЕЖИЩЕ');
       playSfx('sfx/reward');

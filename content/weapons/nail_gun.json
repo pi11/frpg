@@ -1,6 +1,7 @@
 {
   "id": "nail_gun",
   "name": "Гвоздемёт",
+  "description": "Очереди пробивных гвоздей",
   "sprite": "weapons/nail_gun",
   "projectileSprite": "projectiles/bullet",
   "fireSound": "sfx/shot_pistol",

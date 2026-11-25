@@ -7,7 +7,7 @@ describe('weapon evolutions', () => {
   const base = Object.values(weapons).filter((weapon) => weapon.evolution);
 
   it('pairs every base weapon with a passive and a distinct evolved weapon', () => {
-    expect(base.length).toBe(Object.values(weapons).filter((weapon) => !weapon.evolved).length);
+    expect(base.length).toBe(Object.values(weapons).filter((weapon) => !weapon.evolved && !weapon.heavy).length);
     for (const weapon of base) {
       expect(passives[weapon.evolution!.passive]).toBeDefined();
       expect(evolutionSource(weapons, weapon.evolution!.into)?.id).toBe(weapon.id);

@@ -1,0 +1,14 @@
+{
+  "id": "turbo_boots",
+  "name": "Форсажные сапоги",
+  "description": "Заметно ускоряет бег",
+  "sprite": "passives/turbo_boots",
+  "stat": "moveSpeed",
+  "mod": "percent",
+  "perLevel": 0.07,
+  "maxLevel": 3,
+  "unlock": {
+    "type": "emeralds",
+    "emeralds": 5
+  }
+}

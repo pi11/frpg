@@ -1,0 +1,10 @@
+{
+  "id": "spiked_vest",
+  "name": "Шипованный жилет",
+  "description": "Враги ранятся о героя",
+  "sprite": "passives/spiked_vest",
+  "stat": "thorns",
+  "mod": "flat",
+  "perLevel": 8,
+  "maxLevel": 5
+}

@@ -1,0 +1,61 @@
+{
+  "id": "rotary_gun",
+  "name": "Роторный пулемёт",
+  "description": "Поливает врагов очередями",
+  "sprite": "weapons/rotary_gun",
+  "projectileSprite": "projectiles/tracer",
+  "fireSound": "sfx/rotary",
+  "behavior": {
+    "type": "projectile",
+    "params": {
+      "speed": 420,
+      "lifetimeMs": 700
+    }
+  },
+  "levels": [
+    {
+      "damage": 12,
+      "cooldownMs": 130,
+      "shots": 1,
+      "spreadDegrees": 0,
+      "pierce": 1
+    },
+    {
+      "damage": 13,
+      "cooldownMs": 120,
+      "shots": 1,
+      "spreadDegrees": 2,
+      "pierce": 1
+    },
+    {
+      "damage": 15,
+      "cooldownMs": 110,
+      "shots": 2,
+      "spreadDegrees": 4,
+      "pierce": 2
+    },
+    {
+      "damage": 16,
+      "cooldownMs": 100,
+      "shots": 2,
+      "spreadDegrees": 6,
+      "pierce": 2
+    },
+    {
+      "damage": 18,
+      "cooldownMs": 90,
+      "shots": 2,
+      "spreadDegrees": 8,
+      "pierce": 3
+    }
+  ],
+  "tags": [
+    "heavy"
+  ],
+  "heavy": true,
+  "minHeroLevel": 8,
+  "unlock": {
+    "type": "emeralds",
+    "emeralds": 6
+  }
+}

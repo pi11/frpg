@@ -7,6 +7,11 @@
     "location": "dead_city"
   },
   "rewardMultiplier": 2,
+  "emeralds": {
+    "elite": 3,
+    "boss": 7,
+    "firstBoss": 12
+  },
   "groundSprite": "ground/marsh",
   "music": "music/marsh",
   "bossMusic": "music/boss",
@@ -135,7 +140,7 @@
       "atSecond": 480,
       "spawnIntervalMs": 220,
       "hpMultiplier": 5.04,
-      "speedMultiplier": 1.2,
+      "speedMultiplier": 1.15,
       "enemies": [
         {
           "id": "glow_slime",
@@ -163,8 +168,8 @@
     {
       "atSecond": 600,
       "spawnIntervalMs": 180,
-      "hpMultiplier": 6.38,
-      "speedMultiplier": 1.3,
+      "hpMultiplier": 7.15,
+      "speedMultiplier": 1.18,
       "enemies": [
         {
           "id": "glow_slime",
@@ -192,8 +197,8 @@
     {
       "atSecond": 720,
       "spawnIntervalMs": 150,
-      "hpMultiplier": 7.73,
-      "speedMultiplier": 1.4,
+      "hpMultiplier": 8.66,
+      "speedMultiplier": 1.2,
       "enemies": [
         {
           "id": "glow_slime",
@@ -221,8 +226,8 @@
     {
       "atSecond": 780,
       "spawnIntervalMs": 950,
-      "hpMultiplier": 7.73,
-      "speedMultiplier": 1.4,
+      "hpMultiplier": 8.66,
+      "speedMultiplier": 1.2,
       "enemies": [
         {
           "id": "glow_slime",

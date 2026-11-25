@@ -1,6 +1,7 @@
 {
   "id": "laser_rifle",
   "name": "Лазерная винтовка",
+  "description": "Луч пробивает врагов насквозь",
   "sprite": "weapons/laser_rifle",
   "projectileSprite": "projectiles/laser",
   "fireSound": "sfx/laser",

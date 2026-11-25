@@ -1,6 +1,7 @@
 {
   "id": "rocket_barrage",
   "name": "Ракетный шквал",
+  "description": "Залп самонаводящихся ракет",
   "sprite": "weapons/rocket_barrage",
   "projectileSprite": "projectiles/rocket",
   "fireSound": "sfx/rocket",

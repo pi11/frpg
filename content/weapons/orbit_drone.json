@@ -1,6 +1,7 @@
 {
   "id": "orbit_drone",
   "name": "Дрон-спутник",
+  "description": "Дроны кружат рядом и бьют врагов",
   "sprite": "weapons/orbit_drone",
   "projectileSprite": "projectiles/drone",
   "fireSound": "sfx/drone",

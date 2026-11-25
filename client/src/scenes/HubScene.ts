@@ -1,20 +1,28 @@
 import * as Phaser from 'phaser';
 import { ApiRequestError, deleteAccount, session } from '../api/auth';
-import { buyUpgrade, getProfile, startRun, type Profile } from '../api/game';
+import { buyUnlock, buyUpgrade, getProfile, startRun, type Profile } from '../api/game';
 import { getCatalog } from '../content/catalog';
 import { orderedLocations } from '../content/locations';
 import { bundledContentHash } from '../content/hash';
-import type { UpgradeDefinition } from '../content/schemas';
+import type { PassiveDefinition, UpgradeDefinition, WeaponDefinition } from '../content/schemas';
 import { statBonus } from '../content/statText';
 import { ATLAS, HUB_MUSIC } from '../assets';
 import { upgradeCost } from '../economy';
-import { applyCrt, settings, updateSettings, type Settings } from '../settings';
+import { applyCrt, settings, updateSettings } from '../settings';
 import { playMusic, playSfx } from '../sound';
 import type { RunData } from './RunScene';
 
+const VOLUMES = [['music', 'Музыка'], ['sfx', 'Звуки']] as const;
+
 const CATEGORIES: readonly [UpgradeDefinition['category'], string][] = [
-  ['survival', 'Выживание'], ['combat', 'Бой'], ['scavenge', 'Добыча и опыт'],
+  ['slots', 'Слоты в забеге'], ['survival', 'Выживание'], ['combat', 'Бой'], ['scavenge', 'Добыча и опыт'],
 ];
+
+const TABS = [
+  ['run', 'Вылазка'], ['upgrades', 'Улучшения'], ['weapons', 'Оружие'], ['passives', 'Перки'],
+  ['emeralds', 'Изумруды'], ['settings', 'Настройки'],
+] as const;
+type Tab = (typeof TABS)[number][0];
 
 function escapeHtml(value: string): string {
   return value.replace(/[&<>"']/g, (char) => `&#${char.charCodeAt(0)};`);
@@ -47,6 +55,7 @@ export class HubScene extends Phaser.Scene {
   private profile: Profile | null = null;
   private active = false;
   private busy = false;
+  private tab: Tab = 'run';
 
   /** Location chosen in the list; remembered per browser. */
   private selected = loadSelectedLocation();
@@ -67,26 +76,47 @@ export class HubScene extends Phaser.Scene {
         <div id="hub-body" hidden>
           <dl class="hub-stats">
             <div><dt>Крышки</dt><dd><img id="hub-cap-icon" class="hub-cap" alt=""><span id="hub-caps"></span></dd></div>
+            <div><dt>Изумруды</dt><dd><img id="hub-emerald-icon" class="hub-cap" alt=""><span id="hub-emeralds"></span></dd></div>
             <div><dt>Лучшее время</dt><dd id="hub-best"></dd></div>
             <div><dt>Забегов</dt><dd id="hub-runs"></dd></div>
           </dl>
           <p id="hub-guest-hint" class="auth-warning" hidden>Вы играете как гость. Привяжите почту или Telegram, чтобы не потерять прогресс.</p>
-          <h2>Куда идём</h2>
-          <ul id="hub-locations" class="hub-locations"></ul>
-          <button id="hub-start" class="auth-primary" type="button">Выйти из убежища</button>
-          <p id="hub-location" class="hub-note"></p>
-          <h2>Улучшения убежища</h2>
-          <ul id="hub-upgrades" class="hub-upgrades"></ul>
-          <fieldset class="hub-settings">
-            <legend>Настройки</legend>
-            <label><input type="checkbox" data-setting="music"> Музыка</label>
-            <label><input type="checkbox" data-setting="sfx"> Звуки</label>
-            <label><input type="checkbox" data-setting="crt"> ЭЛТ-эффект</label>
-          </fieldset>
-          <div class="hub-account">
-            <button id="hub-link" class="auth-secondary" type="button"></button>
-            <button id="hub-delete" class="auth-back hub-danger" type="button">Удалить аккаунт и данные</button>
+          <div class="hub-tabs" role="tablist" aria-label="Разделы убежища">
+            ${TABS.map(([id, title]) => `<button type="button" role="tab" id="hub-tab-${id}"
+              data-tab="${id}" aria-controls="hub-panel-${id}">${title}</button>`).join('')}
           </div>
+          <section id="hub-panel-run" role="tabpanel" aria-labelledby="hub-tab-run">
+            <ul id="hub-locations" class="hub-locations"></ul>
+            <button id="hub-start" class="auth-primary" type="button">Отправиться на вылазку</button>
+            <p id="hub-location" class="hub-note"></p>
+          </section>
+          <section id="hub-panel-upgrades" role="tabpanel" aria-labelledby="hub-tab-upgrades">
+            <ul id="hub-upgrades" class="hub-upgrades"></ul>
+          </section>
+          <section id="hub-panel-weapons" role="tabpanel" aria-labelledby="hub-tab-weapons">
+            <ul id="hub-weapons" class="hub-upgrades hub-items"></ul>
+          </section>
+          <section id="hub-panel-passives" role="tabpanel" aria-labelledby="hub-tab-passives">
+            <ul id="hub-passives" class="hub-upgrades hub-items"></ul>
+          </section>
+          <section id="hub-panel-emeralds" role="tabpanel" aria-labelledby="hub-tab-emeralds">
+            <div id="hub-emerald-info"></div>
+          </section>
+          <section id="hub-panel-settings" role="tabpanel" aria-labelledby="hub-tab-settings">
+            <fieldset class="hub-settings">
+              <legend>Звук и картинка</legend>
+              ${VOLUMES.map(([key, title]) => `<label class="hub-volume">${title}
+                <input type="range" min="0" max="100" step="5" data-volume="${key}"><output></output></label>`).join('')}
+              <label><input type="checkbox" data-setting="crt"> ЭЛТ-эффект</label>
+            </fieldset>
+            <h2>Управление</h2>
+            <p class="hub-help">Мышь: клик — идти в точку, удержание — идти за курсором.<br>Клавиши: WASD или стрелки.<br>Телефон: джойстик под пальцем.<br>Esc, P или II — пауза, громкость и возврат в убежище. R — перебросить карточки.<br>Наведите мышь на слот в забеге, чтобы увидеть описание.</p>
+            <h2>Аккаунт</h2>
+            <div class="hub-account">
+              <button id="hub-link" class="auth-secondary" type="button"></button>
+              <button id="hub-delete" class="auth-back hub-danger" type="button">Удалить аккаунт и данные</button>
+            </div>
+          </section>
         </div>
         <button id="hub-retry" class="auth-secondary" type="button" hidden>Повторить</button>
       </section>`;
@@ -94,15 +124,27 @@ export class HubScene extends Phaser.Scene {
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.cleanup());
 
     this.el<HTMLImageElement>('hub-cap-icon').src = this.textures.getBase64(ATLAS, 'ui/cap');
+    this.el<HTMLImageElement>('hub-emerald-icon').src = this.textures.getBase64(ATLAS, 'ui/emerald');
     this.overlay.querySelectorAll<HTMLInputElement>('input[data-setting]').forEach((input) => {
-      const key = input.dataset.setting as keyof Settings;
-      input.checked = settings()[key];
+      input.checked = settings().crt;
       input.onchange = () => {
-        updateSettings({ [key]: input.checked });
+        updateSettings({ crt: input.checked });
         applyCrt();
-        if (key === 'music' && input.checked) playMusic(HUB_MUSIC);
         playSfx('sfx/ui_click');
       };
+    });
+    this.overlay.querySelectorAll<HTMLInputElement>('input[data-volume]').forEach((input) => {
+      const key = input.dataset.volume as 'music' | 'sfx';
+      const output = input.nextElementSibling as HTMLOutputElement;
+      const show = (): void => { output.textContent = `${input.value}%`; };
+      input.value = String(Math.round(settings()[key] * 100));
+      show();
+      input.oninput = () => {
+        updateSettings({ [key]: Number(input.value) / 100 });
+        show();
+      };
+      // A sample of the new loudness.
+      if (key === 'sfx') input.onchange = () => playSfx('sfx/ui_buy');
     });
     playMusic(HUB_MUSIC);
     this.el<HTMLButtonElement>('hub-start').onclick = () => void this.act(() => this.beginRun());
@@ -121,14 +163,49 @@ export class HubScene extends Phaser.Scene {
       const button = (event.target as HTMLElement).closest<HTMLButtonElement>('button[data-upgrade]');
       if (button?.dataset.upgrade) void this.act(() => this.buy(button.dataset.upgrade!));
     };
-    this.input.keyboard?.on('keydown-SPACE', () => {
-      if (this.profile) void this.act(() => this.beginRun());
+    for (const list of ['hub-weapons', 'hub-passives']) {
+      this.el(list).onclick = (event) => {
+        const button = (event.target as HTMLElement).closest<HTMLButtonElement>('button[data-unlock]');
+        if (button?.dataset.unlock) void this.act(() => this.unlock(button.dataset.unlock!));
+      };
+    }
+    const tabs = this.overlay.querySelector<HTMLElement>('.hub-tabs')!;
+    tabs.onclick = (event) => {
+      const button = (event.target as HTMLElement).closest<HTMLButtonElement>('button[data-tab]');
+      const tab = TABS.find(([id]) => id === button?.dataset.tab)?.[0];
+      if (tab) this.openTab(tab, true);
+    };
+    tabs.onkeydown = (event) => {
+      const step = event.key === 'ArrowRight' ? 1 : event.key === 'ArrowLeft' ? -1 : 0;
+      if (!step) return;
+      const index = TABS.findIndex(([id]) => id === this.tab);
+      const next = TABS[(index + step + TABS.length) % TABS.length]![0];
+      this.openTab(next, true);
+      this.el(`hub-tab-${next}`).focus();
+    };
+    this.openTab('run', false);
+    this.input.keyboard?.on('keydown-SPACE', (event: KeyboardEvent) => {
+      // A focused button already reacts to the space bar.
+      if (event.target instanceof HTMLButtonElement || event.target instanceof HTMLInputElement) return;
+      if (this.tab === 'run' && this.profile) void this.act(() => this.beginRun());
     });
     void this.loadProfile();
   }
 
   private el<T extends HTMLElement = HTMLElement>(id: string): T {
     return this.overlay!.querySelector<T>(`#${id}`)!;
+  }
+
+  private openTab(tab: Tab, sound: boolean): void {
+    this.tab = tab;
+    for (const [id] of TABS) {
+      const selected = id === tab;
+      const button = this.el<HTMLButtonElement>(`hub-tab-${id}`);
+      button.setAttribute('aria-selected', String(selected));
+      button.tabIndex = selected ? 0 : -1;
+      this.el(`hub-panel-${id}`).hidden = !selected;
+    }
+    if (sound) playSfx('sfx/ui_click');
   }
 
   private status(message: string, error = false): void {
@@ -145,7 +222,7 @@ export class HubScene extends Phaser.Scene {
       const profile = await getProfile();
       if (!this.active) return;
       this.render(profile);
-      this.status('Готов к выходу.');
+      this.status('Готов к вылазке.');
       if (import.meta.env.DEV && new URLSearchParams(window.location.search).has('autostart')) {
         void this.act(() => this.beginRun());
       }
@@ -165,6 +242,7 @@ export class HubScene extends Phaser.Scene {
     const catalog = getCatalog();
     this.el('hub-body').hidden = false;
     this.el('hub-caps').textContent = String(profile.caps);
+    this.el('hub-emeralds').textContent = String(profile.emeralds);
     this.el('hub-best').textContent = formatTime(profile.best_time_s);
     this.el('hub-runs').textContent = String(profile.runs_count);
     this.el('hub-guest-hint').hidden = !(profile.is_guest && profile.runs_count >= 3);
@@ -187,20 +265,89 @@ export class HubScene extends Phaser.Scene {
     const location = catalog.locations[this.selected];
     const hero = location ? catalog.heroes[location.startingHero] : undefined;
     this.el('hub-location').textContent = location && hero
-      ? `${location.name} · ${hero.name} · WASD / стрелки · тач · P — пауза` : '';
+      ? `${location.name} · ${hero.name} · пробел — начать` : '';
+    this.renderItems(profile);
+    this.renderEmeralds(profile);
     this.el('hub-upgrades').innerHTML = CATEGORIES.map(([category, title]) =>
       `<li class="hub-category">${title}</li>${Object.values(catalog.upgrades)
         .filter((upgrade) => upgrade.category === category).map((upgrade) => {
       const level = profile.upgrades[upgrade.id] ?? 0;
       const maxed = level >= upgrade.maxLevel;
       const cost = maxed ? 0 : upgradeCost(upgrade, level);
-      const label = maxed ? 'Максимум' : `Купить · ${cost}`;
+      const emeralds = upgrade.currency === 'emeralds';
+      const funds = emeralds ? profile.emeralds : profile.caps;
+      const label = maxed ? 'Максимум' : `Купить · ${cost}${emeralds ? ' изумр.' : ''}`;
       return `<li>
         <div><strong>${escapeHtml(upgrade.name)}</strong> <span class="hub-level">${level}/${upgrade.maxLevel}</span>
         <small>${escapeHtml(effectText(upgrade, level))}</small></div>
-        <button type="button" data-upgrade="${escapeHtml(upgrade.id)}" ${maxed || cost > profile.caps ? 'disabled' : ''}>${label}</button>
+        <button type="button" data-upgrade="${escapeHtml(upgrade.id)}" ${maxed || cost > funds ? 'disabled' : ''}>${label}</button>
       </li>`;
     }).join('')}`).join('');
+  }
+
+  private renderItems(profile: Profile): void {
+    const { weapons, passives } = getCatalog();
+    const row = (item: WeaponDefinition | PassiveDefinition, note: string): string => {
+      const cost = item.unlock.type === 'emeralds' ? item.unlock.emeralds : 0;
+      const open = !cost || profile.unlocks.includes(item.id);
+      const action = open ? `<span class="hub-open">${cost ? 'Открыто' : 'Доступно'}</span>`
+        : `<button type="button" data-unlock="${escapeHtml(item.id)}" ${cost > profile.emeralds ? 'disabled' : ''}>Открыть · ${cost}</button>`;
+      return `<li class="${open ? '' : 'hub-locked'}">
+        <img class="hub-icon" alt="" src="${this.textures.getBase64(ATLAS, item.sprite)}">
+        <div><strong>${escapeHtml(item.name)}</strong>
+        <small>${escapeHtml(item.description)}${note ? `<br>${escapeHtml(note)}` : ''}</small></div>${action}</li>`;
+    };
+    const section = (title: string, rows: string[]): string =>
+      `<li class="hub-category">${title}</li>${rows.join('')}`;
+    const byCost = <T extends WeaponDefinition | PassiveDefinition>(items: T[]): T[] =>
+      items.sort((a, b) => (a.unlock.type === 'emeralds' ? a.unlock.emeralds : 0)
+        - (b.unlock.type === 'emeralds' ? b.unlock.emeralds : 0));
+    const guns = Object.values(weapons);
+    const heavy = byCost(guns.filter((weapon) => weapon.heavy));
+    this.el('hub-weapons').innerHTML = section('Тяжёлое оружие', heavy.map((weapon) =>
+      row(weapon, `Встречается в забеге с ${weapon.minHeroLevel} уровня`)))
+      + section('Обычное оружие', guns.filter((weapon) => !weapon.heavy && !weapon.evolved).map((weapon) =>
+        row(weapon, weapon.evolution
+          ? `Эволюция: ${weapons[weapon.evolution.into]!.name} (перк «${passives[weapon.evolution.passive]!.name}»)` : '')));
+    const perks = Object.values(passives);
+    const note = (perk: PassiveDefinition): string =>
+      `${statBonus(perk.stat, perk.perLevel, perk.mod)} за уровень, уровней: ${perk.maxLevel}`;
+    this.el('hub-passives').innerHTML = section('За изумруды',
+      byCost(perks.filter((perk) => perk.unlock.type === 'emeralds')).map((perk) => row(perk, note(perk))))
+      + section('Доступны сразу',
+        perks.filter((perk) => perk.unlock.type === 'default').map((perk) => row(perk, note(perk))));
+  }
+
+  private renderEmeralds(profile: Profile): void {
+    const catalog = getCatalog();
+    const marks = catalog.balance.reward.emeraldMilestones;
+    const row = (title: string, amount: number, done = false): string =>
+      `<li class="${done ? 'hub-done' : ''}"><span>${escapeHtml(title)}</span><span>${done ? 'получено' : `+${amount}`}</span></li>`;
+    this.el('hub-emerald-info').innerHTML = `
+      <p class="hub-help">За изумруды открывают тяжёлое оружие и редкие перки (они появляются среди карточек забега) и докупают слоты (вкладка «Улучшения»). Изумруды начисляются в конце забега, даже если герой погиб.</p>
+      ${orderedLocations(catalog).map((location) => {
+        const { elite, boss, firstBoss } = location.emeralds;
+        const reached = profile.milestones[location.id] ?? [];
+        return `<h2>${escapeHtml(location.name)}</h2><ul class="hub-goals">
+          ${row('Каждый мини-босс', elite)}${row('Каждая победа над боссом', boss)}
+          ${row('Первая победа над боссом', firstBoss, profile.bosses_killed.includes(location.id))}
+          ${marks.map((mark) => row(`Впервые продержаться ${formatTime(mark.atSecond)}`, mark.amount, reached.includes(mark.atSecond))).join('')}
+        </ul>`;
+      }).join('')}`;
+  }
+
+  private async unlock(id: string): Promise<void> {
+    if (!this.profile) return;
+    try {
+      this.render(await buyUnlock(id, this.profile.version));
+      playSfx('sfx/emerald');
+      this.status('Открыто. Теперь встретится в забегах.');
+    } catch (error) {
+      if (error instanceof ApiRequestError && error.status === 409) {
+        this.render(await getProfile());
+      }
+      throw error;
+    }
   }
 
   private async buy(id: string): Promise<void> {
@@ -238,6 +385,7 @@ export class HubScene extends Phaser.Scene {
     const data: RunData = {
       seed, wave, locationId: location.id, heroId: location.startingHero,
       runId: run.run_id, contentHash, upgrades: { ...this.profile.upgrades },
+      unlocks: [...this.profile.unlocks],
     };
     this.scene.start('Run', data);
   }

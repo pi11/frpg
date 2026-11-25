@@ -3,6 +3,7 @@
   "name": "Железный мэр",
   "sprite": "enemies/iron_mayor",
   "role": "boss",
+  "scale": 1.5,
   "ai": {
     "type": "boss_phases",
     "params": {
@@ -12,29 +13,29 @@
           "ai": {
             "type": "ranged",
             "params": {
-              "turnRate": 3,
+              "turnRate": 3.5,
               "preferredRange": 100,
-              "fireCooldownMs": 1500,
-              "projectileSpeed": 150,
-              "projectileDamage": 14,
+              "fireCooldownMs": 1200,
+              "projectileSpeed": 160,
+              "projectileDamage": 16,
               "projectileSprite": "projectiles/slug",
               "lifetimeMs": 3000,
-              "shots": 5,
-              "spreadDegrees": 50
+              "shots": 7,
+              "spreadDegrees": 60
             }
           }
         },
         {
-          "hpBelow": 0.66,
+          "hpBelow": 0.8,
           "ai": {
             "type": "charger",
             "params": {
-              "turnRate": 4,
-              "chargeRange": 220,
-              "windupMs": 650,
-              "chargeSpeed": 240,
-              "chargeMs": 700,
-              "cooldownMs": 1400
+              "turnRate": 4.5,
+              "chargeRange": 230,
+              "windupMs": 550,
+              "chargeSpeed": 260,
+              "chargeMs": 750,
+              "cooldownMs": 1100
             }
           },
           "summon": {
@@ -43,33 +44,72 @@
           }
         },
         {
-          "hpBelow": 0.33,
+          "hpBelow": 0.55,
           "ai": {
             "type": "ranged",
             "params": {
-              "turnRate": 3,
+              "turnRate": 3.5,
               "preferredRange": 90,
-              "fireCooldownMs": 900,
-              "projectileSpeed": 165,
-              "projectileDamage": 15,
+              "fireCooldownMs": 1200,
+              "projectileSpeed": 140,
+              "projectileDamage": 17,
               "projectileSprite": "projectiles/slug",
               "lifetimeMs": 3000,
-              "shots": 9,
-              "spreadDegrees": 120
+              "shots": 22,
+              "spreadDegrees": 344
             }
           },
           "summon": {
             "enemy": "rad_bat",
             "count": 14
           }
+        },
+        {
+          "hpBelow": 0.3,
+          "ai": {
+            "type": "charger",
+            "params": {
+              "turnRate": 4.5,
+              "chargeRange": 230,
+              "windupMs": 450,
+              "chargeSpeed": 300,
+              "chargeMs": 750,
+              "cooldownMs": 700
+            }
+          },
+          "summon": {
+            "enemy": "wild_dog",
+            "count": 16
+          }
+        },
+        {
+          "hpBelow": 0.15,
+          "ai": {
+            "type": "ranged",
+            "params": {
+              "turnRate": 3.5,
+              "preferredRange": 90,
+              "fireCooldownMs": 750,
+              "projectileSpeed": 175,
+              "projectileDamage": 17,
+              "projectileSprite": "projectiles/slug",
+              "lifetimeMs": 3000,
+              "shots": 13,
+              "spreadDegrees": 150
+            }
+          },
+          "summon": {
+            "enemy": "medic",
+            "count": 4
+          }
         }
       ]
     }
   },
   "stats": {
-    "hp": 6000,
-    "speed": 70,
-    "damage": 26,
+    "hp": 16000,
+    "speed": 80,
+    "damage": 30,
     "xp": 0
   },
   "drops": [],

@@ -14,8 +14,8 @@
     "eliteFocusRange": 200,
     "collectRadius": 14,
     "magnetSpeed": 260,
-    "maxWeapons": 5,
-    "maxPassives": 5,
+    "maxWeapons": 6,
+    "maxPassives": 6,
     "critMultiplier": 2,
     "reviveHpFraction": 0.5,
     "reviveInvulnerableMs": 2500,
@@ -23,7 +23,13 @@
     "reviveBlastDamage": 80,
     "hazardTickMs": 500,
     "landmarkDecayRate": 0.5,
-    "landmarkHintRange": 420
+    "landmarkHintRange": 420,
+    "maxHeavyWeapons": 2,
+    "maxDodge": 0.6,
+    "softMoveSpeed": 150,
+    "softMoveSpeedFactor": 0.4,
+    "eliteMaxLossPerSecond": 0.08,
+    "bossMaxLossPerSecond": 0.02
   },
   "xp": {
     "base": 5,
@@ -37,6 +43,20 @@
     "bossBonus": 30,
     "maxKillsPerSecond": 8,
     "maxCapsPerSecond": 3,
-    "durationGraceSeconds": 30
+    "durationGraceSeconds": 30,
+    "emeraldMilestones": [
+      {
+        "atSecond": 300,
+        "amount": 1
+      },
+      {
+        "atSecond": 480,
+        "amount": 2
+      },
+      {
+        "atSecond": 720,
+        "amount": 3
+      }
+    ]
   }
 }

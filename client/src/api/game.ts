@@ -4,6 +4,11 @@ export interface Profile {
   user_id: string;
   is_guest: boolean;
   caps: number;
+  emeralds: number;
+  /** Weapons and perks bought for emeralds. */
+  unlocks: string[];
+  /** Survival marks (seconds) already rewarded, per location. */
+  milestones: Record<string, number[]>;
   version: number;
   schema_version: number;
   best_time_s: number;
@@ -34,6 +39,7 @@ export interface RunSummary {
 export interface RunFinish {
   status: 'finished';
   reward_caps: number;
+  reward_emeralds: number;
   flags: string[];
   profile: Profile;
 }
@@ -44,6 +50,12 @@ export function getProfile(): Promise<Profile> {
 
 export function buyUpgrade(id: string, expectedVersion: number): Promise<Profile> {
   return request<Profile>(`/upgrades/${encodeURIComponent(id)}/buy`, {
+    method: 'POST', body: JSON.stringify({ expected_version: expectedVersion }),
+  }, true);
+}
+
+export function buyUnlock(id: string, expectedVersion: number): Promise<Profile> {
+  return request<Profile>(`/unlocks/${encodeURIComponent(id)}/buy`, {
     method: 'POST', body: JSON.stringify({ expected_version: expectedVersion }),
   }, true);
 }

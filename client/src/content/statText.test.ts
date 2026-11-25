@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { getCatalog } from './catalog';
-import { levelChanges, statBonus } from './statText';
+import { levelChanges, levelStats, statBonus } from './statText';
 
 describe('upgrade texts', () => {
   it('shows fractions as percent without float noise', () => {
@@ -13,6 +13,12 @@ describe('upgrade texts', () => {
     const [first, second] = getCatalog().weapons.tesla_coil!.levels;
     expect(levelChanges(first!, second!)).toEqual(['урон 9>11', 'перезарядка 1.3с>1.25с', 'скачки 2>3']);
     expect(levelChanges(first!, first!)).toEqual([]);
+  });
+
+  it('lists weapon numbers for tooltips', () => {
+    expect(levelStats(getCatalog().weapons.tesla_coil!.levels[0]!))
+      .toEqual(['урон 9', 'перезарядка 1.3с', 'кол-во 1', 'скачки 2']);
+    expect(statBonus('killHeal', 0.06)).toBe('+0.06 здоровье за убийство');
   });
 
   it('describes every weapon level-up', () => {

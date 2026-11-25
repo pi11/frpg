@@ -4,16 +4,58 @@
   "sprite": "enemies/brute",
   "role": "elite",
   "ai": {
-    "type": "chaser",
+    "type": "boss_phases",
     "params": {
-      "turnRate": 3
+      "phases": [
+        {
+          "hpBelow": 1,
+          "ai": {
+            "type": "chaser",
+            "params": {
+              "turnRate": 3
+            }
+          }
+        },
+        {
+          "hpBelow": 0.7,
+          "ai": {
+            "type": "charger",
+            "params": {
+              "turnRate": 3.5,
+              "chargeRange": 180,
+              "windupMs": 650,
+              "chargeSpeed": 200,
+              "chargeMs": 650,
+              "cooldownMs": 1800
+            }
+          }
+        },
+        {
+          "hpBelow": 0.35,
+          "ai": {
+            "type": "charger",
+            "params": {
+              "turnRate": 3.5,
+              "chargeRange": 200,
+              "windupMs": 650,
+              "chargeSpeed": 230,
+              "chargeMs": 650,
+              "cooldownMs": 1100
+            }
+          },
+          "summon": {
+            "enemy": "ghoul",
+            "count": 6
+          }
+        }
+      ]
     }
   },
   "stats": {
-    "hp": 650,
-    "speed": 46,
-    "damage": 14,
-    "xp": 30
+    "hp": 1500,
+    "speed": 58,
+    "damage": 22,
+    "xp": 45
   },
   "drops": [
     {

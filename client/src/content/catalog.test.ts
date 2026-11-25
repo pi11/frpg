@@ -66,6 +66,29 @@ describe('shared content catalog', () => {
     expect(() => validateContent({ ...rawFiles, [pistolPath]: orphan })).toThrow('has no evolution source');
   });
 
+  it('rejects a heavy weapon with evolutions or a locked starting weapon', () => {
+    const find = (name: string): string => Object.keys(rawFiles).find((path) => path.endsWith(name))!;
+    const railPath = find('rail_gun.json');
+    const rail = structuredClone(rawFiles[railPath] as { levels: unknown[]; evolution?: unknown });
+    rail.evolution = { passive: 'scope', into: 'nail_gun' };
+    expect(() => validateContent({ ...rawFiles, [railPath]: rail })).toThrow('cannot evolve');
+    delete rail.evolution;
+    rail.levels.pop();
+    expect(() => validateContent({ ...rawFiles, [railPath]: rail })).toThrow('heavy weapon needs 5 level');
+    const pistolPath = find('scrap_pistol.json');
+    const pistol = structuredClone(rawFiles[pistolPath] as { unlock?: unknown });
+    pistol.unlock = { type: 'emeralds', emeralds: 5 };
+    expect(() => validateContent({ ...rawFiles, [pistolPath]: pistol })).toThrow('must be open');
+  });
+
+  it('has clearly bigger and tougher mini-bosses than ordinary enemies', () => {
+    const enemies = Object.values(getCatalog().enemies);
+    const toughest = Math.max(...enemies.filter((item) => item.role === 'normal').map((item) => item.stats.hp));
+    for (const elite of enemies.filter((item) => item.role === 'elite')) {
+      expect(elite.stats.hp, elite.id).toBeGreaterThan(toughest * 20);
+    }
+  });
+
   it('rejects a boss phase with an unknown AI', () => {
     const bossPath = Object.keys(rawFiles).find((path) => path.endsWith('junk_king.json'));
     const boss = structuredClone(rawFiles[bossPath!] as { ai: { params: { phases: { ai: { type: string } }[] } } });
@@ -134,6 +157,10 @@ describe('assets referenced by content', () => {
     }
     for (const weapon of Object.values(content.weapons)) {
       if (weapon.behavior.type === 'orbit') needFrame(`${weapon.projectileSprite}/spin_0`);
+      if (weapon.behavior.type === 'turret') {
+        needFrame(`${weapon.projectileSprite}/spin_0`);
+        needFrame((weapon.behavior.params as { shotSprite: string }).shotSprite);
+      }
       const fire = (weapon.behavior.params as { fireSprite?: string }).fireSprite;
       if (fire) needFrame(`${fire}/burn_0`);
     }
@@ -146,7 +173,7 @@ describe('assets referenced by content', () => {
         if (item.kind === 'patch' || item.kind === 'object') needFrame(item.sprite);
       }
     }
-    for (const frame of ['xp/green', 'xp/green/idle_0', 'ui/cap', 'fx/hit/burst_0',
+    for (const frame of ['xp/green', 'xp/green/idle_0', 'ui/cap', 'ui/emerald', 'fx/ray/idle_0', 'fx/hit/burst_0',
       'fx/explosion/burst_0']) needFrame(frame);
     for (const sound of UI_SOUNDS) needFile(`${sound}.wav`);
     needFile(`${HUB_MUSIC}.ogg`);

@@ -1,6 +1,7 @@
 {
   "id": "scrap_pistol",
   "name": "Самодельный пистолет",
+  "description": "Стреляет в ближайшего врага",
   "sprite": "weapons/scrap_pistol",
   "projectileSprite": "projectiles/bullet",
   "fireSound": "sfx/shot_pistol",

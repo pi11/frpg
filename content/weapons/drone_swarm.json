@@ -1,6 +1,7 @@
 {
   "id": "drone_swarm",
   "name": "Рой дронов",
+  "description": "Рой дронов почти без перерыва",
   "sprite": "weapons/drone_swarm",
   "projectileSprite": "projectiles/drone",
   "fireSound": "sfx/drone",

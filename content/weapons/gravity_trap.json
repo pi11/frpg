@@ -1,0 +1,68 @@
+{
+  "id": "gravity_trap",
+  "name": "Гравитационная ловушка",
+  "description": "Стягивает врагов и давит их",
+  "sprite": "weapons/gravity_trap",
+  "projectileSprite": "projectiles/rad",
+  "fireSound": "sfx/gravity",
+  "behavior": {
+    "type": "zone",
+    "params": {
+      "range": 170,
+      "tickMs": 300,
+      "fireSprite": "fx/vortex",
+      "pull": 90
+    }
+  },
+  "levels": [
+    {
+      "damage": 14,
+      "cooldownMs": 3600,
+      "shots": 1,
+      "spreadDegrees": 0,
+      "radius": 62,
+      "durationMs": 2600
+    },
+    {
+      "damage": 17,
+      "cooldownMs": 3350,
+      "shots": 1,
+      "spreadDegrees": 0,
+      "radius": 68,
+      "durationMs": 2900
+    },
+    {
+      "damage": 19,
+      "cooldownMs": 3100,
+      "shots": 2,
+      "spreadDegrees": 0,
+      "radius": 74,
+      "durationMs": 3200
+    },
+    {
+      "damage": 22,
+      "cooldownMs": 2850,
+      "shots": 2,
+      "spreadDegrees": 0,
+      "radius": 80,
+      "durationMs": 3500
+    },
+    {
+      "damage": 24,
+      "cooldownMs": 2600,
+      "shots": 2,
+      "spreadDegrees": 0,
+      "radius": 86,
+      "durationMs": 3800
+    }
+  ],
+  "tags": [
+    "heavy"
+  ],
+  "heavy": true,
+  "minHeroLevel": 11,
+  "unlock": {
+    "type": "emeralds",
+    "emeralds": 16
+  }
+}

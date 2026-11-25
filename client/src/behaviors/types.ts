@@ -64,6 +64,8 @@ export interface ProjectileSpec {
   /** Turns back to the hero after this time; hits may repeat on the way back. */
   returnAfterMs?: number;
   returnSpeed?: number;
+  /** Freezes an ordinary enemy on hit. */
+  chillMs?: number;
 }
 
 export interface ZoneSpec extends Point {
@@ -71,6 +73,16 @@ export interface ZoneSpec extends Point {
   damage: number;
   tickMs: number;
   durationMs: number;
+  sprite: string;
+  /** Drags ordinary enemies to the centre, pixels per second. */
+  pull?: number;
+}
+
+export interface BlastSpec extends Point {
+  delayMs: number;
+  radius: number;
+  damage: number;
+  /** Falling shell. */
   sprite: string;
 }
 
@@ -96,6 +108,10 @@ export interface CombatContext {
   damageInRadius(center: Point, radius: number, damage: number, limit?: HitLimit): number;
   spawnProjectile(spec: ProjectileSpec): void;
   spawnZone(spec: ZoneSpec): void;
+  /** Marks a spot and blows it up after the delay. */
+  scheduleBlast(spec: BlastSpec): void;
+  /** Draw a beam for this frame only. */
+  drawBeam(from: Point, to: Point): void;
   /** Show one orbiting sprite per position for this owner; an empty list hides them. */
   placeOrbiters(owner: string, sprite: string, positions: readonly Point[]): void;
   /** Draw (radius > 0) or hide (0) an aura ring around the hero. */
@@ -107,6 +123,8 @@ export interface WeaponState {
   clock: number;
   activeUntil: number;
   angle: number;
+  /** Standing turrets. */
+  posts?: { x: number; y: number; until: number; shootAt: number }[];
 }
 
 /** 'fired' plays the weapon sound, 'silent' consumes the cooldown quietly, 'skip' waits. */

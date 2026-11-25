@@ -1,0 +1,10 @@
+{
+  "id": "nimble",
+  "name": "Вёрткость",
+  "description": "Шанс уйти от удара",
+  "sprite": "passives/nimble",
+  "stat": "dodge",
+  "mod": "flat",
+  "perLevel": 0.04,
+  "maxLevel": 5
+}

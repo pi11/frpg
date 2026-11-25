@@ -11,12 +11,15 @@ import {
 } from './pickups/effects';
 import type { EnemyBehavior, PickupEffect, WeaponBehavior } from './types';
 import { AuraWeaponBehavior } from './weapons/Aura';
+import { BarrageWeaponBehavior } from './weapons/Barrage';
+import { BeamWeaponBehavior } from './weapons/Beam';
 import { BoomerangWeaponBehavior } from './weapons/Boomerang';
 import { ChainWeaponBehavior } from './weapons/Chain';
 import { MineWeaponBehavior } from './weapons/Mine';
 import { OrbitWeaponBehavior } from './weapons/Orbit';
 import { ProjectileWeaponBehavior } from './weapons/Projectile';
 import { RocketWeaponBehavior } from './weapons/Rocket';
+import { TurretWeaponBehavior } from './weapons/Turret';
 import { ZoneWeaponBehavior } from './weapons/Zone';
 
 export const weaponBehaviors: Record<string, WeaponBehavior<unknown> | undefined> = {
@@ -27,6 +30,9 @@ export const weaponBehaviors: Record<string, WeaponBehavior<unknown> | undefined
   chain: new ChainWeaponBehavior() as WeaponBehavior<unknown>,
   boomerang: new BoomerangWeaponBehavior() as WeaponBehavior<unknown>,
   mine: new MineWeaponBehavior() as WeaponBehavior<unknown>,
+  barrage: new BarrageWeaponBehavior() as WeaponBehavior<unknown>,
+  beam: new BeamWeaponBehavior() as WeaponBehavior<unknown>,
+  turret: new TurretWeaponBehavior() as WeaponBehavior<unknown>,
   rocket: new RocketWeaponBehavior() as WeaponBehavior<unknown>,
 };
 

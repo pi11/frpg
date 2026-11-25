@@ -1,6 +1,7 @@
 {
   "id": "minefield",
   "name": "Минное поле",
+  "description": "Засыпает землю минами",
   "sprite": "weapons/minefield",
   "projectileSprite": "projectiles/mine",
   "fireSound": "sfx/mine",

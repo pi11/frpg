@@ -1,0 +1,14 @@
+{
+  "id": "perk_board",
+  "name": "Доска навыков",
+  "category": "slots",
+  "currency": "emeralds",
+  "stat": "passiveSlots",
+  "mod": "flat",
+  "perLevel": 1,
+  "maxLevel": 3,
+  "cost": {
+    "base": 3,
+    "growth": 2
+  }
+}

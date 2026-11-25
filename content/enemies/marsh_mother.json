@@ -3,6 +3,7 @@
   "name": "Мать топей",
   "sprite": "enemies/marsh_mother",
   "role": "boss",
+  "scale": 1.5,
   "ai": {
     "type": "boss_phases",
     "params": {
@@ -12,58 +13,104 @@
           "ai": {
             "type": "burrower",
             "params": {
-              "turnRate": 3,
-              "surfaceMs": 3500,
-              "undergroundSpeed": 190,
-              "maxBurrowMs": 3000,
+              "turnRate": 3.5,
+              "surfaceMs": 4200,
+              "undergroundSpeed": 210,
+              "maxBurrowMs": 2600,
               "emergeRange": 24,
-              "windupMs": 750,
-              "emergeRadius": 70,
-              "emergeDamage": 30
+              "windupMs": 650,
+              "emergeRadius": 76,
+              "emergeDamage": 34
             }
           }
         },
         {
-          "hpBelow": 0.66,
+          "hpBelow": 0.8,
           "ai": {
             "type": "ranged",
             "params": {
-              "turnRate": 3,
+              "turnRate": 3.5,
               "preferredRange": 100,
-              "fireCooldownMs": 1100,
-              "projectileSpeed": 140,
-              "projectileDamage": 16,
+              "fireCooldownMs": 1000,
+              "projectileSpeed": 150,
+              "projectileDamage": 18,
               "projectileSprite": "projectiles/spit",
               "lifetimeMs": 3000,
-              "shots": 8,
-              "spreadDegrees": 100
+              "shots": 10,
+              "spreadDegrees": 110
             }
           },
           "summon": {
             "enemy": "toad",
-            "count": 8
+            "count": 10
           }
         },
         {
-          "hpBelow": 0.33,
+          "hpBelow": 0.55,
           "ai": {
-            "type": "chaser",
+            "type": "charger",
             "params": {
-              "turnRate": 3
+              "turnRate": 4.5,
+              "chargeRange": 230,
+              "windupMs": 550,
+              "chargeSpeed": 270,
+              "chargeMs": 750,
+              "cooldownMs": 1000
             }
           },
           "summon": {
             "enemy": "glow_slime",
             "count": 12
           }
+        },
+        {
+          "hpBelow": 0.35,
+          "ai": {
+            "type": "burrower",
+            "params": {
+              "turnRate": 3.5,
+              "surfaceMs": 3600,
+              "undergroundSpeed": 240,
+              "maxBurrowMs": 2600,
+              "emergeRange": 24,
+              "windupMs": 650,
+              "emergeRadius": 84,
+              "emergeDamage": 38
+            }
+          },
+          "summon": {
+            "enemy": "mire_worm",
+            "count": 8
+          }
+        },
+        {
+          "hpBelow": 0.15,
+          "ai": {
+            "type": "ranged",
+            "params": {
+              "turnRate": 3.5,
+              "preferredRange": 80,
+              "fireCooldownMs": 1000,
+              "projectileSpeed": 140,
+              "projectileDamage": 19,
+              "projectileSprite": "projectiles/spit",
+              "lifetimeMs": 3000,
+              "shots": 24,
+              "spreadDegrees": 345
+            }
+          },
+          "summon": {
+            "enemy": "slimelet",
+            "count": 20
+          }
         }
       ]
     }
   },
   "stats": {
-    "hp": 7500,
-    "speed": 74,
-    "damage": 30,
+    "hp": 22000,
+    "speed": 84,
+    "damage": 34,
     "xp": 0
   },
   "drops": [],

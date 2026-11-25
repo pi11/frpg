@@ -1,6 +1,7 @@
 {
   "id": "rocket_tube",
   "name": "Ракетная труба",
+  "description": "Самонаводящаяся ракета со взрывом",
   "sprite": "weapons/rocket_tube",
   "projectileSprite": "projectiles/rocket",
   "fireSound": "sfx/rocket",

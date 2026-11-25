@@ -74,26 +74,6 @@ def medic(frame: int) -> Image:
     return c.outlined()
 
 
-def riot_mech(frame: int) -> Image:
-    """24x24 elite: walking riot mech with a plated shield in front."""
-    c = Canvas(24, 24)
-    step = (2, 0, -2, 0)[frame]
-    c.line(8, 15, 7 - step, 21, "M", 3)
-    c.line(14, 15, 15 + step, 21, "M", 3)
-    c.rect(5 - step, 21, 5, 2, "A")
-    c.rect(13 + step, 21, 5, 2, "A")
-    c.rect(5, 6, 12, 10, "H")  # hull
-    c.rect(6, 7, 10, 3, "h")
-    c.rect(8, 3, 6, 4, "M")  # cabin
-    c.rect(10, 4, 3, 1, "o")  # visor
-    c.rect(17, 5, 4, 14, "m")  # shield
-    c.rect(18, 6, 2, 12, "n")
-    for y in (8, 12, 16):
-        c.rect(17, y, 4, 1, "M")
-    c.set(4, 9, "y")  # warning light
-    return c.outlined()
-
-
 def iron_mayor(frame: int) -> Image:
     """48x48 boss: a walking city machine with a chimney hat, sash and cannon arms."""
     c = Canvas(48, 48)
@@ -151,20 +131,6 @@ def slime(frame: int, size: int, core: str = "G") -> Image:
     c.set(round(size / 2 + rx * 0.3), round(cy - ry * 0.1), "K")  # eyes
     c.set(round(size / 2 + rx * 0.55), round(cy - ry * 0.1), "K")
     return c.outlined()
-
-
-def slime_queen(frame: int) -> Image:
-    image = slime(frame, 24, "T")
-    crown = Canvas(24, 24)
-    lift = (0, 1, 2, 1)[frame]
-    for index, x in enumerate((8, 11, 14, 17)):
-        crown.line(x, 7 + lift, x, 4 + lift - index % 2, "y")
-    crown.rect(8, 7 + lift, 10, 1, "o")
-    for y, row in enumerate(crown.pixels):
-        for x, pixel in enumerate(row):
-            if pixel[3]:
-                image[y][x] = pixel
-    return image
 
 
 def worm(frame: int, size: int) -> Image:

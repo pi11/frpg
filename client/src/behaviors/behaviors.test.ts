@@ -4,7 +4,7 @@ import type { WeaponDefinition, WeaponLevel } from '../content/schemas';
 import { biomeAt, generateChunk } from '../systems/WorldDecor';
 import { enemyBehaviors, pickupEffects, weaponBehaviors } from './registry';
 import type {
-  CombatContext, EnemyContext, Mob, PickupContext, Point, ProjectileSpec, WeaponState, ZoneSpec,
+  BlastSpec, CombatContext, EnemyContext, Mob, PickupContext, Point, ProjectileSpec, WeaponState, ZoneSpec,
 } from './types';
 
 function mob(x: number, y: number, speed = 50, hpFraction = 1):
@@ -165,10 +165,10 @@ describe('enemy behaviors', () => {
     target.hpFraction = 0.5;
     behavior.update(target, context, boss.ai.params, 16);
     behavior.update(target, context, boss.ai.params, 16);
-    expect(log.summons).toEqual([{ id: 'roach', count: 10 }]);
+    expect(log.summons).toEqual([{ id: 'cleaner_bot', count: 10 }]);
     target.hpFraction = 0.2;
     behavior.update(target, context, boss.ai.params, 16);
-    expect(log.summons.at(-1)).toEqual({ id: 'cleaner_bot', count: 8 });
+    expect(log.summons.at(-1)).toEqual({ id: 'raider', count: 6 });
   });
 });
 
@@ -177,6 +177,7 @@ function combat(stats: Partial<Record<string, number>> = {}, enemies: Point[] = 
     projectiles: [] as ProjectileSpec[], zones: [] as ZoneSpec[], hits: [] as number[],
     orbiters: [] as number[], auras: [] as number[],
     strikes: [] as { target: Point; damage: number }[], bolts: [] as number[],
+    blasts: [] as BlastSpec[], beams: [] as [Point, Point][],
   };
   const lastHit = new Map<string, number>();
   const context: CombatContext & { now: number } = {
@@ -200,6 +201,8 @@ function combat(stats: Partial<Record<string, number>> = {}, enemies: Point[] = 
     },
     spawnProjectile: (spec) => { log.projectiles.push(spec); },
     spawnZone: (spec) => { log.zones.push(spec); },
+    scheduleBlast: (spec) => { log.blasts.push(spec); },
+    drawBeam: (from, to) => { log.beams.push([from, to]); },
     placeOrbiters: (_owner, _sprite, positions) => { log.orbiters.push(positions.length); },
     showAura: (_owner, radius) => { log.auras.push(radius); },
   };
@@ -320,6 +323,74 @@ describe('extra weapon behaviors', () => {
     expect(log.projectiles[0]!.turnRate).toBeGreaterThan(0);
     expect(log.projectiles[0]!.blastRadius).toBe(weapon('rocket_tube').level(1).radius! * 2);
     expect(fire('rocket_tube', 1, combat({}, []).context)).toBe('skip');
+  });
+});
+
+describe('heavy weapon behaviors', () => {
+  const params = (id: string) => weapon(id).definition.behavior.params;
+  const behavior = (id: string) => weaponBehaviors[weapon(id).definition.behavior.type]!;
+  const fire = (id: string, context: CombatContext, own = state()) =>
+    behavior(id).fire(context, weapon(id).definition, weapon(id).level(1), params(id), own);
+
+  it('barrage marks spots and lands shells one after another', () => {
+    const { context, log } = combat({ area: 1, damage: 5, projectileCount: 1 });
+    expect(fire('mortar', context)).toBe('fired');
+    const level = weapon('mortar').level(1);
+    expect(log.blasts).toHaveLength(level.shots + 1);
+    expect(log.blasts[0]).toMatchObject({ x: 100, radius: level.radius! * 2, damage: level.damage + 5 });
+    expect(log.blasts[1]!.delayMs).toBeGreaterThan(log.blasts[0]!.delayMs);
+    expect(fire('mortar', combat({}, []).context)).toBe('skip');
+  });
+
+  it('beam sweeps while active, limits hits and rests', () => {
+    const { context, log } = combat({ projectileCount: 1 });
+    const own = state();
+    const { definition, level } = weapon('beam_cutter');
+    const update = (): void => behavior('beam_cutter')
+      .update!(context, definition, level(1), params('beam_cutter'), own, 16);
+    update();
+    expect(log.beams).toHaveLength(0);
+    fire('beam_cutter', context, own);
+    update();
+    expect(log.beams).toHaveLength(level(1).shots + 1);
+    expect(own.angle).toBeGreaterThan(0);
+    expect(log.hits).toEqual([level(1).damage]);
+    context.now = own.activeUntil;
+    update();
+    expect(log.beams).toHaveLength(level(1).shots + 1);
+  });
+
+  it('turret stays where it was placed, shoots and expires', () => {
+    const { context, log } = combat({ attackSpeed: 1 });
+    const own = state();
+    const { definition, level } = weapon('sentry_turret');
+    const update = (): void => behavior('sentry_turret')
+      .update!(context, definition, level(1), params('sentry_turret'), own, 16);
+    fire('sentry_turret', context, own);
+    (context.hero as Point).x = 500;
+    update();
+    update();
+    expect(log.projectiles).toHaveLength(1);
+    expect(log.projectiles[0]!.at).toEqual({ x: 0, y: 0 });
+    expect(log.projectiles[0]!.vx).toBeGreaterThan(0);
+    context.now = 121;
+    update();
+    expect(log.projectiles).toHaveLength(2);
+    fire('sentry_turret', context, own);
+    expect(own.posts).toHaveLength(level(1).shots);
+    context.now = 1e6;
+    update();
+    expect(log.orbiters.at(-1)).toBe(0);
+  });
+
+  it('cryo shards chill and the gravity trap pulls', () => {
+    const { context, log } = combat();
+    fire('cryo_cannon', context);
+    expect(log.projectiles[0]!.chillMs).toBeGreaterThan(0);
+    fire('gravity_trap', context);
+    expect(log.zones[0]!.pull).toBeGreaterThan(0);
+    fire('scrap_pistol', context);
+    expect(log.projectiles.at(-1)!.chillMs).toBeUndefined();
   });
 });
 

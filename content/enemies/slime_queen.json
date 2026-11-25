@@ -4,16 +4,65 @@
   "sprite": "enemies/slime_queen",
   "role": "elite",
   "ai": {
-    "type": "chaser",
+    "type": "boss_phases",
     "params": {
-      "turnRate": 2.5
+      "phases": [
+        {
+          "hpBelow": 1,
+          "ai": {
+            "type": "chaser",
+            "params": {
+              "turnRate": 3
+            }
+          }
+        },
+        {
+          "hpBelow": 0.66,
+          "ai": {
+            "type": "charger",
+            "params": {
+              "turnRate": 3.5,
+              "chargeRange": 160,
+              "windupMs": 650,
+              "chargeSpeed": 190,
+              "chargeMs": 650,
+              "cooldownMs": 2000
+            }
+          },
+          "summon": {
+            "enemy": "slimelet",
+            "count": 8
+          }
+        },
+        {
+          "hpBelow": 0.33,
+          "ai": {
+            "type": "ranged",
+            "params": {
+              "turnRate": 3,
+              "preferredRange": 110,
+              "fireCooldownMs": 1400,
+              "projectileSpeed": 125,
+              "projectileDamage": 13,
+              "projectileSprite": "projectiles/spit",
+              "lifetimeMs": 2800,
+              "shots": 10,
+              "spreadDegrees": 324
+            }
+          },
+          "summon": {
+            "enemy": "slimelet",
+            "count": 8
+          }
+        }
+      ]
     }
   },
   "stats": {
-    "hp": 2600,
-    "speed": 44,
-    "damage": 18,
-    "xp": 50
+    "hp": 6800,
+    "speed": 56,
+    "damage": 26,
+    "xp": 65
   },
   "drops": [
     {

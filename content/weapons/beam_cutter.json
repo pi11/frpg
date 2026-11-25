@@ -1,0 +1,66 @@
+{
+  "id": "beam_cutter",
+  "name": "Плазменный резак",
+  "description": "Вращающийся луч режет всех вокруг",
+  "sprite": "weapons/beam_cutter",
+  "projectileSprite": "projectiles/spark",
+  "fireSound": "sfx/beam",
+  "behavior": {
+    "type": "beam",
+    "params": {
+      "turnSpeed": 2.6,
+      "hitCooldownMs": 300
+    }
+  },
+  "levels": [
+    {
+      "damage": 22,
+      "cooldownMs": 1600,
+      "shots": 1,
+      "spreadDegrees": 0,
+      "radius": 95,
+      "durationMs": 1400
+    },
+    {
+      "damage": 27,
+      "cooldownMs": 1500,
+      "shots": 2,
+      "spreadDegrees": 0,
+      "radius": 106,
+      "durationMs": 1520
+    },
+    {
+      "damage": 32,
+      "cooldownMs": 1400,
+      "shots": 2,
+      "spreadDegrees": 0,
+      "radius": 118,
+      "durationMs": 1650
+    },
+    {
+      "damage": 37,
+      "cooldownMs": 1300,
+      "shots": 2,
+      "spreadDegrees": 0,
+      "radius": 129,
+      "durationMs": 1780
+    },
+    {
+      "damage": 42,
+      "cooldownMs": 1200,
+      "shots": 3,
+      "spreadDegrees": 0,
+      "radius": 140,
+      "durationMs": 1900
+    }
+  ],
+  "tags": [
+    "heavy"
+  ],
+  "heavy": true,
+  "minHeroLevel": 10,
+  "unlock": {
+    "type": "emeralds",
+    "emeralds": 14
+  }
+}

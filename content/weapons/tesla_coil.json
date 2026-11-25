@@ -1,6 +1,7 @@
 {
   "id": "tesla_coil",
   "name": "Катушка-разрядник",
+  "description": "Молния скачет от врага к врагу",
   "sprite": "weapons/tesla_coil",
   "projectileSprite": "projectiles/spark",
   "fireSound": "sfx/tesla",

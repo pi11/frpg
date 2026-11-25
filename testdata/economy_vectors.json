@@ -967,5 +967,337 @@
    },
    "expected": "97a8df368c7a7efbef64147574f47942ea850e7980beedaa598794f81c747e6e"
   }
+ ],
+ "emeraldReward": [
+  {
+   "rates": {
+    "elite": 1,
+    "boss": 3,
+    "firstBoss": 5
+   },
+   "milestones": [
+    {
+     "atSecond": 300,
+     "amount": 1
+    },
+    {
+     "atSecond": 480,
+     "amount": 2
+    },
+    {
+     "atSecond": 720,
+     "amount": 3
+    }
+   ],
+   "elites": 0,
+   "boss_killed": false,
+   "first_boss": false,
+   "passed": [],
+   "expected": 0
+  },
+  {
+   "rates": {
+    "elite": 1,
+    "boss": 3,
+    "firstBoss": 5
+   },
+   "milestones": [
+    {
+     "atSecond": 300,
+     "amount": 1
+    },
+    {
+     "atSecond": 480,
+     "amount": 2
+    },
+    {
+     "atSecond": 720,
+     "amount": 3
+    }
+   ],
+   "elites": 2,
+   "boss_killed": false,
+   "first_boss": false,
+   "passed": [
+    300,
+    480
+   ],
+   "expected": 5
+  },
+  {
+   "rates": {
+    "elite": 1,
+    "boss": 3,
+    "firstBoss": 5
+   },
+   "milestones": [
+    {
+     "atSecond": 300,
+     "amount": 1
+    },
+    {
+     "atSecond": 480,
+     "amount": 2
+    },
+    {
+     "atSecond": 720,
+     "amount": 3
+    }
+   ],
+   "elites": 4,
+   "boss_killed": true,
+   "first_boss": true,
+   "passed": [
+    300,
+    480,
+    720
+   ],
+   "expected": 18
+  },
+  {
+   "rates": {
+    "elite": 1,
+    "boss": 3,
+    "firstBoss": 5
+   },
+   "milestones": [
+    {
+     "atSecond": 300,
+     "amount": 1
+    },
+    {
+     "atSecond": 480,
+     "amount": 2
+    },
+    {
+     "atSecond": 720,
+     "amount": 3
+    }
+   ],
+   "elites": 4,
+   "boss_killed": true,
+   "first_boss": false,
+   "passed": [],
+   "expected": 7
+  },
+  {
+   "rates": {
+    "elite": 1,
+    "boss": 3,
+    "firstBoss": 5
+   },
+   "milestones": [
+    {
+     "atSecond": 300,
+     "amount": 1
+    },
+    {
+     "atSecond": 480,
+     "amount": 2
+    },
+    {
+     "atSecond": 720,
+     "amount": 3
+    }
+   ],
+   "elites": 0,
+   "boss_killed": false,
+   "first_boss": true,
+   "passed": [],
+   "expected": 0
+  },
+  {
+   "rates": {
+    "elite": 1,
+    "boss": 3,
+    "firstBoss": 5
+   },
+   "milestones": [
+    {
+     "atSecond": 300,
+     "amount": 1
+    },
+    {
+     "atSecond": 480,
+     "amount": 2
+    },
+    {
+     "atSecond": 720,
+     "amount": 3
+    }
+   ],
+   "elites": 1,
+   "boss_killed": true,
+   "first_boss": true,
+   "passed": [
+    999
+   ],
+   "expected": 9
+  },
+  {
+   "rates": {
+    "elite": 3,
+    "boss": 7,
+    "firstBoss": 12
+   },
+   "milestones": [
+    {
+     "atSecond": 300,
+     "amount": 1
+    },
+    {
+     "atSecond": 480,
+     "amount": 2
+    },
+    {
+     "atSecond": 720,
+     "amount": 3
+    }
+   ],
+   "elites": 0,
+   "boss_killed": false,
+   "first_boss": false,
+   "passed": [],
+   "expected": 0
+  },
+  {
+   "rates": {
+    "elite": 3,
+    "boss": 7,
+    "firstBoss": 12
+   },
+   "milestones": [
+    {
+     "atSecond": 300,
+     "amount": 1
+    },
+    {
+     "atSecond": 480,
+     "amount": 2
+    },
+    {
+     "atSecond": 720,
+     "amount": 3
+    }
+   ],
+   "elites": 2,
+   "boss_killed": false,
+   "first_boss": false,
+   "passed": [
+    300,
+    480
+   ],
+   "expected": 9
+  },
+  {
+   "rates": {
+    "elite": 3,
+    "boss": 7,
+    "firstBoss": 12
+   },
+   "milestones": [
+    {
+     "atSecond": 300,
+     "amount": 1
+    },
+    {
+     "atSecond": 480,
+     "amount": 2
+    },
+    {
+     "atSecond": 720,
+     "amount": 3
+    }
+   ],
+   "elites": 4,
+   "boss_killed": true,
+   "first_boss": true,
+   "passed": [
+    300,
+    480,
+    720
+   ],
+   "expected": 37
+  },
+  {
+   "rates": {
+    "elite": 3,
+    "boss": 7,
+    "firstBoss": 12
+   },
+   "milestones": [
+    {
+     "atSecond": 300,
+     "amount": 1
+    },
+    {
+     "atSecond": 480,
+     "amount": 2
+    },
+    {
+     "atSecond": 720,
+     "amount": 3
+    }
+   ],
+   "elites": 4,
+   "boss_killed": true,
+   "first_boss": false,
+   "passed": [],
+   "expected": 19
+  },
+  {
+   "rates": {
+    "elite": 3,
+    "boss": 7,
+    "firstBoss": 12
+   },
+   "milestones": [
+    {
+     "atSecond": 300,
+     "amount": 1
+    },
+    {
+     "atSecond": 480,
+     "amount": 2
+    },
+    {
+     "atSecond": 720,
+     "amount": 3
+    }
+   ],
+   "elites": 0,
+   "boss_killed": false,
+   "first_boss": true,
+   "passed": [],
+   "expected": 0
+  },
+  {
+   "rates": {
+    "elite": 3,
+    "boss": 7,
+    "firstBoss": 12
+   },
+   "milestones": [
+    {
+     "atSecond": 300,
+     "amount": 1
+    },
+    {
+     "atSecond": 480,
+     "amount": 2
+    },
+    {
+     "atSecond": 720,
+     "amount": 3
+    }
+   ],
+   "elites": 1,
+   "boss_killed": true,
+   "first_boss": true,
+   "passed": [
+    999
+   ],
+   "expected": 22
+  }
  ]
 }

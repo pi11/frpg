@@ -5,7 +5,13 @@ from pathlib import Path
 from typing import Any
 
 from app.services.content import content_digest, get_content
-from app.services.economy import run_reward, upgrade_cost
+from app.services.economy import (
+    accepted_elites,
+    emerald_reward,
+    new_milestones,
+    run_reward,
+    upgrade_cost,
+)
 
 VECTORS: dict[str, list[dict[str, Any]]] = json.loads(
     (Path(__file__).resolve().parents[2] / "testdata" / "economy_vectors.json").read_text()
@@ -23,6 +29,34 @@ def test_run_reward_vectors() -> None:
             case["rules"], case["duration"], case["kills"], case["wave"],
             case["boss_killed"], case["picked_caps"], case["multiplier"],
         ) == case["expected"], case
+
+
+def test_emerald_reward_vectors() -> None:
+    for case in VECTORS["emeraldReward"]:
+        assert emerald_reward(
+            case["rates"], case["milestones"], case["elites"], case["boss_killed"],
+            case["first_boss"], case["passed"],
+        ) == case["expected"], case
+
+
+def test_elites_are_limited_by_the_timeline() -> None:
+    content = get_content()
+    location = content.category("locations")["shelter_outskirts"]
+    enemies = content.category("enemies")
+    kills = {"brute": 100, "war_bot": 100, "ghoul": 500}
+    event = location["events"][0]
+    assert accepted_elites(location, enemies, kills, event["atSecond"] - 1) == 0
+    assert accepted_elites(location, enemies, kills, event["atSecond"]) == event["count"]
+    assert accepted_elites(location, enemies, kills, 900) == sum(
+        item["count"] for item in location["events"])
+    assert accepted_elites(location, enemies, {"brute": 1}, 900) == 1
+
+
+def test_milestones_are_paid_once() -> None:
+    marks = [{"atSecond": 300, "amount": 1}, {"atSecond": 480, "amount": 2}]
+    assert new_milestones(marks, 299, []) == []
+    assert new_milestones(marks, 500, []) == [300, 480]
+    assert new_milestones(marks, 500, [300]) == [480]
 
 
 def test_content_digest_vectors() -> None:

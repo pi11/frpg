@@ -335,3 +335,110 @@ async def test_locations_unlock_after_their_boss_and_scale_the_reward(
         rules, 130, 100, 2, False, 12, float(city["rewardMultiplier"]),
     )
     assert result["reward_caps"] > run_reward(rules, 130, 100, 2, False, 12)
+
+
+@pytest.mark.anyio
+async def test_emeralds_are_earned_once_and_open_items(api: dict[str, object]) -> None:
+    client: httpx.AsyncClient = api["client"]  # type: ignore[assignment]
+    factory: async_sessionmaker[AsyncSession] = api["factory"]  # type: ignore[assignment]
+    guest = (await client.post("/api/v1/auth/guest")).json()
+    auth = headers(guest)
+    content = get_content()
+    location = content.category("locations")["shelter_outskirts"]
+    marks = content.balance["reward"]["emeraldMilestones"]
+    event = location["events"][0]
+    duration = max(event["atSecond"], marks[0]["atSecond"]) + 5
+    waves = sum(1 for wave in location["waves"] if wave["atSecond"] <= duration)
+
+    async def play() -> dict[str, object]:
+        started = (await client.post("/api/v1/runs/start", json={
+            "location_id": "shelter_outskirts", "hero_id": "wanderer"}, headers=auth)).json()
+        async with factory() as session:
+            run = await session.get(Run, UUID(started["run_id"]))
+            assert run is not None
+            run.started_at = run.started_at - timedelta(seconds=duration + 10)
+            await session.commit()
+        url = f"/api/v1/runs/{started['run_id']}/finish"
+        body = {
+            "content_hash": content.hash, "duration_seconds": duration,
+            # More kills than mini-bosses that could have appeared are not paid.
+            "kills_by_type": {event["enemy"]: 50}, "wave_reached": waves,
+            "boss_killed": False, "picked_caps": 0,
+        }
+        first = (await client.post(url, json=body, headers=auth)).json()
+        replay = (await client.post(url, json=body, headers=auth)).json()
+        assert replay["reward_emeralds"] == first["reward_emeralds"]
+        assert replay["profile"]["emeralds"] == first["profile"]["emeralds"]
+        return dict(first)
+
+    elite = event["count"] * location["emeralds"]["elite"]
+    first = await play()
+    assert first["reward_emeralds"] == elite + marks[0]["amount"]
+    assert first["profile"]["milestones"] == {  # type: ignore[index]
+        "shelter_outskirts": [marks[0]["atSecond"]]}
+    second = await play()
+    assert second["reward_emeralds"] == elite
+    profile = (await client.get("/api/v1/profile", headers=auth)).json()
+    assert profile["emeralds"] == 2 * elite + marks[0]["amount"]
+
+    async def buy(item: str, version: int) -> httpx.Response:
+        return await client.post(
+            f"/api/v1/unlocks/{item}/buy", json={"expected_version": version}, headers=auth)
+
+    version = profile["version"]
+    cost = content.category("weapons")["rotary_gun"]["unlock"]["emeralds"]
+    assert (await client.post(
+        "/api/v1/unlocks/rotary_gun/buy", json={"expected_version": version})).status_code == 401
+    assert (await buy("missing", version)).status_code == 404
+    assert (await buy("scrap_pistol", version)).status_code == 404
+    assert (await buy("rotary_gun", -1)).status_code == 422
+    assert profile["emeralds"] < cost
+    short = await buy("rotary_gun", version)
+    assert short.status_code == 409 and "изумруд" in short.json()["message"]
+    async with factory() as session:
+        row = await session.get(Profile, UUID(guest["user_id"]))
+        assert row is not None
+        row.data = {**row.data, "emeralds": cost + 4}
+        await session.commit()
+    assert (await buy("rotary_gun", version - 1)).status_code == 409
+    bought = await buy("rotary_gun", version)
+    assert bought.status_code == 200
+    assert bought.json()["emeralds"] == 4 and bought.json()["unlocks"] == ["rotary_gun"]
+    assert bought.json()["runs_count"] == 2
+    again = await buy("rotary_gun", version + 1)
+    assert again.status_code == 409
+    perk = await buy("trophy_hunter", version + 1)
+    assert perk.status_code == 200
+    assert perk.json()["unlocks"] == ["rotary_gun", "trophy_hunter"]
+    assert perk.json()["emeralds"] == 4 - content.category("passives")["trophy_hunter"][
+        "unlock"]["emeralds"]
+
+
+@pytest.mark.anyio
+async def test_slots_cost_emeralds_not_caps(api: dict[str, object]) -> None:
+    client: httpx.AsyncClient = api["client"]  # type: ignore[assignment]
+    factory: async_sessionmaker[AsyncSession] = api["factory"]  # type: ignore[assignment]
+    guest = (await client.post("/api/v1/auth/guest")).json()
+    rack = get_content().category("upgrades")["weapon_rack"]
+    assert rack["currency"] == "emeralds"
+    cost = upgrade_cost(rack, 0)
+
+    async def give(emeralds: int) -> None:
+        async with factory() as session:
+            row = await session.get(Profile, UUID(guest["user_id"]))
+            assert row is not None
+            row.caps = 1000
+            row.data = {**row.data, "emeralds": emeralds}
+            await session.commit()
+
+    async def buy(version: int) -> httpx.Response:
+        return await client.post("/api/v1/upgrades/weapon_rack/buy",
+                                 json={"expected_version": version}, headers=headers(guest))
+
+    await give(cost - 1)
+    short = await buy(0)
+    assert short.status_code == 409 and "изумруд" in short.json()["message"]
+    await give(cost + 2)
+    bought = (await buy(0)).json()
+    assert bought["emeralds"] == 2 and bought["caps"] == 1000
+    assert bought["upgrades"] == {"weapon_rack": 1}

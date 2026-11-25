@@ -4,21 +4,49 @@
   "sprite": "enemies/riot_mech",
   "role": "elite",
   "ai": {
-    "type": "charger",
+    "type": "boss_phases",
     "params": {
-      "turnRate": 3,
-      "chargeRange": 170,
-      "windupMs": 800,
-      "chargeSpeed": 230,
-      "chargeMs": 650,
-      "cooldownMs": 1800
+      "phases": [
+        {
+          "hpBelow": 1,
+          "ai": {
+            "type": "charger",
+            "params": {
+              "turnRate": 3.5,
+              "chargeRange": 180,
+              "windupMs": 650,
+              "chargeSpeed": 220,
+              "chargeMs": 650,
+              "cooldownMs": 1800
+            }
+          }
+        },
+        {
+          "hpBelow": 0.5,
+          "ai": {
+            "type": "charger",
+            "params": {
+              "turnRate": 3.5,
+              "chargeRange": 220,
+              "windupMs": 650,
+              "chargeSpeed": 260,
+              "chargeMs": 650,
+              "cooldownMs": 900
+            }
+          },
+          "summon": {
+            "enemy": "raider",
+            "count": 4
+          }
+        }
+      ]
     }
   },
   "stats": {
-    "hp": 1300,
-    "speed": 50,
-    "damage": 16,
-    "xp": 40
+    "hp": 3800,
+    "speed": 58,
+    "damage": 24,
+    "xp": 55
   },
   "drops": [
     {

@@ -1,6 +1,7 @@
 {
   "id": "buzz_storm",
   "name": "Циркулярный вихрь",
+  "description": "Пилы летят во все стороны",
   "sprite": "weapons/buzz_storm",
   "projectileSprite": "projectiles/saw",
   "fireSound": "sfx/saw",

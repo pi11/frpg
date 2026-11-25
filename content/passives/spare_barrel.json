@@ -1,0 +1,14 @@
+{
+  "id": "spare_barrel",
+  "name": "Запасной ствол",
+  "description": "Ещё снаряд каждому оружию",
+  "sprite": "passives/spare_barrel",
+  "stat": "projectileCount",
+  "mod": "flat",
+  "perLevel": 1,
+  "maxLevel": 1,
+  "unlock": {
+    "type": "emeralds",
+    "emeralds": 12
+  }
+}

@@ -1,7 +1,7 @@
 import * as Phaser from 'phaser';
 import { inputState } from '../inputState';
 
-/** A floating stick that appears under a finger in the left half of the HUD. */
+/** Touch: a floating stick under the finger, anywhere. Mouse: the hero walks towards the cursor. */
 export class VirtualJoystick {
   private readonly scene: Phaser.Scene;
   private readonly base: Phaser.GameObjects.Graphics;
@@ -10,9 +10,12 @@ export class VirtualJoystick {
   private originX = 0;
   private originY = 0;
   private readonly radius = 42;
+  private readonly enabled: () => boolean;
 
-  constructor(scene: Phaser.Scene) {
+  /** `enabled` is asked on every press: no stick while the run is paused. */
+  constructor(scene: Phaser.Scene, enabled: () => boolean) {
     this.scene = scene;
+    this.enabled = enabled;
     this.base = scene.add.graphics().setDepth(100).setVisible(false);
     this.thumb = scene.add.graphics().setDepth(101).setVisible(false);
     scene.input.on('pointerdown', this.onDown, this);
@@ -22,8 +25,13 @@ export class VirtualJoystick {
     scene.events.once(Phaser.Scenes.Events.SHUTDOWN, this.destroy, this);
   }
 
-  private onDown(pointer: Phaser.Input.Pointer): void {
-    if (this.pointerId !== null || pointer.x >= 240) return;
+  private onDown(pointer: Phaser.Input.Pointer, over: Phaser.GameObjects.GameObject[]): void {
+    // Presses on HUD buttons belong to the buttons.
+    if (this.pointerId !== null || over.length || !this.enabled()) return;
+    if (!pointer.wasTouch) {
+      inputState.mouse.press(pointer.x, pointer.y, pointer.event.timeStamp);
+      return;
+    }
     this.pointerId = pointer.id;
     this.originX = pointer.x;
     this.originY = pointer.y;
@@ -35,6 +43,7 @@ export class VirtualJoystick {
   }
 
   private onMove(pointer: Phaser.Input.Pointer): void {
+    if (!pointer.wasTouch) inputState.mouse.move(pointer.x, pointer.y);
     if (pointer.id !== this.pointerId) return;
     const dx = pointer.x - this.originX;
     const dy = pointer.y - this.originY;
@@ -49,6 +58,7 @@ export class VirtualJoystick {
   }
 
   private onUp(pointer: Phaser.Input.Pointer): void {
+    if (!pointer.wasTouch) inputState.mouse.release(pointer.event.timeStamp);
     if (pointer.id !== this.pointerId) return;
     this.pointerId = null;
     inputState.x = 0;
@@ -64,6 +74,7 @@ export class VirtualJoystick {
     this.scene.input.off('pointerupoutside', this.onUp, this);
     inputState.x = 0;
     inputState.y = 0;
+    inputState.mouse.cancel();
     this.base.destroy();
     this.thumb.destroy();
   }

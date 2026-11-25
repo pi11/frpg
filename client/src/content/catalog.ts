@@ -89,6 +89,11 @@ export function validateContent(files: Record<string, unknown>): Catalog {
       }
     });
   }
+  for (const hero of Object.values(heroes)) {
+    if (weapons[hero.startingWeapon]!.unlock.type !== 'default') {
+      throw new Error(`hero ${hero.id}: starting weapon must be open`);
+    }
+  }
   const evolutionTargets = new Set<string>();
   for (const weapon of Object.values(weapons)) {
     if (!weapon.evolution) continue;

@@ -1,13 +1,20 @@
 export interface Settings {
-  music: boolean;
-  sfx: boolean;
+  /** Volumes, 0..1. */
+  music: number;
+  sfx: number;
   crt: boolean;
 }
 
 const STORAGE_KEY = 'wasteland.settings.v1';
-const defaults: Settings = { music: true, sfx: true, crt: true };
+const defaults: Settings = { music: 1, sfx: 1, crt: true };
 let current: Settings | null = null;
 const listeners = new Set<(settings: Settings) => void>();
+
+/** Older versions stored on/off switches here. */
+export function volume(value: unknown, fallback: number): number {
+  if (typeof value === 'boolean') return value ? fallback : 0;
+  return typeof value === 'number' && Number.isFinite(value) ? Math.min(1, Math.max(0, value)) : fallback;
+}
 
 function read(): Settings {
   try {
@@ -15,8 +22,8 @@ function read(): Settings {
     if (value && typeof value === 'object') {
       const stored = value as Partial<Record<keyof Settings, unknown>>;
       return {
-        music: typeof stored.music === 'boolean' ? stored.music : defaults.music,
-        sfx: typeof stored.sfx === 'boolean' ? stored.sfx : defaults.sfx,
+        music: volume(stored.music, defaults.music),
+        sfx: volume(stored.sfx, defaults.sfx),
         crt: typeof stored.crt === 'boolean' ? stored.crt : defaults.crt,
       };
     }

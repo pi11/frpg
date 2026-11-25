@@ -1,6 +1,7 @@
 {
   "id": "reactor_core",
   "name": "Сердце реактора",
+  "description": "Огромное жгучее поле",
   "sprite": "weapons/reactor_core",
   "projectileSprite": "projectiles/rad",
   "fireSound": "sfx/aura",

@@ -1,0 +1,64 @@
+{
+  "id": "sentry_turret",
+  "name": "Сторожевая турель",
+  "description": "Ставит турель, она стреляет сама",
+  "sprite": "weapons/sentry_turret",
+  "projectileSprite": "projectiles/turret",
+  "fireSound": "sfx/mine",
+  "behavior": {
+    "type": "turret",
+    "params": {
+      "range": 190,
+      "shotIntervalMs": 170,
+      "shotSpeed": 360,
+      "shotLifetimeMs": 700,
+      "shotSprite": "projectiles/tracer"
+    }
+  },
+  "levels": [
+    {
+      "damage": 26,
+      "cooldownMs": 5200,
+      "shots": 1,
+      "spreadDegrees": 0,
+      "durationMs": 7000
+    },
+    {
+      "damage": 31,
+      "cooldownMs": 4900,
+      "shots": 1,
+      "spreadDegrees": 0,
+      "durationMs": 7750
+    },
+    {
+      "damage": 37,
+      "cooldownMs": 4600,
+      "shots": 2,
+      "spreadDegrees": 0,
+      "durationMs": 8500
+    },
+    {
+      "damage": 42,
+      "cooldownMs": 4300,
+      "shots": 2,
+      "spreadDegrees": 0,
+      "durationMs": 9250
+    },
+    {
+      "damage": 48,
+      "cooldownMs": 4000,
+      "shots": 2,
+      "spreadDegrees": 0,
+      "durationMs": 10000
+    }
+  ],
+  "tags": [
+    "heavy"
+  ],
+  "heavy": true,
+  "minHeroLevel": 10,
+  "unlock": {
+    "type": "emeralds",
+    "emeralds": 12
+  }
+}

@@ -6,6 +6,11 @@
     "type": "default"
   },
   "rewardMultiplier": 1,
+  "emeralds": {
+    "elite": 1,
+    "boss": 3,
+    "firstBoss": 5
+  },
   "groundSprite": "ground/wasteland",
   "music": "music/wasteland",
   "bossMusic": "music/boss",
@@ -104,7 +109,7 @@
       "atSecond": 480,
       "spawnIntervalMs": 175,
       "hpMultiplier": 2.9,
-      "speedMultiplier": 1.25,
+      "speedMultiplier": 1.16,
       "enemies": [
         {
           "id": "ghoul",
@@ -131,8 +136,8 @@
     {
       "atSecond": 600,
       "spawnIntervalMs": 145,
-      "hpMultiplier": 3.7,
-      "speedMultiplier": 1.35,
+      "hpMultiplier": 4.14,
+      "speedMultiplier": 1.18,
       "enemies": [
         {
           "id": "ghoul",
@@ -159,8 +164,8 @@
     {
       "atSecond": 720,
       "spawnIntervalMs": 125,
-      "hpMultiplier": 4.6,
-      "speedMultiplier": 1.45,
+      "hpMultiplier": 5.15,
+      "speedMultiplier": 1.2,
       "enemies": [
         {
           "id": "ghoul",
@@ -187,8 +192,8 @@
     {
       "atSecond": 780,
       "spawnIntervalMs": 900,
-      "hpMultiplier": 4.6,
-      "speedMultiplier": 1.45,
+      "hpMultiplier": 5.15,
+      "speedMultiplier": 1.2,
       "enemies": [
         {
           "id": "ghoul",

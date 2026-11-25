@@ -7,14 +7,15 @@ const SFX_VOLUME = 0.6;
 const MUSIC_VOLUME = 0.35;
 
 let manager: Phaser.Sound.BaseSoundManager | null = null;
-let music: Phaser.Sound.BaseSound | null = null;
+type Volumed = Phaser.Sound.BaseSound & { volume: number };
+let music: Volumed | null = null;
 let musicKey: string | null = null;
 const playing = new Map<string, number>();
 
 export function initSound(game: Phaser.Game): void {
   manager = game.sound;
   onSettingsChange((value) => {
-    if (!value.music) stopMusic();
+    if (music) music.volume = MUSIC_VOLUME * value.music;
   });
 }
 
@@ -22,7 +23,7 @@ export function playSfx(key: string, volume = 1): void {
   if (!manager || !settings().sfx || !manager.game.cache.audio.exists(key)) return;
   const count = playing.get(key) ?? 0;
   if (count >= MAX_INSTANCES) return;
-  const sound = manager.add(key, { volume: SFX_VOLUME * volume });
+  const sound = manager.add(key, { volume: SFX_VOLUME * volume * settings().sfx });
   playing.set(key, count + 1);
   let released = false;
   const release = (): void => {
@@ -37,10 +38,10 @@ export function playSfx(key: string, volume = 1): void {
 }
 
 export function playMusic(key: string): void {
-  if (!manager || !settings().music || !manager.game.cache.audio.exists(key)) return;
+  if (!manager || !manager.game.cache.audio.exists(key)) return;
   if (musicKey === key && music?.isPlaying) return;
   stopMusic();
-  music = manager.add(key, { loop: true, volume: MUSIC_VOLUME });
+  music = manager.add(key, { loop: true, volume: MUSIC_VOLUME * settings().music }) as Volumed;
   musicKey = key;
   music.play();
 }

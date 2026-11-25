@@ -3,7 +3,8 @@ import { z } from 'zod';
 export const STAT_KEYS = [
   'maxHp', 'armor', 'regen', 'moveSpeed', 'damage', 'attackSpeed', 'area',
   'projectileCount', 'duration', 'pickupRadius', 'xpGain', 'luck', 'radResist',
-  'critChance', 'rerolls', 'revives',
+  'critChance', 'critDamage', 'dodge', 'thorns', 'eliteDamage', 'killHeal', 'rerolls', 'revives',
+  'weaponSlots', 'passiveSlots',
 ] as const;
 
 export const StatKeySchema = z.enum(STAT_KEYS);
@@ -24,9 +25,21 @@ export const StatsSchema = z.object({
   luck: z.number(),
   radResist: z.number(),
   critChance: z.number().min(0).max(1),
+  /** Added to balance.run.critMultiplier. */
+  critDamage: z.number().nonnegative(),
+  dodge: z.number().min(0).max(1),
+  /** Damage dealt back to an enemy that hits the hero by contact. */
+  thorns: z.number().nonnegative(),
+  /** Extra damage share against elites and bosses. */
+  eliteDamage: z.number().nonnegative(),
+  /** HP restored per kill. */
+  killHeal: z.number().nonnegative(),
   /** Level-up rerolls and extra lives per run. */
   rerolls: z.number().int().nonnegative(),
   revives: z.number().int().nonnegative(),
+  /** Slots for ordinary weapons and perks, up to balance.run.maxWeapons / maxPassives. */
+  weaponSlots: z.number().int().positive(),
+  passiveSlots: z.number().int().positive(),
 }).strict();
 export type Stats = z.infer<typeof StatsSchema>;
 
@@ -46,6 +59,12 @@ export const HeroSchema = z.object({
   baseStats: StatsSchema,
 }).strict();
 export type HeroDefinition = z.infer<typeof HeroSchema>;
+
+/** Weapons and perks are offered in runs at once or after being bought for emeralds. */
+const ItemUnlockSchema = z.discriminatedUnion('type', [
+  z.object({ type: z.literal('default') }).strict(),
+  z.object({ type: z.literal('emeralds'), emeralds: z.number().int().positive() }).strict(),
+]).default({ type: 'default' });
 
 /**
  * One weapon level. `shots` is projectiles per volley, drones in orbit or bottles per throw;
@@ -67,6 +86,7 @@ export type WeaponLevel = z.infer<typeof WeaponLevelSchema>;
 export const WeaponSchema = z.object({
   id: IdSchema,
   name: z.string().min(1),
+  description: z.string().min(1),
   sprite: spriteKey('weapons'),
   projectileSprite: spriteKey('projectiles'),
   fireSound: soundKey('sfx'),
@@ -77,14 +97,19 @@ export const WeaponSchema = z.object({
   evolution: z.object({ passive: IdSchema, into: IdSchema }).strict().optional(),
   /** Evolved weapons have a single level and are never offered as new weapons. */
   evolved: z.boolean().default(false),
+  /** Heavy weapons use their own slots, have 5 levels and do not evolve. */
+  heavy: z.boolean().default(false),
+  /** Offered as a new weapon only from this hero level. */
+  minHeroLevel: z.number().int().positive().default(1),
+  unlock: ItemUnlockSchema,
 }).strict().superRefine((weapon, context) => {
-  const expected = weapon.evolved ? 1 : 8;
+  const expected = weapon.evolved ? 1 : weapon.heavy ? 5 : 8;
   if (weapon.levels.length !== expected) {
     context.addIssue({ code: 'custom', path: ['levels'],
-      message: `${weapon.evolved ? 'evolved' : 'base'} weapon needs ${expected} level(s)` });
+      message: `${weapon.evolved ? 'evolved' : weapon.heavy ? 'heavy' : 'base'} weapon needs ${expected} level(s)` });
   }
-  if (weapon.evolved && weapon.evolution) {
-    context.addIssue({ code: 'custom', path: ['evolution'], message: 'evolved weapon cannot evolve again' });
+  if ((weapon.evolved || weapon.heavy) && weapon.evolution) {
+    context.addIssue({ code: 'custom', path: ['evolution'], message: 'evolved and heavy weapons cannot evolve' });
   }
 });
 export type WeaponDefinition = z.infer<typeof WeaponSchema>;
@@ -98,6 +123,7 @@ export const PassiveSchema = z.object({
   mod: z.enum(['flat', 'percent']),
   perLevel: z.number(),
   maxLevel: z.number().int().positive(),
+  unlock: ItemUnlockSchema,
 }).strict();
 export type PassiveDefinition = z.infer<typeof PassiveSchema>;
 
@@ -107,6 +133,8 @@ export const EnemySchema = z.object({
   sprite: spriteKey('enemies'),
   /** normal enemies come from waves; elites (mini-bosses) and the boss from timed events. */
   role: z.enum(['normal', 'elite', 'boss']),
+  /** Sprite and body size multiplier. */
+  scale: z.number().positive().default(1),
   ai: z.object({ type: IdSchema, params: z.unknown() }).strict(),
   stats: z.object({
     hp: z.number().positive(),
@@ -194,6 +222,12 @@ export const LocationSchema = z.object({
   ]),
   /** Multiplies the earned reward (not the picked-up caps); checked by the server. */
   rewardMultiplier: z.number().positive(),
+  /** Emeralds per mini-boss, per boss, and extra for the first boss kill; granted by the server. */
+  emeralds: z.object({
+    elite: z.number().int().nonnegative(),
+    boss: z.number().int().nonnegative(),
+    firstBoss: z.number().int().nonnegative(),
+  }).strict(),
   groundSprite: spriteKey('ground'),
   music: soundKey('music'),
   durationSeconds: z.number().positive(),
@@ -256,7 +290,8 @@ export type LocationDefinition = z.infer<typeof LocationSchema>;
 export const UpgradeSchema = z.object({
   id: IdSchema,
   name: z.string().min(1),
-  category: z.enum(['survival', 'combat', 'scavenge']),
+  category: z.enum(['slots', 'survival', 'combat', 'scavenge']),
+  currency: z.enum(['caps', 'emeralds']).default('caps'),
   stat: StatKeySchema,
   mod: z.enum(['flat', 'percent']),
   perLevel: z.number(),
@@ -284,9 +319,17 @@ export const BalanceSchema = z.object({
     eliteWarningSeconds: z.number().nonnegative(),
     /** Aimed weapons shoot an elite or boss inside this range before the nearest enemy. */
     eliteFocusRange: z.number().nonnegative(),
-    /** Slots: new weapons and perks are not offered when these are full. */
+    /** Upper limit of the weaponSlots and passiveSlots stats. */
     maxWeapons: z.number().int().positive(),
     maxPassives: z.number().int().positive(),
+    maxHeavyWeapons: z.number().int().positive(),
+    /** Hero speed above softMoveSpeed counts only by the factor. */
+    softMoveSpeed: z.number().positive(),
+    softMoveSpeedFactor: z.number().min(0).max(1),
+    /** Share of max HP a mini-boss or boss can lose per second, so strong builds still get a fight. */
+    eliteMaxLossPerSecond: z.number().gt(0).max(1),
+    bossMaxLossPerSecond: z.number().gt(0).max(1),
+    maxDodge: z.number().min(0).max(1),
     critMultiplier: z.number().min(1),
     reviveHpFraction: z.number().gt(0).max(1),
     reviveInvulnerableMs: z.number().nonnegative(),
@@ -308,6 +351,11 @@ export const BalanceSchema = z.object({
     maxKillsPerSecond: z.number().positive(),
     maxCapsPerSecond: z.number().positive(),
     durationGraceSeconds: z.number().nonnegative(),
+    /** Emeralds for surviving this long, once per location. */
+    emeraldMilestones: z.array(z.object({
+      atSecond: z.number().int().positive(),
+      amount: z.number().int().positive(),
+    }).strict()),
   }).strict(),
 }).strict();
 export type BalanceDefinition = z.infer<typeof BalanceSchema>;

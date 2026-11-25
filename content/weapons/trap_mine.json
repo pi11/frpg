@@ -1,6 +1,7 @@
 {
   "id": "trap_mine",
   "name": "Самодельная мина",
+  "description": "Мина взрывается под врагом",
   "sprite": "weapons/trap_mine",
   "projectileSprite": "projectiles/mine",
   "fireSound": "sfx/mine",

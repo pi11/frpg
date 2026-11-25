@@ -102,10 +102,25 @@ body.crt::after {
 .auth-telegram-details small { display: block; color: var(--term-dim); font-size: 8px; }
 [hidden] { display: none !important; }
 
-.hub-card { width: min(100%, 540px); }
+.hub-card { width: min(100%, 640px); }
+/* Tabs differ in height: keep the card in place when switching. */
+.auth-overlay:has(.hub-card) { align-items: start; }
+.hub-tabs { display: flex; flex-wrap: wrap; gap: 4px; margin: 0 0 14px; padding-bottom: 8px; border-bottom: 1px solid var(--term-line); }
+.hub-tabs button { flex: 1 1 auto; padding: 9px 6px; border-color: var(--term-line); color: var(--term-dim); }
+.hub-tabs button[aria-selected='true'] { border-color: var(--term-border); background: var(--term-border); color: var(--term-bg); text-shadow: none; }
+.hub-help { color: var(--term-dim); line-height: 2; }
+.hub-items li { justify-content: flex-start; }
+.hub-items li > div { flex: 1; }
+.hub-icon { flex: none; width: 32px; height: 32px; object-fit: contain; image-rendering: pixelated; }
+.hub-locked .hub-icon { filter: brightness(0.45); }
+.hub-open { flex: none; min-width: 112px; color: var(--term-dim); text-align: center; }
+.hub-goals { margin: 0; padding: 0; list-style: none; }
+.hub-goals li { display: flex; justify-content: space-between; gap: 12px; padding: 7px 0; border-top: 1px dashed var(--term-line); }
+.hub-goals li span:last-child { color: var(--term-warn); }
+.hub-goals .hub-done, .hub-goals .hub-done span:last-child { color: var(--term-dim); }
 .hub-card h2 { margin: 24px 0 8px; color: var(--term-bright); font-size: 8px; font-weight: normal; }
 .hub-card h2::before { content: '// '; color: var(--term-dim); }
-.hub-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 0 0 14px; }
+.hub-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 8px; margin: 0 0 14px; }
 .hub-stats div { padding: 8px; border: 1px solid var(--term-line); background: var(--term-bg); }
 .hub-stats dt { color: var(--term-dim); font-size: 8px; }
 .hub-stats dd { display: flex; align-items: center; gap: 6px; margin: 6px 0 0; color: var(--term-bright); font-size: 16px; }
@@ -130,6 +145,8 @@ body.crt::after {
 .hub-settings legend { padding: 0 6px; color: var(--term-dim); font-size: 8px; }
 .hub-settings label { display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 8px; }
 .hub-settings input { accent-color: var(--term-border); }
+.hub-settings .hub-volume { display: grid; grid-template-columns: 72px 1fr 44px; width: 100%; gap: 12px; }
+.hub-volume output { text-align: right; color: var(--term-warn); }
 .hub-account { display: grid; gap: 6px; margin-top: 18px; }
 .hub-account .auth-secondary { margin-top: 0; }
 .hub-danger { color: var(--term-danger) !important; }

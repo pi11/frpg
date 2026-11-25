@@ -17,7 +17,13 @@ from app.db import get_session
 from app.models.auth import Profile, User
 from app.models.run import Run
 from app.services.content import get_content
-from app.services.economy import run_reward, unlocked_locations
+from app.services.economy import (
+    accepted_elites,
+    emerald_reward,
+    new_milestones,
+    run_reward,
+    unlocked_locations,
+)
 from app.services.tokens import as_utc, current_user, utcnow
 
 router = APIRouter(prefix="/runs", tags=["runs"], responses={
@@ -51,6 +57,7 @@ class RunSummary(BaseModel):
 class RunFinishResponse(BaseModel):
     status: Literal["finished"] = "finished"
     reward_caps: int
+    reward_emeralds: int
     flags: list[str]
     profile: ProfileResponse
 
@@ -107,7 +114,9 @@ async def finish_run(
         raise ApiError(404, ErrorCode.not_found, "Профиль не найден")
     if run.status == "finished":
         return RunFinishResponse(
-            reward_caps=run.reward_caps or 0, flags=run.flags,
+            reward_caps=run.reward_caps or 0,
+            reward_emeralds=((run.summary or {}).get("accepted") or {}).get("emeralds", 0),
+            flags=run.flags,
             profile=await profile_response(session, user, profile),
         )
 
@@ -156,6 +165,17 @@ async def finish_run(
         rules, duration, kills, wave, boss_killed, picked_caps,
         float(location["rewardMultiplier"]),
     )
+    data = profile.data or {}
+    bosses = list(data.get("bosses_killed", []))
+    marks: dict[str, list[int]] = dict(data.get("milestones", {}))
+    reached = marks.get(run.location_id, [])
+    rules_marks = rules["emeraldMilestones"]
+    passed = new_milestones(rules_marks, duration, reached)
+    emeralds = emerald_reward(
+        location["emeralds"], rules_marks,
+        accepted_elites(location, known_enemies, body.kills_by_type, duration),
+        boss_killed, run.location_id not in bosses, passed,
+    )
     run.status = "finished"
     run.finished_at = now
     run.reward_caps = reward
@@ -165,18 +185,22 @@ async def finish_run(
         "accepted": {
             "duration_seconds": duration, "kills": kills, "wave_reached": wave,
             "boss_killed": boss_killed, "picked_caps": picked_caps,
+            "emeralds": emeralds,
         },
     }
     profile.caps += reward
     profile.version += 1
     profile.best_time_s = max(profile.best_time_s, duration)
-    data = profile.data or {}
-    bosses = list(data.get("bosses_killed", []))
     if boss_killed and run.location_id not in bosses:
         bosses.append(run.location_id)
-    profile.data = {**data, "runs_count": data.get("runs_count", 0) + 1, "bosses_killed": bosses}
+    if passed:
+        marks[run.location_id] = sorted([*reached, *passed])
+    profile.data = {
+        **data, "runs_count": data.get("runs_count", 0) + 1, "bosses_killed": bosses,
+        "milestones": marks, "emeralds": data.get("emeralds", 0) + emeralds,
+    }
     await session.commit()
     return RunFinishResponse(
-        reward_caps=reward, flags=flags,
+        reward_caps=reward, reward_emeralds=emeralds, flags=flags,
         profile=await profile_response(session, user, profile),
     )

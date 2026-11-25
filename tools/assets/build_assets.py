@@ -26,6 +26,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 import art  # noqa: E402
 import art_extra as extra  # noqa: E402
+import art_heavy as heavy  # noqa: E402
 import art_more as more  # noqa: E402
 import art_world as world  # noqa: E402
 import audio  # noqa: E402
@@ -181,8 +182,6 @@ def sprite_frames() -> dict[str, Image]:
         "enemies/raider": humanoid(world.RAIDER_TOP, art.WANDERER_LEGS, "R", 13),
         "enemies/cleaner_bot": humanoid(
             world.CLEANER_BOT_TOP, world.CLEANER_BOT_TREADS * 2, "M", 17),
-        "enemies/brute": humanoid(world.BRUTE_TOP, world.BRUTE_LEGS, "H", 19),
-        "enemies/war_bot": humanoid(world.WAR_BOT_TOP, world.WAR_BOT_LEGS, "M", 23),
         "enemies/junk_king": with_death([shapes.junk_king(i) for i in range(4)], "R", 29),
         "projectiles/drone": numbered("spin", [parse(src) for src in world.DRONE_FRAMES]),
         "fx/fire": numbered("burn", [parse(src) for src in world.FIRE_FRAMES]),
@@ -192,18 +191,18 @@ def sprite_frames() -> dict[str, Image]:
         "enemies/wild_dog": with_death([more.wild_dog(i) for i in range(4)], "R", 41),
         "enemies/rad_bat": with_death([more.rad_bat(i) for i in range(4)], "P", 43),
         "enemies/medic": with_death([more.medic(i) for i in range(4)], "R", 47),
-        "enemies/riot_mech": with_death([more.riot_mech(i) for i in range(4)], "M", 53),
         "enemies/iron_mayor": with_death([more.iron_mayor(i) for i in range(4)], "M", 59),
         "enemies/glow_slime": with_death([more.slime(i, 16) for i in range(4)], "G", 61),
         "enemies/slimelet": with_death([more.slime(i, 10) for i in range(4)], "G", 67),
-        "enemies/slime_queen": with_death([more.slime_queen(i) for i in range(4)], "G", 71),
         "enemies/mire_worm": with_death([more.worm(i, 16) for i in range(4)], "u", 73),
-        "enemies/great_worm": with_death([more.worm(i, 24) for i in range(4)], "u", 79),
         "enemies/toad": with_death([more.toad(i) for i in range(4)], "T", 83),
         "enemies/marsh_mother": with_death([more.marsh_mother(i) for i in range(4)], "P", 89),
         "fx/dust": numbered("burst", [more.dust(i) for i in range(5)]),
         "fx/heal": numbered("burst", [more.heal_ring(i) for i in range(4)]),
         **extra.animations(),
+        **heavy.animations(),
+        **{f"enemies/{name}": with_death([draw(i) for i in range(4)], residue, seed)
+           for name, (draw, residue, seed) in heavy.ELITES.items()},
     }
     frames: dict[str, Image] = {}
     for key, animation in animated.items():
@@ -268,10 +267,11 @@ def sprite_frames() -> dict[str, Image]:
         "decor/moss": more.moss(),
     })
     frames.update(extra.frames())
+    frames.update(heavy.frames())
     return frames
 
 
-def pack(frames: dict[str, Image], width: int = 256) -> tuple[Image, dict[str, object]]:
+def pack(frames: dict[str, Image], width: int = 512) -> tuple[Image, dict[str, object]]:
     """Shelf packer with 1px transparent padding; returns the atlas and Phaser JSON Hash."""
     placed: dict[str, tuple[int, int, int, int]] = {}
     x = y = shelf = 1

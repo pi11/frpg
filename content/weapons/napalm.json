@@ -1,6 +1,7 @@
 {
   "id": "napalm",
   "name": "Напалм",
+  "description": "Заливает огнём большие участки",
   "sprite": "weapons/napalm",
   "projectileSprite": "projectiles/bottle",
   "fireSound": "sfx/firebomb",

@@ -1,0 +1,14 @@
+{
+  "id": "lead_lining",
+  "name": "Свинцовая подкладка",
+  "description": "Меньше вреда от луж и трещин",
+  "sprite": "passives/lead_lining",
+  "stat": "radResist",
+  "mod": "flat",
+  "perLevel": 0.15,
+  "maxLevel": 4,
+  "unlock": {
+    "type": "emeralds",
+    "emeralds": 2
+  }
+}

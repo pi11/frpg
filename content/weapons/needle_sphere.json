@@ -1,0 +1,61 @@
+{
+  "id": "needle_sphere",
+  "name": "Игольчатая сфера",
+  "description": "Иглы во все стороны разом",
+  "sprite": "weapons/needle_sphere",
+  "projectileSprite": "projectiles/needle",
+  "fireSound": "sfx/shot_scatter",
+  "behavior": {
+    "type": "projectile",
+    "params": {
+      "speed": 260,
+      "lifetimeMs": 800
+    }
+  },
+  "levels": [
+    {
+      "damage": 16,
+      "cooldownMs": 1500,
+      "shots": 14,
+      "spreadDegrees": 334,
+      "pierce": 1
+    },
+    {
+      "damage": 20,
+      "cooldownMs": 1390,
+      "shots": 16,
+      "spreadDegrees": 337,
+      "pierce": 2
+    },
+    {
+      "damage": 23,
+      "cooldownMs": 1280,
+      "shots": 19,
+      "spreadDegrees": 340,
+      "pierce": 2
+    },
+    {
+      "damage": 26,
+      "cooldownMs": 1160,
+      "shots": 22,
+      "spreadDegrees": 342,
+      "pierce": 2
+    },
+    {
+      "damage": 30,
+      "cooldownMs": 1050,
+      "shots": 24,
+      "spreadDegrees": 345,
+      "pierce": 3
+    }
+  ],
+  "tags": [
+    "heavy"
+  ],
+  "heavy": true,
+  "minHeroLevel": 8,
+  "unlock": {
+    "type": "emeralds",
+    "emeralds": 8
+  }
+}

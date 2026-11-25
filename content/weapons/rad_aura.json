@@ -1,6 +1,7 @@
 {
   "id": "rad_aura",
   "name": "Радиационное поле",
+  "description": "Поле вокруг героя жжёт всех внутри",
   "sprite": "weapons/rad_aura",
   "projectileSprite": "projectiles/rad",
   "fireSound": "sfx/aura",

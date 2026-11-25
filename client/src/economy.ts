@@ -5,7 +5,7 @@ import type { BalanceDefinition, UpgradeDefinition } from './content/schemas';
 // checked by tests on both sides. Exponents use repeated multiplication because
 // Math.pow and CPython's ** may round the last bit differently.
 
-export type RewardRules = BalanceDefinition['reward'];
+export type RewardRules = Omit<BalanceDefinition['reward'], 'emeraldMilestones'>;
 
 export interface RewardInput {
   duration: number;
@@ -36,4 +36,20 @@ export function runReward(rules: RewardRules, input: RewardInput): number {
   total *= input.multiplier;
   total += input.pickedCaps;
   return roundHalfUp(total);
+}
+
+export interface EmeraldRates { elite: number; boss: number; firstBoss: number }
+export interface EmeraldMilestone { atSecond: number; amount: number }
+
+export function emeraldReward(
+  rates: EmeraldRates, milestones: readonly EmeraldMilestone[],
+  input: { elites: number; bossKilled: boolean; firstBoss: boolean; passed: readonly number[] },
+): number {
+  let total = input.elites * rates.elite;
+  if (input.bossKilled) {
+    total += rates.boss;
+    if (input.firstBoss) total += rates.firstBoss;
+  }
+  for (const mark of milestones) if (input.passed.includes(mark.atSecond)) total += mark.amount;
+  return total;
 }

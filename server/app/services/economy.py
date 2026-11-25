@@ -8,7 +8,7 @@ identical everywhere. The shared vectors live in testdata/economy_vectors.json.
 """
 
 import math
-from collections.abc import Collection, Mapping
+from collections.abc import Collection, Mapping, Sequence
 from typing import Any
 
 
@@ -39,6 +39,43 @@ def run_reward(
     total *= multiplier
     total += picked_caps
     return round_half_up(total)
+
+
+def accepted_elites(
+    location: Mapping[str, Any], enemies: Mapping[str, Mapping[str, Any]],
+    kills_by_type: Mapping[str, int], duration: int,
+) -> int:
+    """Mini-boss kills, limited per type by how many could have appeared by `duration`."""
+    spawned: dict[str, int] = {}
+    for event in location["events"]:
+        if event["atSecond"] <= duration:
+            spawned[event["enemy"]] = spawned.get(event["enemy"], 0) + event["count"]
+    return sum(
+        min(kills_by_type.get(enemy, 0), count) for enemy, count in spawned.items()
+        if enemies[enemy]["role"] == "elite"
+    )
+
+
+def new_milestones(
+    milestones: Sequence[Mapping[str, int]], duration: int, reached: Collection[int],
+) -> list[int]:
+    """Survival marks passed for the first time in this location."""
+    return [
+        mark["atSecond"] for mark in milestones
+        if mark["atSecond"] <= duration and mark["atSecond"] not in reached
+    ]
+
+
+def emerald_reward(
+    rates: Mapping[str, int], milestones: Sequence[Mapping[str, int]],
+    elites: int, boss_killed: bool, first_boss: bool, passed: Collection[int],
+) -> int:
+    total = elites * rates["elite"]
+    if boss_killed:
+        total += rates["boss"]
+        if first_boss:
+            total += rates["firstBoss"]
+    return total + sum(mark["amount"] for mark in milestones if mark["atSecond"] in passed)
 
 
 def unlocked_locations(

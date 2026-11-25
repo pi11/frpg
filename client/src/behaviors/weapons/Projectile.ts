@@ -5,6 +5,8 @@ import { fan, type CombatContext, type FireResult, type WeaponBehavior } from '.
 export const ProjectileParamsSchema = z.object({
   speed: z.number().positive(),
   lifetimeMs: z.number().positive(),
+  /** Freezes ordinary enemies on hit. */
+  chillMs: z.number().positive().optional(),
 }).strict();
 type ProjectileParams = z.infer<typeof ProjectileParamsSchema>;
 
@@ -25,6 +27,7 @@ export class ProjectileWeaponBehavior implements WeaponBehavior<ProjectileParams
         lifetimeMs: params.lifetimeMs,
         sprite: weapon.projectileSprite,
         pierce: level.pierce ?? 0,
+        ...(params.chillMs === undefined ? {} : { chillMs: params.chillMs }),
       });
     }
     return 'fired';

@@ -2,20 +2,21 @@ import * as Phaser from 'phaser';
 import { animationKey, ATLAS } from '../assets';
 import { enemyBehaviors, pickupEffects, weaponBehaviors } from '../behaviors/registry';
 import type {
-  CombatContext, EnemyContext, HitLimit, Mob, PickupContext, Point, ProjectileSpec, WeaponState,
+  BlastSpec, CombatContext, EnemyContext, HitLimit, Mob, PickupContext, Point, ProjectileSpec, WeaponState,
   ZoneSpec,
 } from '../behaviors/types';
 import { getCatalog } from '../content/catalog';
 import type { Catalog } from '../content/catalog';
 import type {
-  EnemyDefinition, HeroDefinition, LocationDefinition, StatKey,
+  EnemyDefinition, HeroDefinition, LocationDefinition, PassiveDefinition, StatKey, WeaponDefinition,
 } from '../content/schemas';
 import { inputState } from '../inputState';
 import { playMusic, playSfx } from '../sound';
+import { refillBudget, softCap } from '../systems/limits';
 import { Rng } from '../systems/rng';
 import { availableEvolutions, evolutionSource } from '../systems/evolutions';
 import { COLORS, textStyle } from '../ui/theme';
-import { levelChanges, statBonus } from '../content/statText';
+import { levelChanges, levelStats, statBonus } from '../content/statText';
 import { WorldDecor, type ActiveLandmark } from '../systems/WorldDecor';
 import type { ResultData } from './ResultScene';
 
@@ -39,7 +40,9 @@ export interface RunView {
   rerolls: number;
   revives: number;
   /** Timed bonuses for the HUD, remaining share 0..1. */
-  buffs: { sprite: string; fraction: number }[];
+  buffs: { sprite: string; name: string; text: string; fraction: number }[];
+  /** Emeralds earned so far in this run (the server counts them again). */
+  emeralds: number;
 }
 
 export interface UpgradeChoice {
@@ -55,6 +58,9 @@ export interface UpgradeChoice {
 /** Owned weapons and perks for the level-up screen. */
 export interface LoadoutItem {
   sprite: string;
+  name: string;
+  /** Tooltip lines. */
+  details: string[];
   level: number;
   max: number;
 }
@@ -73,6 +79,8 @@ export interface RunData {
   contentHash: string;
   /** Shelter upgrade levels from the server profile. */
   upgrades: Record<string, number>;
+  /** Weapons and perks bought for emeralds. */
+  unlocks: string[];
 }
 
 /** Presentation constants (not balance). */
@@ -88,6 +96,9 @@ const HIT_FLASH_MS = 50;
 const LABEL_POOL_SIZE = 8;
 const HIT_FLASH_GAP_MS = 120;
 const REWARD_RING = 20;
+/** Mortar shells drop from this height during the last part of their flight. */
+const SHELL_HEIGHT = 150;
+const SHELL_FALL_MS = 350;
 const NO_POINTS: ReadonlySet<Point> = new Set();
 
 /** Adapts a pooled enemy sprite to the Mob interface used by AI behaviors. */
@@ -103,6 +114,10 @@ class SpriteMob implements Mob {
   /** Run time when the white hit flash ends (0 = no flash). */
   flashUntil = 0;
   frozen = false;
+  /** Run time until which this one enemy stays frozen. */
+  chilledUntil = 0;
+  /** Damage a mini-boss or boss may still take now; refills over time. */
+  lossBudget = Infinity;
 
   constructor(readonly sprite: Phaser.Physics.Arcade.Sprite, readonly uid: number) {}
 
@@ -138,6 +153,8 @@ class SpriteMob implements Mob {
     this.setBurrowed(false);
     this.flashUntil = 0;
     this.frozen = false;
+    this.chilledUntil = 0;
+    this.lossBudget = Infinity;
     for (const key of Object.keys(this.memory)) this.memory[key] = 0;
     for (const key of Object.keys(this.hitAt)) this.hitAt[key] = -Infinity;
   }
@@ -150,11 +167,16 @@ interface Zone extends ZoneSpec {
   flames: Phaser.GameObjects.Sprite[];
 }
 
+interface PendingBlast extends BlastSpec {
+  at: number;
+  shell: Phaser.GameObjects.Image;
+}
+
 export class RunScene extends Phaser.Scene {
   readonly view: RunView = {
     hp: 0, maxHp: 0, xp: 0, nextXp: 0, level: 1, kills: 0, caps: 0, seconds: 0,
     wave: 1, enemyCount: 0, projectileCount: 0, seed: 0, boss: null, warning: '',
-    rerolls: 0, revives: 0, buffs: [],
+    rerolls: 0, revives: 0, buffs: [], emeralds: 0,
   };
   choices: UpgradeChoice[] = [];
   chest: ChestData = { granted: [], caps: 0 };
@@ -177,6 +199,9 @@ export class RunScene extends Phaser.Scene {
   /** Small rising labels for collected loot. */
   private labels: Phaser.GameObjects.Text[] = [];
   private zones: Zone[] = [];
+  private blasts: PendingBlast[] = [];
+  private beams: [Point, Point][] = [];
+  private unlocks = new Set<string>();
   private orbiters = new Map<string, Phaser.GameObjects.Sprite[]>();
   private auras = new Map<string, number>();
   private mobs: SpriteMob[] = [];
@@ -240,6 +265,9 @@ export class RunScene extends Phaser.Scene {
     this.finished = false;
     this.choices = [];
     this.zones = [];
+    this.blasts = [];
+    this.beams = [];
+    this.unlocks = new Set(data.unlocks);
     this.orbiters = new Map();
     this.auras = new Map();
     this.mobs = [];
@@ -253,10 +281,11 @@ export class RunScene extends Phaser.Scene {
       nextXp: this.catalog.balance.xp.base, level: 1, kills: 0, caps: 0,
       seconds: Math.floor(this.elapsedMs / 1000), wave: this.waveIndex + 1,
       enemyCount: 0, projectileCount: 0, seed: data.seed, boss: null, warning: '',
-      rerolls: Math.floor(this.stat('rerolls')), revives: Math.floor(this.stat('revives')), buffs: [],
+      rerolls: Math.floor(this.stat('rerolls')), revives: Math.floor(this.stat('revives')), buffs: [], emeralds: 0,
     });
     inputState.x = 0;
     inputState.y = 0;
+    inputState.mouse.cancel();
   }
 
   create(): void {
@@ -305,7 +334,7 @@ export class RunScene extends Phaser.Scene {
         this.add.sprite(0, 0, ATLAS, 'fx/fire').setDepth(-4).setVisible(false));
       this.zones.push({
         active: false, x: 0, y: 0, radius: 0, damage: 0, tickMs: 1, durationMs: 0,
-        sprite: 'fx/fire', nextTick: 0, until: 0, flames,
+        sprite: 'fx/fire', pull: 0, nextTick: 0, until: 0, flames,
       });
     }
     this.prompt = this.add.text(0, 0, '', textStyle(8, COLORS.bright, { align: 'center' }))
@@ -322,6 +351,8 @@ export class RunScene extends Phaser.Scene {
       hits.add(mob.uid);
       this.consumeBullet(bullet);
       if (this.blast(bullet)) return;
+      const chill = bullet.getData('chillMs') as number;
+      if (chill) mob.chilledUntil = this.elapsedMs + chill;
       this.damageMob(mob, bullet.getData('damage') as number, bullet.x, bullet.y);
     });
     this.physics.add.overlap(this.projectiles, this.crates, (first, second) => {
@@ -339,7 +370,9 @@ export class RunScene extends Phaser.Scene {
     this.physics.add.overlap(this.hero, this.enemies, (_hero, item) => {
       const mob = (item as Phaser.Physics.Arcade.Sprite).getData('mob') as SpriteMob;
       if (!mob.targetable) return;
-      this.takeDamage(mob.definition.stats.damage);
+      if (!this.takeDamage(mob.definition.stats.damage)) return;
+      const thorns = this.stat('thorns');
+      if (thorns > 0) this.damageMob(mob, thorns, mob.x, mob.y);
     });
     this.physics.add.overlap(this.hero, this.hostileShots, (_hero, item) => {
       const shot = item as Phaser.Physics.Arcade.Sprite;
@@ -372,6 +405,8 @@ export class RunScene extends Phaser.Scene {
       damageInRadius: (center, radius, damage, limit) => this.damageInRadius(center, radius, damage, limit),
       spawnProjectile: (spec) => this.spawnProjectile(spec),
       spawnZone: (spec) => this.spawnZone(spec),
+      scheduleBlast: (spec) => this.scheduleBlast(spec),
+      drawBeam: (from, to) => { this.beams.push([from, to]); },
       placeOrbiters: (owner, sprite, positions) => this.placeOrbiters(owner, sprite, positions),
       showAura: (owner, radius) => { this.auras.set(owner, radius); },
     };
@@ -495,10 +530,12 @@ export class RunScene extends Phaser.Scene {
     this.steerProjectiles(delta);
     this.expire(this.projectiles);
     this.expire(this.hostileShots);
-    this.updateZones();
+    this.updateZones(delta);
+    this.updateBlasts();
     this.updateLoot();
     if (!this.finished && this.scene.isActive()) this.updateLandmarks(delta);
     this.auras.clear();
+    this.beams.length = 0;
     this.updateWeapons(delta);
     this.drawAreas();
     this.view.enemyCount = this.enemies.countActive();
@@ -523,6 +560,7 @@ export class RunScene extends Phaser.Scene {
       if (seconds >= event.atSecond) {
         this.eventIndex += 1;
         for (let index = 0; index < event.count; index += 1) this.spawnEnemy(definition);
+        this.announceElite();
       }
     }
     const boss = this.location.boss;
@@ -534,9 +572,15 @@ export class RunScene extends Phaser.Scene {
       if (seconds >= boss.atSecond) {
         this.bossSpawned = true;
         this.spawnEnemy(definition);
+        this.announceElite();
         playMusic(this.location.bossMusic);
       }
     }
+  }
+
+  private announceElite(): void {
+    playSfx('sfx/elite_roar');
+    this.cameras.main.shake(350, 0.008);
   }
 
   private warn(text: string): void {
@@ -573,8 +617,16 @@ export class RunScene extends Phaser.Scene {
     if (this.keys.D.isDown || this.cursors.right.isDown) x += 1;
     if (this.keys.W.isDown || this.cursors.up.isDown) y -= 1;
     if (this.keys.S.isDown || this.cursors.down.isDown) y += 1;
+    if (x !== 0 || y !== 0) {
+      inputState.mouse.cancel();
+    } else {
+      const way = inputState.mouse.direction(this.hero,
+        (point) => this.cameras.main.getWorldPoint(point.x, point.y));
+      if (way) ({ x, y } = way);
+    }
     const length = Math.hypot(x, y);
-    const speed = this.stat('moveSpeed') * (1 - this.hazardSlow);
+    const { softMoveSpeed, softMoveSpeedFactor } = this.catalog.balance.run;
+    const speed = softCap(this.stat('moveSpeed'), softMoveSpeed, softMoveSpeedFactor) * (1 - this.hazardSlow);
     this.hero.setVelocity(length > 0 ? (x / length) * speed : 0,
       length > 0 ? (y / length) * speed : 0);
     const sprite = this.heroDefinition.sprite;
@@ -630,10 +682,14 @@ export class RunScene extends Phaser.Scene {
     const multiplier = hpMultiplier ?? (definition.role === 'normal' ? this.currentWave().hpMultiplier : 1);
     sprite.setTexture(ATLAS, definition.sprite).clearTint();
     sprite.enableBody(true, x, y, true, true);
-    (sprite.body as Phaser.Physics.Arcade.Body).setSize(sprite.width * 0.8, sprite.height * 0.8);
+    const fit = definition.role === 'normal' ? 0.8 : 0.65;
+    sprite.setScale(definition.scale);
+    (sprite.body as Phaser.Physics.Arcade.Body).setSize(sprite.width * fit, sprite.height * fit);
     sprite.setVelocity(0, 0).setDepth(definition.role === 'normal' ? 0 : 6);
     const speed = definition.role === 'normal' ? this.currentWave().speedMultiplier : 1;
-    (sprite.getData('mob') as SpriteMob).reset(definition, definition.stats.hp * multiplier, speed);
+    const mob = sprite.getData('mob') as SpriteMob;
+    mob.reset(definition, definition.stats.hp * multiplier, speed);
+    if (definition.role !== 'normal') mob.lossBudget = mob.maxHp * this.maxLoss(definition);
     const walk = animationKey(definition.sprite, 'walk');
     // A frozen enemy dies with its animation paused; the pooled sprite must start clean.
     sprite.anims.resume();
@@ -649,6 +705,9 @@ export class RunScene extends Phaser.Scene {
     for (const mob of this.mobs) {
       const sprite = mob.sprite;
       if (!sprite.active) continue;
+      if (mob.definition.role !== 'normal') {
+        mob.lossBudget = refillBudget(mob.lossBudget, mob.maxHp * this.maxLoss(mob.definition), delta);
+      }
       const dx = this.hero.x - sprite.x;
       const dy = this.hero.y - sprite.y;
       if (mob.definition.role === 'normal' && dx * dx + dy * dy > maxDistanceSquared) {
@@ -662,7 +721,7 @@ export class RunScene extends Phaser.Scene {
         else if (!mob.telegraphing) sprite.clearTint();
       }
       const definition = mob.definition;
-      const frozen = this.elapsedMs < this.frozenUntil && definition.role === 'normal' && !mob.burrowed;
+      const frozen = this.elapsedMs < Math.max(this.frozenUntil, mob.chilledUntil) && definition.role === 'normal' && !mob.burrowed;
       if (frozen !== mob.frozen) {
         mob.frozen = frozen;
         if (frozen) {
@@ -681,11 +740,20 @@ export class RunScene extends Phaser.Scene {
     }
   }
 
+  private maxLoss(definition: EnemyDefinition): number {
+    const { eliteMaxLossPerSecond, bossMaxLossPerSecond } = this.catalog.balance.run;
+    return definition.role === 'boss' ? bossMaxLossPerSecond : eliteMaxLossPerSecond;
+  }
+
   private damageMob(mob: SpriteMob, amount: number, x: number, y: number): void {
     const chance = this.stat('critChance');
     if (chance > 0 && this.rng.next() < chance) {
-      amount *= this.catalog.balance.run.critMultiplier;
+      amount *= this.catalog.balance.run.critMultiplier + this.stat('critDamage');
       this.playEffect('fx/hit', 'burst', x, y - 4, true);
+    }
+    if (mob.definition.role !== 'normal') {
+      amount = Math.min(mob.lossBudget, amount * (1 + this.stat('eliteDamage')));
+      mob.lossBudget -= amount;
     }
     mob.hp -= amount;
     if (mob.hp <= 0) {
@@ -714,7 +782,7 @@ export class RunScene extends Phaser.Scene {
   private killMob(mob: SpriteMob): void {
     const { sprite, definition } = mob;
     const { x, y } = sprite;
-    this.playEffect(definition.sprite, 'death', x, y, sprite.flipX);
+    this.playEffect(definition.sprite, 'death', x, y, sprite.flipX, definition.scale);
     if (definition.role === 'normal') playSfx('sfx/enemy_death');
     else {
       playSfx('sfx/explosion');
@@ -724,6 +792,17 @@ export class RunScene extends Phaser.Scene {
     sprite.clearTint();
     sprite.disableBody(true, true);
     this.view.kills += 1;
+    const healed = this.stat('killHeal');
+    if (healed > 0) this.view.hp = Math.min(this.view.maxHp, this.view.hp + healed);
+    if (definition.role !== 'normal') {
+      const { elite, boss } = this.location.emeralds;
+      const emeralds = definition.role === 'boss' ? boss : elite;
+      this.view.emeralds += emeralds;
+      if (emeralds) {
+        this.label(`+${emeralds} ИЗУМРУД`, '#9bff6e');
+        playSfx('sfx/emerald');
+      }
+    }
     this.killsByType[definition.id] = (this.killsByType[definition.id] ?? 0) + 1;
     if (definition.stats.xp > 0) this.dropXp(x, y, definition.stats.xp);
     this.rollDrops(definition, x, y);
@@ -873,7 +952,7 @@ export class RunScene extends Phaser.Scene {
     for (const mob of this.mobs) {
       const sprite = mob.sprite;
       if (!mob.targetable) continue;
-      const reach = radius + sprite.width / 3;
+      const reach = radius + sprite.displayWidth / 3;
       const dx = sprite.x - center.x;
       const dy = sprite.y - center.y;
       if (dx * dx + dy * dy > reach * reach) continue;
@@ -925,6 +1004,7 @@ export class RunScene extends Phaser.Scene {
       .setData('expiresAt', this.elapsedMs + spec.lifetimeMs)
       .setData('blastRadius', spec.blastRadius ?? 0).setData('turnRate', spec.turnRate ?? 0)
       .setData('returnAt', spec.returnAfterMs === undefined ? 0 : this.elapsedMs + spec.returnAfterMs)
+      .setData('chillMs', spec.chillMs ?? 0)
       .setData('returnSpeed', spec.returnSpeed ?? 0).setData('returning', false);
     bullet.stop();
     for (const name of ['spin', 'idle', 'burn']) {
@@ -986,7 +1066,7 @@ export class RunScene extends Phaser.Scene {
   private spawnZone(spec: ZoneSpec): void {
     const zone = this.zones.find((candidate) => !candidate.active);
     if (!zone) return;
-    Object.assign(zone, spec, {
+    Object.assign(zone, { pull: 0 }, spec, {
       active: true, nextTick: this.elapsedMs, until: this.elapsedMs + spec.durationMs,
     });
     zone.flames.forEach((flame, index) => {
@@ -997,7 +1077,45 @@ export class RunScene extends Phaser.Scene {
     });
   }
 
-  private updateZones(): void {
+  private scheduleBlast(spec: BlastSpec): void {
+    const shell = this.add.image(spec.x, spec.y - SHELL_HEIGHT, ATLAS, spec.sprite)
+      .setDepth(13).setFlipY(true).setVisible(false);
+    this.blasts.push({ ...spec, at: this.elapsedMs + spec.delayMs, shell });
+  }
+
+  private updateBlasts(): void {
+    const due: PendingBlast[] = [];
+    this.blasts = this.blasts.filter((blast) => {
+      const left = blast.at - this.elapsedMs;
+      if (left <= 0) {
+        due.push(blast);
+        return false;
+      }
+      const fall = Math.min(1, left / SHELL_FALL_MS);
+      blast.shell.setVisible(fall < 1).setY(blast.y - SHELL_HEIGHT * fall);
+      return true;
+    });
+    for (const blast of due) {
+      blast.shell.destroy();
+      this.playEffect('fx/explosion', 'burst', blast.x, blast.y, false, blast.radius / 24);
+      playSfx('sfx/explosion', 0.5);
+      this.damageInRadius(blast, blast.radius, blast.damage);
+    }
+  }
+
+  private pullEnemies(zone: Zone, strength: number, delta: number): void {
+    for (const mob of this.mobs) {
+      if (!mob.targetable || mob.definition.role !== 'normal') continue;
+      const dx = zone.x - mob.x;
+      const dy = zone.y - mob.y;
+      const distance = Math.hypot(dx, dy);
+      if (distance > zone.radius * 1.5 || distance < 4) continue;
+      const step = Math.min(distance, strength * delta / 1000);
+      mob.sprite.setPosition(mob.x + (dx / distance) * step, mob.y + (dy / distance) * step);
+    }
+  }
+
+  private updateZones(delta: number): void {
     for (const zone of this.zones) {
       if (!zone.active) continue;
       if (this.elapsedMs >= zone.until) {
@@ -1005,6 +1123,7 @@ export class RunScene extends Phaser.Scene {
         for (const flame of zone.flames) flame.stop().setVisible(false);
         continue;
       }
+      if (zone.pull) this.pullEnemies(zone, zone.pull, delta);
       if (this.elapsedMs >= zone.nextTick) {
         zone.nextTick += zone.tickMs;
         this.damageInRadius(zone, zone.radius, zone.damage);
@@ -1037,8 +1156,16 @@ export class RunScene extends Phaser.Scene {
       graphics.lineStyle(1, 0x9bff6e, 0.35 + 0.2 * pulse).strokeCircle(this.hero.x, this.hero.y, radius);
     }
     for (const zone of this.zones) {
-      if (zone.active) graphics.fillStyle(0xd9602a, 0.18).fillCircle(zone.x, zone.y, zone.radius);
+      if (zone.active) graphics.fillStyle(zone.pull ? 0x8a559c : 0xd9602a, 0.18).fillCircle(zone.x, zone.y, zone.radius);
     }
+    for (const blast of this.blasts) {
+      graphics.lineStyle(1, 0xff7d6b, 0.5 + 0.4 * pulse).strokeCircle(blast.x, blast.y, blast.radius);
+    }
+    for (const [from, to] of this.beams) {
+      graphics.lineStyle(7, 0xd9602a, 0.35).lineBetween(from.x, from.y, to.x, to.y);
+      graphics.lineStyle(3, 0xecc962, 0.9).lineBetween(from.x, from.y, to.x, to.y);
+    }
+    this.drawElites(graphics, pulse);
     this.decor.eachLandmark((landmark) => {
       if (landmark.used) return;
       const { radius } = landmark.definition.trigger;
@@ -1050,6 +1177,21 @@ export class RunScene extends Phaser.Scene {
     });
   }
 
+  /** A warning ring under every mini-boss and boss, and their own HP bar. */
+  private drawElites(graphics: Phaser.GameObjects.Graphics, pulse: number): void {
+    for (const mob of this.mobs) {
+      if (!mob.targetable || mob.definition.role === 'normal') continue;
+      const { sprite } = mob;
+      const width = sprite.displayWidth;
+      const foot = sprite.y + sprite.displayHeight * 0.42;
+      graphics.fillStyle(0xd9402a, 0.2 + 0.15 * pulse).fillEllipse(sprite.x, foot, width * 1.1, width * 0.4);
+      graphics.lineStyle(2, 0xff7d6b, 0.5 + 0.4 * pulse).strokeEllipse(sprite.x, foot, width * 1.1, width * 0.4);
+      const top = sprite.y - sprite.displayHeight / 2 - 6;
+      graphics.fillStyle(0x16120f, 0.9).fillRect(sprite.x - 22, top, 44, 5);
+      graphics.fillStyle(COLORS.hp, 1).fillRect(sprite.x - 21, top + 1, Math.round(42 * mob.hpFraction), 3);
+    }
+  }
+
   // --- map: bonuses, hazards, landmarks -----------------------------------------------
 
   private updateBuffs(): void {
@@ -1057,7 +1199,11 @@ export class RunScene extends Phaser.Scene {
     for (const [id, buff] of this.buffs) {
       const left = buff.until - this.elapsedMs;
       if (left <= 0) this.buffs.delete(id);
-      else buffs.push({ sprite: this.catalog.pickups[id]!.sprite, fraction: left / buff.durationMs });
+      else {
+        const { sprite, name } = this.catalog.pickups[id]!;
+        buffs.push({ sprite, name, text: statBonus(buff.stat, buff.amount),
+          fraction: left / buff.durationMs });
+      }
     }
     this.view.buffs = buffs;
   }
@@ -1084,6 +1230,11 @@ export class RunScene extends Phaser.Scene {
     const { landmarkDecayRate, landmarkHintRange } = this.catalog.balance.run;
     const hints = this.hintGraphics.clear();
     const view = this.cameras.main.worldView;
+    for (const mob of this.mobs) {
+      if (mob.sprite.active && mob.definition.role !== 'normal' && !view.contains(mob.x, mob.y)) {
+        this.drawHint(hints, mob, 0xff5a4a);
+      }
+    }
     const nearby: ActiveLandmark[] = [];
     this.decor.eachLandmark((landmark) => {
       if (landmark.used) return;
@@ -1141,7 +1292,7 @@ export class RunScene extends Phaser.Scene {
   }
 
   /** Arrow at the screen edge towards an off-screen landmark. */
-  private drawHint(graphics: Phaser.GameObjects.Graphics, target: Point): void {
+  private drawHint(graphics: Phaser.GameObjects.Graphics, target: Point, color = 0xf2c46b): void {
     const { width, height } = this.cameras.main;
     const angle = Math.atan2(target.y - this.hero.y, target.x - this.hero.x);
     const scale = Math.min((width / 2 - 12) / Math.max(0.001, Math.abs(Math.cos(angle))),
@@ -1150,7 +1301,7 @@ export class RunScene extends Phaser.Scene {
     const y = height / 2 + Math.sin(angle) * scale;
     const corner = (turn: number, size: number): [number, number] =>
       [x + Math.cos(angle + turn) * size, y + Math.sin(angle + turn) * size];
-    graphics.fillStyle(0xf2c46b, 0.85)
+    graphics.fillStyle(color, 0.85)
       .fillTriangle(...corner(0, 6), ...corner(2.5, 5), ...corner(-2.5, 5));
   }
 
@@ -1258,23 +1409,26 @@ export class RunScene extends Phaser.Scene {
 
   /** Everything that can be offered; new items need a free slot. */
   private upgradePool(ownedOnly: boolean): UpgradeChoice[] {
-    const { maxWeapons, maxPassives } = this.catalog.balance.run;
+    const slots = this.slots;
+    const heavyOwned = this.heavyOwned();
     const pool: UpgradeChoice[] = [];
     for (const weapon of Object.values(this.catalog.weapons)) {
       const owned = this.weapons.get(weapon.id);
-      if (!owned && (ownedOnly || weapon.evolved || this.weapons.size >= maxWeapons
-        || this.hasEvolved(weapon))) continue;
+      const full = weapon.heavy ? heavyOwned >= slots.heavy
+        : this.weapons.size - heavyOwned >= slots.weapons;
+      if (!owned && (ownedOnly || weapon.evolved || full || this.view.level < weapon.minHeroLevel
+        || !this.isOpen(weapon) || this.hasEvolved(weapon))) continue;
       if (owned && owned.level >= weapon.levels.length) continue;
       const changes = owned
         ? levelChanges(weapon.levels[owned.level - 1]!, weapon.levels[owned.level]!) : [];
       pool.push({ kind: 'weapon', id: weapon.id, name: weapon.name, sprite: weapon.sprite,
-        description: owned ? [`Уровень ${owned.level + 1}`, ...changes].join('\n') : 'Новое оружие',
+        description: owned ? [`Уровень ${owned.level + 1}`, ...changes].join('\n') : `${weapon.heavy ? 'Тяжёлое оружие' : 'Новое оружие'}\n${weapon.description}`,
         pairs: weapon.evolution ? [this.catalog.passives[weapon.evolution.passive]!.sprite] : [] });
     }
     for (const passive of Object.values(this.catalog.passives)) {
       const level = this.ownedPassives.get(passive.id) ?? 0;
-      if (!level && (ownedOnly || this.ownedPassives.size >= maxPassives)) continue;
-      if (level >= passive.maxLevel) continue;
+      if (!level && (ownedOnly || this.ownedPassives.size >= slots.passives)) continue;
+      if (level >= passive.maxLevel || (!level && !this.isOpen(passive))) continue;
       pool.push({ kind: 'passive', id: passive.id, name: passive.name, sprite: passive.sprite,
         description: `${level ? `Уровень ${level + 1}` : 'Новый перк'}\n${
           statBonus(passive.stat, passive.perLevel, passive.mod)}`,
@@ -1284,21 +1438,61 @@ export class RunScene extends Phaser.Scene {
     return pool;
   }
 
+  private heavyOwned(): number {
+    let count = 0;
+    for (const id of this.weapons.keys()) if (this.catalog.weapons[id]!.heavy) count += 1;
+    return count;
+  }
+
+  private isOpen(item: WeaponDefinition | PassiveDefinition): boolean {
+    return item.unlock.type === 'default' || this.unlocks.has(item.id);
+  }
+
   /** The evolved form is already in hand, so the base weapon must not come back. */
   private hasEvolved(weapon: { evolution?: { into: string } | undefined }): boolean {
     return weapon.evolution !== undefined && this.weapons.has(weapon.evolution.into);
   }
 
-  loadout(): { weapons: LoadoutItem[]; passives: LoadoutItem[] } {
+  /** Every slot the shelter can give, for the HUD. */
+  get maxSlots(): { weapons: number; passives: number } {
+    const { maxWeapons, maxPassives } = this.catalog.balance.run;
+    return { weapons: maxWeapons, passives: maxPassives };
+  }
+
+  /** How many weapons, heavy weapons and perks fit into one run. */
+  get slots(): { weapons: number; heavy: number; passives: number } {
+    const { maxWeapons, maxHeavyWeapons, maxPassives } = this.catalog.balance.run;
     return {
-      weapons: [...this.weapons].map(([id, state]) => ({
-        sprite: this.catalog.weapons[id]!.sprite, level: state.level,
-        max: this.catalog.weapons[id]!.levels.length,
-      })),
-      passives: [...this.ownedPassives].map(([id, level]) => ({
-        sprite: this.catalog.passives[id]!.sprite, level, max: this.catalog.passives[id]!.maxLevel,
-      })),
+      weapons: Math.min(maxWeapons, this.stat('weaponSlots')), heavy: maxHeavyWeapons,
+      passives: Math.min(maxPassives, this.stat('passiveSlots')),
     };
+  }
+
+  loadout(): { weapons: LoadoutItem[]; heavy: LoadoutItem[]; passives: LoadoutItem[] } {
+    const weapons: LoadoutItem[] = [];
+    const heavy: LoadoutItem[] = [];
+    for (const [id, state] of this.weapons) {
+      const weapon = this.catalog.weapons[id]!;
+      const details = [weapon.description, `Уровень ${state.level}/${weapon.levels.length}`,
+        ...levelStats(weapon.levels[state.level - 1]!)];
+      if (weapon.evolution) {
+        const { passive, into } = weapon.evolution;
+        details.push(`Эволюция: ${this.catalog.weapons[into]!.name}, нужен перк «${
+          this.catalog.passives[passive]!.name}»`);
+      }
+      (weapon.heavy ? heavy : weapons).push({
+        sprite: weapon.sprite, name: weapon.name, details, level: state.level, max: weapon.levels.length,
+      });
+    }
+    const passives = [...this.ownedPassives].map(([id, level]) => {
+      const passive = this.catalog.passives[id]!;
+      return {
+        sprite: passive.sprite, name: passive.name, level, max: passive.maxLevel,
+        details: [passive.description, `Уровень ${level}/${passive.maxLevel}`,
+          `Сейчас: ${statBonus(passive.stat, passive.perLevel * level, passive.mod)}`],
+      };
+    });
+    return { weapons, heavy, passives };
   }
 
   private evolutionChoices(): UpgradeChoice[] {
@@ -1310,14 +1504,20 @@ export class RunScene extends Phaser.Scene {
     });
   }
 
-  /** Three cards; a ready evolution always takes the first one. */
+  /** Three cards; a ready evolution comes first and one card is a weapon while any is left. */
   private rollChoices(): UpgradeChoice[] {
     const pool = this.upgradePool(false);
     for (let index = pool.length - 1; index > 0; index -= 1) {
       const chosen = Math.floor(this.rng.next() * (index + 1));
       [pool[index], pool[chosen]] = [pool[chosen]!, pool[index]!];
     }
-    return [...this.evolutionChoices().slice(0, 1), ...pool].slice(0, 3);
+    const ready = this.evolutionChoices().slice(0, 1);
+    const cards = [...ready, ...pool].slice(0, 3);
+    if (!cards.some((card) => card.kind !== 'passive')) {
+      const weapon = pool.find((card) => card.kind === 'weapon');
+      if (weapon) cards[cards.length - 1] = weapon;
+    }
+    return cards;
   }
 
   private gainXp(amount: number): boolean {
@@ -1400,12 +1600,18 @@ export class RunScene extends Phaser.Scene {
 
   // --- damage, death, end ------------------------------------------------------------
 
-  private takeDamage(damage: number, ignoreCooldown = false): void {
-    if (this.finished) return;
-    if (!ignoreCooldown &&
-      this.elapsedMs - this.lastDamageAt < this.catalog.balance.run.contactCooldownMs) return;
+  private takeDamage(damage: number, ignoreCooldown = false): boolean {
+    if (this.finished) return false;
+    const { contactCooldownMs, maxDodge } = this.catalog.balance.run;
+    if (!ignoreCooldown && this.elapsedMs - this.lastDamageAt < contactCooldownMs) return false;
     this.lastDamageAt = this.elapsedMs;
+    const dodge = Math.min(maxDodge, this.stat('dodge'));
+    if (dodge > 0 && this.rng.next() < dodge) {
+      this.label('МИМО', COLORS.dim);
+      return false;
+    }
     this.hurt(Math.max(1, damage - this.stat('armor')));
+    return true;
   }
 
   private hurt(damage: number): void {
@@ -1447,7 +1653,13 @@ export class RunScene extends Phaser.Scene {
     this.time.delayedCall(HERO_DEATH_DELAY_MS, () => this.finish('death'));
   }
 
-  private finish(reason: 'death' | 'survived'): void {
+  /** Leaves the run from the pause menu; what was earned so far is kept. */
+  abandon(): void {
+    if (this.finished) return;
+    this.finish('quit');
+  }
+
+  private finish(reason: ResultData['reason']): void {
     this.finished = true;
     this.hero.setVelocity(0, 0);
     this.scene.stop('Hud');
@@ -1480,12 +1692,12 @@ export class RunScene extends Phaser.Scene {
     });
   }
 
-  private playEffect(sprite: string, animation: string, x: number, y: number, flipX: boolean): void {
+  private playEffect(sprite: string, animation: string, x: number, y: number, flipX: boolean, scale = 1): void {
     const key = animationKey(sprite, animation);
     if (!this.anims.exists(key)) return;
     const effect = this.effects.getFirstDead(false) as Phaser.GameObjects.Sprite | null;
     if (!effect) return;
-    effect.setActive(true).setVisible(true).setPosition(x, y).setFlipX(flipX).play(key);
+    effect.setActive(true).setVisible(true).setPosition(x, y).setScale(scale).setFlipX(flipX).play(key);
   }
 
   private createPool(key: string, size: number): Phaser.Physics.Arcade.Group {
