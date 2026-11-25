@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Update the server from git. Run as root: <repository>/deploy/deploy.sh [git-ref]
-# The repository may live anywhere; web/, node/ and python/ are its neighbours.
+# The repository may live anywhere; web/ and node/ are its neighbours.
 set -euo pipefail
 
 # A function is read whole, so `git checkout` may replace this file while it runs.
@@ -15,12 +15,11 @@ deploy_env=/etc/wasteland/deploy.env
 
 # Own Node.js next to the app, if it is there: the system one belongs to other sites.
 node_bin=$base/node/bin
-# Git, npm and uv run as the owner of the repository. Python is kept outside of home directories,
-# which the service cannot see (ProtectHome).
-as_app() {
-  sudo -u "$owner" -H env PATH="$node_bin:$PATH" UV_PYTHON_INSTALL_DIR="$base/python" \
-    UV_PYTHON_PREFERENCE=only-managed "$@"
-}
+# Git, npm and pip run as the owner of the repository.
+as_app() { sudo -u "$owner" -H env PATH="$node_bin:$PATH" "$@"; }
+python=${PYTHON:-/usr/bin/python3}
+"$python" -c 'import sys, venv, ensurepip; sys.exit(not (3, 12) <= sys.version_info[:2] < (3, 15))' \
+  || { echo "$python: need Python 3.12-3.14 with venv (apt install python3-venv)" >&2; exit 1; }
 
 # shellcheck source=/dev/null
 set -a; . "$deploy_env"; set +a
@@ -36,11 +35,14 @@ cd "$app"
 # The API runs as another user: it must be able to read the code.
 sudo -u wasteland test -r "$app/server/app/main.py" \
   || { echo "user wasteland cannot read $app (see docs/DEPLOY.md)" >&2; exit 1; }
-install -d -o "$owner" "$web" "$base/python"
+install -d -o "$owner" "$web"
 as_app git fetch --prune origin
 as_app git checkout --detach "$ref"
 
-as_app /usr/local/bin/uv sync --project server --locked --no-dev --python 3.12
+# Exact versions and hashes from server/requirements.txt (make requirements).
+[ -x server/.venv/bin/pip ] || as_app "$python" -m venv --clear server/.venv
+as_app server/.venv/bin/pip install --quiet --disable-pip-version-check \
+  --require-hashes -r server/requirements.txt
 (cd client
  as_app npm ci
  as_app env VITE_API_URL= VITE_CONTACT_EMAIL="$VITE_CONTACT_EMAIL" \

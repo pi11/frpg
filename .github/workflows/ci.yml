@@ -38,6 +38,7 @@ jobs:
         run: |
           make test
           make content-check
+          make requirements && git diff --exit-code server/requirements.txt
       - name: Check live health endpoint
         run: |
           uv run --project server --locked uvicorn app.main:app --app-dir server --host 127.0.0.1 --port 8000 &

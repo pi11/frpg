@@ -6,7 +6,7 @@
 | --- | --- |
 | Код (git clone) | `/var/www/webii/wasteland.lol/frpg` |
 | Готовый сайт, корень nginx | `/var/www/webii/wasteland.lol/web` |
-| Своя Node.js и Python | `…/wasteland.lol/node`, `…/wasteland.lol/python` |
+| Своя Node.js | `…/wasteland.lol/node` |
 | Секреты | `/etc/wasteland/` |
 | Бэкапы | `/var/lib/wasteland-backups/` |
 
@@ -44,21 +44,25 @@ cp -a /etc/nginx /root/nginx-backup-$(date +%F)
 Ставьте только то, чего нет; имеющиеся nginx, PostgreSQL, PgBouncer и Node не обновляйте.
 
 ```bash
-apt-get install --no-upgrade nginx postgresql certbot git curl rsync sudo xz-utils
-# uv — в /usr/local/bin/uv (скачайте архив с github.com/astral-sh/uv/releases и сверьте sha256)
+apt-get install --no-upgrade nginx postgresql certbot git curl rsync sudo xz-utils python3-venv
+python3 --version        # нужен 3.12–3.14 (Ubuntu 24.04 и Debian 13 подходят)
 BASE=/var/www/webii/wasteland.lol
 OWNER=$(stat -c %U $BASE/frpg); sudo -u $OWNER git -C $BASE/frpg remote -v; sudo -u $OWNER git -C $BASE/frpg status -sb   # git clone, без своих правок
 stat -c '%U %a %n' /var/www/webii $BASE $BASE/frpg               # владелец не root, есть вход (x)
 # Отдельный пользователь службы: читает код, но не меняет его
 useradd --system --create-home --home-dir /srv/wasteland --shell /usr/sbin/nologin wasteland
 for u in wasteland www-data; do sudo -u $u test -x $BASE && echo "$u: ok" || echo "$u: НЕТ ДОСТУПА"; done
-# Своя Node.js 22.13+ (или 24+), чтобы не трогать системную: архив linux-x64 с nodejs.org/dist, сверьте sha256
-install -d $BASE/node && tar -xJf node-v*-linux-x64.tar.xz -C $BASE/node --strip-components=1
+# Своя Node.js (22.13+), чтобы не трогать системную; на ARM-сервере замените x64 на arm64
+cd /tmp && curl -fsSLO https://nodejs.org/dist/latest-v22.x/SHASUMS256.txt
+NODE=$(awk '/linux-x64.tar.xz$/ {print $2}' SHASUMS256.txt)
+curl -fsSLO https://nodejs.org/dist/latest-v22.x/$NODE
+grep " $NODE\$" SHASUMS256.txt | sha256sum -c -                    # должно быть: OK
+install -d $BASE/node && tar -xJf $NODE -C $BASE/node --strip-components=1
 $BASE/node/bin/node --version
 cd $BASE/frpg
 ```
 
-Если доступа нет, дайте только проход, не открывая содержимое: `apt-get install --no-upgrade acl; setfacl -m u:wasteland:x,u:www-data:x /var/www/webii $BASE`. Если репозиторий принадлежит root, отдайте его обычному пользователю сайта: `chown -R webii: $BASE` (имя проверьте). Код, Node и Python ставит владелец репозитория, сервис работает от `wasteland`.
+Если доступа нет, дайте только проход, не открывая содержимое: `apt-get install --no-upgrade acl; setfacl -m u:wasteland:x,u:www-data:x /var/www/webii $BASE`. Если репозиторий принадлежит root, отдайте его обычному пользователю сайта: `chown -R webii: $BASE` (имя проверьте). Зависимости ставит владелец репозитория: Python — обычный `venv` в `server/.venv` с точными версиями из `server/requirements.txt`; сервис работает от `wasteland`.
 
 **Корень сайта — только `web`.** Если для домена уже есть сайт nginx с корнем `/var/www/webii/wasteland.lol`, отключите его: иначе наружу попадут исходники и `frpg/.git`.
 

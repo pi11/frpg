@@ -1,4 +1,4 @@
-.PHONY: install dev bot-poll migrate test content-check assets android-debug android-aab
+.PHONY: requirements install dev bot-poll migrate test content-check assets android-debug android-aab
 
 install:
 	cd client && npm ci
@@ -21,6 +21,10 @@ test:
 
 content-check:
 	cd client && npm run content-check
+
+# Pinned server dependencies for deploy.sh (plain pip); run after changing server/uv.lock.
+requirements:
+	uv export --project server --locked --no-dev --no-emit-project --no-header --format requirements-txt -q -o server/requirements.txt
 
 # Rebuild original sprites, atlas, SFX and music into client/public/assets (needs ffmpeg).
 assets:
