@@ -96,6 +96,15 @@ describe('shared content catalog', () => {
     expect(() => validateContent({ ...rawFiles, [path]: raw })).toThrow('unknown location moon_base');
   });
 
+  it('rejects a hero that nothing can unlock', () => {
+    const path = Object.keys(rawFiles).find((key) => key.endsWith('heroes/marksman.json'))!;
+    const raw = structuredClone(rawFiles[path] as { unlock: { location: string; atSecond: number } });
+    raw.unlock.atSecond = 999;
+    expect(() => validateContent({ ...rawFiles, [path]: raw })).toThrow('no milestone at 999');
+    raw.unlock.location = 'moon_base';
+    expect(() => validateContent({ ...rawFiles, [path]: raw })).toThrow('unknown unlock location');
+  });
+
   it('rejects a boss phase with an unknown AI', () => {
     const bossPath = Object.keys(rawFiles).find((path) => path.endsWith('junk_king.json'));
     const boss = structuredClone(rawFiles[bossPath!] as { ai: { params: { phases: { ai: { type: string } }[] } } });
@@ -139,6 +148,8 @@ describe('assets referenced by content', () => {
       needFrame(`${actor.sprite}/walk_0`);
       needFrame(`${actor.sprite}/death_0`);
     }
+    for (const hero of Object.values(content.heroes)) needFrame(`${hero.sprite}/idle_0`);
+    needFile('ui/shelter.png');
     for (const weapon of Object.values(content.weapons)) {
       needFrame(weapon.sprite);
       needFrame(weapon.projectileSprite);

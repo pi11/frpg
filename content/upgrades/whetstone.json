@@ -1,0 +1,13 @@
+{
+  "id": "whetstone",
+  "name": "Точильный круг",
+  "category": "combat",
+  "stat": "critDamage",
+  "mod": "flat",
+  "perLevel": 0.08,
+  "maxLevel": 10,
+  "cost": {
+    "base": 60,
+    "growth": 1.45
+  }
+}

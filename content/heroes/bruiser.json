@@ -1,0 +1,40 @@
+{
+  "id": "bruiser",
+  "name": "Молот",
+  "description": "Гора металла. Держит удар и ранит тех, кто бьёт его.",
+  "sprite": "heroes/bruiser",
+  "startingWeapon": "saw_blade",
+  "unlock": {
+    "type": "bossKilled",
+    "location": "shelter_outskirts"
+  },
+  "baseStats": {
+    "maxHp": 160,
+    "armor": 2,
+    "regen": 0,
+    "moveSpeed": 98,
+    "damage": 0,
+    "attackSpeed": -0.1,
+    "area": 0,
+    "projectileCount": 0,
+    "duration": 0,
+    "pickupRadius": 52,
+    "xpGain": 0,
+    "luck": 0,
+    "radResist": 0,
+    "critChance": 0.02,
+    "rerolls": 1,
+    "revives": 0,
+    "critDamage": 0,
+    "dodge": 0,
+    "thorns": 6,
+    "eliteDamage": 0,
+    "killHeal": 0,
+    "weaponSlots": 3,
+    "passiveSlots": 3,
+    "autopilot": 0,
+    "headStart": 0,
+    "buffDuration": 0,
+    "landmarkSpeed": 0
+  }
+}

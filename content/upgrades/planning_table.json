@@ -5,9 +5,9 @@
   "stat": "rerolls",
   "mod": "flat",
   "perLevel": 1,
-  "maxLevel": 3,
+  "maxLevel": 6,
   "cost": {
     "base": 80,
-    "growth": 1.8
+    "growth": 1.7
   }
 }

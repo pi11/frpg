@@ -23,6 +23,7 @@ from app.services.economy import (
     emerald_reward,
     new_milestones,
     run_reward,
+    unlocked_heroes,
     unlocked_locations,
 )
 from app.services.tokens import as_utc, current_user, utcnow
@@ -78,9 +79,12 @@ async def start_run(
     if body.hero_id not in content.category("heroes"):
         raise ApiError(404, ErrorCode.not_found, "Герой не найден")
     profile = await session.get(Profile, user.id)
-    bosses_killed = (profile.data or {}).get("bosses_killed", []) if profile else []
+    data = (profile.data or {}) if profile else {}
+    bosses_killed = data.get("bosses_killed", [])
     if body.location_id not in unlocked_locations(content.category("locations"), bosses_killed):
         raise ApiError(403, ErrorCode.locked, "Локация ещё закрыта")
+    if body.hero_id not in unlocked_heroes(content.category("heroes"), data):
+        raise ApiError(403, ErrorCode.locked, "Персонаж ещё не открыт")
     await session.scalar(select(User).where(User.id == user.id).with_for_update())
     now = utcnow()
     active = (await session.scalars(

@@ -5,9 +5,9 @@
   "stat": "damage",
   "mod": "flat",
   "perLevel": 1,
-  "maxLevel": 5,
+  "maxLevel": 10,
   "cost": {
     "base": 60,
-    "growth": 1.6
+    "growth": 1.45
   }
 }

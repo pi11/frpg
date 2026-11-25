@@ -19,6 +19,7 @@ export interface Profile {
   bosses_killed: string[];
   /** Locations open for this profile (checked again by the server on run start). */
   unlocked_locations: string[];
+  unlocked_heroes: string[];
   identities: { provider: string; subject: string }[];
 }
 

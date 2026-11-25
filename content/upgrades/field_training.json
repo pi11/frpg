@@ -5,9 +5,9 @@
   "stat": "maxHp",
   "mod": "flat",
   "perLevel": 10,
-  "maxLevel": 5,
+  "maxLevel": 10,
   "cost": {
     "base": 40,
-    "growth": 1.5
+    "growth": 1.45
   }
 }

@@ -19,7 +19,7 @@ import subprocess
 import sys
 import tempfile
 import zlib
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -27,6 +27,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import art  # noqa: E402
 import art_extra as extra  # noqa: E402
 import art_heavy as heavy  # noqa: E402
+import art_heroes as heroes  # noqa: E402
 import art_more as more  # noqa: E402
 import art_world as world  # noqa: E402
 import audio  # noqa: E402
@@ -170,10 +171,16 @@ def roach() -> dict[str, Image]:
     return frames
 
 
+def hero_frames(
+    draw: Callable[..., Image], residue: str, seed: int,
+) -> dict[str, Image]:
+    walk, idle = heroes.animations(draw)
+    return {**numbered("idle", idle), **with_death(walk, residue, seed)}
+
+
 def sprite_frames() -> dict[str, Image]:
     """Atlas frame name -> image. `<key>` is always the idle/static frame."""
     animated = {
-        "heroes/wanderer": humanoid(art.WANDERER_TOP, art.WANDERER_LEGS, "R", 3),
         "enemies/ghoul": humanoid(art.GHOUL_TOP, art.GHOUL_LEGS, "Q", 5),
         "enemies/roach": roach(),
         "xp/green": {f"idle_{i}": parse(src) for i, src in enumerate(art.XP_FRAMES)},
@@ -199,6 +206,7 @@ def sprite_frames() -> dict[str, Image]:
         "enemies/marsh_mother": with_death([more.marsh_mother(i) for i in range(4)], "P", 89),
         "fx/dust": numbered("burst", [more.dust(i) for i in range(5)]),
         "fx/heal": numbered("burst", [more.heal_ring(i) for i in range(4)]),
+        **{f"heroes/{name}": hero_frames(*parts) for name, parts in heroes.HEROES.items()},
         **extra.animations(),
         **heavy.animations(),
         **{f"enemies/{name}": with_death([draw(i) for i in range(4)], residue, seed)
@@ -363,6 +371,8 @@ def build_images(preview: Path | None) -> None:
     (OUT / "ground" / "wasteland.png").write_bytes(png(ground))
     (OUT / "ground" / "city.png").write_bytes(png(more.city_ground()))
     (OUT / "ground" / "marsh.png").write_bytes(png(more.marsh_ground()))
+    (OUT / "ui").mkdir(parents=True, exist_ok=True)
+    (OUT / "ui" / "shelter.png").write_bytes(png(heroes.shelter_strip()))
     build_android(frames)
     if preview:
         preview.mkdir(parents=True, exist_ok=True)
@@ -384,8 +394,8 @@ DENSITIES = {"mdpi": 1, "hdpi": 1.5, "xhdpi": 2, "xxhdpi": 3, "xxxhdpi": 4}
 
 def centered(size: int, sprite: Image, factor: int, background: Pixel = CLEAR) -> Image:
     big = scale(sprite, factor)
-    offset = (size - len(big)) // 2
-    return overlay([[background] * size for _ in range(size)], big, offset, offset)
+    canvas = [[background] * size for _ in range(size)]
+    return overlay(canvas, big, (size - len(big[0])) // 2, (size - len(big)) // 2)
 
 
 def circle(image: Image) -> Image:
@@ -404,14 +414,14 @@ def build_android(frames: dict[str, Image]) -> None:
         folder = ANDROID_RES / f"mipmap-{name}"
         folder.mkdir(parents=True, exist_ok=True)
         # Adaptive foreground is 108dp; the hero stays inside the 66dp safe zone.
-        foreground = centered(round(108 * density), hero, round(4 * density))
+        foreground = centered(round(108 * density), hero, round(2.5 * density))
         (folder / "ic_launcher_foreground.png").write_bytes(png(foreground))
-        legacy = centered(round(48 * density), hero, round(2 * density), ICON_BACKGROUND)
+        legacy = centered(round(48 * density), hero, max(1, round(1.5 * density)), ICON_BACKGROUND)
         (folder / "ic_launcher.png").write_bytes(png(legacy))
         (folder / "ic_launcher_round.png").write_bytes(png(circle(legacy)))
     splash = ANDROID_RES / "drawable-xxhdpi"
     splash.mkdir(parents=True, exist_ok=True)
-    (splash / "splash_logo.png").write_bytes(png(centered(192, hero, 12)))
+    (splash / "splash_logo.png").write_bytes(png(centered(192, hero, 6)))
 
 
 # --- audio ---------------------------------------------------------------------------

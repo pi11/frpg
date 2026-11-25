@@ -5,9 +5,9 @@
   "stat": "xpGain",
   "mod": "flat",
   "perLevel": 0.05,
-  "maxLevel": 5,
+  "maxLevel": 10,
   "cost": {
     "base": 50,
-    "growth": 1.6
+    "growth": 1.45
   }
 }

@@ -93,6 +93,14 @@ export function validateContent(files: Record<string, unknown>): Catalog {
     });
   }
   for (const hero of Object.values(heroes)) {
+    const { unlock } = hero;
+    if ('location' in unlock && !locations[unlock.location]) {
+      throw new Error(`hero ${hero.id}: unknown unlock location ${unlock.location}`);
+    }
+    if (unlock.type === 'milestone' && !balance.reward.emeraldMilestones
+      .some((mark) => mark.atSecond === unlock.atSecond)) {
+      throw new Error(`hero ${hero.id}: no milestone at ${unlock.atSecond}`);
+    }
     if (weapons[hero.startingWeapon]!.unlock.type !== 'default') {
       throw new Error(`hero ${hero.id}: starting weapon must be open`);
     }
@@ -176,8 +184,8 @@ export function validateContent(files: Record<string, unknown>): Catalog {
     throw new Error('At least one location must be open from the start');
   }
   for (const location of Object.values(locations)) {
-    if (!heroes[location.startingHero]) {
-      throw new Error(`location ${location.id}: unknown hero ${location.startingHero}`);
+    if (heroes[location.startingHero]?.unlock.type !== 'default') {
+      throw new Error(`location ${location.id}: hero ${location.startingHero} must be open`);
     }
     if (location.unlock.type === 'bossKilled' && !locations[location.unlock.location]) {
       throw new Error(`location ${location.id}: unlocks after unknown location`);

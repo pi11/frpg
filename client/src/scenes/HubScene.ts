@@ -4,8 +4,8 @@ import { buyUnlock, buyUpgrade, getProfile, startRun, type Profile } from '../ap
 import { getCatalog } from '../content/catalog';
 import { orderedLocations } from '../content/locations';
 import { bundledContentHash } from '../content/hash';
-import type { AchievementDefinition, PassiveDefinition, UpgradeDefinition, WeaponDefinition } from '../content/schemas';
-import { statBonus } from '../content/statText';
+import type { AchievementDefinition, HeroDefinition, PassiveDefinition, UpgradeDefinition, WeaponDefinition } from '../content/schemas';
+import { heroTraits, statBonus } from '../content/statText';
 import { ATLAS, HUB_MUSIC } from '../assets';
 import { upgradeCost } from '../economy';
 import { applyCrt, settings, updateSettings } from '../settings';
@@ -15,11 +15,11 @@ import type { RunData } from './RunScene';
 const VOLUMES = [['music', 'Музыка'], ['sfx', 'Звуки']] as const;
 
 const CATEGORIES: readonly [UpgradeDefinition['category'], string][] = [
-  ['slots', 'Слоты в забеге'], ['special', 'Особое'], ['survival', 'Выживание'], ['combat', 'Бой'], ['scavenge', 'Добыча и опыт'],
+  ['survival', 'Выживание'], ['combat', 'Бой'], ['scavenge', 'Добыча'], ['slots', 'Слоты'], ['special', 'Особое'],
 ];
 
 const TABS = [
-  ['run', 'Вылазка'], ['upgrades', 'Улучшения'], ['weapons', 'Оружие'], ['passives', 'Перки'],
+  ['run', 'Вылазка'], ['heroes', 'Герои'], ['upgrades', 'Улучшения'], ['weapons', 'Оружие'], ['passives', 'Перки'],
   ['emeralds', 'Изумруды'],
   ['achievements', 'Достижения'], ['settings', 'Настройки'],
 ] as const;
@@ -35,13 +35,14 @@ function formatTime(totalSeconds: number): string {
 }
 
 const LOCATION_KEY = 'wasteland.location.v1';
+const HERO_KEY = 'wasteland.hero.v1';
 
-function loadSelectedLocation(): string {
-  try { return localStorage.getItem(LOCATION_KEY) ?? ''; } catch { return ''; }
+function loadChoice(key: string): string {
+  try { return localStorage.getItem(key) ?? ''; } catch { return ''; }
 }
 
-function saveSelectedLocation(id: string): void {
-  try { localStorage.setItem(LOCATION_KEY, id); } catch { /* only a convenience */ }
+function saveChoice(key: string, id: string): void {
+  try { localStorage.setItem(key, id); } catch { /* only a convenience */ }
 }
 
 function effectText(upgrade: UpgradeDefinition, level: number): string {
@@ -59,7 +60,9 @@ export class HubScene extends Phaser.Scene {
   private tab: Tab = 'run';
 
   /** Location chosen in the list; remembered per browser. */
-  private selected = loadSelectedLocation();
+  private selected = loadChoice(LOCATION_KEY);
+  private hero = loadChoice(HERO_KEY);
+  private category: UpgradeDefinition['category'] = 'survival';
 
   constructor() { super('Hub'); }
 
@@ -87,13 +90,19 @@ export class HubScene extends Phaser.Scene {
               data-tab="${id}" aria-controls="hub-panel-${id}">${title}</button>`).join('')}
           </div>
           <section id="hub-panel-run" role="tabpanel" aria-labelledby="hub-tab-run">
+            <div class="shelter-view" role="img" aria-label="Закат над пустошью и вход в убежище"></div>
+            <button id="hub-hero" class="hub-hero" type="button"></button>
             <ul id="hub-locations" class="hub-locations"></ul>
             <label class="hub-autopilot"><input id="hub-autopilot" type="checkbox"> <span>Автопилот: героем управляет ИИ</span></label>
             <p id="hub-autopilot-note" class="hub-note"></p>
             <button id="hub-start" class="auth-primary" type="button">Отправиться на вылазку</button>
             <p id="hub-location" class="hub-note"></p>
           </section>
+          <section id="hub-panel-heroes" role="tabpanel" aria-labelledby="hub-tab-heroes">
+            <ul id="hub-heroes" class="hub-heroes"></ul>
+          </section>
           <section id="hub-panel-upgrades" role="tabpanel" aria-labelledby="hub-tab-upgrades">
+            <div id="hub-categories" class="hub-subtabs" role="group" aria-label="Виды улучшений"></div>
             <ul id="hub-upgrades" class="hub-upgrades"></ul>
           </section>
           <section id="hub-panel-weapons" role="tabpanel" aria-labelledby="hub-tab-weapons">
@@ -192,9 +201,27 @@ export class HubScene extends Phaser.Scene {
       const button = (event.target as HTMLElement).closest<HTMLButtonElement>('button[data-location]');
       if (!button?.dataset.location || !this.profile) return;
       this.selected = button.dataset.location;
-      saveSelectedLocation(this.selected);
+      saveChoice(LOCATION_KEY, this.selected);
       playSfx('sfx/ui_click');
       this.render(this.profile);
+    };
+    this.el('hub-hero').onclick = () => this.openTab('heroes', true);
+    this.el('hub-heroes').onclick = (event) => {
+      const button = (event.target as HTMLElement).closest<HTMLButtonElement>('button[data-hero]');
+      if (!button?.dataset.hero || !this.profile) return;
+      this.hero = button.dataset.hero;
+      saveChoice(HERO_KEY, this.hero);
+      playSfx('sfx/ui_click');
+      this.render(this.profile);
+    };
+    this.el('hub-categories').onclick = (event) => {
+      const button = (event.target as HTMLElement).closest<HTMLButtonElement>('button[data-category]');
+      const category = CATEGORIES.find(([id]) => id === button?.dataset.category)?.[0];
+      if (!category || !this.profile) return;
+      this.category = category;
+      playSfx('sfx/ui_click');
+      this.render(this.profile);
+      this.el('hub-categories').querySelector<HTMLButtonElement>(`[data-category="${category}"]`)?.focus();
     };
     this.el('hub-upgrades').onclick = (event) => {
       const button = (event.target as HTMLElement).closest<HTMLButtonElement>('button[data-upgrade]');
@@ -301,7 +328,8 @@ export class HubScene extends Phaser.Scene {
         <small>${escapeHtml(open ? location.description : lock)}</small></button></li>`;
     }).join('');
     const location = catalog.locations[this.selected];
-    const hero = location ? catalog.heroes[location.startingHero] : undefined;
+    this.renderHeroes(profile);
+    const hero = catalog.heroes[this.hero];
     this.el('hub-location').textContent = location && hero
       ? `${location.name} · ${hero.name} · пробел — начать` : '';
     this.renderItems(profile);
@@ -313,9 +341,10 @@ export class HubScene extends Phaser.Scene {
     this.el('hub-autopilot-note').textContent = bought
       ? 'Не закрывайте вкладку игры. В забеге переключается клавишей I.'
       : pilot ? `Купите за ${upgradeCost(pilot, 0)} изумр. на вкладке «Улучшения».` : '';
-    this.el('hub-upgrades').innerHTML = CATEGORIES.map(([category, title]) =>
-      `<li class="hub-category">${title}</li>${Object.values(catalog.upgrades)
-        .filter((upgrade) => upgrade.category === category).map((upgrade) => {
+    this.el('hub-categories').innerHTML = CATEGORIES.map(([category, title]) =>
+      `<button type="button" data-category="${category}" aria-pressed="${category === this.category}">${title}</button>`).join('');
+    this.el('hub-upgrades').innerHTML = Object.values(catalog.upgrades)
+      .filter((upgrade) => upgrade.category === this.category).map((upgrade) => {
       const level = profile.upgrades[upgrade.id] ?? 0;
       const maxed = level >= upgrade.maxLevel;
       const cost = maxed ? 0 : upgradeCost(upgrade, level);
@@ -327,7 +356,48 @@ export class HubScene extends Phaser.Scene {
         <small>${escapeHtml(effectText(upgrade, level))}</small></div>
         <button type="button" data-upgrade="${escapeHtml(upgrade.id)}" ${maxed || cost > funds ? 'disabled' : ''}>${label}</button>
       </li>`;
-    }).join('')}`).join('');
+    }).join('');
+  }
+
+  private heroCondition(hero: HeroDefinition, profile: Profile): string {
+    const { unlock } = hero;
+    const { locations } = getCatalog();
+    switch (unlock.type) {
+      case 'default': return '';
+      case 'runs': return `Сыграйте ${unlock.count} забегов (${Math.min(profile.runs_count, unlock.count)}/${unlock.count})`;
+      case 'achievements': return `Получите ${unlock.count} достижений (${Math.min(profile.achievements.length, unlock.count)}/${unlock.count})`;
+      case 'bossKilled': return `Победите босса: ${locations[unlock.location]!.name}`;
+      case 'milestone': return `Продержитесь ${formatTime(unlock.atSecond)}: ${locations[unlock.location]!.name}`;
+    }
+  }
+
+  private renderHeroes(profile: Profile): void {
+    const { heroes, weapons } = getCatalog();
+    const list = Object.values(heroes);
+    const basic = list.find((hero) => hero.unlock.type === 'default')!;
+    if (!profile.unlocked_heroes.includes(this.hero)) this.hero = basic.id;
+    const picture = (hero: HeroDefinition, frame = ''): string =>
+      this.textures.getBase64(ATLAS, `${hero.sprite}${frame}`);
+    const ordered = [basic, ...list.filter((hero) => hero !== basic)
+      .sort((a, b) => Number(profile.unlocked_heroes.includes(b.id)) - Number(profile.unlocked_heroes.includes(a.id)))];
+    this.el('hub-heroes').innerHTML = ordered.map((hero) => {
+      const open = profile.unlocked_heroes.includes(hero.id);
+      const chosen = hero.id === this.hero;
+      const { good, bad } = heroTraits(hero, basic);
+      const traits = (items: string[], mark: string): string => items.map((item) =>
+        `<li class="${mark}">${escapeHtml(item)}</li>`).join('');
+      return `<li><button type="button" data-hero="${escapeHtml(hero.id)}" aria-pressed="${chosen}"
+        class="${chosen ? 'hub-hero-chosen' : ''}${open ? '' : ' hub-hero-locked'}" ${open ? '' : 'disabled'}>
+        <span class="hub-hero-stage" style="--sheet-a:url('${picture(hero, '/idle_0')}');--sheet-b:url('${picture(hero, '/idle_2')}')"></span>
+        <span class="hub-hero-text"><strong>${escapeHtml(hero.name)}</strong>${chosen ? ' <em>выбран</em>' : ''}
+        <small>${escapeHtml(hero.description)}</small>
+        <small>Оружие: ${escapeHtml(weapons[hero.startingWeapon]!.name)}</small>
+        ${open ? '' : `<small class="hub-hero-lock">${escapeHtml(this.heroCondition(hero, profile))}</small>`}
+        <ul>${traits(good, 'good')}${traits(bad, 'bad')}</ul></span></button></li>`;
+    }).join('');
+    const hero = heroes[this.hero]!;
+    this.el('hub-hero').innerHTML = `<img alt="" src="${picture(hero)}"><span><strong>${escapeHtml(hero.name)}</strong>
+      <small>${escapeHtml(hero.description)}</small></span><span class="hub-level">Сменить</span>`;
   }
 
   private renderItems(profile: Profile): void {
@@ -456,7 +526,7 @@ export class HubScene extends Phaser.Scene {
     playSfx('sfx/ui_click');
     this.status('Открываем шлюз…');
     const [run, contentHash] = await Promise.all([
-      startRun(location.id, location.startingHero), bundledContentHash(),
+      startRun(location.id, this.hero), bundledContentHash(),
     ]);
     if (!this.active) return;
     const params = new URLSearchParams(window.location.search);
@@ -467,7 +537,7 @@ export class HubScene extends Phaser.Scene {
     const seed = Number.isSafeInteger(parsedSeed) && parsedSeed >= 0 ? parsedSeed >>> 0 : run.seed >>> 0;
     const wave = Number.isSafeInteger(parsedWave) && parsedWave >= 0 ? parsedWave : 0;
     const data: RunData = {
-      seed, wave, locationId: location.id, heroId: location.startingHero,
+      seed, wave, locationId: location.id, heroId: this.hero,
       runId: run.run_id, contentHash, upgrades: { ...this.profile.upgrades },
       unlocks: [...this.profile.unlocks], achievements: [...this.profile.achievements],
     };

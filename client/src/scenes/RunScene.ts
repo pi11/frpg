@@ -218,6 +218,8 @@ export class RunScene extends Phaser.Scene {
   private ownedAchievements = new Set<string>();
   private bossSpawnedAt = 0;
   private checkedSecond = -1;
+  /** Free level-ups left to show at the start. */
+  private headStart = 0;
   private orbiters = new Map<string, Phaser.GameObjects.Sprite[]>();
   private auras = new Map<string, number>();
   private mobs: SpriteMob[] = [];
@@ -287,6 +289,7 @@ export class RunScene extends Phaser.Scene {
     this.record = newRecord(new Date().getHours());
     this.reported = new Set();
     this.ownedAchievements = new Set(data.achievements);
+    this.headStart = Math.floor(this.stat('headStart'));
     this.checkedSecond = -1;
     this.orbiters = new Map();
     this.auras = new Map();
@@ -314,7 +317,8 @@ export class RunScene extends Phaser.Scene {
     this.ground = this.add.tileSprite(0, 0, 480, 270, this.location.groundSprite)
       .setOrigin(0).setScrollFactor(0).setDepth(-100);
     this.hero = this.physics.add.sprite(0, 0, ATLAS, this.heroDefinition.sprite).setDepth(10);
-    (this.hero.body as Phaser.Physics.Arcade.Body).setSize(12, 12);
+    // The body stays small and sits on the feet of the taller sprite.
+    (this.hero.body as Phaser.Physics.Arcade.Body).setSize(12, 14).setOffset(6, 9);
     this.cameras.main.startFollow(this.hero, true);
     this.cameras.main.setRoundPixels(true);
 
@@ -499,7 +503,8 @@ export class RunScene extends Phaser.Scene {
       addCaps: (amount) => { this.view.caps += amount; },
       openChest: (items, caps) => this.openChest(items, caps),
       addBuff: (id, stat, amount, durationMs) => {
-        this.buffs.set(id, { stat, amount, until: this.elapsedMs + durationMs, durationMs });
+        const lasts = durationMs * (1 + this.stat('buffDuration'));
+        this.buffs.set(id, { stat, amount, until: this.elapsedMs + lasts, durationMs: lasts });
       },
       addXpFraction: (fraction) => { this.gainXp(this.view.nextXp * fraction); },
       freezeEnemies: (durationMs) => {
@@ -530,6 +535,11 @@ export class RunScene extends Phaser.Scene {
     }
     this.runTimeline();
     this.updateRecord(delta);
+    if (this.headStart > 0 && this.scene.isActive()) {
+      this.headStart -= 1;
+      this.gainXp(this.view.nextXp - this.view.xp);
+      return;
+    }
 
     const regen = this.stat('regen');
     if (regen > 0) this.view.hp = Math.min(this.view.maxHp, this.view.hp + regen * delta / 1000);
@@ -721,9 +731,8 @@ export class RunScene extends Phaser.Scene {
     if (length > 0) {
       if (x !== 0) this.hero.setFlipX(x < 0);
       this.hero.anims.play(animationKey(sprite, 'walk'), true);
-    } else if (this.hero.anims.isPlaying) {
-      this.hero.anims.stop();
-      this.hero.setFrame(sprite);
+    } else {
+      this.hero.anims.play(animationKey(sprite, 'idle'), true);
     }
   }
 
@@ -1332,7 +1341,7 @@ export class RunScene extends Phaser.Scene {
       const { trigger } = landmark.definition;
       if (distance <= trigger.radius) {
         nearby.push(landmark);
-        if (this.view.caps >= trigger.caps) landmark.progress += delta / trigger.holdMs;
+        if (this.view.caps >= trigger.caps) landmark.progress += delta * (1 + this.stat('landmarkSpeed')) / trigger.holdMs;
       } else {
         landmark.progress = Math.max(0, landmark.progress - landmarkDecayRate * delta / trigger.holdMs);
         if (distance <= landmarkHintRange && !view.contains(landmark.x, landmark.y)) {

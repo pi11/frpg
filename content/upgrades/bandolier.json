@@ -5,9 +5,9 @@
   "stat": "projectileCount",
   "mod": "flat",
   "perLevel": 1,
-  "maxLevel": 1,
+  "maxLevel": 2,
   "cost": {
     "base": 600,
-    "growth": 1
+    "growth": 3
   }
 }

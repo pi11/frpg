@@ -1,6 +1,7 @@
 {
   "id": "wanderer",
   "name": "Скиталец",
+  "description": "Бродяга без слабых мест. Всё умеет понемногу.",
   "sprite": "heroes/wanderer",
   "startingWeapon": "scrap_pistol",
   "unlock": {
@@ -30,6 +31,9 @@
     "killHeal": 0,
     "weaponSlots": 3,
     "passiveSlots": 3,
-    "autopilot": 0
+    "autopilot": 0,
+    "headStart": 0,
+    "buffDuration": 0,
+    "landmarkSpeed": 0
   }
 }

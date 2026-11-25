@@ -13,7 +13,7 @@ from app.db import get_session
 from app.models.auth import AuthIdentity, Profile, User
 from app.services.achievements import grant_achievements
 from app.services.content import get_content
-from app.services.economy import unlocked_locations, upgrade_cost
+from app.services.economy import unlocked_heroes, unlocked_locations, upgrade_cost
 from app.services.tokens import current_user
 
 router = APIRouter(tags=["profile"], responses={
@@ -44,6 +44,7 @@ class ProfileResponse(BaseModel):
     milestones: dict[str, list[int]]
     achievements: list[str]
     unlocked_locations: list[str]
+    unlocked_heroes: list[str]
     identities: list[IdentityResponse]
 
 
@@ -65,6 +66,7 @@ async def profile_response(session: AsyncSession, user: User, profile: Profile) 
         bosses_killed=sorted(data.get("bosses_killed", [])),
         unlocks=sorted(data.get("unlocks", [])), milestones=data.get("milestones", {}),
         achievements=data.get("achievements", []),
+        unlocked_heroes=unlocked_heroes(get_content().category("heroes"), data),
         unlocked_locations=unlocked_locations(
             get_content().category("locations"), data.get("bosses_killed", []),
         ),

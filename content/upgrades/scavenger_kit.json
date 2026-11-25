@@ -5,9 +5,9 @@
   "stat": "pickupRadius",
   "mod": "flat",
   "perLevel": 6,
-  "maxLevel": 5,
+  "maxLevel": 10,
   "cost": {
     "base": 30,
-    "growth": 1.5
+    "growth": 1.45
   }
 }

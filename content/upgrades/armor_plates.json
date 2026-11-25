@@ -5,9 +5,9 @@
   "stat": "armor",
   "mod": "flat",
   "perLevel": 1,
-  "maxLevel": 3,
+  "maxLevel": 6,
   "cost": {
     "base": 30,
-    "growth": 1.6
+    "growth": 1.8
   }
 }

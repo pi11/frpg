@@ -1,0 +1,13 @@
+{
+  "id": "trophy_wall",
+  "name": "Стена трофеев",
+  "category": "combat",
+  "stat": "eliteDamage",
+  "mod": "flat",
+  "perLevel": 0.04,
+  "maxLevel": 10,
+  "cost": {
+    "base": 70,
+    "growth": 1.45
+  }
+}

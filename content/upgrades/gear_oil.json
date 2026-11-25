@@ -5,9 +5,9 @@
   "stat": "attackSpeed",
   "mod": "flat",
   "perLevel": 0.03,
-  "maxLevel": 5,
+  "maxLevel": 10,
   "cost": {
     "base": 60,
-    "growth": 1.6
+    "growth": 1.45
   }
 }

@@ -10,6 +10,7 @@ from app.services.economy import (
     emerald_reward,
     new_milestones,
     run_reward,
+    unlocked_heroes,
     upgrade_cost,
 )
 
@@ -69,3 +70,16 @@ def test_bundle_hash_covers_every_content_file() -> None:
     content = get_content()
     assert "content/balance.json" in content.files
     assert len(content.hash) == 64
+
+
+def test_heroes_open_by_their_conditions() -> None:
+    heroes = get_content().category("heroes")
+    assert unlocked_heroes(heroes, {}) == ["wanderer"]
+    assert "spark" not in unlocked_heroes(heroes, {"runs_count": 4})
+    assert "spark" in unlocked_heroes(heroes, {"runs_count": 5})
+    assert "bruiser" in unlocked_heroes(heroes, {"bosses_killed": ["shelter_outskirts"]})
+    assert "bruiser" not in unlocked_heroes(heroes, {"bosses_killed": ["dead_city"]})
+    assert "marksman" in unlocked_heroes(heroes, {"milestones": {"dead_city": [300, 720]}})
+    assert "marksman" not in unlocked_heroes(heroes, {"milestones": {"toxic_marsh": [720]}})
+    assert "chemist" in unlocked_heroes(heroes, {"achievements": list("abcdefgh")})
+    assert "chemist" not in unlocked_heroes(heroes, {"achievements": list("abcdefg")})

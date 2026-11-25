@@ -5,9 +5,9 @@
   "stat": "duration",
   "mod": "flat",
   "perLevel": 0.06,
-  "maxLevel": 5,
+  "maxLevel": 10,
   "cost": {
     "base": 45,
-    "growth": 1.6
+    "growth": 1.45
   }
 }

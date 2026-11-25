@@ -1,0 +1,13 @@
+{
+  "id": "head_start",
+  "name": "Полигон",
+  "category": "scavenge",
+  "stat": "headStart",
+  "mod": "flat",
+  "perLevel": 1,
+  "maxLevel": 3,
+  "cost": {
+    "base": 250,
+    "growth": 2.2
+  }
+}

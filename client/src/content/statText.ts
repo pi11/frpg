@@ -1,4 +1,4 @@
-import type { StatKey, WeaponLevel } from './schemas';
+import { STAT_KEYS, type HeroDefinition, type StatKey, type WeaponLevel } from './schemas';
 
 export const STAT_LABELS: Record<StatKey, string> = {
   maxHp: 'здоровье', armor: 'броня', regen: 'регенерация', moveSpeed: 'скорость',
@@ -6,21 +6,22 @@ export const STAT_LABELS: Record<StatKey, string> = {
   duration: 'длительность', pickupRadius: 'радиус сбора', xpGain: 'опыт', luck: 'удача',
   radResist: 'защита от опасных зон', critChance: 'шанс крита', rerolls: 'переброс карточек',
   revives: 'возрождение', critDamage: 'урон крита', dodge: 'уклонение', thorns: 'урон шипов',
-  autopilot: 'автопилот', weaponSlots: 'слот оружия', passiveSlots: 'слот перка',
+  headStart: 'уровень на старте', buffDuration: 'время усилений',
+  landmarkSpeed: 'скорость взлома', autopilot: 'автопилот', weaponSlots: 'слот оружия', passiveSlots: 'слот перка',
   eliteDamage: 'урон боссам', killHeal: 'здоровье за убийство',
 };
 
 /** Stats stored as fractions and shown as percent. */
 const FRACTIONS: ReadonlySet<StatKey> = new Set([
   'attackSpeed', 'area', 'duration', 'xpGain', 'luck', 'radResist', 'critChance',
-  'critDamage', 'dodge', 'eliteDamage',
+  'critDamage', 'dodge', 'eliteDamage', 'buffDuration', 'landmarkSpeed',
 ]);
 
 /** `+15% удача`; amounts are rounded so 3 × 0.05 does not show float noise. */
 export function statBonus(stat: StatKey, amount: number, mod: 'flat' | 'percent' = 'flat'): string {
   const percent = mod === 'percent' || FRACTIONS.has(stat);
   const value = percent ? Math.round(amount * 1000) / 10 : Math.round(amount * 100) / 100;
-  return `+${value}${percent ? '%' : ''} ${STAT_LABELS[stat]}`;
+  return `${value < 0 ? '' : '+'}${value}${percent ? '%' : ''} ${STAT_LABELS[stat]}`;
 }
 
 const LEVEL_FIELDS: readonly [keyof WeaponLevel, string, (value: number) => string][] = [
@@ -50,4 +51,15 @@ export function levelStats(level: WeaponLevel): string[] {
     const value = level[field];
     return value === undefined || (field === 'pierce' && !value) ? [] : [`${label} ${format(value)}`];
   });
+}
+
+/** How a hero differs from the basic one, strengths and weaknesses apart. */
+export function heroTraits(hero: HeroDefinition, basic: HeroDefinition): { good: string[]; bad: string[] } {
+  const good: string[] = [];
+  const bad: string[] = [];
+  for (const key of STAT_KEYS) {
+    const difference = hero.baseStats[key] - basic.baseStats[key];
+    if (difference) (difference > 0 ? good : bad).push(statBonus(key, difference));
+  }
+  return { good, bad };
 }

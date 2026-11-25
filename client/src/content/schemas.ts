@@ -4,7 +4,7 @@ export const STAT_KEYS = [
   'maxHp', 'armor', 'regen', 'moveSpeed', 'damage', 'attackSpeed', 'area',
   'projectileCount', 'duration', 'pickupRadius', 'xpGain', 'luck', 'radResist',
   'critChance', 'critDamage', 'dodge', 'thorns', 'eliteDamage', 'killHeal', 'rerolls', 'revives',
-  'weaponSlots', 'passiveSlots', 'autopilot',
+  'weaponSlots', 'passiveSlots', 'autopilot', 'headStart', 'buffDuration', 'landmarkSpeed',
 ] as const;
 
 export const StatKeySchema = z.enum(STAT_KEYS);
@@ -42,6 +42,11 @@ export const StatsSchema = z.object({
   passiveSlots: z.number().int().positive(),
   /** 1 when the autopilot was bought. */
   autopilot: z.number().int().min(0).max(1),
+  /** Level-ups at the start of a run. */
+  headStart: z.number().int().nonnegative(),
+  /** Longer temporary bonuses and faster landmarks, shares. */
+  buffDuration: z.number().nonnegative(),
+  landmarkSpeed: z.number().nonnegative(),
 }).strict();
 export type Stats = z.infer<typeof StatsSchema>;
 
@@ -55,9 +60,18 @@ const soundKey = (folder: 'sfx' | 'music') => spriteKey(folder);
 export const HeroSchema = z.object({
   id: IdSchema,
   name: z.string().min(1),
+  description: z.string().min(1),
   sprite: spriteKey('heroes'),
   startingWeapon: IdSchema,
-  unlock: z.object({ type: z.literal('default') }).strict(),
+  /** Checked by the server (unlocked_heroes in economy.py). */
+  unlock: z.discriminatedUnion('type', [
+    z.object({ type: z.literal('default') }).strict(),
+    z.object({ type: z.literal('runs'), count: z.number().int().positive() }).strict(),
+    z.object({ type: z.literal('achievements'), count: z.number().int().positive() }).strict(),
+    z.object({ type: z.literal('bossKilled'), location: IdSchema }).strict(),
+    z.object({ type: z.literal('milestone'), location: IdSchema,
+      atSecond: z.number().int().positive() }).strict(),
+  ]),
   baseStats: StatsSchema,
 }).strict();
 export type HeroDefinition = z.infer<typeof HeroSchema>;

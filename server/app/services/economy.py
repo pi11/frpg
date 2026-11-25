@@ -87,3 +87,25 @@ def unlocked_locations(
         if location["unlock"]["type"] == "default"
         or location["unlock"].get("location") in bosses_killed
     )
+
+
+def unlocked_heroes(heroes: Mapping[str, Mapping[str, Any]], data: Mapping[str, Any]) -> list[str]:
+    """Heroes whose condition is met by the profile; mirrored by heroProgress on the client."""
+    return sorted(
+        hero_id for hero_id, hero in heroes.items() if hero_progress(hero["unlock"], data)
+    )
+
+
+def hero_progress(unlock: Mapping[str, Any], data: Mapping[str, Any]) -> bool:
+    match unlock["type"]:
+        case "default":
+            return True
+        case "runs":
+            return int(data.get("runs_count", 0)) >= int(unlock["count"])
+        case "achievements":
+            return len(data.get("achievements", [])) >= int(unlock["count"])
+        case "bossKilled":
+            return unlock["location"] in data.get("bosses_killed", [])
+        case "milestone":
+            return unlock["atSecond"] in data.get("milestones", {}).get(unlock["location"], [])
+    return False

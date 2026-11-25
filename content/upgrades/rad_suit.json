@@ -5,7 +5,7 @@
   "stat": "radResist",
   "mod": "flat",
   "perLevel": 0.15,
-  "maxLevel": 4,
+  "maxLevel": 6,
   "cost": {
     "base": 40,
     "growth": 1.6

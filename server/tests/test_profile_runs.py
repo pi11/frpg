@@ -442,3 +442,22 @@ async def test_slots_cost_emeralds_not_caps(api: dict[str, object]) -> None:
     bought = (await buy(0)).json()
     assert bought["emeralds"] == 2 and bought["caps"] == 1000
     assert bought["upgrades"] == {"weapon_rack": 1}
+
+
+@pytest.mark.anyio
+async def test_locked_hero_cannot_start_a_run(api: dict[str, object]) -> None:
+    client: httpx.AsyncClient = api["client"]  # type: ignore[assignment]
+    factory: async_sessionmaker[AsyncSession] = api["factory"]  # type: ignore[assignment]
+    guest = (await client.post("/api/v1/auth/guest")).json()
+    body = {"location_id": "shelter_outskirts", "hero_id": "spark"}
+    locked = await client.post("/api/v1/runs/start", json=body, headers=headers(guest))
+    assert locked.status_code == 403 and locked.json()["code"] == "locked"
+    async with factory() as session:
+        row = await session.get(Profile, UUID(guest["user_id"]))
+        assert row is not None
+        row.data = {"runs_count": 5}
+        await session.commit()
+    profile = (await client.get("/api/v1/profile", headers=headers(guest))).json()
+    assert profile["unlocked_heroes"] == ["spark", "wanderer"]
+    started = await client.post("/api/v1/runs/start", json=body, headers=headers(guest))
+    assert started.status_code == 200

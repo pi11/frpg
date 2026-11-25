@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { getCatalog } from './catalog';
-import { levelChanges, levelStats, statBonus } from './statText';
+import { heroTraits, levelChanges, levelStats, statBonus } from './statText';
 
 describe('upgrade texts', () => {
   it('shows fractions as percent without float noise', () => {
@@ -13,6 +13,20 @@ describe('upgrade texts', () => {
     const [first, second] = getCatalog().weapons.tesla_coil!.levels;
     expect(levelChanges(first!, second!)).toEqual(['урон 9>11', 'перезарядка 1.3с>1.25с', 'скачки 2>3']);
     expect(levelChanges(first!, first!)).toEqual([]);
+  });
+
+  it('separates strengths and weaknesses of heroes', () => {
+    const { heroes } = getCatalog();
+    const { good, bad } = heroTraits(heroes.bruiser!, heroes.wanderer!);
+    expect(good).toContain('+60 здоровье');
+    expect(bad).toContain('-10% скорость атаки');
+    expect(heroTraits(heroes.wanderer!, heroes.wanderer!)).toEqual({ good: [], bad: [] });
+    for (const hero of Object.values(heroes)) {
+      if (hero.unlock.type === 'default') continue;
+      const traits = heroTraits(hero, heroes.wanderer!);
+      expect(traits.good.length, hero.id).toBeGreaterThan(0);
+      expect(traits.bad.length, hero.id).toBeGreaterThan(0);
+    }
   });
 
   it('lists weapon numbers for tooltips', () => {

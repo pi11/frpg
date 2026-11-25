@@ -1,0 +1,13 @@
+{
+  "id": "infirmary",
+  "name": "Лазарет",
+  "category": "survival",
+  "stat": "killHeal",
+  "mod": "flat",
+  "perLevel": 0.02,
+  "maxLevel": 8,
+  "cost": {
+    "base": 80,
+    "growth": 1.5
+  }
+}

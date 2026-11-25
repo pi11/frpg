@@ -42,8 +42,8 @@
   },
   "decor/barrel": {
    "frame": {
-    "x": 220,
-    "y": 635,
+    "x": 441,
+    "y": 730,
     "w": 10,
     "h": 13
    },
@@ -82,8 +82,8 @@
   },
   "decor/boat": {
    "frame": {
-    "x": 83,
-    "y": 508,
+    "x": 467,
+    "y": 599,
     "w": 44,
     "h": 20
    },
@@ -102,8 +102,8 @@
   },
   "decor/bones": {
    "frame": {
-    "x": 426,
-    "y": 650,
+    "x": 142,
+    "y": 760,
     "w": 14,
     "h": 6
    },
@@ -142,8 +142,8 @@
   },
   "decor/cactus": {
    "frame": {
-    "x": 491,
-    "y": 450,
+    "x": 375,
+    "y": 570,
     "w": 16,
     "h": 24
    },
@@ -162,8 +162,8 @@
   },
   "decor/campfire": {
    "frame": {
-    "x": 477,
-    "y": 618,
+    "x": 205,
+    "y": 730,
     "w": 16,
     "h": 14
    },
@@ -182,8 +182,8 @@
   },
   "decor/car_wreck": {
    "frame": {
-    "x": 1,
-    "y": 635,
+    "x": 222,
+    "y": 730,
     "w": 32,
     "h": 14
    },
@@ -202,8 +202,8 @@
   },
   "decor/concrete_block": {
    "frame": {
-    "x": 34,
-    "y": 635,
+    "x": 255,
+    "y": 730,
     "w": 18,
     "h": 14
    },
@@ -222,8 +222,8 @@
   },
   "decor/container": {
    "frame": {
-    "x": 359,
-    "y": 450,
+    "x": 243,
+    "y": 570,
     "w": 52,
     "h": 26
    },
@@ -242,8 +242,8 @@
   },
   "decor/crate": {
    "frame": {
-    "x": 231,
-    "y": 635,
+    "x": 452,
+    "y": 730,
     "w": 12,
     "h": 12
    },
@@ -262,8 +262,8 @@
   },
   "decor/crate/break_0": {
    "frame": {
-    "x": 244,
-    "y": 635,
+    "x": 465,
+    "y": 730,
     "w": 12,
     "h": 12
    },
@@ -282,8 +282,8 @@
   },
   "decor/crate/break_1": {
    "frame": {
-    "x": 257,
-    "y": 635,
+    "x": 478,
+    "y": 730,
     "w": 12,
     "h": 12
    },
@@ -302,8 +302,8 @@
   },
   "decor/crate/break_2": {
    "frame": {
-    "x": 270,
-    "y": 635,
+    "x": 491,
+    "y": 730,
     "w": 12,
     "h": 12
    },
@@ -322,8 +322,8 @@
   },
   "decor/crater": {
    "frame": {
-    "x": 1,
-    "y": 483,
+    "x": 392,
+    "y": 570,
     "w": 36,
     "h": 24
    },
@@ -342,8 +342,8 @@
   },
   "decor/crystal": {
    "frame": {
-    "x": 38,
-    "y": 483,
+    "x": 429,
+    "y": 570,
     "w": 20,
     "h": 24
    },
@@ -362,8 +362,8 @@
   },
   "decor/dead_tree": {
    "frame": {
-    "x": 417,
-    "y": 483,
+    "x": 314,
+    "y": 599,
     "w": 18,
     "h": 22
    },
@@ -382,8 +382,8 @@
   },
   "decor/dry_grass": {
    "frame": {
-    "x": 59,
-    "y": 483,
+    "x": 450,
+    "y": 570,
     "w": 44,
     "h": 24
    },
@@ -402,8 +402,8 @@
   },
   "decor/dune": {
    "frame": {
-    "x": 128,
-    "y": 508,
+    "x": 1,
+    "y": 624,
     "w": 48,
     "h": 20
    },
@@ -422,8 +422,8 @@
   },
   "decor/fence": {
    "frame": {
-    "x": 112,
-    "y": 531,
+    "x": 1,
+    "y": 645,
     "w": 34,
     "h": 16
    },
@@ -442,8 +442,8 @@
   },
   "decor/grave": {
    "frame": {
-    "x": 177,
-    "y": 508,
+    "x": 50,
+    "y": 624,
     "w": 16,
     "h": 20
    },
@@ -502,8 +502,8 @@
   },
   "decor/lava_crack": {
    "frame": {
-    "x": 104,
-    "y": 483,
+    "x": 1,
+    "y": 599,
     "w": 44,
     "h": 24
    },
@@ -522,8 +522,8 @@
   },
   "decor/lily_pads": {
    "frame": {
-    "x": 149,
-    "y": 483,
+    "x": 46,
+    "y": 599,
     "w": 44,
     "h": 24
    },
@@ -562,8 +562,8 @@
   },
   "decor/moss": {
    "frame": {
-    "x": 194,
-    "y": 508,
+    "x": 67,
+    "y": 624,
     "w": 40,
     "h": 20
    },
@@ -582,8 +582,8 @@
   },
   "decor/mushrooms": {
    "frame": {
-    "x": 283,
-    "y": 635,
+    "x": 1,
+    "y": 747,
     "w": 14,
     "h": 12
    },
@@ -602,8 +602,8 @@
   },
   "decor/oil_puddle": {
    "frame": {
-    "x": 53,
-    "y": 635,
+    "x": 274,
+    "y": 730,
     "w": 30,
     "h": 14
    },
@@ -622,8 +622,8 @@
   },
   "decor/pipe": {
    "frame": {
-    "x": 147,
-    "y": 531,
+    "x": 36,
+    "y": 645,
     "w": 44,
     "h": 16
    },
@@ -682,8 +682,8 @@
   },
   "decor/rad_puddle": {
    "frame": {
-    "x": 84,
-    "y": 635,
+    "x": 305,
+    "y": 730,
     "w": 28,
     "h": 14
    },
@@ -722,8 +722,8 @@
   },
   "decor/reeds": {
    "frame": {
-    "x": 436,
-    "y": 483,
+    "x": 333,
+    "y": 599,
     "w": 16,
     "h": 22
    },
@@ -762,8 +762,8 @@
   },
   "decor/rocks": {
    "frame": {
-    "x": 285,
-    "y": 650,
+    "x": 1,
+    "y": 760,
     "w": 14,
     "h": 8
    },
@@ -782,8 +782,8 @@
   },
   "decor/rubble": {
    "frame": {
-    "x": 235,
-    "y": 508,
+    "x": 108,
+    "y": 624,
     "w": 32,
     "h": 20
    },
@@ -802,8 +802,8 @@
   },
   "decor/ruin_wall": {
    "frame": {
-    "x": 412,
-    "y": 450,
+    "x": 296,
+    "y": 570,
     "w": 36,
     "h": 26
    },
@@ -842,8 +842,8 @@
   },
   "decor/sandbags": {
    "frame": {
-    "x": 192,
-    "y": 531,
+    "x": 81,
+    "y": 645,
     "w": 34,
     "h": 16
    },
@@ -862,8 +862,8 @@
   },
   "decor/scorch": {
    "frame": {
-    "x": 268,
-    "y": 508,
+    "x": 141,
+    "y": 624,
     "w": 30,
     "h": 20
    },
@@ -902,8 +902,8 @@
   },
   "decor/signpost": {
    "frame": {
-    "x": 194,
-    "y": 483,
+    "x": 91,
+    "y": 599,
     "w": 18,
     "h": 24
    },
@@ -922,8 +922,8 @@
   },
   "decor/stump": {
    "frame": {
-    "x": 113,
-    "y": 635,
+    "x": 334,
+    "y": 730,
     "w": 16,
     "h": 14
    },
@@ -942,8 +942,8 @@
   },
   "decor/tent": {
    "frame": {
-    "x": 453,
-    "y": 483,
+    "x": 350,
+    "y": 599,
     "w": 34,
     "h": 22
    },
@@ -962,8 +962,8 @@
   },
   "decor/tires": {
    "frame": {
-    "x": 88,
-    "y": 650,
+    "x": 305,
+    "y": 747,
     "w": 14,
     "h": 11
    },
@@ -982,8 +982,8 @@
   },
   "decor/toxic_pool": {
    "frame": {
-    "x": 1,
-    "y": 508,
+    "x": 385,
+    "y": 599,
     "w": 40,
     "h": 22
    },
@@ -1002,8 +1002,8 @@
   },
   "decor/tracks": {
    "frame": {
-    "x": 227,
-    "y": 531,
+    "x": 116,
+    "y": 645,
     "w": 64,
     "h": 16
    },
@@ -1022,8 +1022,8 @@
   },
   "decor/violet_slime": {
    "frame": {
-    "x": 42,
-    "y": 508,
+    "x": 426,
+    "y": 599,
     "w": 40,
     "h": 22
    },
@@ -1042,8 +1042,8 @@
   },
   "decor/walkway": {
    "frame": {
-    "x": 462,
-    "y": 508,
+    "x": 335,
+    "y": 624,
     "w": 48,
     "h": 18
    },
@@ -1242,8 +1242,8 @@
   },
   "enemies/cleaner_bot": {
    "frame": {
-    "x": 292,
-    "y": 531,
+    "x": 181,
+    "y": 645,
     "w": 16,
     "h": 16
    },
@@ -1262,8 +1262,8 @@
   },
   "enemies/cleaner_bot/death_0": {
    "frame": {
-    "x": 309,
-    "y": 531,
+    "x": 198,
+    "y": 645,
     "w": 16,
     "h": 16
    },
@@ -1282,8 +1282,8 @@
   },
   "enemies/cleaner_bot/death_1": {
    "frame": {
-    "x": 326,
-    "y": 531,
+    "x": 215,
+    "y": 645,
     "w": 16,
     "h": 16
    },
@@ -1302,8 +1302,8 @@
   },
   "enemies/cleaner_bot/death_2": {
    "frame": {
-    "x": 343,
-    "y": 531,
+    "x": 232,
+    "y": 645,
     "w": 16,
     "h": 16
    },
@@ -1322,8 +1322,8 @@
   },
   "enemies/cleaner_bot/death_3": {
    "frame": {
-    "x": 360,
-    "y": 531,
+    "x": 249,
+    "y": 645,
     "w": 16,
     "h": 16
    },
@@ -1342,8 +1342,8 @@
   },
   "enemies/cleaner_bot/walk_0": {
    "frame": {
-    "x": 377,
-    "y": 531,
+    "x": 266,
+    "y": 645,
     "w": 16,
     "h": 16
    },
@@ -1362,8 +1362,8 @@
   },
   "enemies/cleaner_bot/walk_1": {
    "frame": {
-    "x": 394,
-    "y": 531,
+    "x": 283,
+    "y": 645,
     "w": 16,
     "h": 16
    },
@@ -1382,8 +1382,8 @@
   },
   "enemies/cleaner_bot/walk_2": {
    "frame": {
-    "x": 411,
-    "y": 531,
+    "x": 300,
+    "y": 645,
     "w": 16,
     "h": 16
    },
@@ -1402,8 +1402,8 @@
   },
   "enemies/cleaner_bot/walk_3": {
    "frame": {
-    "x": 428,
-    "y": 531,
+    "x": 317,
+    "y": 645,
     "w": 16,
     "h": 16
    },
@@ -1422,8 +1422,8 @@
   },
   "enemies/ghoul": {
    "frame": {
-    "x": 445,
-    "y": 531,
+    "x": 334,
+    "y": 645,
     "w": 16,
     "h": 16
    },
@@ -1442,8 +1442,8 @@
   },
   "enemies/ghoul/death_0": {
    "frame": {
-    "x": 462,
-    "y": 531,
+    "x": 351,
+    "y": 645,
     "w": 16,
     "h": 16
    },
@@ -1462,8 +1462,8 @@
   },
   "enemies/ghoul/death_1": {
    "frame": {
-    "x": 479,
-    "y": 531,
+    "x": 368,
+    "y": 645,
     "w": 16,
     "h": 16
    },
@@ -1482,8 +1482,8 @@
   },
   "enemies/ghoul/death_2": {
    "frame": {
-    "x": 1,
-    "y": 550,
+    "x": 385,
+    "y": 645,
     "w": 16,
     "h": 16
    },
@@ -1502,8 +1502,8 @@
   },
   "enemies/ghoul/death_3": {
    "frame": {
-    "x": 18,
-    "y": 550,
+    "x": 402,
+    "y": 645,
     "w": 16,
     "h": 16
    },
@@ -1522,8 +1522,8 @@
   },
   "enemies/ghoul/walk_0": {
    "frame": {
-    "x": 35,
-    "y": 550,
+    "x": 419,
+    "y": 645,
     "w": 16,
     "h": 16
    },
@@ -1542,8 +1542,8 @@
   },
   "enemies/ghoul/walk_1": {
    "frame": {
-    "x": 52,
-    "y": 550,
+    "x": 436,
+    "y": 645,
     "w": 16,
     "h": 16
    },
@@ -1562,8 +1562,8 @@
   },
   "enemies/ghoul/walk_2": {
    "frame": {
-    "x": 69,
-    "y": 550,
+    "x": 453,
+    "y": 645,
     "w": 16,
     "h": 16
    },
@@ -1582,8 +1582,8 @@
   },
   "enemies/ghoul/walk_3": {
    "frame": {
-    "x": 86,
-    "y": 550,
+    "x": 470,
+    "y": 645,
     "w": 16,
     "h": 16
    },
@@ -1602,8 +1602,8 @@
   },
   "enemies/glow_slime": {
    "frame": {
-    "x": 103,
-    "y": 550,
+    "x": 487,
+    "y": 645,
     "w": 16,
     "h": 16
    },
@@ -1622,8 +1622,8 @@
   },
   "enemies/glow_slime/death_0": {
    "frame": {
-    "x": 120,
-    "y": 550,
+    "x": 1,
+    "y": 662,
     "w": 16,
     "h": 16
    },
@@ -1642,8 +1642,8 @@
   },
   "enemies/glow_slime/death_1": {
    "frame": {
-    "x": 137,
-    "y": 550,
+    "x": 18,
+    "y": 662,
     "w": 16,
     "h": 16
    },
@@ -1662,8 +1662,8 @@
   },
   "enemies/glow_slime/death_2": {
    "frame": {
-    "x": 154,
-    "y": 550,
+    "x": 35,
+    "y": 662,
     "w": 16,
     "h": 16
    },
@@ -1682,8 +1682,8 @@
   },
   "enemies/glow_slime/death_3": {
    "frame": {
-    "x": 171,
-    "y": 550,
+    "x": 52,
+    "y": 662,
     "w": 16,
     "h": 16
    },
@@ -1702,8 +1702,8 @@
   },
   "enemies/glow_slime/walk_0": {
    "frame": {
-    "x": 188,
-    "y": 550,
+    "x": 69,
+    "y": 662,
     "w": 16,
     "h": 16
    },
@@ -1722,8 +1722,8 @@
   },
   "enemies/glow_slime/walk_1": {
    "frame": {
-    "x": 205,
-    "y": 550,
+    "x": 86,
+    "y": 662,
     "w": 16,
     "h": 16
    },
@@ -1742,8 +1742,8 @@
   },
   "enemies/glow_slime/walk_2": {
    "frame": {
-    "x": 222,
-    "y": 550,
+    "x": 103,
+    "y": 662,
     "w": 16,
     "h": 16
    },
@@ -1762,8 +1762,8 @@
   },
   "enemies/glow_slime/walk_3": {
    "frame": {
-    "x": 239,
-    "y": 550,
+    "x": 120,
+    "y": 662,
     "w": 16,
     "h": 16
    },
@@ -2502,8 +2502,8 @@
   },
   "enemies/medic": {
    "frame": {
-    "x": 256,
-    "y": 550,
+    "x": 137,
+    "y": 662,
     "w": 16,
     "h": 16
    },
@@ -2522,8 +2522,8 @@
   },
   "enemies/medic/death_0": {
    "frame": {
-    "x": 273,
-    "y": 550,
+    "x": 154,
+    "y": 662,
     "w": 16,
     "h": 16
    },
@@ -2542,8 +2542,8 @@
   },
   "enemies/medic/death_1": {
    "frame": {
-    "x": 290,
-    "y": 550,
+    "x": 171,
+    "y": 662,
     "w": 16,
     "h": 16
    },
@@ -2562,8 +2562,8 @@
   },
   "enemies/medic/death_2": {
    "frame": {
-    "x": 307,
-    "y": 550,
+    "x": 188,
+    "y": 662,
     "w": 16,
     "h": 16
    },
@@ -2582,8 +2582,8 @@
   },
   "enemies/medic/death_3": {
    "frame": {
-    "x": 324,
-    "y": 550,
+    "x": 205,
+    "y": 662,
     "w": 16,
     "h": 16
    },
@@ -2602,8 +2602,8 @@
   },
   "enemies/medic/walk_0": {
    "frame": {
-    "x": 341,
-    "y": 550,
+    "x": 222,
+    "y": 662,
     "w": 16,
     "h": 16
    },
@@ -2622,8 +2622,8 @@
   },
   "enemies/medic/walk_1": {
    "frame": {
-    "x": 358,
-    "y": 550,
+    "x": 239,
+    "y": 662,
     "w": 16,
     "h": 16
    },
@@ -2642,8 +2642,8 @@
   },
   "enemies/medic/walk_2": {
    "frame": {
-    "x": 375,
-    "y": 550,
+    "x": 256,
+    "y": 662,
     "w": 16,
     "h": 16
    },
@@ -2662,8 +2662,8 @@
   },
   "enemies/medic/walk_3": {
    "frame": {
-    "x": 392,
-    "y": 550,
+    "x": 273,
+    "y": 662,
     "w": 16,
     "h": 16
    },
@@ -2682,8 +2682,8 @@
   },
   "enemies/mire_worm": {
    "frame": {
-    "x": 409,
-    "y": 550,
+    "x": 290,
+    "y": 662,
     "w": 16,
     "h": 16
    },
@@ -2702,8 +2702,8 @@
   },
   "enemies/mire_worm/death_0": {
    "frame": {
-    "x": 426,
-    "y": 550,
+    "x": 307,
+    "y": 662,
     "w": 16,
     "h": 16
    },
@@ -2722,8 +2722,8 @@
   },
   "enemies/mire_worm/death_1": {
    "frame": {
-    "x": 443,
-    "y": 550,
+    "x": 324,
+    "y": 662,
     "w": 16,
     "h": 16
    },
@@ -2742,8 +2742,8 @@
   },
   "enemies/mire_worm/death_2": {
    "frame": {
-    "x": 460,
-    "y": 550,
+    "x": 341,
+    "y": 662,
     "w": 16,
     "h": 16
    },
@@ -2762,8 +2762,8 @@
   },
   "enemies/mire_worm/death_3": {
    "frame": {
-    "x": 477,
-    "y": 550,
+    "x": 358,
+    "y": 662,
     "w": 16,
     "h": 16
    },
@@ -2782,8 +2782,8 @@
   },
   "enemies/mire_worm/walk_0": {
    "frame": {
-    "x": 494,
-    "y": 550,
+    "x": 375,
+    "y": 662,
     "w": 16,
     "h": 16
    },
@@ -2802,8 +2802,8 @@
   },
   "enemies/mire_worm/walk_1": {
    "frame": {
-    "x": 1,
-    "y": 567,
+    "x": 392,
+    "y": 662,
     "w": 16,
     "h": 16
    },
@@ -2822,8 +2822,8 @@
   },
   "enemies/mire_worm/walk_2": {
    "frame": {
-    "x": 18,
-    "y": 567,
+    "x": 409,
+    "y": 662,
     "w": 16,
     "h": 16
    },
@@ -2842,8 +2842,8 @@
   },
   "enemies/mire_worm/walk_3": {
    "frame": {
-    "x": 35,
-    "y": 567,
+    "x": 426,
+    "y": 662,
     "w": 16,
     "h": 16
    },
@@ -2862,8 +2862,8 @@
   },
   "enemies/rad_bat": {
    "frame": {
-    "x": 52,
-    "y": 567,
+    "x": 443,
+    "y": 662,
     "w": 16,
     "h": 16
    },
@@ -2882,8 +2882,8 @@
   },
   "enemies/rad_bat/death_0": {
    "frame": {
-    "x": 69,
-    "y": 567,
+    "x": 460,
+    "y": 662,
     "w": 16,
     "h": 16
    },
@@ -2902,8 +2902,8 @@
   },
   "enemies/rad_bat/death_1": {
    "frame": {
-    "x": 86,
-    "y": 567,
+    "x": 477,
+    "y": 662,
     "w": 16,
     "h": 16
    },
@@ -2922,8 +2922,8 @@
   },
   "enemies/rad_bat/death_2": {
    "frame": {
-    "x": 103,
-    "y": 567,
+    "x": 494,
+    "y": 662,
     "w": 16,
     "h": 16
    },
@@ -2942,8 +2942,8 @@
   },
   "enemies/rad_bat/death_3": {
    "frame": {
-    "x": 120,
-    "y": 567,
+    "x": 1,
+    "y": 679,
     "w": 16,
     "h": 16
    },
@@ -2962,8 +2962,8 @@
   },
   "enemies/rad_bat/walk_0": {
    "frame": {
-    "x": 137,
-    "y": 567,
+    "x": 18,
+    "y": 679,
     "w": 16,
     "h": 16
    },
@@ -2982,8 +2982,8 @@
   },
   "enemies/rad_bat/walk_1": {
    "frame": {
-    "x": 154,
-    "y": 567,
+    "x": 35,
+    "y": 679,
     "w": 16,
     "h": 16
    },
@@ -3002,8 +3002,8 @@
   },
   "enemies/rad_bat/walk_2": {
    "frame": {
-    "x": 171,
-    "y": 567,
+    "x": 52,
+    "y": 679,
     "w": 16,
     "h": 16
    },
@@ -3022,8 +3022,8 @@
   },
   "enemies/rad_bat/walk_3": {
    "frame": {
-    "x": 188,
-    "y": 567,
+    "x": 69,
+    "y": 679,
     "w": 16,
     "h": 16
    },
@@ -3042,8 +3042,8 @@
   },
   "enemies/raider": {
    "frame": {
-    "x": 205,
-    "y": 567,
+    "x": 86,
+    "y": 679,
     "w": 16,
     "h": 16
    },
@@ -3062,8 +3062,8 @@
   },
   "enemies/raider/death_0": {
    "frame": {
-    "x": 222,
-    "y": 567,
+    "x": 103,
+    "y": 679,
     "w": 16,
     "h": 16
    },
@@ -3082,8 +3082,8 @@
   },
   "enemies/raider/death_1": {
    "frame": {
-    "x": 239,
-    "y": 567,
+    "x": 120,
+    "y": 679,
     "w": 16,
     "h": 16
    },
@@ -3102,8 +3102,8 @@
   },
   "enemies/raider/death_2": {
    "frame": {
-    "x": 256,
-    "y": 567,
+    "x": 137,
+    "y": 679,
     "w": 16,
     "h": 16
    },
@@ -3122,8 +3122,8 @@
   },
   "enemies/raider/death_3": {
    "frame": {
-    "x": 273,
-    "y": 567,
+    "x": 154,
+    "y": 679,
     "w": 16,
     "h": 16
    },
@@ -3142,8 +3142,8 @@
   },
   "enemies/raider/walk_0": {
    "frame": {
-    "x": 290,
-    "y": 567,
+    "x": 171,
+    "y": 679,
     "w": 16,
     "h": 16
    },
@@ -3162,8 +3162,8 @@
   },
   "enemies/raider/walk_1": {
    "frame": {
-    "x": 307,
-    "y": 567,
+    "x": 188,
+    "y": 679,
     "w": 16,
     "h": 16
    },
@@ -3182,8 +3182,8 @@
   },
   "enemies/raider/walk_2": {
    "frame": {
-    "x": 324,
-    "y": 567,
+    "x": 205,
+    "y": 679,
     "w": 16,
     "h": 16
    },
@@ -3202,8 +3202,8 @@
   },
   "enemies/raider/walk_3": {
    "frame": {
-    "x": 341,
-    "y": 567,
+    "x": 222,
+    "y": 679,
     "w": 16,
     "h": 16
    },
@@ -3402,8 +3402,8 @@
   },
   "enemies/roach": {
    "frame": {
-    "x": 358,
-    "y": 567,
+    "x": 239,
+    "y": 679,
     "w": 16,
     "h": 16
    },
@@ -3422,8 +3422,8 @@
   },
   "enemies/roach/death_0": {
    "frame": {
-    "x": 375,
-    "y": 567,
+    "x": 256,
+    "y": 679,
     "w": 16,
     "h": 16
    },
@@ -3442,8 +3442,8 @@
   },
   "enemies/roach/death_1": {
    "frame": {
-    "x": 392,
-    "y": 567,
+    "x": 273,
+    "y": 679,
     "w": 16,
     "h": 16
    },
@@ -3462,8 +3462,8 @@
   },
   "enemies/roach/death_2": {
    "frame": {
-    "x": 409,
-    "y": 567,
+    "x": 290,
+    "y": 679,
     "w": 16,
     "h": 16
    },
@@ -3482,8 +3482,8 @@
   },
   "enemies/roach/death_3": {
    "frame": {
-    "x": 426,
-    "y": 567,
+    "x": 307,
+    "y": 679,
     "w": 16,
     "h": 16
    },
@@ -3502,8 +3502,8 @@
   },
   "enemies/roach/walk_0": {
    "frame": {
-    "x": 443,
-    "y": 567,
+    "x": 324,
+    "y": 679,
     "w": 16,
     "h": 16
    },
@@ -3522,8 +3522,8 @@
   },
   "enemies/roach/walk_1": {
    "frame": {
-    "x": 460,
-    "y": 567,
+    "x": 341,
+    "y": 679,
     "w": 16,
     "h": 16
    },
@@ -3542,8 +3542,8 @@
   },
   "enemies/roach/walk_2": {
    "frame": {
-    "x": 477,
-    "y": 567,
+    "x": 358,
+    "y": 679,
     "w": 16,
     "h": 16
    },
@@ -3562,8 +3562,8 @@
   },
   "enemies/roach/walk_3": {
    "frame": {
-    "x": 494,
-    "y": 567,
+    "x": 375,
+    "y": 679,
     "w": 16,
     "h": 16
    },
@@ -3582,8 +3582,8 @@
   },
   "enemies/scorpion": {
    "frame": {
-    "x": 1,
-    "y": 584,
+    "x": 392,
+    "y": 679,
     "w": 16,
     "h": 16
    },
@@ -3602,8 +3602,8 @@
   },
   "enemies/scorpion/death_0": {
    "frame": {
-    "x": 18,
-    "y": 584,
+    "x": 409,
+    "y": 679,
     "w": 16,
     "h": 16
    },
@@ -3622,8 +3622,8 @@
   },
   "enemies/scorpion/death_1": {
    "frame": {
-    "x": 35,
-    "y": 584,
+    "x": 426,
+    "y": 679,
     "w": 16,
     "h": 16
    },
@@ -3642,8 +3642,8 @@
   },
   "enemies/scorpion/death_2": {
    "frame": {
-    "x": 52,
-    "y": 584,
+    "x": 443,
+    "y": 679,
     "w": 16,
     "h": 16
    },
@@ -3662,8 +3662,8 @@
   },
   "enemies/scorpion/death_3": {
    "frame": {
-    "x": 69,
-    "y": 584,
+    "x": 460,
+    "y": 679,
     "w": 16,
     "h": 16
    },
@@ -3682,8 +3682,8 @@
   },
   "enemies/scorpion/walk_0": {
    "frame": {
-    "x": 86,
-    "y": 584,
+    "x": 477,
+    "y": 679,
     "w": 16,
     "h": 16
    },
@@ -3702,8 +3702,8 @@
   },
   "enemies/scorpion/walk_1": {
    "frame": {
-    "x": 103,
-    "y": 584,
+    "x": 494,
+    "y": 679,
     "w": 16,
     "h": 16
    },
@@ -3722,8 +3722,8 @@
   },
   "enemies/scorpion/walk_2": {
    "frame": {
-    "x": 120,
-    "y": 584,
+    "x": 1,
+    "y": 696,
     "w": 16,
     "h": 16
    },
@@ -3742,8 +3742,8 @@
   },
   "enemies/scorpion/walk_3": {
    "frame": {
-    "x": 137,
-    "y": 584,
+    "x": 18,
+    "y": 696,
     "w": 16,
     "h": 16
    },
@@ -3942,8 +3942,8 @@
   },
   "enemies/slimelet": {
    "frame": {
-    "x": 142,
-    "y": 650,
+    "x": 359,
+    "y": 747,
     "w": 10,
     "h": 10
    },
@@ -3962,8 +3962,8 @@
   },
   "enemies/slimelet/death_0": {
    "frame": {
-    "x": 153,
-    "y": 650,
+    "x": 370,
+    "y": 747,
     "w": 10,
     "h": 10
    },
@@ -3982,8 +3982,8 @@
   },
   "enemies/slimelet/death_1": {
    "frame": {
-    "x": 164,
-    "y": 650,
+    "x": 381,
+    "y": 747,
     "w": 10,
     "h": 10
    },
@@ -4002,8 +4002,8 @@
   },
   "enemies/slimelet/death_2": {
    "frame": {
-    "x": 175,
-    "y": 650,
+    "x": 392,
+    "y": 747,
     "w": 10,
     "h": 10
    },
@@ -4022,8 +4022,8 @@
   },
   "enemies/slimelet/death_3": {
    "frame": {
-    "x": 186,
-    "y": 650,
+    "x": 403,
+    "y": 747,
     "w": 10,
     "h": 10
    },
@@ -4042,8 +4042,8 @@
   },
   "enemies/slimelet/walk_0": {
    "frame": {
-    "x": 197,
-    "y": 650,
+    "x": 414,
+    "y": 747,
     "w": 10,
     "h": 10
    },
@@ -4062,8 +4062,8 @@
   },
   "enemies/slimelet/walk_1": {
    "frame": {
-    "x": 208,
-    "y": 650,
+    "x": 425,
+    "y": 747,
     "w": 10,
     "h": 10
    },
@@ -4082,8 +4082,8 @@
   },
   "enemies/slimelet/walk_2": {
    "frame": {
-    "x": 219,
-    "y": 650,
+    "x": 436,
+    "y": 747,
     "w": 10,
     "h": 10
    },
@@ -4102,8 +4102,8 @@
   },
   "enemies/slimelet/walk_3": {
    "frame": {
-    "x": 230,
-    "y": 650,
+    "x": 447,
+    "y": 747,
     "w": 10,
     "h": 10
    },
@@ -4122,8 +4122,8 @@
   },
   "enemies/toad": {
    "frame": {
-    "x": 154,
-    "y": 584,
+    "x": 35,
+    "y": 696,
     "w": 16,
     "h": 16
    },
@@ -4142,8 +4142,8 @@
   },
   "enemies/toad/death_0": {
    "frame": {
-    "x": 171,
-    "y": 584,
+    "x": 52,
+    "y": 696,
     "w": 16,
     "h": 16
    },
@@ -4162,8 +4162,8 @@
   },
   "enemies/toad/death_1": {
    "frame": {
-    "x": 188,
-    "y": 584,
+    "x": 69,
+    "y": 696,
     "w": 16,
     "h": 16
    },
@@ -4182,8 +4182,8 @@
   },
   "enemies/toad/death_2": {
    "frame": {
-    "x": 205,
-    "y": 584,
+    "x": 86,
+    "y": 696,
     "w": 16,
     "h": 16
    },
@@ -4202,8 +4202,8 @@
   },
   "enemies/toad/death_3": {
    "frame": {
-    "x": 222,
-    "y": 584,
+    "x": 103,
+    "y": 696,
     "w": 16,
     "h": 16
    },
@@ -4222,8 +4222,8 @@
   },
   "enemies/toad/walk_0": {
    "frame": {
-    "x": 239,
-    "y": 584,
+    "x": 120,
+    "y": 696,
     "w": 16,
     "h": 16
    },
@@ -4242,8 +4242,8 @@
   },
   "enemies/toad/walk_1": {
    "frame": {
-    "x": 256,
-    "y": 584,
+    "x": 137,
+    "y": 696,
     "w": 16,
     "h": 16
    },
@@ -4262,8 +4262,8 @@
   },
   "enemies/toad/walk_2": {
    "frame": {
-    "x": 273,
-    "y": 584,
+    "x": 154,
+    "y": 696,
     "w": 16,
     "h": 16
    },
@@ -4282,8 +4282,8 @@
   },
   "enemies/toad/walk_3": {
    "frame": {
-    "x": 290,
-    "y": 584,
+    "x": 171,
+    "y": 696,
     "w": 16,
     "h": 16
    },
@@ -4482,8 +4482,8 @@
   },
   "enemies/wild_dog": {
    "frame": {
-    "x": 307,
-    "y": 584,
+    "x": 188,
+    "y": 696,
     "w": 16,
     "h": 16
    },
@@ -4502,8 +4502,8 @@
   },
   "enemies/wild_dog/death_0": {
    "frame": {
-    "x": 324,
-    "y": 584,
+    "x": 205,
+    "y": 696,
     "w": 16,
     "h": 16
    },
@@ -4522,8 +4522,8 @@
   },
   "enemies/wild_dog/death_1": {
    "frame": {
-    "x": 341,
-    "y": 584,
+    "x": 222,
+    "y": 696,
     "w": 16,
     "h": 16
    },
@@ -4542,8 +4542,8 @@
   },
   "enemies/wild_dog/death_2": {
    "frame": {
-    "x": 358,
-    "y": 584,
+    "x": 239,
+    "y": 696,
     "w": 16,
     "h": 16
    },
@@ -4562,8 +4562,8 @@
   },
   "enemies/wild_dog/death_3": {
    "frame": {
-    "x": 375,
-    "y": 584,
+    "x": 256,
+    "y": 696,
     "w": 16,
     "h": 16
    },
@@ -4582,8 +4582,8 @@
   },
   "enemies/wild_dog/walk_0": {
    "frame": {
-    "x": 392,
-    "y": 584,
+    "x": 273,
+    "y": 696,
     "w": 16,
     "h": 16
    },
@@ -4602,8 +4602,8 @@
   },
   "enemies/wild_dog/walk_1": {
    "frame": {
-    "x": 409,
-    "y": 584,
+    "x": 290,
+    "y": 696,
     "w": 16,
     "h": 16
    },
@@ -4622,8 +4622,8 @@
   },
   "enemies/wild_dog/walk_2": {
    "frame": {
-    "x": 426,
-    "y": 584,
+    "x": 307,
+    "y": 696,
     "w": 16,
     "h": 16
    },
@@ -4642,8 +4642,8 @@
   },
   "enemies/wild_dog/walk_3": {
    "frame": {
-    "x": 443,
-    "y": 584,
+    "x": 324,
+    "y": 696,
     "w": 16,
     "h": 16
    },
@@ -4662,8 +4662,8 @@
   },
   "fx/dust": {
    "frame": {
-    "x": 213,
-    "y": 483,
+    "x": 110,
+    "y": 599,
     "w": 24,
     "h": 24
    },
@@ -4682,8 +4682,8 @@
   },
   "fx/dust/burst_0": {
    "frame": {
-    "x": 238,
-    "y": 483,
+    "x": 135,
+    "y": 599,
     "w": 24,
     "h": 24
    },
@@ -4702,8 +4702,8 @@
   },
   "fx/dust/burst_1": {
    "frame": {
-    "x": 263,
-    "y": 483,
+    "x": 160,
+    "y": 599,
     "w": 24,
     "h": 24
    },
@@ -4722,8 +4722,8 @@
   },
   "fx/dust/burst_2": {
    "frame": {
-    "x": 288,
-    "y": 483,
+    "x": 185,
+    "y": 599,
     "w": 24,
     "h": 24
    },
@@ -4742,8 +4742,8 @@
   },
   "fx/dust/burst_3": {
    "frame": {
-    "x": 313,
-    "y": 483,
+    "x": 210,
+    "y": 599,
     "w": 24,
     "h": 24
    },
@@ -4762,8 +4762,8 @@
   },
   "fx/dust/burst_4": {
    "frame": {
-    "x": 338,
-    "y": 483,
+    "x": 235,
+    "y": 599,
     "w": 24,
     "h": 24
    },
@@ -4902,8 +4902,8 @@
   },
   "fx/fire": {
    "frame": {
-    "x": 298,
-    "y": 635,
+    "x": 16,
+    "y": 747,
     "w": 12,
     "h": 12
    },
@@ -4922,8 +4922,8 @@
   },
   "fx/fire/burn_0": {
    "frame": {
-    "x": 311,
-    "y": 635,
+    "x": 29,
+    "y": 747,
     "w": 12,
     "h": 12
    },
@@ -4942,8 +4942,8 @@
   },
   "fx/fire/burn_1": {
    "frame": {
-    "x": 324,
-    "y": 635,
+    "x": 42,
+    "y": 747,
     "w": 12,
     "h": 12
    },
@@ -4962,8 +4962,8 @@
   },
   "fx/fire/burn_2": {
    "frame": {
-    "x": 337,
-    "y": 635,
+    "x": 55,
+    "y": 747,
     "w": 12,
     "h": 12
    },
@@ -4982,8 +4982,8 @@
   },
   "fx/heal": {
    "frame": {
-    "x": 299,
-    "y": 508,
+    "x": 172,
+    "y": 624,
     "w": 20,
     "h": 20
    },
@@ -5002,8 +5002,8 @@
   },
   "fx/heal/burst_0": {
    "frame": {
-    "x": 320,
-    "y": 508,
+    "x": 193,
+    "y": 624,
     "w": 20,
     "h": 20
    },
@@ -5022,8 +5022,8 @@
   },
   "fx/heal/burst_1": {
    "frame": {
-    "x": 341,
-    "y": 508,
+    "x": 214,
+    "y": 624,
     "w": 20,
     "h": 20
    },
@@ -5042,8 +5042,8 @@
   },
   "fx/heal/burst_2": {
    "frame": {
-    "x": 362,
-    "y": 508,
+    "x": 235,
+    "y": 624,
     "w": 20,
     "h": 20
    },
@@ -5062,8 +5062,8 @@
   },
   "fx/heal/burst_3": {
    "frame": {
-    "x": 383,
-    "y": 508,
+    "x": 256,
+    "y": 624,
     "w": 20,
     "h": 20
    },
@@ -5082,8 +5082,8 @@
   },
   "fx/hit": {
    "frame": {
-    "x": 300,
-    "y": 650,
+    "x": 16,
+    "y": 760,
     "w": 8,
     "h": 8
    },
@@ -5102,8 +5102,8 @@
   },
   "fx/hit/burst_0": {
    "frame": {
-    "x": 309,
-    "y": 650,
+    "x": 25,
+    "y": 760,
     "w": 8,
     "h": 8
    },
@@ -5122,8 +5122,8 @@
   },
   "fx/hit/burst_1": {
    "frame": {
-    "x": 318,
-    "y": 650,
+    "x": 34,
+    "y": 760,
     "w": 8,
     "h": 8
    },
@@ -5142,8 +5142,8 @@
   },
   "fx/hit/burst_2": {
    "frame": {
-    "x": 327,
-    "y": 650,
+    "x": 43,
+    "y": 760,
     "w": 8,
     "h": 8
    },
@@ -5262,8 +5262,8 @@
   },
   "fx/vortex": {
    "frame": {
-    "x": 350,
-    "y": 635,
+    "x": 68,
+    "y": 747,
     "w": 12,
     "h": 12
    },
@@ -5282,8 +5282,8 @@
   },
   "fx/vortex/burn_0": {
    "frame": {
-    "x": 363,
-    "y": 635,
+    "x": 81,
+    "y": 747,
     "w": 12,
     "h": 12
    },
@@ -5302,8 +5302,8 @@
   },
   "fx/vortex/burn_1": {
    "frame": {
-    "x": 376,
-    "y": 635,
+    "x": 94,
+    "y": 747,
     "w": 12,
     "h": 12
    },
@@ -5322,8 +5322,8 @@
   },
   "fx/vortex/burn_2": {
    "frame": {
-    "x": 389,
-    "y": 635,
+    "x": 107,
+    "y": 747,
     "w": 12,
     "h": 12
    },
@@ -5338,192 +5338,1512 @@
    "sourceSize": {
     "w": 12,
     "h": 12
+   }
+  },
+  "heroes/bruiser": {
+   "frame": {
+    "x": 317,
+    "y": 450,
+    "w": 24,
+    "h": 28
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 28
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 28
+   }
+  },
+  "heroes/bruiser/death_0": {
+   "frame": {
+    "x": 342,
+    "y": 450,
+    "w": 24,
+    "h": 28
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 28
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 28
+   }
+  },
+  "heroes/bruiser/death_1": {
+   "frame": {
+    "x": 367,
+    "y": 450,
+    "w": 24,
+    "h": 28
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 28
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 28
+   }
+  },
+  "heroes/bruiser/death_2": {
+   "frame": {
+    "x": 392,
+    "y": 450,
+    "w": 24,
+    "h": 28
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 28
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 28
+   }
+  },
+  "heroes/bruiser/death_3": {
+   "frame": {
+    "x": 417,
+    "y": 450,
+    "w": 24,
+    "h": 28
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 28
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 28
+   }
+  },
+  "heroes/bruiser/idle_0": {
+   "frame": {
+    "x": 442,
+    "y": 450,
+    "w": 24,
+    "h": 28
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 28
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 28
+   }
+  },
+  "heroes/bruiser/idle_1": {
+   "frame": {
+    "x": 467,
+    "y": 450,
+    "w": 24,
+    "h": 28
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 28
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 28
+   }
+  },
+  "heroes/bruiser/idle_2": {
+   "frame": {
+    "x": 1,
+    "y": 483,
+    "w": 24,
+    "h": 28
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 28
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 28
+   }
+  },
+  "heroes/bruiser/idle_3": {
+   "frame": {
+    "x": 26,
+    "y": 483,
+    "w": 24,
+    "h": 28
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 28
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 28
+   }
+  },
+  "heroes/bruiser/walk_0": {
+   "frame": {
+    "x": 51,
+    "y": 483,
+    "w": 24,
+    "h": 28
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 28
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 28
+   }
+  },
+  "heroes/bruiser/walk_1": {
+   "frame": {
+    "x": 76,
+    "y": 483,
+    "w": 24,
+    "h": 28
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 28
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 28
+   }
+  },
+  "heroes/bruiser/walk_2": {
+   "frame": {
+    "x": 101,
+    "y": 483,
+    "w": 24,
+    "h": 28
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 28
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 28
+   }
+  },
+  "heroes/bruiser/walk_3": {
+   "frame": {
+    "x": 126,
+    "y": 483,
+    "w": 24,
+    "h": 28
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 28
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 28
+   }
+  },
+  "heroes/bruiser/walk_4": {
+   "frame": {
+    "x": 151,
+    "y": 483,
+    "w": 24,
+    "h": 28
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 28
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 28
+   }
+  },
+  "heroes/bruiser/walk_5": {
+   "frame": {
+    "x": 176,
+    "y": 483,
+    "w": 24,
+    "h": 28
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 28
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 28
+   }
+  },
+  "heroes/chemist": {
+   "frame": {
+    "x": 201,
+    "y": 483,
+    "w": 24,
+    "h": 28
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 28
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 28
+   }
+  },
+  "heroes/chemist/death_0": {
+   "frame": {
+    "x": 226,
+    "y": 483,
+    "w": 24,
+    "h": 28
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 28
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 28
+   }
+  },
+  "heroes/chemist/death_1": {
+   "frame": {
+    "x": 251,
+    "y": 483,
+    "w": 24,
+    "h": 28
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 28
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 28
+   }
+  },
+  "heroes/chemist/death_2": {
+   "frame": {
+    "x": 276,
+    "y": 483,
+    "w": 24,
+    "h": 28
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 28
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 28
+   }
+  },
+  "heroes/chemist/death_3": {
+   "frame": {
+    "x": 301,
+    "y": 483,
+    "w": 24,
+    "h": 28
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 28
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 28
+   }
+  },
+  "heroes/chemist/idle_0": {
+   "frame": {
+    "x": 326,
+    "y": 483,
+    "w": 24,
+    "h": 28
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 28
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 28
+   }
+  },
+  "heroes/chemist/idle_1": {
+   "frame": {
+    "x": 351,
+    "y": 483,
+    "w": 24,
+    "h": 28
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 28
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 28
+   }
+  },
+  "heroes/chemist/idle_2": {
+   "frame": {
+    "x": 376,
+    "y": 483,
+    "w": 24,
+    "h": 28
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 28
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 28
+   }
+  },
+  "heroes/chemist/idle_3": {
+   "frame": {
+    "x": 401,
+    "y": 483,
+    "w": 24,
+    "h": 28
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 28
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 28
+   }
+  },
+  "heroes/chemist/walk_0": {
+   "frame": {
+    "x": 426,
+    "y": 483,
+    "w": 24,
+    "h": 28
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 28
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 28
+   }
+  },
+  "heroes/chemist/walk_1": {
+   "frame": {
+    "x": 451,
+    "y": 483,
+    "w": 24,
+    "h": 28
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 28
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 28
+   }
+  },
+  "heroes/chemist/walk_2": {
+   "frame": {
+    "x": 476,
+    "y": 483,
+    "w": 24,
+    "h": 28
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 28
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 28
+   }
+  },
+  "heroes/chemist/walk_3": {
+   "frame": {
+    "x": 1,
+    "y": 512,
+    "w": 24,
+    "h": 28
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 28
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 28
+   }
+  },
+  "heroes/chemist/walk_4": {
+   "frame": {
+    "x": 26,
+    "y": 512,
+    "w": 24,
+    "h": 28
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 28
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 28
+   }
+  },
+  "heroes/chemist/walk_5": {
+   "frame": {
+    "x": 51,
+    "y": 512,
+    "w": 24,
+    "h": 28
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 28
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 28
+   }
+  },
+  "heroes/marksman": {
+   "frame": {
+    "x": 76,
+    "y": 512,
+    "w": 24,
+    "h": 28
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 28
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 28
+   }
+  },
+  "heroes/marksman/death_0": {
+   "frame": {
+    "x": 101,
+    "y": 512,
+    "w": 24,
+    "h": 28
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 28
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 28
+   }
+  },
+  "heroes/marksman/death_1": {
+   "frame": {
+    "x": 126,
+    "y": 512,
+    "w": 24,
+    "h": 28
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 28
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 28
+   }
+  },
+  "heroes/marksman/death_2": {
+   "frame": {
+    "x": 151,
+    "y": 512,
+    "w": 24,
+    "h": 28
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 28
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 28
+   }
+  },
+  "heroes/marksman/death_3": {
+   "frame": {
+    "x": 176,
+    "y": 512,
+    "w": 24,
+    "h": 28
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 28
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 28
+   }
+  },
+  "heroes/marksman/idle_0": {
+   "frame": {
+    "x": 201,
+    "y": 512,
+    "w": 24,
+    "h": 28
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 28
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 28
+   }
+  },
+  "heroes/marksman/idle_1": {
+   "frame": {
+    "x": 226,
+    "y": 512,
+    "w": 24,
+    "h": 28
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 28
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 28
+   }
+  },
+  "heroes/marksman/idle_2": {
+   "frame": {
+    "x": 251,
+    "y": 512,
+    "w": 24,
+    "h": 28
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 28
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 28
+   }
+  },
+  "heroes/marksman/idle_3": {
+   "frame": {
+    "x": 276,
+    "y": 512,
+    "w": 24,
+    "h": 28
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 28
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 28
+   }
+  },
+  "heroes/marksman/walk_0": {
+   "frame": {
+    "x": 301,
+    "y": 512,
+    "w": 24,
+    "h": 28
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 28
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 28
+   }
+  },
+  "heroes/marksman/walk_1": {
+   "frame": {
+    "x": 326,
+    "y": 512,
+    "w": 24,
+    "h": 28
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 28
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 28
+   }
+  },
+  "heroes/marksman/walk_2": {
+   "frame": {
+    "x": 351,
+    "y": 512,
+    "w": 24,
+    "h": 28
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 28
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 28
+   }
+  },
+  "heroes/marksman/walk_3": {
+   "frame": {
+    "x": 376,
+    "y": 512,
+    "w": 24,
+    "h": 28
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 28
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 28
+   }
+  },
+  "heroes/marksman/walk_4": {
+   "frame": {
+    "x": 401,
+    "y": 512,
+    "w": 24,
+    "h": 28
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 28
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 28
+   }
+  },
+  "heroes/marksman/walk_5": {
+   "frame": {
+    "x": 426,
+    "y": 512,
+    "w": 24,
+    "h": 28
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 28
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 28
+   }
+  },
+  "heroes/spark": {
+   "frame": {
+    "x": 451,
+    "y": 512,
+    "w": 24,
+    "h": 28
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 28
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 28
+   }
+  },
+  "heroes/spark/death_0": {
+   "frame": {
+    "x": 476,
+    "y": 512,
+    "w": 24,
+    "h": 28
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 28
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 28
+   }
+  },
+  "heroes/spark/death_1": {
+   "frame": {
+    "x": 1,
+    "y": 541,
+    "w": 24,
+    "h": 28
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 28
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 28
+   }
+  },
+  "heroes/spark/death_2": {
+   "frame": {
+    "x": 26,
+    "y": 541,
+    "w": 24,
+    "h": 28
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 28
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 28
+   }
+  },
+  "heroes/spark/death_3": {
+   "frame": {
+    "x": 51,
+    "y": 541,
+    "w": 24,
+    "h": 28
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 28
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 28
+   }
+  },
+  "heroes/spark/idle_0": {
+   "frame": {
+    "x": 76,
+    "y": 541,
+    "w": 24,
+    "h": 28
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 28
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 28
+   }
+  },
+  "heroes/spark/idle_1": {
+   "frame": {
+    "x": 101,
+    "y": 541,
+    "w": 24,
+    "h": 28
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 28
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 28
+   }
+  },
+  "heroes/spark/idle_2": {
+   "frame": {
+    "x": 126,
+    "y": 541,
+    "w": 24,
+    "h": 28
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 28
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 28
+   }
+  },
+  "heroes/spark/idle_3": {
+   "frame": {
+    "x": 151,
+    "y": 541,
+    "w": 24,
+    "h": 28
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 28
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 28
+   }
+  },
+  "heroes/spark/walk_0": {
+   "frame": {
+    "x": 176,
+    "y": 541,
+    "w": 24,
+    "h": 28
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 28
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 28
+   }
+  },
+  "heroes/spark/walk_1": {
+   "frame": {
+    "x": 201,
+    "y": 541,
+    "w": 24,
+    "h": 28
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 28
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 28
+   }
+  },
+  "heroes/spark/walk_2": {
+   "frame": {
+    "x": 226,
+    "y": 541,
+    "w": 24,
+    "h": 28
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 28
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 28
+   }
+  },
+  "heroes/spark/walk_3": {
+   "frame": {
+    "x": 251,
+    "y": 541,
+    "w": 24,
+    "h": 28
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 28
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 28
+   }
+  },
+  "heroes/spark/walk_4": {
+   "frame": {
+    "x": 276,
+    "y": 541,
+    "w": 24,
+    "h": 28
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 28
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 28
+   }
+  },
+  "heroes/spark/walk_5": {
+   "frame": {
+    "x": 301,
+    "y": 541,
+    "w": 24,
+    "h": 28
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 28
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 28
    }
   },
   "heroes/wanderer": {
    "frame": {
-    "x": 460,
-    "y": 584,
-    "w": 16,
-    "h": 16
+    "x": 326,
+    "y": 541,
+    "w": 24,
+    "h": 28
    },
    "rotated": false,
    "trimmed": false,
    "spriteSourceSize": {
     "x": 0,
     "y": 0,
-    "w": 16,
-    "h": 16
+    "w": 24,
+    "h": 28
    },
    "sourceSize": {
-    "w": 16,
-    "h": 16
+    "w": 24,
+    "h": 28
    }
   },
   "heroes/wanderer/death_0": {
    "frame": {
-    "x": 477,
-    "y": 584,
-    "w": 16,
-    "h": 16
+    "x": 351,
+    "y": 541,
+    "w": 24,
+    "h": 28
    },
    "rotated": false,
    "trimmed": false,
    "spriteSourceSize": {
     "x": 0,
     "y": 0,
-    "w": 16,
-    "h": 16
+    "w": 24,
+    "h": 28
    },
    "sourceSize": {
-    "w": 16,
-    "h": 16
+    "w": 24,
+    "h": 28
    }
   },
   "heroes/wanderer/death_1": {
    "frame": {
-    "x": 494,
-    "y": 584,
-    "w": 16,
-    "h": 16
+    "x": 376,
+    "y": 541,
+    "w": 24,
+    "h": 28
    },
    "rotated": false,
    "trimmed": false,
    "spriteSourceSize": {
     "x": 0,
     "y": 0,
-    "w": 16,
-    "h": 16
+    "w": 24,
+    "h": 28
    },
    "sourceSize": {
-    "w": 16,
-    "h": 16
+    "w": 24,
+    "h": 28
    }
   },
   "heroes/wanderer/death_2": {
    "frame": {
-    "x": 1,
-    "y": 601,
-    "w": 16,
-    "h": 16
+    "x": 401,
+    "y": 541,
+    "w": 24,
+    "h": 28
    },
    "rotated": false,
    "trimmed": false,
    "spriteSourceSize": {
     "x": 0,
     "y": 0,
-    "w": 16,
-    "h": 16
+    "w": 24,
+    "h": 28
    },
    "sourceSize": {
-    "w": 16,
-    "h": 16
+    "w": 24,
+    "h": 28
    }
   },
   "heroes/wanderer/death_3": {
    "frame": {
-    "x": 18,
-    "y": 601,
-    "w": 16,
-    "h": 16
+    "x": 426,
+    "y": 541,
+    "w": 24,
+    "h": 28
    },
    "rotated": false,
    "trimmed": false,
    "spriteSourceSize": {
     "x": 0,
     "y": 0,
-    "w": 16,
-    "h": 16
+    "w": 24,
+    "h": 28
    },
    "sourceSize": {
-    "w": 16,
-    "h": 16
+    "w": 24,
+    "h": 28
+   }
+  },
+  "heroes/wanderer/idle_0": {
+   "frame": {
+    "x": 451,
+    "y": 541,
+    "w": 24,
+    "h": 28
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 28
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 28
+   }
+  },
+  "heroes/wanderer/idle_1": {
+   "frame": {
+    "x": 476,
+    "y": 541,
+    "w": 24,
+    "h": 28
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 28
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 28
+   }
+  },
+  "heroes/wanderer/idle_2": {
+   "frame": {
+    "x": 1,
+    "y": 570,
+    "w": 24,
+    "h": 28
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 28
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 28
+   }
+  },
+  "heroes/wanderer/idle_3": {
+   "frame": {
+    "x": 26,
+    "y": 570,
+    "w": 24,
+    "h": 28
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 28
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 28
    }
   },
   "heroes/wanderer/walk_0": {
    "frame": {
-    "x": 35,
-    "y": 601,
-    "w": 16,
-    "h": 16
+    "x": 51,
+    "y": 570,
+    "w": 24,
+    "h": 28
    },
    "rotated": false,
    "trimmed": false,
    "spriteSourceSize": {
     "x": 0,
     "y": 0,
-    "w": 16,
-    "h": 16
+    "w": 24,
+    "h": 28
    },
    "sourceSize": {
-    "w": 16,
-    "h": 16
+    "w": 24,
+    "h": 28
    }
   },
   "heroes/wanderer/walk_1": {
    "frame": {
-    "x": 52,
-    "y": 601,
-    "w": 16,
-    "h": 16
+    "x": 76,
+    "y": 570,
+    "w": 24,
+    "h": 28
    },
    "rotated": false,
    "trimmed": false,
    "spriteSourceSize": {
     "x": 0,
     "y": 0,
-    "w": 16,
-    "h": 16
+    "w": 24,
+    "h": 28
    },
    "sourceSize": {
-    "w": 16,
-    "h": 16
+    "w": 24,
+    "h": 28
    }
   },
   "heroes/wanderer/walk_2": {
    "frame": {
-    "x": 69,
-    "y": 601,
-    "w": 16,
-    "h": 16
+    "x": 101,
+    "y": 570,
+    "w": 24,
+    "h": 28
    },
    "rotated": false,
    "trimmed": false,
    "spriteSourceSize": {
     "x": 0,
     "y": 0,
-    "w": 16,
-    "h": 16
+    "w": 24,
+    "h": 28
    },
    "sourceSize": {
-    "w": 16,
-    "h": 16
+    "w": 24,
+    "h": 28
    }
   },
   "heroes/wanderer/walk_3": {
    "frame": {
-    "x": 86,
-    "y": 601,
-    "w": 16,
-    "h": 16
+    "x": 126,
+    "y": 570,
+    "w": 24,
+    "h": 28
    },
    "rotated": false,
    "trimmed": false,
    "spriteSourceSize": {
     "x": 0,
     "y": 0,
-    "w": 16,
-    "h": 16
+    "w": 24,
+    "h": 28
    },
    "sourceSize": {
-    "w": 16,
-    "h": 16
+    "w": 24,
+    "h": 28
+   }
+  },
+  "heroes/wanderer/walk_4": {
+   "frame": {
+    "x": 151,
+    "y": 570,
+    "w": 24,
+    "h": 28
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 28
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 28
+   }
+  },
+  "heroes/wanderer/walk_5": {
+   "frame": {
+    "x": 176,
+    "y": 570,
+    "w": 24,
+    "h": 28
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 28
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 28
    }
   },
   "landmarks/generator": {
    "frame": {
-    "x": 363,
-    "y": 483,
+    "x": 260,
+    "y": 599,
     "w": 26,
     "h": 24
    },
@@ -5542,8 +6862,8 @@
   },
   "landmarks/generator_used": {
    "frame": {
-    "x": 390,
-    "y": 483,
+    "x": 287,
+    "y": 599,
     "w": 26,
     "h": 24
    },
@@ -5562,8 +6882,8 @@
   },
   "landmarks/hatch": {
    "frame": {
-    "x": 1,
-    "y": 531,
+    "x": 384,
+    "y": 624,
     "w": 26,
     "h": 18
    },
@@ -5582,8 +6902,8 @@
   },
   "landmarks/hatch_used": {
    "frame": {
-    "x": 28,
-    "y": 531,
+    "x": 411,
+    "y": 624,
     "w": 26,
     "h": 18
    },
@@ -5602,8 +6922,8 @@
   },
   "landmarks/med_station": {
    "frame": {
-    "x": 449,
-    "y": 450,
+    "x": 333,
+    "y": 570,
     "w": 20,
     "h": 26
    },
@@ -5622,8 +6942,8 @@
   },
   "landmarks/med_station_used": {
    "frame": {
-    "x": 470,
-    "y": 450,
+    "x": 354,
+    "y": 570,
     "w": 20,
     "h": 26
    },
@@ -5642,8 +6962,8 @@
   },
   "landmarks/vending": {
    "frame": {
-    "x": 317,
-    "y": 450,
+    "x": 201,
+    "y": 570,
     "w": 20,
     "h": 28
    },
@@ -5662,8 +6982,8 @@
   },
   "landmarks/vending_used": {
    "frame": {
-    "x": 338,
-    "y": 450,
+    "x": 222,
+    "y": 570,
     "w": 20,
     "h": 28
    },
@@ -5682,8 +7002,8 @@
   },
   "landmarks/workbench": {
    "frame": {
-    "x": 404,
-    "y": 508,
+    "x": 277,
+    "y": 624,
     "w": 28,
     "h": 20
    },
@@ -5702,8 +7022,8 @@
   },
   "landmarks/workbench_used": {
    "frame": {
-    "x": 433,
-    "y": 508,
+    "x": 306,
+    "y": 624,
     "w": 28,
     "h": 20
    },
@@ -5722,8 +7042,8 @@
   },
   "passives/capacitor": {
    "frame": {
-    "x": 103,
-    "y": 601,
+    "x": 341,
+    "y": 696,
     "w": 16,
     "h": 16
    },
@@ -5742,8 +7062,8 @@
   },
   "passives/extra_mag": {
    "frame": {
-    "x": 120,
-    "y": 601,
+    "x": 358,
+    "y": 696,
     "w": 16,
     "h": 16
    },
@@ -5762,8 +7082,8 @@
   },
   "passives/field_dressing": {
    "frame": {
-    "x": 137,
-    "y": 601,
+    "x": 375,
+    "y": 696,
     "w": 16,
     "h": 16
    },
@@ -5782,8 +7102,8 @@
   },
   "passives/field_notes": {
    "frame": {
-    "x": 154,
-    "y": 601,
+    "x": 392,
+    "y": 696,
     "w": 16,
     "h": 16
    },
@@ -5802,8 +7122,8 @@
   },
   "passives/heavy_rounds": {
    "frame": {
-    "x": 171,
-    "y": 601,
+    "x": 409,
+    "y": 696,
     "w": 16,
     "h": 16
    },
@@ -5822,8 +7142,8 @@
   },
   "passives/keen_edge": {
    "frame": {
-    "x": 188,
-    "y": 601,
+    "x": 426,
+    "y": 696,
     "w": 16,
     "h": 16
    },
@@ -5842,8 +7162,8 @@
   },
   "passives/lead_lining": {
    "frame": {
-    "x": 205,
-    "y": 601,
+    "x": 443,
+    "y": 696,
     "w": 16,
     "h": 16
    },
@@ -5862,8 +7182,8 @@
   },
   "passives/lucky_cap": {
    "frame": {
-    "x": 222,
-    "y": 601,
+    "x": 460,
+    "y": 696,
     "w": 16,
     "h": 16
    },
@@ -5882,8 +7202,8 @@
   },
   "passives/nimble": {
    "frame": {
-    "x": 239,
-    "y": 601,
+    "x": 477,
+    "y": 696,
     "w": 16,
     "h": 16
    },
@@ -5902,8 +7222,8 @@
   },
   "passives/quickstep": {
    "frame": {
-    "x": 256,
-    "y": 601,
+    "x": 494,
+    "y": 696,
     "w": 16,
     "h": 16
    },
@@ -5922,8 +7242,8 @@
   },
   "passives/rad_sponge": {
    "frame": {
-    "x": 273,
-    "y": 601,
+    "x": 1,
+    "y": 713,
     "w": 16,
     "h": 16
    },
@@ -5942,8 +7262,8 @@
   },
   "passives/scope": {
    "frame": {
-    "x": 290,
-    "y": 601,
+    "x": 18,
+    "y": 713,
     "w": 16,
     "h": 16
    },
@@ -5962,8 +7282,8 @@
   },
   "passives/scrap_magnet": {
    "frame": {
-    "x": 307,
-    "y": 601,
+    "x": 35,
+    "y": 713,
     "w": 16,
     "h": 16
    },
@@ -5982,8 +7302,8 @@
   },
   "passives/scrap_plating": {
    "frame": {
-    "x": 324,
-    "y": 601,
+    "x": 52,
+    "y": 713,
     "w": 16,
     "h": 16
    },
@@ -6002,8 +7322,8 @@
   },
   "passives/spare_barrel": {
    "frame": {
-    "x": 341,
-    "y": 601,
+    "x": 69,
+    "y": 713,
     "w": 16,
     "h": 16
    },
@@ -6022,8 +7342,8 @@
   },
   "passives/spiked_vest": {
    "frame": {
-    "x": 358,
-    "y": 601,
+    "x": 86,
+    "y": 713,
     "w": 16,
     "h": 16
    },
@@ -6042,8 +7362,8 @@
   },
   "passives/thick_hide": {
    "frame": {
-    "x": 375,
-    "y": 601,
+    "x": 103,
+    "y": 713,
     "w": 16,
     "h": 16
    },
@@ -6062,8 +7382,8 @@
   },
   "passives/trigger_spring": {
    "frame": {
-    "x": 392,
-    "y": 601,
+    "x": 120,
+    "y": 713,
     "w": 16,
     "h": 16
    },
@@ -6082,8 +7402,8 @@
   },
   "passives/trophy_hunter": {
    "frame": {
-    "x": 409,
-    "y": 601,
+    "x": 137,
+    "y": 713,
     "w": 16,
     "h": 16
    },
@@ -6102,8 +7422,8 @@
   },
   "passives/turbo_boots": {
    "frame": {
-    "x": 426,
-    "y": 601,
+    "x": 154,
+    "y": 713,
     "w": 16,
     "h": 16
    },
@@ -6122,8 +7442,8 @@
   },
   "passives/wide_bore": {
    "frame": {
-    "x": 443,
-    "y": 601,
+    "x": 171,
+    "y": 713,
     "w": 16,
     "h": 16
    },
@@ -6142,8 +7462,8 @@
   },
   "pickups/adrenaline": {
    "frame": {
-    "x": 130,
-    "y": 635,
+    "x": 351,
+    "y": 730,
     "w": 14,
     "h": 14
    },
@@ -6162,8 +7482,8 @@
   },
   "pickups/ammo_belt": {
    "frame": {
-    "x": 145,
-    "y": 635,
+    "x": 366,
+    "y": 730,
     "w": 14,
     "h": 14
    },
@@ -6182,8 +7502,8 @@
   },
   "pickups/cap": {
    "frame": {
-    "x": 336,
-    "y": 650,
+    "x": 52,
+    "y": 760,
     "w": 8,
     "h": 8
    },
@@ -6202,8 +7522,8 @@
   },
   "pickups/caps_stash": {
    "frame": {
-    "x": 103,
-    "y": 650,
+    "x": 320,
+    "y": 747,
     "w": 12,
     "h": 11
    },
@@ -6222,8 +7542,8 @@
   },
   "pickups/chest": {
    "frame": {
-    "x": 402,
-    "y": 635,
+    "x": 120,
+    "y": 747,
     "w": 16,
     "h": 12
    },
@@ -6242,8 +7562,8 @@
   },
   "pickups/chest/idle_0": {
    "frame": {
-    "x": 419,
-    "y": 635,
+    "x": 137,
+    "y": 747,
     "w": 16,
     "h": 12
    },
@@ -6262,8 +7582,8 @@
   },
   "pickups/chest/idle_1": {
    "frame": {
-    "x": 436,
-    "y": 635,
+    "x": 154,
+    "y": 747,
     "w": 16,
     "h": 12
    },
@@ -6282,8 +7602,8 @@
   },
   "pickups/chest/idle_2": {
    "frame": {
-    "x": 453,
-    "y": 635,
+    "x": 171,
+    "y": 747,
     "w": 16,
     "h": 12
    },
@@ -6302,8 +7622,8 @@
   },
   "pickups/chest/idle_3": {
    "frame": {
-    "x": 470,
-    "y": 635,
+    "x": 188,
+    "y": 747,
     "w": 16,
     "h": 12
    },
@@ -6322,8 +7642,8 @@
   },
   "pickups/cryo_bomb": {
    "frame": {
-    "x": 160,
-    "y": 635,
+    "x": 381,
+    "y": 730,
     "w": 14,
     "h": 14
    },
@@ -6342,8 +7662,8 @@
   },
   "pickups/data_disk": {
    "frame": {
-    "x": 175,
-    "y": 635,
+    "x": 396,
+    "y": 730,
     "w": 14,
     "h": 14
    },
@@ -6362,8 +7682,8 @@
   },
   "pickups/magnet": {
    "frame": {
-    "x": 116,
-    "y": 650,
+    "x": 333,
+    "y": 747,
     "w": 12,
     "h": 11
    },
@@ -6382,8 +7702,8 @@
   },
   "pickups/medkit": {
    "frame": {
-    "x": 487,
-    "y": 635,
+    "x": 205,
+    "y": 747,
     "w": 12,
     "h": 12
    },
@@ -6402,8 +7722,8 @@
   },
   "pickups/pulse_bomb": {
    "frame": {
-    "x": 129,
-    "y": 650,
+    "x": 346,
+    "y": 747,
     "w": 12,
     "h": 11
    },
@@ -6422,8 +7742,8 @@
   },
   "pickups/rage_shot": {
    "frame": {
-    "x": 190,
-    "y": 635,
+    "x": 411,
+    "y": 730,
     "w": 14,
     "h": 14
    },
@@ -6442,8 +7762,8 @@
   },
   "pickups/shield_cell": {
    "frame": {
-    "x": 205,
-    "y": 635,
+    "x": 426,
+    "y": 730,
     "w": 14,
     "h": 14
    },
@@ -6462,8 +7782,8 @@
   },
   "projectiles/bottle": {
    "frame": {
-    "x": 387,
-    "y": 650,
+    "x": 103,
+    "y": 760,
     "w": 6,
     "h": 7
    },
@@ -6482,8 +7802,8 @@
   },
   "projectiles/bullet": {
    "frame": {
-    "x": 29,
-    "y": 663,
+    "x": 254,
+    "y": 760,
     "w": 4,
     "h": 4
    },
@@ -6502,8 +7822,8 @@
   },
   "projectiles/drone": {
    "frame": {
-    "x": 441,
-    "y": 650,
+    "x": 157,
+    "y": 760,
     "w": 8,
     "h": 6
    },
@@ -6522,8 +7842,8 @@
   },
   "projectiles/drone/spin_0": {
    "frame": {
-    "x": 450,
-    "y": 650,
+    "x": 166,
+    "y": 760,
     "w": 8,
     "h": 6
    },
@@ -6542,8 +7862,8 @@
   },
   "projectiles/drone/spin_1": {
    "frame": {
-    "x": 459,
-    "y": 650,
+    "x": 175,
+    "y": 760,
     "w": 8,
     "h": 6
    },
@@ -6562,8 +7882,8 @@
   },
   "projectiles/flame": {
    "frame": {
-    "x": 241,
-    "y": 650,
+    "x": 458,
+    "y": 747,
     "w": 10,
     "h": 10
    },
@@ -6582,8 +7902,8 @@
   },
   "projectiles/flame/burn_0": {
    "frame": {
-    "x": 252,
-    "y": 650,
+    "x": 469,
+    "y": 747,
     "w": 10,
     "h": 10
    },
@@ -6602,8 +7922,8 @@
   },
   "projectiles/flame/burn_1": {
    "frame": {
-    "x": 263,
-    "y": 650,
+    "x": 480,
+    "y": 747,
     "w": 10,
     "h": 10
    },
@@ -6622,8 +7942,8 @@
   },
   "projectiles/flame/burn_2": {
    "frame": {
-    "x": 274,
-    "y": 650,
+    "x": 491,
+    "y": 747,
     "w": 10,
     "h": 10
    },
@@ -6642,8 +7962,8 @@
   },
   "projectiles/ice_shard": {
    "frame": {
-    "x": 394,
-    "y": 650,
+    "x": 110,
+    "y": 760,
     "w": 10,
     "h": 7
    },
@@ -6662,8 +7982,8 @@
   },
   "projectiles/laser": {
    "frame": {
-    "x": 44,
-    "y": 663,
+    "x": 269,
+    "y": 760,
     "w": 8,
     "h": 3
    },
@@ -6682,8 +8002,8 @@
   },
   "projectiles/mine": {
    "frame": {
-    "x": 345,
-    "y": 650,
+    "x": 61,
+    "y": 760,
     "w": 10,
     "h": 8
    },
@@ -6702,8 +8022,8 @@
   },
   "projectiles/mine/idle_0": {
    "frame": {
-    "x": 356,
-    "y": 650,
+    "x": 72,
+    "y": 760,
     "w": 10,
     "h": 8
    },
@@ -6722,8 +8042,8 @@
   },
   "projectiles/mine/idle_1": {
    "frame": {
-    "x": 367,
-    "y": 650,
+    "x": 83,
+    "y": 760,
     "w": 10,
     "h": 8
    },
@@ -6742,8 +8062,8 @@
   },
   "projectiles/needle": {
    "frame": {
-    "x": 53,
-    "y": 663,
+    "x": 278,
+    "y": 760,
     "w": 8,
     "h": 3
    },
@@ -6762,8 +8082,8 @@
   },
   "projectiles/pellet": {
    "frame": {
-    "x": 34,
-    "y": 663,
+    "x": 259,
+    "y": 760,
     "w": 4,
     "h": 4
    },
@@ -6782,8 +8102,8 @@
   },
   "projectiles/rad": {
    "frame": {
-    "x": 1,
-    "y": 663,
+    "x": 226,
+    "y": 760,
     "w": 6,
     "h": 5
    },
@@ -6802,8 +8122,8 @@
   },
   "projectiles/rail_slug": {
    "frame": {
-    "x": 8,
-    "y": 663,
+    "x": 233,
+    "y": 760,
     "w": 20,
     "h": 5
    },
@@ -6822,8 +8142,8 @@
   },
   "projectiles/rocket": {
    "frame": {
-    "x": 405,
-    "y": 650,
+    "x": 121,
+    "y": 760,
     "w": 12,
     "h": 7
    },
@@ -6842,8 +8162,8 @@
   },
   "projectiles/saw": {
    "frame": {
-    "x": 1,
-    "y": 650,
+    "x": 218,
+    "y": 747,
     "w": 12,
     "h": 12
    },
@@ -6862,8 +8182,8 @@
   },
   "projectiles/saw/spin_0": {
    "frame": {
-    "x": 14,
-    "y": 650,
+    "x": 231,
+    "y": 747,
     "w": 12,
     "h": 12
    },
@@ -6882,8 +8202,8 @@
   },
   "projectiles/saw/spin_1": {
    "frame": {
-    "x": 27,
-    "y": 650,
+    "x": 244,
+    "y": 747,
     "w": 12,
     "h": 12
    },
@@ -6902,8 +8222,8 @@
   },
   "projectiles/saw/spin_2": {
    "frame": {
-    "x": 40,
-    "y": 650,
+    "x": 257,
+    "y": 747,
     "w": 12,
     "h": 12
    },
@@ -6922,8 +8242,8 @@
   },
   "projectiles/saw/spin_3": {
    "frame": {
-    "x": 53,
-    "y": 650,
+    "x": 270,
+    "y": 747,
     "w": 12,
     "h": 12
    },
@@ -6942,8 +8262,8 @@
   },
   "projectiles/shell": {
    "frame": {
-    "x": 66,
-    "y": 650,
+    "x": 283,
+    "y": 747,
     "w": 8,
     "h": 12
    },
@@ -6962,8 +8282,8 @@
   },
   "projectiles/slug": {
    "frame": {
-    "x": 39,
-    "y": 663,
+    "x": 264,
+    "y": 760,
     "w": 4,
     "h": 4
    },
@@ -6982,8 +8302,8 @@
   },
   "projectiles/spark": {
    "frame": {
-    "x": 468,
-    "y": 650,
+    "x": 184,
+    "y": 760,
     "w": 6,
     "h": 6
    },
@@ -7002,8 +8322,8 @@
   },
   "projectiles/spit": {
    "frame": {
-    "x": 418,
-    "y": 650,
+    "x": 134,
+    "y": 760,
     "w": 7,
     "h": 7
    },
@@ -7022,8 +8342,8 @@
   },
   "projectiles/tracer": {
    "frame": {
-    "x": 62,
-    "y": 663,
+    "x": 287,
+    "y": 760,
     "w": 7,
     "h": 3
    },
@@ -7042,8 +8362,8 @@
   },
   "projectiles/turret": {
    "frame": {
-    "x": 55,
-    "y": 531,
+    "x": 438,
+    "y": 624,
     "w": 18,
     "h": 18
    },
@@ -7062,8 +8382,8 @@
   },
   "projectiles/turret/spin_0": {
    "frame": {
-    "x": 74,
-    "y": 531,
+    "x": 457,
+    "y": 624,
     "w": 18,
     "h": 18
    },
@@ -7082,8 +8402,8 @@
   },
   "projectiles/turret/spin_1": {
    "frame": {
-    "x": 93,
-    "y": 531,
+    "x": 476,
+    "y": 624,
     "w": 18,
     "h": 18
    },
@@ -7102,8 +8422,8 @@
   },
   "ui/cap": {
    "frame": {
-    "x": 378,
-    "y": 650,
+    "x": 94,
+    "y": 760,
     "w": 8,
     "h": 8
    },
@@ -7122,8 +8442,8 @@
   },
   "ui/emerald": {
    "frame": {
-    "x": 75,
-    "y": 650,
+    "x": 292,
+    "y": 747,
     "w": 12,
     "h": 12
    },
@@ -7142,8 +8462,8 @@
   },
   "ui/lock": {
    "frame": {
-    "x": 460,
-    "y": 601,
+    "x": 188,
+    "y": 713,
     "w": 16,
     "h": 16
    },
@@ -7162,8 +8482,8 @@
   },
   "weapons/beam_cutter": {
    "frame": {
-    "x": 477,
-    "y": 601,
+    "x": 205,
+    "y": 713,
     "w": 16,
     "h": 16
    },
@@ -7182,8 +8502,8 @@
   },
   "weapons/buzz_storm": {
    "frame": {
-    "x": 494,
-    "y": 601,
+    "x": 222,
+    "y": 713,
     "w": 16,
     "h": 16
    },
@@ -7202,8 +8522,8 @@
   },
   "weapons/cryo_cannon": {
    "frame": {
-    "x": 1,
-    "y": 618,
+    "x": 239,
+    "y": 713,
     "w": 16,
     "h": 16
    },
@@ -7222,8 +8542,8 @@
   },
   "weapons/drone_swarm": {
    "frame": {
-    "x": 18,
-    "y": 618,
+    "x": 256,
+    "y": 713,
     "w": 16,
     "h": 16
    },
@@ -7242,8 +8562,8 @@
   },
   "weapons/firebomb": {
    "frame": {
-    "x": 35,
-    "y": 618,
+    "x": 273,
+    "y": 713,
     "w": 16,
     "h": 16
    },
@@ -7262,8 +8582,8 @@
   },
   "weapons/flamethrower": {
    "frame": {
-    "x": 52,
-    "y": 618,
+    "x": 290,
+    "y": 713,
     "w": 16,
     "h": 16
    },
@@ -7282,8 +8602,8 @@
   },
   "weapons/furnace": {
    "frame": {
-    "x": 69,
-    "y": 618,
+    "x": 307,
+    "y": 713,
     "w": 16,
     "h": 16
    },
@@ -7302,8 +8622,8 @@
   },
   "weapons/gravity_trap": {
    "frame": {
-    "x": 86,
-    "y": 618,
+    "x": 324,
+    "y": 713,
     "w": 16,
     "h": 16
    },
@@ -7322,8 +8642,8 @@
   },
   "weapons/laser_rifle": {
    "frame": {
-    "x": 103,
-    "y": 618,
+    "x": 341,
+    "y": 713,
     "w": 16,
     "h": 16
    },
@@ -7342,8 +8662,8 @@
   },
   "weapons/minefield": {
    "frame": {
-    "x": 120,
-    "y": 618,
+    "x": 358,
+    "y": 713,
     "w": 16,
     "h": 16
    },
@@ -7362,8 +8682,8 @@
   },
   "weapons/mortar": {
    "frame": {
-    "x": 137,
-    "y": 618,
+    "x": 375,
+    "y": 713,
     "w": 16,
     "h": 16
    },
@@ -7382,8 +8702,8 @@
   },
   "weapons/nail_gun": {
    "frame": {
-    "x": 154,
-    "y": 618,
+    "x": 392,
+    "y": 713,
     "w": 16,
     "h": 16
    },
@@ -7402,8 +8722,8 @@
   },
   "weapons/napalm": {
    "frame": {
-    "x": 171,
-    "y": 618,
+    "x": 409,
+    "y": 713,
     "w": 16,
     "h": 16
    },
@@ -7422,8 +8742,8 @@
   },
   "weapons/needle_sphere": {
    "frame": {
-    "x": 188,
-    "y": 618,
+    "x": 426,
+    "y": 713,
     "w": 16,
     "h": 16
    },
@@ -7442,8 +8762,8 @@
   },
   "weapons/orbit_drone": {
    "frame": {
-    "x": 205,
-    "y": 618,
+    "x": 443,
+    "y": 713,
     "w": 16,
     "h": 16
    },
@@ -7462,8 +8782,8 @@
   },
   "weapons/prism_emitter": {
    "frame": {
-    "x": 222,
-    "y": 618,
+    "x": 460,
+    "y": 713,
     "w": 16,
     "h": 16
    },
@@ -7482,8 +8802,8 @@
   },
   "weapons/rad_aura": {
    "frame": {
-    "x": 239,
-    "y": 618,
+    "x": 477,
+    "y": 713,
     "w": 16,
     "h": 16
    },
@@ -7502,8 +8822,8 @@
   },
   "weapons/rail_gun": {
    "frame": {
-    "x": 256,
-    "y": 618,
+    "x": 494,
+    "y": 713,
     "w": 16,
     "h": 16
    },
@@ -7522,8 +8842,8 @@
   },
   "weapons/reactor_core": {
    "frame": {
-    "x": 273,
-    "y": 618,
+    "x": 1,
+    "y": 730,
     "w": 16,
     "h": 16
    },
@@ -7542,8 +8862,8 @@
   },
   "weapons/rocket_barrage": {
    "frame": {
-    "x": 290,
-    "y": 618,
+    "x": 18,
+    "y": 730,
     "w": 16,
     "h": 16
    },
@@ -7562,8 +8882,8 @@
   },
   "weapons/rocket_tube": {
    "frame": {
-    "x": 307,
-    "y": 618,
+    "x": 35,
+    "y": 730,
     "w": 16,
     "h": 16
    },
@@ -7582,8 +8902,8 @@
   },
   "weapons/rotary_gun": {
    "frame": {
-    "x": 324,
-    "y": 618,
+    "x": 52,
+    "y": 730,
     "w": 16,
     "h": 16
    },
@@ -7602,8 +8922,8 @@
   },
   "weapons/saw_blade": {
    "frame": {
-    "x": 341,
-    "y": 618,
+    "x": 69,
+    "y": 730,
     "w": 16,
     "h": 16
    },
@@ -7622,8 +8942,8 @@
   },
   "weapons/scattergun": {
    "frame": {
-    "x": 358,
-    "y": 618,
+    "x": 86,
+    "y": 730,
     "w": 16,
     "h": 16
    },
@@ -7642,8 +8962,8 @@
   },
   "weapons/scrap_cannon": {
    "frame": {
-    "x": 375,
-    "y": 618,
+    "x": 103,
+    "y": 730,
     "w": 16,
     "h": 16
    },
@@ -7662,8 +8982,8 @@
   },
   "weapons/scrap_pistol": {
    "frame": {
-    "x": 392,
-    "y": 618,
+    "x": 120,
+    "y": 730,
     "w": 16,
     "h": 16
    },
@@ -7682,8 +9002,8 @@
   },
   "weapons/sentry_turret": {
    "frame": {
-    "x": 409,
-    "y": 618,
+    "x": 137,
+    "y": 730,
     "w": 16,
     "h": 16
    },
@@ -7702,8 +9022,8 @@
   },
   "weapons/storm_core": {
    "frame": {
-    "x": 426,
-    "y": 618,
+    "x": 154,
+    "y": 730,
     "w": 16,
     "h": 16
    },
@@ -7722,8 +9042,8 @@
   },
   "weapons/tesla_coil": {
    "frame": {
-    "x": 443,
-    "y": 618,
+    "x": 171,
+    "y": 730,
     "w": 16,
     "h": 16
    },
@@ -7742,8 +9062,8 @@
   },
   "weapons/trap_mine": {
    "frame": {
-    "x": 460,
-    "y": 618,
+    "x": 188,
+    "y": 730,
     "w": 16,
     "h": 16
    },
@@ -7762,8 +9082,8 @@
   },
   "xp/green": {
    "frame": {
-    "x": 475,
-    "y": 650,
+    "x": 191,
+    "y": 760,
     "w": 6,
     "h": 6
    },
@@ -7782,8 +9102,8 @@
   },
   "xp/green/idle_0": {
    "frame": {
-    "x": 482,
-    "y": 650,
+    "x": 198,
+    "y": 760,
     "w": 6,
     "h": 6
    },
@@ -7802,8 +9122,8 @@
   },
   "xp/green/idle_1": {
    "frame": {
-    "x": 489,
-    "y": 650,
+    "x": 205,
+    "y": 760,
     "w": 6,
     "h": 6
    },
@@ -7822,8 +9142,8 @@
   },
   "xp/green/idle_2": {
    "frame": {
-    "x": 496,
-    "y": 650,
+    "x": 212,
+    "y": 760,
     "w": 6,
     "h": 6
    },
@@ -7842,8 +9162,8 @@
   },
   "xp/green/idle_3": {
    "frame": {
-    "x": 503,
-    "y": 650,
+    "x": 219,
+    "y": 760,
     "w": 6,
     "h": 6
    },

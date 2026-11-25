@@ -1,0 +1,13 @@
+{
+  "id": "spike_frame",
+  "name": "Шипованный каркас",
+  "category": "survival",
+  "stat": "thorns",
+  "mod": "flat",
+  "perLevel": 3,
+  "maxLevel": 8,
+  "cost": {
+    "base": 50,
+    "growth": 1.5
+  }
+}

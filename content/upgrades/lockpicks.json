@@ -1,0 +1,13 @@
+{
+  "id": "lockpicks",
+  "name": "Набор отмычек",
+  "category": "scavenge",
+  "stat": "landmarkSpeed",
+  "mod": "flat",
+  "perLevel": 0.12,
+  "maxLevel": 8,
+  "cost": {
+    "base": 40,
+    "growth": 1.45
+  }
+}

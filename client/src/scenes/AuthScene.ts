@@ -29,6 +29,7 @@ export class AuthScene extends Phaser.Scene {
     this.overlay.className = 'auth-overlay';
     this.overlay.innerHTML = `
       <section class="auth-card" aria-labelledby="auth-title">
+        <div class="shelter-view" role="img" aria-label="Закат над пустошью и вход в убежище"></div>
         <div class="auth-eyebrow">УБЕЖИЩЕ · ДОСТУП</div>
         <h1 id="auth-title">ПУСТОШЬ</h1>
         <p class="auth-intro">${this.linking ? 'Привяжите вход, чтобы сохранить доступ к аккаунту.' : 'Выживите за пределами убежища. Начните новую игру или продолжите свою.'}</p>
