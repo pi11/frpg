@@ -4,15 +4,18 @@
 
 ## 1. Что нужно заранее
 
-- Сервер, домен с записями A/AAAA на него, второй хост для бэкапов (доступ по SSH-ключу).
-- Аккаунт Resend и бот от @BotFather (отдельный от тестового).
+- Сервер: от 1 ГБ памяти (на 1 ГБ добавьте 1–2 ГБ swap, иначе сборка клиента может не пройти), 5 ГБ диска, открыты порты 22, 80, 443.
+- Домен с записями A/AAAA на сервер (AAAA — только если IPv6 работает, иначе сертификат не выдадут), второй хост для бэкапов с `rsync` и доступом по SSH-ключу.
+- Аккаунт Resend и бот от @BotFather (отдельный от тестового). Основной вход — по ключу аккаунта, но без почты и бота сервис пока **не запустится**: это проверяет `check_config`.
+- Код отправлен в `origin/master` (`git push`) и CI зелёный: сервер берёт код оттуда, а не с вашего компьютера.
 - Почта и имя владельца игры: они публикуются в `/privacy` и `/delete-account`. До запуска покажите политику юристу (152-ФЗ, передача адресов в Resend — США).
 
 ## 2. Пакеты, пользователь, код
 
 ```bash
 apt install nginx postgresql pgbouncer certbot git curl rsync sudo
-# Node.js 22+ — из NodeSource или другого доверенного источника; uv — в /usr/local/bin/uv.
+# Node.js 22.13+ (или 24+) — из NodeSource или другого доверенного источника, проверьте: node --version
+# uv — в /usr/local/bin/uv (скачайте архив с github.com/astral-sh/uv/releases и сверьте sha256)
 useradd --system --create-home --home-dir /srv/wasteland --shell /usr/sbin/nologin wasteland
 chmod 755 /srv/wasteland
 sudo -u wasteland -H git clone <адрес репозитория> /srv/wasteland/app
@@ -20,6 +23,10 @@ install -d -o wasteland -g wasteland /srv/wasteland/web
 sudo -u wasteland -H /usr/local/bin/uv python install 3.12
 cd /srv/wasteland/app
 ```
+
+Адрес репозитория — по HTTPS (`https://github.com/pi11/frpg.git`): ключ не нужен, пока репозиторий публичный. Если закроете его, создайте пользователю `wasteland` ключ (`sudo -u wasteland -H ssh-keygen -t ed25519`) и добавьте как Deploy key только на чтение.
+
+Файрвол: `ufw allow OpenSSH && ufw allow 80,443/tcp && ufw enable` (сначала SSH, иначе потеряете доступ).
 
 ## 3. База и PgBouncer
 
@@ -31,6 +38,7 @@ cp deploy/pgbouncer/pgbouncer.ini /etc/pgbouncer/pgbouncer.ini
 sudo -u postgres psql -Atc "select format('\"%s\" \"%s\"', usename, passwd) from pg_shadow where usename='wasteland'" > /etc/pgbouncer/userlist.txt
 chown postgres:postgres /etc/pgbouncer/userlist.txt && chmod 600 /etc/pgbouncer/userlist.txt
 systemctl restart pgbouncer
+psql 'postgresql://wasteland:ПАРОЛЬ@127.0.0.1:6432/wasteland' -c 'select 1'   # проверка пути через PgBouncer
 ```
 
 PgBouncer и PostgreSQL должны слушать только localhost. Пул соединений — transaction; миграции и `pg_dump` ходят напрямую в PostgreSQL (5432). Если на сервере уже есть PgBouncer, не заменяйте его файл, а добавьте базу в `[databases]` и строку в `userlist.txt`.
@@ -44,7 +52,11 @@ install -m 600 deploy/deploy.env.example /etc/wasteland/deploy.env
 install -m 600 deploy/backup.env.example /etc/wasteland/backup.env
 ```
 
-Заполните файлы. `JWT_SECRET` и `TELEGRAM_WEBHOOK_SECRET` — по `openssl rand -hex 32`. Смена `JWT_SECRET` завершает access-токены и незавершённые входы по коду. Сервис не стартует с небезопасными настройками (`check_config`): не HTTPS, короткий секрет, `MAIL_BACKEND=console`, неполные настройки Resend или Telegram.
+Заполните файлы. `JWT_SECRET` и `TELEGRAM_WEBHOOK_SECRET` — по `openssl rand -hex 32`. Пароль базы подставьте в `DATABASE_URL`, `MIGRATION_DATABASE_URL` и `BACKUP_DATABASE_URL`; имя владельца с пробелами — в кавычках.
+
+**`JWT_SECRET` сохраните отдельно от сервера** (менеджер паролей): из него выводятся ключи аккаунтов, и в бэкап базы он не входит, как и весь `/etc/wasteland`. При его смене завершаются access-токены и незавершённые входы по коду, а ключ аккаунта меняется, когда игрок снова откроет его в настройках: до этого работает старый, после — только новый.
+
+Сервис не стартует с небезопасными настройками (`check_config`): не HTTPS, короткий секрет, `MAIL_BACKEND=console`, неполные настройки Resend или Telegram.
 
 ## 5. nginx и TLS
 
@@ -74,6 +86,8 @@ deploy/deploy.sh            # далее — так же для обновлен
 systemctl enable --now wasteland-cleanup.timer wasteland-backup.timer
 ```
 
+Перед обновлением с миграциями сделайте бэкап: `systemctl start wasteland-backup`. Предупредите игроков: забеги, идущие в момент обновления, могут получить флаг.
+
 `deploy.sh` обновляет код, собирает клиент, проверяет настройки, применяет миграции, перезапускает API, ждёт `/health` и только потом публикует клиент. Откат кода: `deploy/deploy.sh <прошлый коммит>`; миграции назад сам не откатывает. Если обновление меняет `content/`, забеги, начатые до перезапуска, получат флаг `content_hash_mismatch`.
 
 ## 7. Почта и Telegram
@@ -102,7 +116,12 @@ sudo -u postgres dropdb wasteland_restore
 4. `/privacy` и `/delete-account` открываются, в них настоящие контакты. Удалите тестовый аккаунт по почте и через Telegram.
 5. 15 быстрых `POST /api/v1/auth/guest` → последние 429 с JSON.
 6. `systemctl list-timers 'wasteland-*'`; `systemctl start wasteland-cleanup` завершился без ошибок; восстановление бэкапа прошло.
-7. Перезагрузите сервер: игра поднялась сама.
+7. Ключ: «Настройки» → «Показать», войдите по нему в другом браузере — тот же баланс; неверный ключ даёт ошибку. Кнопка «Копировать» работает только по HTTPS.
+8. После забега с убийством 100 врагов на вкладке «Достижения» есть «Забрать»; изумруды прибавились. Закрытый герой выбрать нельзя.
+9. С телефона: вертикально и после поворота игра занимает экран, звук и мелодии играют, в консоли браузера нет ошибок CSP (предупреждение Zod про `new Function` допустимо).
+10. Перезагрузите сервер: игра поднялась сама.
+
+Прогресс с домашнего компьютера на сервер не переносится: база там новая.
 
 ## 10. Android (в самом конце)
 
