@@ -1,0 +1,12 @@
+{
+  "id": "tickle",
+  "name": "Щекотно!",
+  "description": "Нажать на героя 10 раз подряд",
+  "hidden": true,
+  "emeralds": 2,
+  "condition": {
+    "type": "reported",
+    "event": "heroClicks",
+    "value": 10
+  }
+}

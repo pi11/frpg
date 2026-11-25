@@ -170,6 +170,7 @@ export class ChestScene extends Phaser.Scene {
     for (const part of this.footer) part.setVisible(true);
     playSfx(this.rows.length >= 3 ? 'sfx/chest_jackpot' : this.caps ? 'sfx/cap' : 'sfx/ui_click');
     this.hint.setText('ПРОБЕЛ ИЛИ КАСАНИЕ — ДАЛЬШЕ');
+    if ((this.scene.get('Run') as RunScene).autopilotOn) this.time.delayedCall(1200, () => this.close());
   }
 
   /** First press shows everything at once, the next one closes the chest. */

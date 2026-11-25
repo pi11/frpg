@@ -1,0 +1,14 @@
+{
+  "id": "boss_blitz",
+  "name": "Блиц",
+  "description": "Убить босса быстрее чем за 55 секунд",
+  "hidden": false,
+  "emeralds": 8,
+  "condition": {
+    "type": "reported",
+    "event": "bossFast",
+    "value": 55,
+    "boss": true,
+    "minSeconds": 780
+  }
+}

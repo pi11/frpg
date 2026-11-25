@@ -12,6 +12,10 @@ import type {
 } from '../content/schemas';
 import { inputState } from '../inputState';
 import { playMusic, playSfx } from '../sound';
+import { isReached, newRecord, type RunRecord } from '../systems/achievements';
+import { autopilotDirection, type Threat } from '../systems/autopilot';
+import { keepAwake } from '../platform/wakeLock';
+import { settings } from '../settings';
 import { refillBudget, softCap } from '../systems/limits';
 import { Rng } from '../systems/rng';
 import { availableEvolutions, evolutionSource } from '../systems/evolutions';
@@ -43,6 +47,8 @@ export interface RunView {
   buffs: { sprite: string; name: string; text: string; fraction: number }[];
   /** Emeralds earned so far in this run (the server counts them again). */
   emeralds: number;
+  /** Achievement banner. */
+  toast: string;
 }
 
 export interface UpgradeChoice {
@@ -81,6 +87,8 @@ export interface RunData {
   upgrades: Record<string, number>;
   /** Weapons and perks bought for emeralds. */
   unlocks: string[];
+  /** Already earned achievements. */
+  achievements: string[];
 }
 
 /** Presentation constants (not balance). */
@@ -96,6 +104,9 @@ const HIT_FLASH_MS = 50;
 const LABEL_POOL_SIZE = 8;
 const HIT_FLASH_GAP_MS = 120;
 const REWARD_RING = 20;
+const TOAST_MS = 3500;
+const HERO_PRESS_RADIUS = 16;
+const AUTOPILOT_LOOT_RANGE = 260;
 /** Mortar shells drop from this height during the last part of their flight. */
 const SHELL_HEIGHT = 150;
 const SHELL_FALL_MS = 350;
@@ -176,7 +187,7 @@ export class RunScene extends Phaser.Scene {
   readonly view: RunView = {
     hp: 0, maxHp: 0, xp: 0, nextXp: 0, level: 1, kills: 0, caps: 0, seconds: 0,
     wave: 1, enemyCount: 0, projectileCount: 0, seed: 0, boss: null, warning: '',
-    rerolls: 0, revives: 0, buffs: [], emeralds: 0,
+    rerolls: 0, revives: 0, buffs: [], emeralds: 0, toast: '',
   };
   choices: UpgradeChoice[] = [];
   chest: ChestData = { granted: [], caps: 0 };
@@ -202,6 +213,11 @@ export class RunScene extends Phaser.Scene {
   private blasts: PendingBlast[] = [];
   private beams: [Point, Point][] = [];
   private unlocks = new Set<string>();
+  private record: RunRecord = newRecord(0);
+  private reported = new Set<string>();
+  private ownedAchievements = new Set<string>();
+  private bossSpawnedAt = 0;
+  private checkedSecond = -1;
   private orbiters = new Map<string, Phaser.GameObjects.Sprite[]>();
   private auras = new Map<string, number>();
   private mobs: SpriteMob[] = [];
@@ -268,6 +284,10 @@ export class RunScene extends Phaser.Scene {
     this.blasts = [];
     this.beams = [];
     this.unlocks = new Set(data.unlocks);
+    this.record = newRecord(new Date().getHours());
+    this.reported = new Set();
+    this.ownedAchievements = new Set(data.achievements);
+    this.checkedSecond = -1;
     this.orbiters = new Map();
     this.auras = new Map();
     this.mobs = [];
@@ -281,7 +301,7 @@ export class RunScene extends Phaser.Scene {
       nextXp: this.catalog.balance.xp.base, level: 1, kills: 0, caps: 0,
       seconds: Math.floor(this.elapsedMs / 1000), wave: this.waveIndex + 1,
       enemyCount: 0, projectileCount: 0, seed: data.seed, boss: null, warning: '',
-      rerolls: Math.floor(this.stat('rerolls')), revives: Math.floor(this.stat('revives')), buffs: [], emeralds: 0,
+      rerolls: Math.floor(this.stat('rerolls')), revives: Math.floor(this.stat('revives')), buffs: [], emeralds: 0, toast: '',
     });
     inputState.x = 0;
     inputState.y = 0;
@@ -385,6 +405,7 @@ export class RunScene extends Phaser.Scene {
     this.keys = this.input.keyboard!.addKeys('W,A,S,D') as typeof this.keys;
     this.scene.launch('Hud');
     this.scene.bringToTop('Hud');
+    if (this.autopilotOn) void keepAwake(true);
     playSfx('sfx/run_start');
     playMusic(this.location.music);
   }
@@ -508,6 +529,7 @@ export class RunScene extends Phaser.Scene {
       this.spawnClock = 0;
     }
     this.runTimeline();
+    this.updateRecord(delta);
 
     const regen = this.stat('regen');
     if (regen > 0) this.view.hp = Math.min(this.view.maxHp, this.view.hp + regen * delta / 1000);
@@ -571,6 +593,7 @@ export class RunScene extends Phaser.Scene {
       }
       if (seconds >= boss.atSecond) {
         this.bossSpawned = true;
+        this.bossSpawnedAt = this.elapsedMs;
         this.spawnEnemy(definition);
         this.announceElite();
         playMusic(this.location.bossMusic);
@@ -610,6 +633,69 @@ export class RunScene extends Phaser.Scene {
     return (this.heroDefinition.baseStats[key] + flat) * (1 + percent);
   }
 
+  get autopilotOwned(): boolean {
+    return this.stat('autopilot') > 0;
+  }
+
+  get autopilotOn(): boolean {
+    return settings().autopilot && this.autopilotOwned;
+  }
+
+  private autopilotStep(): Point | null {
+    const threats: Threat[] = [];
+    for (const mob of this.mobs) {
+      if (mob.targetable) threats.push({ x: mob.x, y: mob.y, big: mob.definition.role !== 'normal' });
+    }
+    const shots = (this.hostileShots.getChildren() as Phaser.Physics.Arcade.Sprite[])
+      .filter((shot) => shot.active);
+    let loot: Point | null = null;
+    let best = AUTOPILOT_LOOT_RANGE;
+    for (const group of [this.crystals, this.pickups]) {
+      for (const item of group.getChildren() as Phaser.Physics.Arcade.Sprite[]) {
+        if (!item.active) continue;
+        const distance = Math.hypot(item.x - this.hero.x, item.y - this.hero.y);
+        if (distance >= best) continue;
+        best = distance;
+        loot = item;
+      }
+    }
+    return autopilotDirection(this.hero, threats, shots, loot);
+  }
+
+  /** A press on the canvas: presses on the hero in a row are counted. */
+  heroPress(x: number, y: number): void {
+    const { scrollX, scrollY } = this.cameras.main;
+    const hit = Math.hypot(x + scrollX - this.hero.x, y + scrollY - this.hero.y) <= HERO_PRESS_RADIUS;
+    this.record.heroClicks = hit ? this.record.heroClicks + 1 : 0;
+    this.checkAchievements();
+  }
+
+  notePause(): void {
+    this.record.pauses += 1;
+    this.checkAchievements();
+  }
+
+  private updateRecord(delta: number): void {
+    if (this.autopilotOn) this.record.autopilotMs += delta;
+    this.record.seconds = this.view.seconds;
+    if (this.view.seconds === this.checkedSecond) return;
+    this.checkedSecond = this.view.seconds;
+    this.checkAchievements();
+  }
+
+  private checkAchievements(): void {
+    for (const achievement of Object.values(this.catalog.achievements)) {
+      if (this.ownedAchievements.has(achievement.id) || this.reported.has(achievement.id)
+        || !isReached(achievement, this.record)) continue;
+      this.reported.add(achievement.id);
+      if (this.record.end) continue;
+      playSfx('sfx/chest_jackpot');
+      this.view.toast = `ДОСТИЖЕНИЕ: ${achievement.name.toUpperCase()}`;
+      // Scene time stands still on pause, so the banner waits for the run to go on.
+      this.time.delayedCall(TOAST_MS, () => { this.view.toast = ''; });
+    }
+  }
+
   private moveHero(): void {
     let x = inputState.x;
     let y = inputState.y;
@@ -623,7 +709,9 @@ export class RunScene extends Phaser.Scene {
       const way = inputState.mouse.direction(this.hero,
         (point) => this.cameras.main.getWorldPoint(point.x, point.y));
       if (way) ({ x, y } = way);
+      else if (this.autopilotOn) ({ x, y } = this.autopilotStep() ?? { x: 0, y: 0 });
     }
+    if (x !== 0 || y !== 0) this.record.moved = true;
     const length = Math.hypot(x, y);
     const { softMoveSpeed, softMoveSpeedFactor } = this.catalog.balance.run;
     const speed = softCap(this.stat('moveSpeed'), softMoveSpeed, softMoveSpeedFactor) * (1 - this.hazardSlow);
@@ -828,6 +916,7 @@ export class RunScene extends Phaser.Scene {
 
   private winByBoss(): void {
     this.bossKilled = true;
+    this.record.bossSeconds = (this.elapsedMs - this.bossSpawnedAt) / 1000;
     this.finished = true;
     this.physics.pause();
     this.hero.setVelocity(0, 0);
@@ -1213,6 +1302,7 @@ export class RunScene extends Phaser.Scene {
     const { damagePerSecond, slow } = this.decor.hazardAt(this.hero.x, this.hero.y);
     const resist = Math.min(1, Math.max(0, this.stat('radResist')));
     this.hazardSlow = slow * (1 - resist);
+    if (slow > 0 || damagePerSecond > 0) this.record.hazardMs += delta;
     const tick = this.catalog.balance.run.hazardTickMs;
     const damage = damagePerSecond * (1 - resist) * tick / 1000;
     if (damage <= 0) {
@@ -1557,6 +1647,7 @@ export class RunScene extends Phaser.Scene {
       const source = evolutionSource(this.catalog.weapons, choice.id);
       const state = source && this.weapons.get(source.id);
       if (!source || !state) return;
+      this.record.evolved = true;
       this.weapons.delete(source.id);
       this.weapons.set(choice.id, { ...state, level: 1 });
       this.placeOrbiters(source.id, source.projectileSprite, []);
@@ -1568,6 +1659,7 @@ export class RunScene extends Phaser.Scene {
     } else {
       this.ownedPassives.set(choice.id, (this.ownedPassives.get(choice.id) ?? 0) + 1);
     }
+    this.record.weapons = Math.max(this.record.weapons, this.weapons.size);
     const maxHp = this.stat('maxHp');
     this.view.hp += Math.max(0, maxHp - this.view.maxHp);
     this.view.maxHp = maxHp;
@@ -1616,6 +1708,7 @@ export class RunScene extends Phaser.Scene {
 
   private hurt(damage: number): void {
     if (this.finished || this.elapsedMs < this.invulnerableUntil) return;
+    this.record.damaged = true;
     playSfx('sfx/hero_hurt');
     this.view.hp = Math.max(0, this.view.hp - damage);
     this.cameras.main.shake(80, 0.005);
@@ -1661,8 +1754,12 @@ export class RunScene extends Phaser.Scene {
 
   private finish(reason: ResultData['reason']): void {
     this.finished = true;
+    this.record.seconds = this.view.seconds;
+    this.record.end = reason;
+    this.checkAchievements();
     this.hero.setVelocity(0, 0);
     this.scene.stop('Hud');
+    void keepAwake(false);
     const result: ResultData = {
       reason, seconds: this.view.seconds, kills: this.view.kills,
       level: this.view.level, seed: this.view.seed, runId: this.runId,
@@ -1674,6 +1771,12 @@ export class RunScene extends Phaser.Scene {
         wave_reached: this.view.wave,
         boss_killed: this.bossKilled,
         picked_caps: this.view.caps,
+        autopilot: this.record.autopilotMs > 0,
+        achievements: this.record.autopilotMs > 0
+          ? [...this.reported].filter((id) => {
+            const { condition } = this.catalog.achievements[id]!;
+            return condition.type === 'reported' && condition.autopilot;
+          }) : [...this.reported],
       },
     };
     this.scene.start('Result', result);

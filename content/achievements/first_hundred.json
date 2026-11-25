@@ -1,0 +1,12 @@
+{
+  "id": "first_hundred",
+  "name": "Первая сотня",
+  "description": "Убить 100 врагов за забег",
+  "hidden": false,
+  "emeralds": 1,
+  "condition": {
+    "type": "metric",
+    "metric": "kills",
+    "value": 100
+  }
+}

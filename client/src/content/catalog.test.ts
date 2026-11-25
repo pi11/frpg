@@ -89,6 +89,13 @@ describe('shared content catalog', () => {
     }
   });
 
+  it('rejects a boss achievement without its location', () => {
+    const path = Object.keys(rawFiles).find((key) => key.endsWith('junk_king_down.json'))!;
+    const raw = structuredClone(rawFiles[path] as { condition: { location: string } });
+    raw.condition.location = 'moon_base';
+    expect(() => validateContent({ ...rawFiles, [path]: raw })).toThrow('unknown location moon_base');
+  });
+
   it('rejects a boss phase with an unknown AI', () => {
     const bossPath = Object.keys(rawFiles).find((path) => path.endsWith('junk_king.json'));
     const boss = structuredClone(rawFiles[bossPath!] as { ai: { params: { phases: { ai: { type: string } }[] } } });

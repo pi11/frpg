@@ -1,0 +1,12 @@
+{
+  "id": "armory",
+  "name": "Оружейный барон",
+  "description": "Открыть 5 предметов за изумруды",
+  "hidden": false,
+  "emeralds": 5,
+  "condition": {
+    "type": "metric",
+    "metric": "unlocks",
+    "value": 5
+  }
+}

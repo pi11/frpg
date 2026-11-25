@@ -1,0 +1,12 @@
+{
+  "id": "night_owl",
+  "name": "Ночной дозор",
+  "description": "Выйти на вылазку между 3 и 4 часами ночи",
+  "hidden": true,
+  "emeralds": 2,
+  "condition": {
+    "type": "reported",
+    "event": "nightHour",
+    "value": 3
+  }
+}

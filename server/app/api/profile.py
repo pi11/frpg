@@ -11,6 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.api.errors import ApiError, ErrorCode, ErrorResponse
 from app.db import get_session
 from app.models.auth import AuthIdentity, Profile, User
+from app.services.achievements import grant_achievements
 from app.services.content import get_content
 from app.services.economy import unlocked_locations, upgrade_cost
 from app.services.tokens import current_user
@@ -41,6 +42,7 @@ class ProfileResponse(BaseModel):
     bosses_killed: list[str]
     unlocks: list[str]
     milestones: dict[str, list[int]]
+    achievements: list[str]
     unlocked_locations: list[str]
     identities: list[IdentityResponse]
 
@@ -62,6 +64,7 @@ async def profile_response(session: AsyncSession, user: User, profile: Profile) 
         runs_count=data.get("runs_count", 0),
         bosses_killed=sorted(data.get("bosses_killed", [])),
         unlocks=sorted(data.get("unlocks", [])), milestones=data.get("milestones", {}),
+        achievements=data.get("achievements", []),
         unlocked_locations=unlocked_locations(
             get_content().category("locations"), data.get("bosses_killed", []),
         ),
@@ -151,13 +154,14 @@ async def buy_unlock(
     emeralds = data.get("emeralds", 0)
     if emeralds < cost:
         raise ApiError(409, ErrorCode.conflict, "Недостаточно изумрудов")
+    data, _ = grant_achievements(
+        content.category("achievements"),
+        {**data, "emeralds": emeralds - cost, "unlocks": [*unlocks, item_id]}, None,
+    )
     changed = await session.execute(
         update(Profile).where(
             Profile.user_id == user.id, Profile.version == body.expected_version,
-        ).values(
-            version=Profile.version + 1,
-            data={**data, "emeralds": emeralds - cost, "unlocks": [*unlocks, item_id]},
-        ).returning(Profile.user_id)
+        ).values(version=Profile.version + 1, data=data).returning(Profile.user_id)
     )
     if changed.scalar_one_or_none() is None:
         raise ApiError(409, ErrorCode.conflict, "Профиль изменился. Обновите данные")

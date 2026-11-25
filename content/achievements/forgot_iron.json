@@ -1,0 +1,12 @@
+{
+  "id": "forgot_iron",
+  "name": "Утюг не выключил",
+  "description": "Вернуться в убежище в первые 10 секунд",
+  "hidden": true,
+  "emeralds": 1,
+  "condition": {
+    "type": "reported",
+    "event": "earlyQuit",
+    "value": 10
+  }
+}

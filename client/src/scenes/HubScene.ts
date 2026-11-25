@@ -1,10 +1,10 @@
 import * as Phaser from 'phaser';
-import { ApiRequestError, deleteAccount, session } from '../api/auth';
+import { accountKey, ApiRequestError, deleteAccount, loginByKey, saveSession, session } from '../api/auth';
 import { buyUnlock, buyUpgrade, getProfile, startRun, type Profile } from '../api/game';
 import { getCatalog } from '../content/catalog';
 import { orderedLocations } from '../content/locations';
 import { bundledContentHash } from '../content/hash';
-import type { PassiveDefinition, UpgradeDefinition, WeaponDefinition } from '../content/schemas';
+import type { AchievementDefinition, PassiveDefinition, UpgradeDefinition, WeaponDefinition } from '../content/schemas';
 import { statBonus } from '../content/statText';
 import { ATLAS, HUB_MUSIC } from '../assets';
 import { upgradeCost } from '../economy';
@@ -15,12 +15,13 @@ import type { RunData } from './RunScene';
 const VOLUMES = [['music', 'Музыка'], ['sfx', 'Звуки']] as const;
 
 const CATEGORIES: readonly [UpgradeDefinition['category'], string][] = [
-  ['slots', 'Слоты в забеге'], ['survival', 'Выживание'], ['combat', 'Бой'], ['scavenge', 'Добыча и опыт'],
+  ['slots', 'Слоты в забеге'], ['special', 'Особое'], ['survival', 'Выживание'], ['combat', 'Бой'], ['scavenge', 'Добыча и опыт'],
 ];
 
 const TABS = [
   ['run', 'Вылазка'], ['upgrades', 'Улучшения'], ['weapons', 'Оружие'], ['passives', 'Перки'],
-  ['emeralds', 'Изумруды'], ['settings', 'Настройки'],
+  ['emeralds', 'Изумруды'],
+  ['achievements', 'Достижения'], ['settings', 'Настройки'],
 ] as const;
 type Tab = (typeof TABS)[number][0];
 
@@ -80,13 +81,15 @@ export class HubScene extends Phaser.Scene {
             <div><dt>Лучшее время</dt><dd id="hub-best"></dd></div>
             <div><dt>Забегов</dt><dd id="hub-runs"></dd></div>
           </dl>
-          <p id="hub-guest-hint" class="auth-warning" hidden>Вы играете как гость. Привяжите почту или Telegram, чтобы не потерять прогресс.</p>
+          <p id="hub-guest-hint" class="auth-warning" hidden>Сохраните ключ аккаунта (вкладка «Настройки»): с ним можно продолжить на другом устройстве.</p>
           <div class="hub-tabs" role="tablist" aria-label="Разделы убежища">
             ${TABS.map(([id, title]) => `<button type="button" role="tab" id="hub-tab-${id}"
               data-tab="${id}" aria-controls="hub-panel-${id}">${title}</button>`).join('')}
           </div>
           <section id="hub-panel-run" role="tabpanel" aria-labelledby="hub-tab-run">
             <ul id="hub-locations" class="hub-locations"></ul>
+            <label class="hub-autopilot"><input id="hub-autopilot" type="checkbox"> <span>Автопилот: героем управляет ИИ</span></label>
+            <p id="hub-autopilot-note" class="hub-note"></p>
             <button id="hub-start" class="auth-primary" type="button">Отправиться на вылазку</button>
             <p id="hub-location" class="hub-note"></p>
           </section>
@@ -102,6 +105,9 @@ export class HubScene extends Phaser.Scene {
           <section id="hub-panel-emeralds" role="tabpanel" aria-labelledby="hub-tab-emeralds">
             <div id="hub-emerald-info"></div>
           </section>
+          <section id="hub-panel-achievements" role="tabpanel" aria-labelledby="hub-tab-achievements">
+            <div id="hub-achievements"></div>
+          </section>
           <section id="hub-panel-settings" role="tabpanel" aria-labelledby="hub-tab-settings">
             <fieldset class="hub-settings">
               <legend>Звук и картинка</legend>
@@ -110,7 +116,15 @@ export class HubScene extends Phaser.Scene {
               <label><input type="checkbox" data-setting="crt"> ЭЛТ-эффект</label>
             </fieldset>
             <h2>Управление</h2>
-            <p class="hub-help">Мышь: клик — идти в точку, удержание — идти за курсором.<br>Клавиши: WASD или стрелки.<br>Телефон: джойстик под пальцем.<br>Esc, P или II — пауза, громкость и возврат в убежище. R — перебросить карточки.<br>Наведите мышь на слот в забеге, чтобы увидеть описание.</p>
+            <p class="hub-help">Мышь: клик — идти в точку, удержание — идти за курсором.<br>Клавиши: WASD или стрелки.<br>Телефон: джойстик под пальцем.<br>Esc, P или II — пауза, громкость и возврат в убежище. R — перебросить карточки. I — автопилот, если куплен.<br>Наведите мышь на слот в забеге, чтобы увидеть описание.</p>
+            <h2>Ключ аккаунта</h2>
+            <p class="hub-help">Введите этот ключ на другом устройстве, и игра продолжится с того же места. Храните его как пароль: по нему откроется ваш аккаунт.</p>
+            <div class="auth-row"><input id="hub-key" type="text" readonly value="•••••-•••••-•••••-•••••" aria-label="Ключ аккаунта"><button id="hub-key-show" type="button">Показать</button><button id="hub-key-copy" type="button" hidden>Копировать</button></div>
+            <button id="hub-key-renew" class="auth-back" type="button">Сменить ключ (старый перестанет работать)</button>
+            <form id="hub-key-form" class="auth-form">
+              <label for="hub-key-other">Перейти в другой аккаунт по ключу</label>
+              <div class="auth-row"><input id="hub-key-other" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="40" required placeholder="XXXXX-XXXXX-XXXXX-XXXXX"><button type="submit">Войти</button></div>
+            </form>
             <h2>Аккаунт</h2>
             <div class="hub-account">
               <button id="hub-link" class="auth-secondary" type="button"></button>
@@ -146,6 +160,29 @@ export class HubScene extends Phaser.Scene {
       // A sample of the new loudness.
       if (key === 'sfx') input.onchange = () => playSfx('sfx/ui_buy');
     });
+    const autopilot = this.el<HTMLInputElement>('hub-autopilot');
+    autopilot.checked = settings().autopilot;
+    autopilot.onchange = () => {
+      updateSettings({ autopilot: autopilot.checked });
+      playSfx('sfx/ui_click');
+    };
+    this.el('hub-key-show').onclick = () => void this.act(() => this.showKey(false));
+    this.el('hub-key-renew').onclick = () => void this.act(async () => {
+      if (window.confirm('Сменить ключ? Старый больше не подойдёт ни на одном устройстве.')) await this.showKey(true);
+    });
+    this.el('hub-key-copy').onclick = () => void this.act(async () => {
+      const input = this.el<HTMLInputElement>('hub-key');
+      try { await navigator.clipboard.writeText(input.value); }
+      catch {
+        input.select();
+        throw new Error('Не удалось скопировать. Ключ выделен, скопируйте вручную.');
+      }
+      this.status('Ключ скопирован.');
+    });
+    this.el<HTMLFormElement>('hub-key-form').onsubmit = (event) => {
+      event.preventDefault();
+      void this.act(() => this.switchAccount());
+    };
     playMusic(HUB_MUSIC);
     this.el<HTMLButtonElement>('hub-start').onclick = () => void this.act(() => this.beginRun());
     this.el<HTMLButtonElement>('hub-retry').onclick = () => void this.loadProfile();
@@ -178,8 +215,9 @@ export class HubScene extends Phaser.Scene {
     tabs.onkeydown = (event) => {
       const step = event.key === 'ArrowRight' ? 1 : event.key === 'ArrowLeft' ? -1 : 0;
       if (!step) return;
-      const index = TABS.findIndex(([id]) => id === this.tab);
-      const next = TABS[(index + step + TABS.length) % TABS.length]![0];
+      const open = TABS.filter(([id]) => !this.el(`hub-tab-${id}`).hidden);
+      const index = open.findIndex(([id]) => id === this.tab);
+      const next = open[(index + step + open.length) % open.length]![0];
       this.openTab(next, true);
       this.el(`hub-tab-${next}`).focus();
     };
@@ -245,7 +283,7 @@ export class HubScene extends Phaser.Scene {
     this.el('hub-emeralds').textContent = String(profile.emeralds);
     this.el('hub-best').textContent = formatTime(profile.best_time_s);
     this.el('hub-runs').textContent = String(profile.runs_count);
-    this.el('hub-guest-hint').hidden = !(profile.is_guest && profile.runs_count >= 3);
+    this.el('hub-guest-hint').hidden = !(profile.is_guest && profile.runs_count >= 1);
     this.el('hub-link').textContent = profile.is_guest ? 'Привязать вход' : 'Способы входа';
     const locations = orderedLocations(catalog);
     if (!profile.unlocked_locations.includes(this.selected)) {
@@ -268,6 +306,13 @@ export class HubScene extends Phaser.Scene {
       ? `${location.name} · ${hero.name} · пробел — начать` : '';
     this.renderItems(profile);
     this.renderEmeralds(profile);
+    this.renderAchievements(profile);
+    const pilot = catalog.upgrades.autopilot;
+    const bought = (profile.upgrades.autopilot ?? 0) > 0;
+    this.el<HTMLInputElement>('hub-autopilot').disabled = !bought;
+    this.el('hub-autopilot-note').textContent = bought
+      ? 'Не закрывайте вкладку игры. В забеге переключается клавишей I.'
+      : pilot ? `Купите за ${upgradeCost(pilot, 0)} изумр. на вкладке «Улучшения».` : '';
     this.el('hub-upgrades').innerHTML = CATEGORIES.map(([category, title]) =>
       `<li class="hub-category">${title}</li>${Object.values(catalog.upgrades)
         .filter((upgrade) => upgrade.category === category).map((upgrade) => {
@@ -336,6 +381,45 @@ export class HubScene extends Phaser.Scene {
       }).join('')}`;
   }
 
+  /** The tab stays a secret until the first achievement. */
+  private renderAchievements(profile: Profile): void {
+    const all = Object.values(getCatalog().achievements);
+    const owned = new Set(profile.achievements);
+    this.el('hub-tab-achievements').hidden = owned.size === 0;
+    const row = (item: AchievementDefinition): string => {
+      const done = owned.has(item.id);
+      return `<li class="${done ? 'hub-done' : ''}"><span><strong>${escapeHtml(item.name)}</strong><br>${escapeHtml(item.description)}</span><span>${done ? 'получено' : `+${item.emeralds}`}</span></li>`;
+    };
+    const open = all.filter((item) => !item.hidden);
+    const hidden = all.filter((item) => item.hidden);
+    const found = hidden.filter((item) => owned.has(item.id));
+    const left = hidden.length - found.length;
+    this.el('hub-achievements').innerHTML = `
+      <p class="hub-help">Получено ${all.filter((item) => owned.has(item.id)).length} из ${all.length}. Награда в изумрудах выдаётся один раз в конце забега.</p>
+      <ul class="hub-goals">${open.map(row).join('')}</ul>
+      <h2>Скрытые: ${found.length} из ${hidden.length}</h2>
+      <ul class="hub-goals">${found.map(row).join('')}${left
+        ? `<li><span>??? Ещё не найдено: ${left}</span><span></span></li>` : ''}</ul>`;
+  }
+
+  private async showKey(renew: boolean): Promise<void> {
+    const key = await accountKey(renew);
+    if (!this.active) return;
+    this.el<HTMLInputElement>('hub-key').value = key;
+    this.el('hub-key-show').hidden = true;
+    this.el('hub-key-copy').hidden = false;
+    this.render(await getProfile());
+    this.status(renew ? 'Ключ сменён. Сохраните новый.' : 'Сохраните ключ в надёжном месте.');
+  }
+
+  private async switchAccount(): Promise<void> {
+    if (this.profile?.is_guest && !window.confirm(
+      'Ключ текущего аккаунта не сохранён. После перехода вернуться в него будет нельзя. Продолжить?')) return;
+    const pair = await loginByKey(this.el<HTMLInputElement>('hub-key-other').value);
+    saveSession(pair);
+    this.scene.restart();
+  }
+
   private async unlock(id: string): Promise<void> {
     if (!this.profile) return;
     try {
@@ -385,7 +469,7 @@ export class HubScene extends Phaser.Scene {
     const data: RunData = {
       seed, wave, locationId: location.id, heroId: location.startingHero,
       runId: run.run_id, contentHash, upgrades: { ...this.profile.upgrades },
-      unlocks: [...this.profile.unlocks],
+      unlocks: [...this.profile.unlocks], achievements: [...this.profile.achievements],
     };
     this.scene.start('Run', data);
   }

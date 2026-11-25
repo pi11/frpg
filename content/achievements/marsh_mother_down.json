@@ -1,0 +1,13 @@
+{
+  "id": "marsh_mother_down",
+  "name": "Осушитель топей",
+  "description": "Победить Мать топей",
+  "hidden": false,
+  "emeralds": 8,
+  "condition": {
+    "type": "metric",
+    "metric": "boss",
+    "value": 1,
+    "location": "toxic_marsh"
+  }
+}

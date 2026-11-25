@@ -63,7 +63,10 @@ export async function preparePlatform(): Promise<void> {
 
 export function setupPlatform(game: Phaser.Game): void {
   // Leaving the tab or app pauses the run; Phaser already pauses its loop and sounds.
-  game.events.on(Phaser.Core.Events.HIDDEN, () => pauseRun(game));
+  // With the autopilot the run just stands still and goes on when the player returns.
+  game.events.on(Phaser.Core.Events.HIDDEN, () => {
+    if (!hud(game)?.autopilotOn) pauseRun(game);
+  });
   if (!isNative) return;
   void App.addListener('pause', () => {
     pauseRun(game);

@@ -1,0 +1,13 @@
+{
+  "id": "evolver",
+  "name": "Естественный отбор",
+  "description": "Получить эволюцию оружия",
+  "hidden": false,
+  "emeralds": 3,
+  "condition": {
+    "type": "reported",
+    "event": "evolved",
+    "value": 1,
+    "minSeconds": 60
+  }
+}

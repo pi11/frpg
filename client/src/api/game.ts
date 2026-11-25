@@ -8,6 +8,7 @@ export interface Profile {
   /** Weapons and perks bought for emeralds. */
   unlocks: string[];
   /** Survival marks (seconds) already rewarded, per location. */
+  achievements: string[];
   milestones: Record<string, number[]>;
   version: number;
   schema_version: number;
@@ -34,12 +35,17 @@ export interface RunSummary {
   wave_reached: number;
   boss_killed: boolean;
   picked_caps: number;
+  autopilot: boolean;
+  /** Achievements only the client can notice. */
+  achievements: string[];
 }
 
 export interface RunFinish {
   status: 'finished';
   reward_caps: number;
   reward_emeralds: number;
+  /** Newly earned; their emeralds are already in the profile. */
+  achievements: string[];
   flags: string[];
   profile: Profile;
 }

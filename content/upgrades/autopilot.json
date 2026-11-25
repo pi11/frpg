@@ -1,0 +1,14 @@
+{
+  "id": "autopilot",
+  "name": "Автопилот",
+  "category": "special",
+  "currency": "emeralds",
+  "stat": "autopilot",
+  "mod": "flat",
+  "perLevel": 1,
+  "maxLevel": 1,
+  "cost": {
+    "base": 15,
+    "growth": 1
+  }
+}

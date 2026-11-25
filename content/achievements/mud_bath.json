@@ -1,0 +1,13 @@
+{
+  "id": "mud_bath",
+  "name": "Грязевые ванны",
+  "description": "Простоять в опасной зоне 20 секунд за забег",
+  "hidden": true,
+  "emeralds": 2,
+  "condition": {
+    "type": "reported",
+    "event": "hazardTime",
+    "value": 20,
+    "minSeconds": 20
+  }
+}

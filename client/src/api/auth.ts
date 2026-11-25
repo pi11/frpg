@@ -135,6 +135,16 @@ export async function restoreSession(): Promise<TokenPair | null> {
   return refreshInFlight;
 }
 
+export async function loginByKey(key: string): Promise<TokenPair> {
+  return request<TokenPair>('/auth/key', { method: 'POST', body: JSON.stringify({ key }) });
+}
+
+/** The key of the open account; `renew` replaces it and the old one stops working. */
+export async function accountKey(renew = false): Promise<string> {
+  const path = renew ? '/account/key/renew' : '/account/key';
+  return (await request<{ key: string }>(path, { method: 'POST' }, true)).key;
+}
+
 export async function createGuest(): Promise<TokenPair> {
   return request<TokenPair>('/auth/guest', { method: 'POST' });
 }

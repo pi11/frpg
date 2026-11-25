@@ -29,6 +29,7 @@
     "eliteDamage": 0,
     "killHeal": 0,
     "weaponSlots": 3,
-    "passiveSlots": 3
+    "passiveSlots": 3,
+    "autopilot": 0
   }
 }

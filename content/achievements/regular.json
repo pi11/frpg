@@ -1,0 +1,12 @@
+{
+  "id": "regular",
+  "name": "Завсегдатай",
+  "description": "Сыграть 25 забегов",
+  "hidden": false,
+  "emeralds": 4,
+  "condition": {
+    "type": "metric",
+    "metric": "runs",
+    "value": 25
+  }
+}

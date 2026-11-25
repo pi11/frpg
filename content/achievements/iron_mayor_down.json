@@ -1,0 +1,13 @@
+{
+  "id": "iron_mayor_down",
+  "name": "Импичмент",
+  "description": "Победить Железного мэра",
+  "hidden": false,
+  "emeralds": 5,
+  "condition": {
+    "type": "metric",
+    "metric": "boss",
+    "value": 1,
+    "location": "dead_city"
+  }
+}

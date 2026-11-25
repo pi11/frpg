@@ -88,12 +88,16 @@ export class ResultScene extends Phaser.Scene {
       if (!this.scene.isActive()) return;
       this.settled = true;
       this.leaveLabel.setVisible(false);
+      const earned = response.achievements.map((id) => {
+        const item = catalog.achievements[id];
+        return item ? `${item.name} (+${item.emeralds} изумр.)` : id;
+      });
       const note = response.flags.length
         ? '\nСервер скорректировал сводку забега, награда урезана.' : '';
       this.rewardLabel.setText(
         `Награда: +${response.reward_caps} крышек${
           response.reward_emeralds ? `, +${response.reward_emeralds} изумрудов` : ''
-        }\nВсего: ${response.profile.caps} крышек, ${response.profile.emeralds} изумрудов${note}`,
+        }\nВсего: ${response.profile.caps} крышек, ${response.profile.emeralds} изумрудов${note}${earned.length ? `\nДостижения: ${earned.join(', ')}` : ''}`,
       );
       this.actionLabel.setText('В УБЕЖИЩЕ');
       playSfx('sfx/reward');

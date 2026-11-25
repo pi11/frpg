@@ -4,7 +4,7 @@ export const STAT_KEYS = [
   'maxHp', 'armor', 'regen', 'moveSpeed', 'damage', 'attackSpeed', 'area',
   'projectileCount', 'duration', 'pickupRadius', 'xpGain', 'luck', 'radResist',
   'critChance', 'critDamage', 'dodge', 'thorns', 'eliteDamage', 'killHeal', 'rerolls', 'revives',
-  'weaponSlots', 'passiveSlots',
+  'weaponSlots', 'passiveSlots', 'autopilot',
 ] as const;
 
 export const StatKeySchema = z.enum(STAT_KEYS);
@@ -40,6 +40,8 @@ export const StatsSchema = z.object({
   /** Slots for ordinary weapons and perks, up to balance.run.maxWeapons / maxPassives. */
   weaponSlots: z.number().int().positive(),
   passiveSlots: z.number().int().positive(),
+  /** 1 when the autopilot was bought. */
+  autopilot: z.number().int().min(0).max(1),
 }).strict();
 export type Stats = z.infer<typeof StatsSchema>;
 
@@ -290,7 +292,7 @@ export type LocationDefinition = z.infer<typeof LocationSchema>;
 export const UpgradeSchema = z.object({
   id: IdSchema,
   name: z.string().min(1),
-  category: z.enum(['slots', 'survival', 'combat', 'scavenge']),
+  category: z.enum(['slots', 'special', 'survival', 'combat', 'scavenge']),
   currency: z.enum(['caps', 'emeralds']).default('caps'),
   stat: StatKeySchema,
   mod: z.enum(['flat', 'percent']),
@@ -299,6 +301,38 @@ export const UpgradeSchema = z.object({
   cost: z.object({ base: z.number().positive(), growth: z.number().positive() }).strict(),
 }).strict();
 export type UpgradeDefinition = z.infer<typeof UpgradeSchema>;
+
+/**
+ * `metric` conditions are computed by the server (server/app/services/achievements.py).
+ * `reported` events are noticed by the client (systems/achievements.ts); the server only checks
+ * minSeconds, boss and autopilot.
+ */
+export const AchievementSchema = z.object({
+  id: IdSchema,
+  name: z.string().min(1),
+  description: z.string().min(1),
+  /** Not listed until earned. */
+  hidden: z.boolean(),
+  emeralds: z.number().int().positive(),
+  condition: z.discriminatedUnion('type', [
+    z.object({
+      type: z.literal('metric'),
+      metric: z.enum(['kills', 'duration', 'caps', 'boss', 'runs', 'unlocks']),
+      value: z.number().int().positive(),
+      location: IdSchema.optional(),
+    }).strict(),
+    z.object({
+      type: z.literal('reported'),
+      event: z.enum(['noMove', 'finishNoMove', 'noDamage', 'singleWeapon', 'evolved', 'bossFast',
+        'heroClicks', 'earlyDeath', 'earlyQuit', 'autopilotTime', 'pauses', 'hazardTime', 'nightHour']),
+      value: z.number().int().positive(),
+      minSeconds: z.number().int().nonnegative().default(0),
+      boss: z.boolean().default(false),
+      autopilot: z.boolean().default(false),
+    }).strict(),
+  ]),
+}).strict();
+export type AchievementDefinition = z.infer<typeof AchievementSchema>;
 
 export const BalanceSchema = z.object({
   run: z.object({

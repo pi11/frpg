@@ -6,7 +6,7 @@ export const STAT_LABELS: Record<StatKey, string> = {
   duration: 'длительность', pickupRadius: 'радиус сбора', xpGain: 'опыт', luck: 'удача',
   radResist: 'защита от опасных зон', critChance: 'шанс крита', rerolls: 'переброс карточек',
   revives: 'возрождение', critDamage: 'урон крита', dodge: 'уклонение', thorns: 'урон шипов',
-  weaponSlots: 'слот оружия', passiveSlots: 'слот перка',
+  autopilot: 'автопилот', weaponSlots: 'слот оружия', passiveSlots: 'слот перка',
   eliteDamage: 'урон боссам', killHeal: 'здоровье за убийство',
 };
 

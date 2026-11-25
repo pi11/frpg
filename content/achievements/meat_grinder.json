@@ -1,0 +1,12 @@
+{
+  "id": "meat_grinder",
+  "name": "Мясорубка",
+  "description": "Убить 2500 врагов за забег",
+  "hidden": false,
+  "emeralds": 3,
+  "condition": {
+    "type": "metric",
+    "metric": "kills",
+    "value": 2500
+  }
+}

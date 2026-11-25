@@ -1,0 +1,12 @@
+{
+  "id": "brave_fool",
+  "name": "Слабоумие и отвага",
+  "description": "Погибнуть в первые 30 секунд",
+  "hidden": true,
+  "emeralds": 1,
+  "condition": {
+    "type": "reported",
+    "event": "earlyDeath",
+    "value": 30
+  }
+}

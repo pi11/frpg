@@ -1,0 +1,12 @@
+{
+  "id": "full_time",
+  "name": "До последней минуты",
+  "description": "Продержаться 15 минут",
+  "hidden": false,
+  "emeralds": 5,
+  "condition": {
+    "type": "metric",
+    "metric": "duration",
+    "value": 900
+  }
+}

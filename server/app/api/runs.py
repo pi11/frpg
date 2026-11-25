@@ -16,6 +16,7 @@ from app.api.profile import ProfileResponse, profile_response
 from app.db import get_session
 from app.models.auth import Profile, User
 from app.models.run import Run
+from app.services.achievements import RunFacts, grant_achievements
 from app.services.content import get_content
 from app.services.economy import (
     accepted_elites,
@@ -52,12 +53,17 @@ class RunSummary(BaseModel):
     wave_reached: int = Field(ge=1)
     boss_killed: bool
     picked_caps: int = Field(ge=0)
+    autopilot: bool = False
+    achievements: list[Annotated[str, Field(max_length=64)]] = Field(
+        default_factory=list, max_length=64,
+    )
 
 
 class RunFinishResponse(BaseModel):
     status: Literal["finished"] = "finished"
     reward_caps: int
     reward_emeralds: int
+    achievements: list[str]
     flags: list[str]
     profile: ProfileResponse
 
@@ -116,6 +122,7 @@ async def finish_run(
         return RunFinishResponse(
             reward_caps=run.reward_caps or 0,
             reward_emeralds=((run.summary or {}).get("accepted") or {}).get("emeralds", 0),
+            achievements=((run.summary or {}).get("accepted") or {}).get("achievements", []),
             flags=run.flags,
             profile=await profile_response(session, user, profile),
         )
@@ -176,6 +183,21 @@ async def finish_run(
         accepted_elites(location, known_enemies, body.kills_by_type, duration),
         boss_killed, run.location_id not in bosses, passed,
     )
+    if passed:
+        marks[run.location_id] = sorted([*reached, *passed])
+    if boss_killed and run.location_id not in bosses:
+        bosses.append(run.location_id)
+    data, achievements = grant_achievements(
+        content.category("achievements"),
+        {
+            **data, "runs_count": data.get("runs_count", 0) + 1, "bosses_killed": bosses,
+            "milestones": marks, "emeralds": data.get("emeralds", 0) + emeralds,
+        },
+        RunFacts(
+            location=run.location_id, duration=duration, kills=kills, picked_caps=picked_caps,
+            boss_killed=boss_killed, autopilot=body.autopilot, reported=body.achievements,
+        ),
+    )
     run.status = "finished"
     run.finished_at = now
     run.reward_caps = reward
@@ -185,22 +207,15 @@ async def finish_run(
         "accepted": {
             "duration_seconds": duration, "kills": kills, "wave_reached": wave,
             "boss_killed": boss_killed, "picked_caps": picked_caps,
-            "emeralds": emeralds,
+            "emeralds": emeralds, "achievements": achievements,
         },
     }
     profile.caps += reward
     profile.version += 1
     profile.best_time_s = max(profile.best_time_s, duration)
-    if boss_killed and run.location_id not in bosses:
-        bosses.append(run.location_id)
-    if passed:
-        marks[run.location_id] = sorted([*reached, *passed])
-    profile.data = {
-        **data, "runs_count": data.get("runs_count", 0) + 1, "bosses_killed": bosses,
-        "milestones": marks, "emeralds": data.get("emeralds", 0) + emeralds,
-    }
+    profile.data = data
     await session.commit()
     return RunFinishResponse(
-        reward_caps=reward, reward_emeralds=emeralds, flags=flags,
+        reward_caps=reward, reward_emeralds=emeralds, achievements=achievements, flags=flags,
         profile=await profile_response(session, user, profile),
     )

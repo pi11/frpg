@@ -103,6 +103,19 @@ class RefreshToken(Base):
     user_agent: Mapped[str | None] = mapped_column(String(512), nullable=True)
 
 
+class RecoveryKey(Base):
+    """Only the hash is stored; the key itself is derived from the server secret."""
+
+    __tablename__ = "recovery_keys"
+
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE"), primary_key=True
+    )
+    key_hash: Mapped[str] = mapped_column(String(64), unique=True)
+    version: Mapped[int] = mapped_column(Integer, default=1)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+
+
 class Profile(Base):
     __tablename__ = "profiles"
 

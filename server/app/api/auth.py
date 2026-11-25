@@ -16,8 +16,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.api.errors import ApiError, ErrorCode, ErrorResponse
 from app.config import get_settings
 from app.db import get_session
-from app.models.auth import AuthIdentity, LoginToken, Profile, User
+from app.models.auth import AuthIdentity, LoginToken, Profile, RecoveryKey, User
 from app.services.mail import send_login_email
+from app.services.recovery import derive_key, format_key, key_digest, normalize_key
 from app.services.tokens import (
     TokenPair,
     as_utc,
@@ -62,6 +63,14 @@ class EmailVerifyRequest(BaseModel):
 
 class RefreshRequest(BaseModel):
     refresh_token: str
+
+
+class KeyLoginRequest(BaseModel):
+    key: str = Field(max_length=64)
+
+
+class KeyResponse(BaseModel):
+    key: str
 
 
 class OkResponse(BaseModel):
@@ -193,6 +202,21 @@ async def email_verify(
     return pair
 
 
+@router.post("/key", response_model=TokenPair)
+async def key_login(body: KeyLoginRequest, request: Request, session: SessionDep) -> TokenPair:
+    key = normalize_key(body.key)
+    record = await session.scalar(
+        select(RecoveryKey).where(RecoveryKey.key_hash == key_digest(key))
+    ) if key else None
+    user = await session.get(User, record.user_id) if record else None
+    if user is None:
+        raise ApiError(401, ErrorCode.invalid_code, "Ключ не подходит. Проверьте, нет ли опечатки")
+    user.last_seen_at = utcnow()
+    pair = await issue_pair(session, user, request.headers.get("user-agent"))
+    await session.commit()
+    return pair
+
+
 @router.post("/refresh", response_model=TokenPair)
 async def refresh(
     body: RefreshRequest,
@@ -210,6 +234,35 @@ async def logout(
 ) -> OkResponse:
     await logout_refresh(session, user, body.refresh_token)
     return OkResponse()
+
+
+async def issue_key(session: AsyncSession, user: User, renew: bool) -> str:
+    # The row lock keeps two tabs from issuing different versions at once.
+    await session.scalar(select(User).where(User.id == user.id).with_for_update())
+    record = await session.get(RecoveryKey, user.id)
+    if record is None:
+        record = RecoveryKey(user_id=user.id, version=1, key_hash="")
+        session.add(record)
+    elif renew:
+        record.version += 1
+        record.created_at = utcnow()
+    key = derive_key(user.id, record.version)
+    record.key_hash = key_digest(key)
+    # An account with a key can be reopened, so it is no longer a disposable guest.
+    user.is_guest = False
+    await session.commit()
+    return format_key(key)
+
+
+@account_router.post("/account/key", response_model=KeyResponse)
+async def account_key(user: UserDep, session: SessionDep) -> KeyResponse:
+    return KeyResponse(key=await issue_key(session, user, renew=False))
+
+
+@account_router.post("/account/key/renew", response_model=KeyResponse)
+async def renew_account_key(user: UserDep, session: SessionDep) -> KeyResponse:
+    """Replaces the key, e.g. after someone else saw it; the old one stops working."""
+    return KeyResponse(key=await issue_key(session, user, renew=True))
 
 
 @account_router.delete("/account", status_code=204)

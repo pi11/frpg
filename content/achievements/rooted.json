@@ -1,0 +1,13 @@
+{
+  "id": "rooted",
+  "name": "Как вкопанный",
+  "description": "Продержаться 2 минуты с начала забега, не сходя с места",
+  "hidden": false,
+  "emeralds": 3,
+  "condition": {
+    "type": "reported",
+    "event": "noMove",
+    "value": 120,
+    "minSeconds": 120
+  }
+}

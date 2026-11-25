@@ -1,0 +1,12 @@
+{
+  "id": "cap_pocket",
+  "name": "Полные карманы",
+  "description": "Подобрать 150 крышек за забег",
+  "hidden": false,
+  "emeralds": 2,
+  "condition": {
+    "type": "metric",
+    "metric": "caps",
+    "value": 150
+  }
+}

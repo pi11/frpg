@@ -1,5 +1,6 @@
 import * as Phaser from 'phaser';
 import { ATLAS } from '../assets';
+import { autopilotChoice } from '../systems/autopilot';
 import { playSfx } from '../sound';
 import { Tooltip } from '../ui/Tooltip';
 import { COLORS, textStyle } from '../ui/theme';
@@ -61,6 +62,11 @@ export class LevelUpScene extends Phaser.Scene {
         textStyle(8, COLORS.bright, { backgroundColor: '#1d3322', padding: { x: 8, y: 8 } }))
         .setOrigin(1, 0.5).setInteractive({ useHandCursor: true });
       button.on('pointerdown', () => this.reroll());
+    }
+    if (run.autopilotOn) {
+      const choice = autopilotChoice(choices);
+      // Long enough to see the cards; a player may still click another one.
+      if (choice) this.time.delayedCall(900, () => this.choose(choice));
     }
     const onKey = (event: KeyboardEvent): void => {
       if (event.code === 'KeyR') {

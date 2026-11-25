@@ -1,0 +1,12 @@
+{
+  "id": "indecisive",
+  "name": "Семь раз отмерь",
+  "description": "Поставить паузу 10 раз за забег",
+  "hidden": true,
+  "emeralds": 1,
+  "condition": {
+    "type": "reported",
+    "event": "pauses",
+    "value": 10
+  }
+}

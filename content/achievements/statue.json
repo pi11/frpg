@@ -1,0 +1,13 @@
+{
+  "id": "statue",
+  "name": "Памятник",
+  "description": "Пройти забег до конца, ни разу не сдвинувшись",
+  "hidden": true,
+  "emeralds": 30,
+  "condition": {
+    "type": "reported",
+    "event": "finishNoMove",
+    "value": 1,
+    "minSeconds": 780
+  }
+}

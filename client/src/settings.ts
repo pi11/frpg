@@ -3,10 +3,12 @@ export interface Settings {
   music: number;
   sfx: number;
   crt: boolean;
+  /** Let the bought autopilot play. */
+  autopilot: boolean;
 }
 
 const STORAGE_KEY = 'wasteland.settings.v1';
-const defaults: Settings = { music: 1, sfx: 1, crt: true };
+const defaults: Settings = { music: 1, sfx: 1, crt: true, autopilot: false };
 let current: Settings | null = null;
 const listeners = new Set<(settings: Settings) => void>();
 
@@ -25,6 +27,7 @@ function read(): Settings {
         music: volume(stored.music, defaults.music),
         sfx: volume(stored.sfx, defaults.sfx),
         crt: typeof stored.crt === 'boolean' ? stored.crt : defaults.crt,
+        autopilot: typeof stored.autopilot === 'boolean' ? stored.autopilot : defaults.autopilot,
       };
     }
   } catch { /* Unavailable or damaged storage falls back to defaults. */ }

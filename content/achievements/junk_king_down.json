@@ -1,0 +1,13 @@
+{
+  "id": "junk_king_down",
+  "name": "Свергнуть короля",
+  "description": "Победить Короля свалки",
+  "hidden": false,
+  "emeralds": 3,
+  "condition": {
+    "type": "metric",
+    "metric": "boss",
+    "value": 1,
+    "location": "shelter_outskirts"
+  }
+}

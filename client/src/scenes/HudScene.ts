@@ -2,6 +2,8 @@ import * as Phaser from 'phaser';
 import { ATLAS } from '../assets';
 import { playSfx } from '../sound';
 import { VirtualJoystick } from '../ui/VirtualJoystick';
+import { keepAwake } from '../platform/wakeLock';
+import { settings, updateSettings } from '../settings';
 import { PausePanel } from '../ui/PausePanel';
 import { Tooltip } from '../ui/Tooltip';
 import { COLORS, textStyle } from '../ui/theme';
@@ -38,6 +40,8 @@ export class HudScene extends Phaser.Scene {
   private heavySlots: Slot[] = [];
   private passiveSlots: Slot[] = [];
   private tooltip!: Tooltip;
+  private toast!: Phaser.GameObjects.Text;
+  private autopilot: Phaser.GameObjects.Text | null = null;
   private emeraldIcon!: Phaser.GameObjects.Image;
   private emeralds!: Phaser.GameObjects.Text;
   private refreshAt = 0;
@@ -85,12 +89,29 @@ export class HudScene extends Phaser.Scene {
       backgroundColor: '#1d3322', padding: { x: 5, y: 4 },
     })).setInteractive({ useHandCursor: true });
     pauseButton.on('pointerdown', () => this.togglePause());
+    this.toast = this.add.text(240, 66, '', textStyle(8, '#9bff6e', {
+      backgroundColor: '#08120b', padding: { x: 8, y: 6 },
+    })).setOrigin(0.5).setDepth(85).setVisible(false);
+    this.autopilot = null;
+    if (this.run.autopilotOwned) {
+      this.autopilot = this.add.text(474, 32, '', textStyle(8, COLORS.dim, {
+        backgroundColor: '#08120b', padding: { x: 5, y: 4 },
+      })).setOrigin(1, 0).setInteractive({ useHandCursor: true })
+        .on('pointerdown', () => this.toggleAutopilot());
+      this.showAutopilot();
+      this.input.keyboard?.on('keydown-I', (event: KeyboardEvent) => {
+        if (!event.repeat) this.toggleAutopilot();
+      });
+    }
+    this.input.on('pointerdown', (pointer: Phaser.Input.Pointer, over: Phaser.GameObjects.GameObject[]) => {
+      if (!over.length && this.scene.isActive('Run')) this.run.heroPress(pointer.x, pointer.y);
+    });
     const onPause = (event: KeyboardEvent): void => {
       if (!event.repeat) this.togglePause();
     };
     this.input.keyboard?.on('keydown-P', onPause).on('keydown-ESC', onPause);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
-      this.input.keyboard?.off('keydown-P', onPause).off('keydown-ESC', onPause);
+      this.input.keyboard?.off('keydown-I').off('keydown-P', onPause).off('keydown-ESC', onPause);
     });
     new VirtualJoystick(this, () => this.scene.isActive('Run'));
   }
@@ -114,6 +135,7 @@ export class HudScene extends Phaser.Scene {
     this.emeralds.setText(String(view.emeralds));
     this.emeraldIcon.setVisible(view.emeralds > 0);
     this.emeralds.setVisible(view.emeralds > 0);
+    this.toast.setText(view.toast).setVisible(Boolean(view.toast));
     this.buffBars.clear();
     while (this.buffIcons.length < view.buffs.length) {
       this.buffIcons.push(this.add.image(16 + this.buffIcons.length * 22, 40, ATLAS, 'ui/cap'));
@@ -205,6 +227,23 @@ export class HudScene extends Phaser.Scene {
     else this.tooltip.hide();
   }
 
+  get autopilotOn(): boolean {
+    return this.run.autopilotOn;
+  }
+
+  private toggleAutopilot(): void {
+    if (!this.scene.isActive('Run')) return;
+    updateSettings({ autopilot: !settings().autopilot });
+    playSfx('sfx/ui_click');
+    void keepAwake(settings().autopilot);
+    this.showAutopilot();
+  }
+
+  private showAutopilot(): void {
+    const on = settings().autopilot;
+    this.autopilot?.setText(`[I] ИИ ${on ? 'ВКЛ' : 'ВЫКЛ'}`).setColor(on ? '#9bff6e' : COLORS.dim);
+  }
+
   togglePause(): void {
     if (this.scene.isActive('LevelUp') || this.scene.isActive('Chest')) return;
     playSfx('sfx/ui_click');
@@ -220,6 +259,7 @@ export class HudScene extends Phaser.Scene {
   pause(): void {
     if (this.scene.isActive('LevelUp') || this.scene.isActive('Chest')) return;
     if (!this.scene.isActive('Run')) return;
+    this.run.notePause();
     this.scene.pause('Run');
     this.pausePanel.show();
   }

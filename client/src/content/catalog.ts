@@ -1,10 +1,10 @@
 import { enemyBehaviors, pickupEffects, weaponBehaviors } from '../behaviors/registry';
 import {
-  BalanceSchema, EnemySchema, HeroSchema, LandmarkSchema, LocationSchema, PassiveSchema, PickupSchema,
+  AchievementSchema, BalanceSchema, EnemySchema, HeroSchema, LandmarkSchema, LocationSchema, PassiveSchema, PickupSchema,
   StructureSchema, UpgradeSchema, WeaponSchema,
 } from './schemas';
 import type {
-  BalanceDefinition, EnemyDefinition, HeroDefinition, LandmarkDefinition, LocationDefinition,
+  AchievementDefinition, BalanceDefinition, EnemyDefinition, HeroDefinition, LandmarkDefinition, LocationDefinition,
   PassiveDefinition, PickupDefinition, StructureDefinition, UpgradeDefinition, WeaponDefinition,
 } from './schemas';
 
@@ -19,6 +19,7 @@ export interface Catalog {
   pickups: Record<string, PickupDefinition>;
   landmarks: Record<string, LandmarkDefinition>;
   structures: Record<string, StructureDefinition>;
+  achievements: Record<string, AchievementDefinition>;
 }
 
 const bundledFiles = import.meta.glob<unknown>('../../../content/**/*.json', {
@@ -37,6 +38,7 @@ export function validateContent(files: Record<string, unknown>): Catalog {
   const pickups: Catalog['pickups'] = {};
   const landmarks: Catalog['landmarks'] = {};
   const structures: Catalog['structures'] = {};
+  const achievements: Catalog['achievements'] = {};
   let balance: BalanceDefinition | undefined;
 
   function add<T extends { id: string }>(target: Record<string, T>, value: T, path: string): void {
@@ -62,6 +64,7 @@ export function validateContent(files: Record<string, unknown>): Catalog {
       case 'pickups': add(pickups, PickupSchema.parse(raw), path); break;
       case 'landmarks': add(landmarks, LandmarkSchema.parse(raw), path); break;
       case 'structures': add(structures, StructureSchema.parse(raw), path); break;
+      case 'achievements': add(achievements, AchievementSchema.parse(raw), path); break;
       default: throw new Error(`${path}: unknown content category`);
     }
   }
@@ -161,6 +164,13 @@ export function validateContent(files: Record<string, unknown>): Catalog {
       }
     }
   }
+  for (const achievement of Object.values(achievements)) {
+    const { condition } = achievement;
+    if (condition.type === 'metric' && condition.metric === 'boss'
+      && !locations[condition.location ?? '']) {
+      throw new Error(`achievement ${achievement.id}: unknown location ${condition.location}`);
+    }
+  }
   if (!pickups.cap) throw new Error('content/pickups/cap.json is required for caps drops');
   if (!Object.values(locations).some((location) => location.unlock.type === 'default')) {
     throw new Error('At least one location must be open from the start');
@@ -222,7 +232,7 @@ export function validateContent(files: Record<string, unknown>): Catalog {
     }
   }
 
-  return { balance, heroes, weapons, passives, enemies, locations, upgrades, pickups, landmarks, structures };
+  return { balance, heroes, weapons, passives, enemies, locations, upgrades, pickups, landmarks, structures, achievements };
 }
 
 let cached: Catalog | undefined;

@@ -1,7 +1,7 @@
 import * as Phaser from 'phaser';
 import QRCode from 'qrcode';
 import {
-  createGuest, isTransientError, pollTelegram, restoreSession, saveSession, session,
+  createGuest, isTransientError, loginByKey, pollTelegram, restoreSession, saveSession, session,
   startEmail, startTelegram, verifyEmail,
   webPage, type TelegramStart, type TokenPair,
 } from '../api/auth';
@@ -31,11 +31,17 @@ export class AuthScene extends Phaser.Scene {
       <section class="auth-card" aria-labelledby="auth-title">
         <div class="auth-eyebrow">УБЕЖИЩЕ · ДОСТУП</div>
         <h1 id="auth-title">ПУСТОШЬ</h1>
-        <p class="auth-intro">${this.linking ? 'Привяжите вход, чтобы сохранить доступ к аккаунту.' : 'Выживите за пределами убежища. Войдите, чтобы начать.'}</p>
+        <p class="auth-intro">${this.linking ? 'Привяжите вход, чтобы сохранить доступ к аккаунту.' : 'Выживите за пределами убежища. Начните новую игру или продолжите свою.'}</p>
         <p id="auth-status" class="auth-status" role="status">Подключаемся к серверу…</p>
         <div id="auth-methods" hidden>
-          <button id="auth-guest" class="auth-primary" type="button">Играть сразу · гость</button>
           <button id="auth-continue" class="auth-primary" type="button" hidden>Продолжить текущий аккаунт</button>
+          <button id="auth-guest" class="auth-primary" type="button">Новая игра</button>
+          <form id="auth-key-form" class="auth-form">
+            <label for="auth-key">Продолжить по ключу аккаунта</label>
+            <div class="auth-row"><input id="auth-key" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="40" required placeholder="XXXXX-XXXXX-XXXXX-XXXXX"><button type="submit">Войти</button></div>
+            <small class="auth-hint">Ключ показан в настройках убежища на вашем устройстве.</small>
+          </form>
+          <details id="auth-more" class="auth-more"><summary>Другие способы: почта, Telegram</summary>
           <p id="auth-link-warning" class="auth-warning" hidden>Если этот адрес или Telegram уже принадлежит другому аккаунту, откроется он. Прогресс текущего гостя не перенесётся.</p>
           <form id="auth-email-form" class="auth-form">
             <label for="auth-email">Вход по почте</label>
@@ -51,6 +57,7 @@ export class AuthScene extends Phaser.Scene {
             <img id="auth-telegram-qr" alt="QR-код для входа через Telegram">
             <small>Нажмите «Войти в игру» в сообщении бота. Ожидание — 5 минут.</small>
           </div>
+          </details>
           <button id="auth-back" class="auth-back" type="button" hidden>Вернуться в игру</button>
         </div>
         <button id="auth-privacy" class="auth-back" type="button">Политика конфиденциальности</button>
@@ -63,6 +70,10 @@ export class AuthScene extends Phaser.Scene {
       const restored = await restoreSession();
       if (restored) this.finish(restored);
     });
+    this.el<HTMLFormElement>('auth-key-form').onsubmit = (event) => {
+      event.preventDefault();
+      void this.act(async () => this.finish(await loginByKey(this.el<HTMLInputElement>('auth-key').value)));
+    };
     this.el<HTMLFormElement>('auth-email-form').onsubmit = (event) => {
       event.preventDefault();
       void this.act(async () => {
@@ -124,6 +135,8 @@ export class AuthScene extends Phaser.Scene {
     this.el('auth-guest').hidden = this.linking || Boolean(session());
     this.el('auth-continue').hidden = this.linking || !session();
     this.el('auth-back').hidden = !this.linking;
+    this.el('auth-key-form').hidden = this.linking;
+    this.el<HTMLDetailsElement>('auth-more').open = this.linking;
     this.el('auth-link-warning').hidden = !this.linking;
   }
 
@@ -153,7 +166,7 @@ export class AuthScene extends Phaser.Scene {
     }
     if (!this.active) return;
     this.showMethods();
-    if (!magicToken && !session()) this.status('Выберите способ входа.');
+    if (!magicToken && !session()) this.status('Начните новую игру или введите ключ.');
     if (this.linking) this.status('Выберите способ привязки.');
   }
 
