@@ -367,10 +367,64 @@ def marsh_theme() -> list[float]:
     ], cutoff=4200)
 
 
+def sunset_theme() -> list[float]:
+    """Unhurried evening tune in F major, 76 BPM, 12 bars, hardly any drums."""
+    step = 60 / 76 / 4
+    total = int(step * 16 * 12 * RATE)
+    chords = (("F3", "A3", "C4", "E4"), ("D3", "F3", "A3", "C4"), ("A#2", "D3", "F3", "A3"),
+              ("C3", "E3", "G3", "A#3"))
+    arps = " ".join(" ".join(f"{note}:2" for note in (*chord, *chord[::-1])) for chord in chords)
+    bass = "F2:12 C2:4 D2:12 A1:4 A#1:12 F1:4 C2:12 G1:4"
+    lead = ("-:64 A4:6 C5:2 F5:8 E5:6 D5:2 C5:8 D5:6 C5:2 A#4:4 A4:4 G4:16 "
+            "A4:6 C5:2 F5:8 G5:6 F5:2 E5:8 D5:8 C5:4 A#4:4 C5:16")
+    return master([
+        sequence(arps, step, pulse(0.125), 0.07, total, curve=1.8),
+        sequence(bass, step, triangle, 0.30, total, curve=0.5),
+        sequence(lead, step, triangle, 0.20, total, curve=0.7),
+        drums("....h.......h.h.", step, total, 61),
+    ], cutoff=3800)
+
+
+def road_theme() -> list[float]:
+    """Easy walking groove in G major, 96 BPM, 12 bars."""
+    step = 60 / 96 / 4
+    total = int(step * 16 * 12 * RATE)
+    bass = ("G2:4 -:2 G2:2 D2:4 G2:4 E2:4 -:2 E2:2 B1:4 E2:4 "
+            "C2:4 -:2 C2:2 G2:4 C2:4 D2:4 -:2 D2:2 A2:4 F#2:4")
+    chime = "B4:4 D5:4 G5:4 D5:4 B4:4 E5:4 G5:4 E5:4 C5:4 E5:4 G5:4 E5:4 A4:4 D5:4 F#5:4 D5:4"
+    lead = ("-:64 D5:4 E5:4 G5:6 E5:2 D5:8 B4:8 C5:4 D5:4 E5:6 D5:2 C5:4 B4:4 A4:8 "
+            "D5:4 E5:4 G5:6 A5:2 G5:8 E5:8 C5:4 E5:4 D5:4 C5:4 B4:4 A4:4 G4:8")
+    return master([
+        sequence(bass, step, triangle, 0.28, total, curve=0.9),
+        sequence(chime, step, pulse(0.125), 0.05, total, curve=2.2),
+        sequence(lead, step, pulse(0.25), 0.07, total, curve=0.9),
+        drums("k...h...s...h.h.", step, total, 67),
+    ], cutoff=4200)
+
+
+def rain_theme() -> list[float]:
+    """Dreamy waltz in B minor, 84 BPM, 16 bars of three beats."""
+    step = 60 / 84 / 4
+    total = int(step * 12 * 16 * RATE)
+    waltz = " ".join(f"{root}:4 {third}:4 {fifth}:4" for root, third, fifth in (
+        ("B2", "F#3", "B3"), ("G2", "D3", "B3"), ("A2", "E3", "C#4"), ("F#2", "C#3", "A#3")))
+    drops = ("F#5:2 -:4 D5:2 -:4 B4:2 -:4 G5:2 -:4 E5:2 -:2 C#5:2 -:4 A5:2 -:4 "
+             "F#5:2 -:4 C#5:2 -:2")
+    lead = ("-:48 F#4:8 B4:4 D5:8 C#5:4 E5:8 C#5:4 A#4:12 B4:8 D5:4 G5:8 F#5:4 E5:8 D5:4 C#5:12 "
+            "D5:6 C#5:2 B4:4 G4:12 A4:8 C#5:4 B4:12")
+    return master([
+        sequence(waltz, step, triangle, 0.26, total, curve=0.9),
+        sequence(drops, step, pulse(0.125), 0.05, total, curve=2.4),
+        sequence(lead, step, sine, 0.22, total, curve=0.6),
+        drums("k...h...h...", step, total, 71),
+    ], cutoff=3600)
+
+
 def music_tracks() -> dict[str, list[float]]:
     return {
         "shelter": shelter_theme(), "wasteland": wasteland_theme(), "boss": boss_theme(),
-        "city": city_theme(), "marsh": marsh_theme(),
+        "city": city_theme(), "marsh": marsh_theme(), "sunset": sunset_theme(),
+        "road": road_theme(), "rain": rain_theme(),
     }
 
 

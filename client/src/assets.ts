@@ -13,6 +13,12 @@ export const UI_SOUNDS = [
   'sfx/chest_jackpot', 'sfx/emerald', 'sfx/elite_roar',
 ] as const;
 export const HUB_MUSIC = 'music/shelter';
+/** Tunes offered in the settings; calm ones first. */
+export const TUNES = [
+  ['music/shelter', 'Убежище'], ['music/sunset', 'Закат'], ['music/road', 'Дорога'],
+  ['music/rain', 'Дождь'], ['music/wasteland', 'Пустошь'], ['music/city', 'Город'],
+  ['music/marsh', 'Топи'],
+] as const;
 
 /** Presentation timing per animation name (frames per second, loop or not). */
 const ANIMATION_TIMING: Record<string, { frameRate: number; repeat: number }> = {
@@ -39,7 +45,7 @@ export function preloadAssets(scene: Phaser.Scene, catalog: Catalog): void {
   for (const weapon of Object.values(catalog.weapons)) sounds.add(weapon.fireSound);
   for (const pickup of Object.values(catalog.pickups)) sounds.add(pickup.sound);
   for (const key of sounds) scene.load.audio(key, `${key}.wav`);
-  const music = new Set([HUB_MUSIC, ...Object.values(catalog.locations)
+  const music = new Set<string>([...TUNES.map(([key]) => key), ...Object.values(catalog.locations)
     .flatMap((item) => [item.music, item.bossMusic])]);
   for (const key of music) scene.load.audio(key, [`${key}.ogg`, `${key}.mp3`]);
   scene.load.setPath('');

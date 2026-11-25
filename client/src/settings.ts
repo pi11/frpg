@@ -5,10 +5,13 @@ export interface Settings {
   crt: boolean;
   /** Let the bought autopilot play. */
   autopilot: boolean;
+  /** Tune keys; `auto` in a run means the tune of the location. */
+  hubTune: string;
+  runTune: string;
 }
 
 const STORAGE_KEY = 'wasteland.settings.v1';
-const defaults: Settings = { music: 1, sfx: 1, crt: true, autopilot: false };
+const defaults: Settings = { music: 1, sfx: 1, crt: true, autopilot: false, hubTune: 'music/shelter', runTune: 'auto' };
 let current: Settings | null = null;
 const listeners = new Set<(settings: Settings) => void>();
 
@@ -28,6 +31,8 @@ function read(): Settings {
         sfx: volume(stored.sfx, defaults.sfx),
         crt: typeof stored.crt === 'boolean' ? stored.crt : defaults.crt,
         autopilot: typeof stored.autopilot === 'boolean' ? stored.autopilot : defaults.autopilot,
+        hubTune: typeof stored.hubTune === 'string' ? stored.hubTune : defaults.hubTune,
+        runTune: typeof stored.runTune === 'string' ? stored.runTune : defaults.runTune,
       };
     }
   } catch { /* Unavailable or damaged storage falls back to defaults. */ }

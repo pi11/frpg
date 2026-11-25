@@ -1,0 +1,13 @@
+{
+  "id": "cartographer",
+  "name": "Картограф",
+  "description": "Посетить 6 мест с наградой за забег",
+  "hidden": true,
+  "emeralds": 4,
+  "condition": {
+    "type": "reported",
+    "event": "landmarks",
+    "value": 6,
+    "minSeconds": 60
+  }
+}

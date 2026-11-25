@@ -1,0 +1,12 @@
+{
+  "id": "drunk_master",
+  "name": "Пьяный мастер",
+  "description": "Резко развернуться 20 раз подряд",
+  "hidden": true,
+  "emeralds": 2,
+  "condition": {
+    "type": "reported",
+    "event": "flips",
+    "value": 20
+  }
+}

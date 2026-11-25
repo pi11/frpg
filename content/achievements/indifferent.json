@@ -1,0 +1,13 @@
+{
+  "id": "indifferent",
+  "name": "Мне всё равно",
+  "description": "5 раз за забег не выбрать карточку вовремя",
+  "hidden": true,
+  "emeralds": 2,
+  "condition": {
+    "type": "reported",
+    "event": "autoPicks",
+    "value": 5,
+    "minSeconds": 50
+  }
+}

@@ -1,16 +1,21 @@
 import * as Phaser from 'phaser';
 import { accountKey, ApiRequestError, deleteAccount, loginByKey, saveSession, session } from '../api/auth';
-import { buyUnlock, buyUpgrade, getProfile, startRun, type Profile } from '../api/game';
+import { buyUnlock, buyUpgrade, claimAchievement, getProfile, startRun, type Profile } from '../api/game';
 import { getCatalog } from '../content/catalog';
 import { orderedLocations } from '../content/locations';
 import { bundledContentHash } from '../content/hash';
 import type { AchievementDefinition, HeroDefinition, PassiveDefinition, UpgradeDefinition, WeaponDefinition } from '../content/schemas';
 import { heroTraits, statBonus } from '../content/statText';
-import { ATLAS, HUB_MUSIC } from '../assets';
+import { ATLAS, HUB_MUSIC, TUNES } from '../assets';
 import { upgradeCost } from '../economy';
 import { applyCrt, settings, updateSettings } from '../settings';
-import { playMusic, playSfx } from '../sound';
+import { shelterState } from '../inputState';
+import { playSfx, playTune } from '../sound';
 import type { RunData } from './RunScene';
+
+const TUNE_PLACES = [['hubTune', 'В убежище'], ['runTune', 'В забеге']] as const;
+/** The door on the shelter picture, shares of its size. */
+const DOOR = { left: 0.75, right: 0.89, top: 0.55, bottom: 0.93 };
 
 const VOLUMES = [['music', 'Музыка'], ['sfx', 'Звуки']] as const;
 
@@ -122,6 +127,9 @@ export class HubScene extends Phaser.Scene {
               <legend>Звук и картинка</legend>
               ${VOLUMES.map(([key, title]) => `<label class="hub-volume">${title}
                 <input type="range" min="0" max="100" step="5" data-volume="${key}"><output></output></label>`).join('')}
+              ${TUNE_PLACES.map(([key, title]) => `<label class="hub-volume">${title}
+                <select data-tune="${key}">${key === 'runTune' ? '<option value="auto">По локации</option>' : ''}${
+                  TUNES.map(([tune, name]) => `<option value="${tune}">${name}</option>`).join('')}</select></label>`).join('')}
               <label><input type="checkbox" data-setting="crt"> ЭЛТ-эффект</label>
             </fieldset>
             <h2>Управление</h2>
@@ -169,6 +177,28 @@ export class HubScene extends Phaser.Scene {
       // A sample of the new loudness.
       if (key === 'sfx') input.onchange = () => playSfx('sfx/ui_buy');
     });
+    this.overlay.querySelectorAll<HTMLSelectElement>('select[data-tune]').forEach((select) => {
+      const key = select.dataset.tune as 'hubTune' | 'runTune';
+      select.value = settings()[key];
+      if (select.selectedIndex < 0) select.selectedIndex = 0;
+      select.onchange = () => {
+        updateSettings({ [key]: select.value });
+        // Both lists play a sample; leaving the tab brings the shelter tune back.
+        playTune(select.value, HUB_MUSIC);
+      };
+    });
+    this.overlay.querySelector<HTMLElement>('.shelter-view')!.onclick = (event) => {
+      const box = (event.currentTarget as HTMLElement).getBoundingClientRect();
+      const x = (event.clientX - box.left) / box.width;
+      const y = (event.clientY - box.top) / box.height;
+      const door = x > DOOR.left && x < DOOR.right && y > DOOR.top && y < DOOR.bottom;
+      shelterState.knocks = door ? shelterState.knocks + 1 : 0;
+      if (door) playSfx('sfx/crate_break', 0.6);
+    };
+    this.el('hub-achievements').onclick = (event) => {
+      const button = (event.target as HTMLElement).closest<HTMLButtonElement>('button[data-claim]');
+      if (button?.dataset.claim) void this.act(() => this.claim(button.dataset.claim!));
+    };
     const autopilot = this.el<HTMLInputElement>('hub-autopilot');
     autopilot.checked = settings().autopilot;
     autopilot.onchange = () => {
@@ -192,7 +222,7 @@ export class HubScene extends Phaser.Scene {
       event.preventDefault();
       void this.act(() => this.switchAccount());
     };
-    playMusic(HUB_MUSIC);
+    playTune(settings().hubTune, HUB_MUSIC);
     this.el<HTMLButtonElement>('hub-start').onclick = () => void this.act(() => this.beginRun());
     this.el<HTMLButtonElement>('hub-retry').onclick = () => void this.loadProfile();
     this.el<HTMLButtonElement>('hub-link').onclick = () => this.scene.start('Auth', { linkAccount: true });
@@ -270,7 +300,10 @@ export class HubScene extends Phaser.Scene {
       button.tabIndex = selected ? 0 : -1;
       this.el(`hub-panel-${id}`).hidden = !selected;
     }
-    if (sound) playSfx('sfx/ui_click');
+    if (sound) {
+      playSfx('sfx/ui_click');
+      playTune(settings().hubTune, HUB_MUSIC);
+    }
   }
 
   private status(message: string, error = false): void {
@@ -455,21 +488,44 @@ export class HubScene extends Phaser.Scene {
   private renderAchievements(profile: Profile): void {
     const all = Object.values(getCatalog().achievements);
     const owned = new Set(profile.achievements);
-    this.el('hub-tab-achievements').hidden = owned.size === 0;
+    const waiting = new Set(profile.achievements_unclaimed);
+    const tab = this.el('hub-tab-achievements');
+    tab.hidden = owned.size === 0;
+    tab.textContent = waiting.size ? `Достижения (${waiting.size})` : 'Достижения';
     const row = (item: AchievementDefinition): string => {
       const done = owned.has(item.id);
-      return `<li class="${done ? 'hub-done' : ''}"><span><strong>${escapeHtml(item.name)}</strong><br>${escapeHtml(item.description)}</span><span>${done ? 'получено' : `+${item.emeralds}`}</span></li>`;
+      const reward = waiting.has(item.id)
+        ? `<button type="button" data-claim="${escapeHtml(item.id)}">Забрать +${item.emeralds}</button>`
+        : done ? 'получено' : `+${item.emeralds}`;
+      return `<li class="${done && !waiting.has(item.id) ? 'hub-done' : ''}"><span><strong>${escapeHtml(item.name)}</strong><br>${escapeHtml(item.description)}</span><span>${reward}</span></li>`;
     };
-    const open = all.filter((item) => !item.hidden);
+    const ready = all.filter((item) => waiting.has(item.id));
+    const open = all.filter((item) => !item.hidden && !waiting.has(item.id));
     const hidden = all.filter((item) => item.hidden);
     const found = hidden.filter((item) => owned.has(item.id));
+    const shown = found.filter((item) => !waiting.has(item.id));
     const left = hidden.length - found.length;
     this.el('hub-achievements').innerHTML = `
-      <p class="hub-help">Получено ${all.filter((item) => owned.has(item.id)).length} из ${all.length}. Награда в изумрудах выдаётся один раз в конце забега.</p>
+      <p class="hub-help">Получено ${all.filter((item) => owned.has(item.id)).length} из ${all.length}. Нажмите «Забрать», чтобы получить изумруды.</p>
+      ${ready.length ? `<h2>Заберите награду</h2><ul class="hub-goals">${ready.map(row).join('')}</ul><h2>Список</h2>` : ''}
       <ul class="hub-goals">${open.map(row).join('')}</ul>
       <h2>Скрытые: ${found.length} из ${hidden.length}</h2>
-      <ul class="hub-goals">${found.map(row).join('')}${left
+      <ul class="hub-goals">${shown.map(row).join('')}${left
         ? `<li><span>??? Ещё не найдено: ${left}</span><span></span></li>` : ''}</ul>`;
+  }
+
+  private async claim(id: string): Promise<void> {
+    if (!this.profile) return;
+    try {
+      this.render(await claimAchievement(id, this.profile.version));
+      playSfx('sfx/emerald');
+      this.status(`Изумруды получены: +${getCatalog().achievements[id]?.emeralds ?? 0}.`);
+    } catch (error) {
+      if (error instanceof ApiRequestError && error.status === 409) {
+        this.render(await getProfile());
+      }
+      throw error;
+    }
   }
 
   private async showKey(renew: boolean): Promise<void> {

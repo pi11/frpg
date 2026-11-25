@@ -3,6 +3,7 @@ import { preloadAssets, registerAnimations } from '../assets';
 import { getCatalog } from '../content/catalog';
 import { applyCrt } from '../settings';
 import { initSound } from '../sound';
+import { layoutOf } from '../ui/layout';
 import { COLORS, FONT } from '../ui/theme';
 
 /** Validates content, loads the atlas, audio and pixel font, then opens the shelter. */
@@ -24,12 +25,13 @@ export class BootScene extends Phaser.Scene {
       return;
     }
     const bar = this.add.graphics();
-    this.add.text(240, 120, 'ЗАГРУЗКА…', {
+    const { cx, cy } = layoutOf(this);
+    this.add.text(cx, cy - 15, 'ЗАГРУЗКА…', {
       fontFamily: 'monospace', fontSize: '10px', color: COLORS.text,
     }).setOrigin(0.5);
     this.load.on(Phaser.Loader.Events.PROGRESS, (value: number) => {
-      bar.clear().fillStyle(COLORS.barBack).fillRect(140, 134, 200, 6)
-        .fillStyle(COLORS.xp).fillRect(140, 134, 200 * value, 6);
+      bar.clear().fillStyle(COLORS.barBack).fillRect(cx - 100, cy - 1, 200, 6)
+        .fillStyle(COLORS.xp).fillRect(cx - 100, cy - 1, 200 * value, 6);
     });
     preloadAssets(this, catalog);
   }
@@ -38,7 +40,7 @@ export class BootScene extends Phaser.Scene {
     if (this.contentError) {
       this.add.text(12, 30, `Ошибка контента: ${this.contentError}`, {
         fontFamily: 'monospace', fontSize: '12px', color: COLORS.danger,
-        wordWrap: { width: 456 },
+        wordWrap: { width: this.scale.width - 24 },
       });
       return;
     }

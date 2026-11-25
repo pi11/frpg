@@ -14,16 +14,36 @@ export interface RunRecord {
   hazardMs: number;
   startHour: number;
   autopilotMs: number;
+  /** Knocks on the shelter door before the run. */
+  knocks: number;
+  /** Lowest HP the hero survived with. */
+  lowestHp: number;
+  kills: number;
+  crates: number;
+  /** Most enemies frozen at once. */
+  frozen: number;
+  /** Quick left-right turns in a row, and the best row. */
+  flips: number;
+  autoPicks: number;
+  idleMs: number;
+  landmarks: number;
+  broke: boolean;
+  bossSpawned: boolean;
   /** Set when the run is over. */
   end: 'death' | 'survived' | 'quit' | null;
 }
 
-export function newRecord(startHour: number): RunRecord {
+export function newRecord(startHour: number, knocks = 0): RunRecord {
   return {
     seconds: 0, moved: false, damaged: false, weapons: 1, evolved: false, bossSeconds: null,
     heroClicks: 0, pauses: 0, hazardMs: 0, startHour, autopilotMs: 0, end: null,
+    knocks, lowestHp: Infinity, kills: 0, crates: 0, frozen: 0, flips: 0, autoPicks: 0, idleMs: 0,
+    landmarks: 0, broke: false, bossSpawned: false,
   };
 }
+
+/** Time to grab the controls at the start. */
+const IDLE_GRACE_MS = 1500;
 
 export function isReached(achievement: AchievementDefinition, record: RunRecord): boolean {
   const { condition } = achievement;
@@ -37,6 +57,19 @@ export function isReached(achievement: AchievementDefinition, record: RunRecord)
     case 'finishNoMove': return !record.moved && record.end === 'survived';
     case 'noDamage': return !record.damaged && record.seconds >= value;
     case 'singleWeapon': return record.weapons <= 1 && record.seconds >= value;
+    case 'knocks': return record.knocks >= value;
+    case 'lowHp': return record.lowestHp <= value;
+    case 'exactKills': return record.end !== null && record.kills === value;
+    case 'crates': return record.crates >= value;
+    case 'frozen': return record.frozen >= value;
+    case 'flips': return record.flips >= value;
+    case 'autoPicks': return record.autoPicks >= value;
+    case 'noKills': return record.kills === 0 && record.seconds >= value;
+    case 'alwaysMoving': return record.idleMs < IDLE_GRACE_MS && record.seconds >= value;
+    case 'landmarks': return record.landmarks >= value;
+    case 'broke': return record.broke;
+    case 'bossIgnored':
+      return record.end === 'survived' && record.bossSpawned && record.bossSeconds === null;
     case 'evolved': return record.evolved;
     case 'bossFast': return record.bossSeconds !== null && record.bossSeconds < value;
     case 'heroClicks': return record.heroClicks >= value;

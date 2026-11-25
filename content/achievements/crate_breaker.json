@@ -1,0 +1,13 @@
+{
+  "id": "crate_breaker",
+  "name": "Ломать — не строить",
+  "description": "Разбить 40 ящиков за забег",
+  "hidden": true,
+  "emeralds": 3,
+  "condition": {
+    "type": "reported",
+    "event": "crates",
+    "value": 40,
+    "minSeconds": 60
+  }
+}

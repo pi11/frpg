@@ -1,0 +1,13 @@
+{
+  "id": "pacifist",
+  "name": "Пацифист",
+  "description": "Продержаться 45 секунд, никого не убив",
+  "hidden": true,
+  "emeralds": 5,
+  "condition": {
+    "type": "reported",
+    "event": "noKills",
+    "value": 45,
+    "minSeconds": 45
+  }
+}

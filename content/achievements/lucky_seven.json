@@ -1,0 +1,13 @@
+{
+  "id": "lucky_seven",
+  "name": "Три топора",
+  "description": "Закончить забег ровно с 777 убитыми",
+  "hidden": true,
+  "emeralds": 15,
+  "condition": {
+    "type": "reported",
+    "event": "exactKills",
+    "value": 777,
+    "minSeconds": 60
+  }
+}

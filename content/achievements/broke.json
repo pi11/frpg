@@ -1,0 +1,12 @@
+{
+  "id": "broke",
+  "name": "Без сдачи",
+  "description": "Потратить в автомате все крышки до последней",
+  "hidden": true,
+  "emeralds": 2,
+  "condition": {
+    "type": "reported",
+    "event": "broke",
+    "value": 1
+  }
+}

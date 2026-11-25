@@ -9,6 +9,8 @@ export interface Profile {
   unlocks: string[];
   /** Survival marks (seconds) already rewarded, per location. */
   achievements: string[];
+  /** Earned, but the emeralds are not taken yet. */
+  achievements_unclaimed: string[];
   milestones: Record<string, number[]>;
   version: number;
   schema_version: number;
@@ -45,7 +47,7 @@ export interface RunFinish {
   status: 'finished';
   reward_caps: number;
   reward_emeralds: number;
-  /** Newly earned; their emeralds are already in the profile. */
+  /** Newly earned; their emeralds are claimed in the shelter. */
   achievements: string[];
   flags: string[];
   profile: Profile;
@@ -63,6 +65,12 @@ export function buyUpgrade(id: string, expectedVersion: number): Promise<Profile
 
 export function buyUnlock(id: string, expectedVersion: number): Promise<Profile> {
   return request<Profile>(`/unlocks/${encodeURIComponent(id)}/buy`, {
+    method: 'POST', body: JSON.stringify({ expected_version: expectedVersion }),
+  }, true);
+}
+
+export function claimAchievement(id: string, expectedVersion: number): Promise<Profile> {
+  return request<Profile>(`/achievements/${encodeURIComponent(id)}/claim`, {
     method: 'POST', body: JSON.stringify({ expected_version: expectedVersion }),
   }, true);
 }

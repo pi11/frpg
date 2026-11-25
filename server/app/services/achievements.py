@@ -1,5 +1,7 @@
 """Achievements: one-time emerald rewards stored in profile.data.
 
+An earned achievement waits in `achievements_unclaimed` until the player takes its emeralds.
+
 `metric` conditions are computed here from accepted run data. `reported` ones (standing still,
 clicking the hero) cannot be seen by the server: the client names them and the server only checks
 the limits written in content (minimum duration, boss kill, autopilot).
@@ -64,13 +66,12 @@ def new_achievements(
 def grant_achievements(
     achievements: Mapping[str, Mapping[str, Any]], data: Mapping[str, Any], run: RunFacts | None,
 ) -> tuple[dict[str, Any], list[str]]:
-    """Profile data with new achievements and their emeralds added, and what was added."""
+    """Profile data with new achievements waiting to be claimed, and what was added."""
     earned = new_achievements(achievements, data, run)
     if not earned:
         return dict(data), []
     return {
         **data,
         "achievements": [*data.get("achievements", []), *earned],
-        "emeralds": data.get("emeralds", 0)
-        + sum(int(achievements[key]["emeralds"]) for key in earned),
+        "achievements_unclaimed": [*data.get("achievements_unclaimed", []), *earned],
     }, earned

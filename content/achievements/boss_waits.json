@@ -1,0 +1,13 @@
+{
+  "id": "boss_waits",
+  "name": "Босс подождёт",
+  "description": "Дожить до конца забега, не убив босса",
+  "hidden": true,
+  "emeralds": 6,
+  "condition": {
+    "type": "reported",
+    "event": "bossIgnored",
+    "value": 1,
+    "minSeconds": 880
+  }
+}

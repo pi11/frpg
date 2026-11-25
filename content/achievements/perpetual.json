@@ -1,0 +1,13 @@
+{
+  "id": "perpetual",
+  "name": "Вечный двигатель",
+  "description": "Не останавливаться первые 3 минуты",
+  "hidden": true,
+  "emeralds": 4,
+  "condition": {
+    "type": "reported",
+    "event": "alwaysMoving",
+    "value": 180,
+    "minSeconds": 180
+  }
+}

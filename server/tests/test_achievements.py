@@ -49,10 +49,11 @@ def test_reported_conditions_have_limits() -> None:
     assert earned(facts(reported=["meat_grinder", "unknown"])) == []
 
 
-def test_reward_is_added_once() -> None:
+def test_achievement_is_added_once_and_waits() -> None:
     items = get_content().category("achievements")
     data, new = grant_achievements(items, {"emeralds": 2}, facts(reported=["tickle"]))
-    assert new == ["tickle"] and data["emeralds"] == 2 + items["tickle"]["emeralds"]
+    assert new == ["tickle"] and data["emeralds"] == 2
+    assert data["achievements"] == data["achievements_unclaimed"] == ["tickle"]
     assert grant_achievements(items, data, facts(reported=["tickle"])) == (data, [])
 
 
@@ -82,7 +83,26 @@ async def test_run_finish_grants_achievements(api: dict[str, object]) -> None:
     items = get_content().category("achievements")
     total = items["first_hundred"]["emeralds"] + items["tickle"]["emeralds"]
     assert first["profile"]["achievements"] == ["first_hundred", "tickle"]
-    assert first["profile"]["emeralds"] == total and first["reward_emeralds"] == 0
+    assert first["profile"]["emeralds"] == 0 and first["reward_emeralds"] == 0
     replay = (await client.post(url, json=body, headers=auth)).json()
     assert replay["achievements"] == first["achievements"]
-    assert replay["profile"]["emeralds"] == total
+    assert replay["profile"]["achievements_unclaimed"] == first["achievements"]
+
+    async def claim(item: str, version: int) -> httpx.Response:
+        return await client.post(f"/api/v1/achievements/{item}/claim",
+                                 json={"expected_version": version}, headers=auth)
+
+    version = replay["profile"]["version"]
+    assert (await client.post("/api/v1/achievements/tickle/claim",
+                              json={"expected_version": version})).status_code == 401
+    assert (await claim("missing", version)).status_code == 404
+    assert (await claim("statue", version)).status_code == 409
+    assert (await claim("tickle", version + 5)).status_code == 409
+    assert (await claim("tickle", -1)).status_code == 422
+    taken = (await claim("tickle", version)).json()
+    assert taken["emeralds"] == items["tickle"]["emeralds"]
+    assert taken["achievements_unclaimed"] == ["first_hundred"]
+    assert taken["achievements"] == ["first_hundred", "tickle"]
+    assert (await claim("tickle", taken["version"])).status_code == 409
+    last = (await claim("first_hundred", taken["version"])).json()
+    assert last["emeralds"] == total and last["achievements_unclaimed"] == []

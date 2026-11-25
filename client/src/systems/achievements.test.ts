@@ -39,6 +39,27 @@ describe('achievements noticed by the client', () => {
     expect(reached('evolver', { seconds: 200, evolved: true })).toBe(true);
   });
 
+  it('oddities', () => {
+    expect(reached('knock_knock', { knocks: 7 })).toBe(true);
+    expect(reached('by_a_thread', {})).toBe(false);
+    expect(reached('by_a_thread', { lowestHp: 2.5 })).toBe(true);
+    expect(reached('lucky_seven', { seconds: 300, kills: 777 })).toBe(false);
+    expect(reached('lucky_seven', { seconds: 300, kills: 777, end: 'quit' })).toBe(true);
+    expect(reached('lucky_seven', { seconds: 300, kills: 778, end: 'death' })).toBe(false);
+    expect(reached('crate_breaker', { seconds: 90, crates: 40 })).toBe(true);
+    expect(reached('ice_age', { seconds: 90, frozen: 24 })).toBe(false);
+    expect(reached('drunk_master', { flips: 20 })).toBe(true);
+    expect(reached('indifferent', { seconds: 60, autoPicks: 5 })).toBe(true);
+    expect(reached('pacifist', { seconds: 45 })).toBe(true);
+    expect(reached('pacifist', { seconds: 45, kills: 1 })).toBe(false);
+    expect(reached('perpetual', { seconds: 180, idleMs: 900 })).toBe(true);
+    expect(reached('perpetual', { seconds: 180, idleMs: 2000 })).toBe(false);
+    expect(reached('cartographer', { seconds: 90, landmarks: 6 })).toBe(true);
+    expect(reached('broke', { broke: true })).toBe(true);
+    expect(reached('boss_waits', { seconds: 900, end: 'survived', bossSpawned: true })).toBe(true);
+    expect(reached('boss_waits', { seconds: 900, end: 'survived', bossSpawned: true, bossSeconds: 60 })).toBe(false);
+  });
+
   it('the autopilot earns only its own', () => {
     expect(reached('tea_time', { seconds: 700, autopilotMs: 600000 })).toBe(true);
     expect(reached('tea_time', { seconds: 700 })).toBe(false);

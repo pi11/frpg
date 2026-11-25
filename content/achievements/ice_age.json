@@ -1,0 +1,13 @@
+{
+  "id": "ice_age",
+  "name": "Ледниковый период",
+  "description": "Заморозить 25 врагов одновременно",
+  "hidden": true,
+  "emeralds": 3,
+  "condition": {
+    "type": "reported",
+    "event": "frozen",
+    "value": 25,
+    "minSeconds": 30
+  }
+}

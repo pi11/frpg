@@ -1,0 +1,12 @@
+{
+  "id": "knock_knock",
+  "name": "Тук-тук",
+  "description": "Постучать в дверь убежища 7 раз подряд",
+  "hidden": true,
+  "emeralds": 2,
+  "condition": {
+    "type": "reported",
+    "event": "knocks",
+    "value": 7
+  }
+}

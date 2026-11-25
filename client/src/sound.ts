@@ -46,6 +46,11 @@ export function playMusic(key: string): void {
   music.play();
 }
 
+/** The chosen tune, or the fallback when it is `auto` or no longer exists. */
+export function playTune(choice: string, fallback: string): void {
+  playMusic(manager?.game.cache.audio.exists(choice) ? choice : fallback);
+}
+
 export function stopMusic(): void {
   music?.stop();
   music?.destroy();

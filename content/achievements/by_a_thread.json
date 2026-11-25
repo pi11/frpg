@@ -1,0 +1,12 @@
+{
+  "id": "by_a_thread",
+  "name": "На волоске",
+  "description": "Остаться в живых с 3 единицами здоровья или меньше",
+  "hidden": true,
+  "emeralds": 3,
+  "condition": {
+    "type": "reported",
+    "event": "lowHp",
+    "value": 3
+  }
+}

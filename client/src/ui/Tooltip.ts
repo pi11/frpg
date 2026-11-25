@@ -11,7 +11,7 @@ export class Tooltip {
   private readonly body: Phaser.GameObjects.Text;
   private shown = '';
 
-  constructor(scene: Phaser.Scene) {
+  constructor(private readonly scene: Phaser.Scene) {
     this.panel = scene.add.rectangle(0, 0, WIDTH, 10, COLORS.panel, 0.96).setOrigin(0)
       .setStrokeStyle(1, COLORS.panelBorder).setDepth(120).setVisible(false);
     const wrap = { wordWrap: { width: WIDTH - PADDING * 2 } };
@@ -27,7 +27,7 @@ export class Tooltip {
     this.title.setText(title.toUpperCase());
     this.body.setText(lines.join('\n'));
     const height = this.title.height + this.body.height + PADDING * 2 + 4;
-    const x = Phaser.Math.Clamp(Math.round(anchor.x - WIDTH / 2), 4, 476 - WIDTH);
+    const x = Phaser.Math.Clamp(Math.round(anchor.x - WIDTH / 2), 4, this.scene.scale.width - 4 - WIDTH);
     const above = anchor.y - 14 - height;
     const y = Math.round(above >= 4 ? above : anchor.y + 14);
     this.panel.setPosition(x, y).setSize(WIDTH, height);

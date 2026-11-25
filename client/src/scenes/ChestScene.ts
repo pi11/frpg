@@ -2,10 +2,10 @@ import * as Phaser from 'phaser';
 import { animationKey, ATLAS } from '../assets';
 import { getCatalog } from '../content/catalog';
 import { playSfx } from '../sound';
+import { layoutOf, onLayoutChange, type Layout } from '../ui/layout';
 import { COLORS, textStyle } from '../ui/theme';
 import { RunScene, type UpgradeChoice } from './RunScene';
 
-const TEXT_WIDTH = 396;
 const ROW_GAP = 4;
 const SHAKES = 3;
 const SHAKE_MS = 260;
@@ -41,26 +41,28 @@ export class ChestScene extends Phaser.Scene {
     super('Chest');
   }
 
-  create(): void {
+  create({ instant = false }: { instant?: boolean }): void {
     this.opened = false;
     this.done = false;
     this.closing = false;
+    const layout = layoutOf(this);
+    const { cx, cy, width, height } = layout;
     const { granted, caps } = (this.scene.get('Run') as RunScene).chest;
     this.caps = caps;
-    this.add.rectangle(240, 135, 480, 270, 0x030805, 0.88);
-    this.glow = this.add.sprite(240, 135, ATLAS, 'fx/ray').setScale(3).setAlpha(0);
+    this.add.rectangle(cx, cy, width, height, 0x030805, 0.88);
+    this.glow = this.add.sprite(cx, cy, ATLAS, 'fx/ray').setScale(3).setAlpha(0);
     this.glow.play(animationKey('fx/ray', 'idle'));
-    this.chest = this.add.sprite(240, 135, ATLAS, 'pickups/chest').setScale(5);
-    this.buildRows(granted);
+    this.chest = this.add.sprite(cx, cy, ATLAS, 'pickups/chest').setScale(5);
+    this.buildRows(granted, layout);
     this.footer = [
-      this.add.image(214, 222, ATLAS, 'ui/cap').setVisible(false),
-      this.add.text(226, 218, `+${caps} КРЫШЕК`, textStyle(8, COLORS.warn)).setVisible(false),
+      this.add.image(cx - 26, height - 48, ATLAS, 'ui/cap').setVisible(false),
+      this.add.text(cx - 14, height - 52, `+${caps} КРЫШЕК`, textStyle(8, COLORS.warn)).setVisible(false),
     ];
     if (!granted.length) {
-      this.footer.push(this.add.text(240, 130, 'ВСЁ УЖЕ НА МАКСИМУМЕ', textStyle(8, COLORS.dim))
+      this.footer.push(this.add.text(cx, cy - 5, 'ВСЁ УЖЕ НА МАКСИМУМЕ', textStyle(8, COLORS.dim))
         .setOrigin(0.5).setVisible(false));
     }
-    this.hint = this.add.text(240, 250, 'ПРОБЕЛ ИЛИ КАСАНИЕ — ПРОПУСТИТЬ', textStyle(8, COLORS.dim))
+    this.hint = this.add.text(cx, height - 20, 'ПРОБЕЛ ИЛИ КАСАНИЕ — ПРОПУСТИТЬ', textStyle(8, COLORS.dim))
       .setOrigin(0.5).setVisible(false);
 
     // A short delay so the click that picked the chest up does not skip it at once.
@@ -71,6 +73,12 @@ export class ChestScene extends Phaser.Scene {
         if (!event.repeat) this.advance();
       });
     });
+    // The phone was turned: show the result right away in the new layout.
+    onLayoutChange(this, () => this.scene.restart({ instant: true }));
+    if (instant) {
+      this.advance();
+      return;
+    }
     for (let index = 0; index < SHAKES; index += 1) {
       this.time.delayedCall(index * SHAKE_MS, () => this.shake());
     }
@@ -78,11 +86,12 @@ export class ChestScene extends Phaser.Scene {
   }
 
   /** Hidden result rows, sized by their text and centred between the chest and the caps line. */
-  private buildRows(granted: UpgradeChoice[]): void {
+  private buildRows(granted: UpgradeChoice[], { cx, cy, width }: Layout): void {
+    const textWidth = width - 84;
     const sized = granted.map((choice) => {
       const evolution = choice.kind === 'evolution';
       const title = evolution ? `ЭВОЛЮЦИЯ: ${choice.name.toUpperCase()}` : choice.name.toUpperCase();
-      const wordWrap = { width: TEXT_WIDTH };
+      const wordWrap = { width: textWidth };
       const name = this.add.text(52, 0, title,
         textStyle(8, evolution ? COLORS.warn : COLORS.bright, { wordWrap })).setDepth(2).setVisible(false);
       const text = this.add.text(52, 0, choice.description.replaceAll('\n', ' · '),
@@ -90,9 +99,9 @@ export class ChestScene extends Phaser.Scene {
       return { choice, evolution, name, text, height: name.height + text.height + 12 };
     });
     const total = sized.reduce((sum, row) => sum + row.height + ROW_GAP, -ROW_GAP);
-    let y = Math.max(78, 142 - total / 2);
+    let y = Math.max(78, cy + 7 - total / 2);
     this.rows = sized.map(({ choice, evolution, name, text, height }) => {
-      const frame = this.add.rectangle(240, y + height / 2, 432, height, COLORS.panel, 0.95)
+      const frame = this.add.rectangle(cx, y + height / 2, width - 48 + (width < 400 ? 28 : 0), height, COLORS.panel, 0.95)
         .setStrokeStyle(evolution ? 2 : 1, evolution ? COLORS.evolution : COLORS.panelBorder)
         .setDepth(1).setVisible(false);
       const icon = this.add.image(38, y + height / 2, ATLAS, choice.sprite).setDepth(2).setVisible(false);
@@ -116,10 +125,11 @@ export class ChestScene extends Phaser.Scene {
     playSfx('sfx/chest');
     this.cameras.main.flash(180, 255, 230, 150);
     this.glow.setAlpha(0.9);
-    this.burst(240, 135, 24);
+    const { cx, cy } = layoutOf(this);
+    this.burst(cx, cy, 24);
     this.tweens.add({ targets: this.chest, y: 42, scale: 2, duration: 260, ease: 'Cubic.easeOut' });
     this.tweens.add({ targets: this.glow, y: 42, scale: 1.4, alpha: 0.6, duration: 260 });
-    this.add.text(240, 66, 'СУНДУК', textStyle(16, COLORS.warn)).setOrigin(0.5);
+    this.add.text(cx, 66, 'СУНДУК', textStyle(16, COLORS.warn)).setOrigin(0.5);
     this.time.delayedCall(320, () => this.spin(0));
   }
 

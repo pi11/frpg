@@ -173,6 +173,8 @@ body.crt::after {
 .hub-settings label { display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 8px; }
 .hub-settings input { accent-color: var(--term-border); }
 .hub-settings .hub-volume { display: grid; grid-template-columns: 72px 1fr 44px; width: 100%; gap: 12px; }
+#game, #game canvas { touch-action: none; }
+.hub-volume select { grid-column: 2 / 4; padding: 7px; border: 1px solid var(--term-line); background: var(--term-bg); color: var(--term-bright); font: inherit; }
 .hub-volume output { text-align: right; color: var(--term-warn); }
 .hub-autopilot { display: flex; align-items: center; gap: 8px; margin-top: 12px; cursor: pointer; }
 .hub-autopilot input { accent-color: var(--term-border); }
@@ -192,4 +194,10 @@ body.crt::after {
 @media (max-width: 420px) {
   .hub-stats dd { font-size: 8px; }
   .hub-upgrades li { flex-direction: column; align-items: stretch; }
+  .hub-items li { flex-direction: row; flex-wrap: wrap; align-items: center; }
+  .hub-items li > button, .hub-items li > .hub-open { flex: 1 1 100%; }
+  .hub-tabs button { flex: 1 1 30%; }
+  .hub-stats { grid-template-columns: repeat(2, 1fr); }
+  .hub-card { padding: 14px; }
+  .hub-hero-stage { width: 72px; height: 84px; background-size: 72px 84px, auto; }
 }

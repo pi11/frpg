@@ -43,6 +43,7 @@ class ProfileResponse(BaseModel):
     unlocks: list[str]
     milestones: dict[str, list[int]]
     achievements: list[str]
+    achievements_unclaimed: list[str]
     unlocked_locations: list[str]
     unlocked_heroes: list[str]
     identities: list[IdentityResponse]
@@ -66,6 +67,7 @@ async def profile_response(session: AsyncSession, user: User, profile: Profile) 
         bosses_killed=sorted(data.get("bosses_killed", [])),
         unlocks=sorted(data.get("unlocks", [])), milestones=data.get("milestones", {}),
         achievements=data.get("achievements", []),
+        achievements_unclaimed=data.get("achievements_unclaimed", []),
         unlocked_heroes=unlocked_heroes(get_content().category("heroes"), data),
         unlocked_locations=unlocked_locations(
             get_content().category("locations"), data.get("bosses_killed", []),
@@ -164,6 +166,40 @@ async def buy_unlock(
         update(Profile).where(
             Profile.user_id == user.id, Profile.version == body.expected_version,
         ).values(version=Profile.version + 1, data=data).returning(Profile.user_id)
+    )
+    if changed.scalar_one_or_none() is None:
+        raise ApiError(409, ErrorCode.conflict, "Профиль изменился. Обновите данные")
+    await session.commit()
+    await session.refresh(profile)
+    return await profile_response(session, user, profile)
+
+
+@router.post("/achievements/{achievement_id}/claim", response_model=ProfileResponse)
+async def claim_achievement(
+    achievement_id: str, body: BuyRequest, user: UserDep, session: SessionDep,
+) -> ProfileResponse:
+    achievement = get_content().category("achievements").get(achievement_id)
+    if achievement is None:
+        raise ApiError(404, ErrorCode.not_found, "Достижение не найдено")
+    profile = await session.scalar(
+        select(Profile).where(Profile.user_id == user.id).with_for_update()
+    )
+    if profile is None:
+        raise ApiError(404, ErrorCode.not_found, "Профиль не найден")
+    if profile.version != body.expected_version:
+        raise ApiError(409, ErrorCode.conflict, "Профиль изменился. Обновите данные")
+    data = profile.data or {}
+    waiting = list(data.get("achievements_unclaimed", []))
+    if achievement_id not in waiting:
+        raise ApiError(409, ErrorCode.conflict, "Награда уже получена или ещё не заслужена")
+    waiting.remove(achievement_id)
+    changed = await session.execute(
+        update(Profile).where(
+            Profile.user_id == user.id, Profile.version == body.expected_version,
+        ).values(version=Profile.version + 1, data={
+            **data, "achievements_unclaimed": waiting,
+            "emeralds": data.get("emeralds", 0) + achievement["emeralds"],
+        }).returning(Profile.user_id)
     )
     if changed.scalar_one_or_none() is None:
         raise ApiError(409, ErrorCode.conflict, "Профиль изменился. Обновите данные")

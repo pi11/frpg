@@ -1,6 +1,7 @@
 import * as Phaser from 'phaser';
 import { settings, updateSettings } from '../settings';
 import { playSfx } from '../sound';
+import { layoutOf } from './layout';
 import { COLORS, textStyle } from './theme';
 
 const SLIDER_WIDTH = 110;
@@ -19,7 +20,8 @@ export class PausePanel {
   private confirming = false;
 
   constructor(private readonly scene: Phaser.Scene, actions: Actions) {
-    const panel = scene.add.rectangle(0, 0, 270, 150, COLORS.panel, 0.95)
+    const { cx, cy, width } = layoutOf(scene);
+    const panel = scene.add.rectangle(0, 0, Math.min(270, width - 12), 150, COLORS.panel, 0.95)
       .setStrokeStyle(1, COLORS.panelBorder).setInteractive();
     const title = scene.add.text(0, -60, 'ПАУЗА', textStyle(16, COLORS.bright)).setOrigin(0.5);
     const resume = this.button(-36, 'ПРОДОЛЖИТЬ [ESC]', actions.resume);
@@ -32,7 +34,7 @@ export class PausePanel {
       this.confirming = true;
       this.updateLeave();
     });
-    this.root = scene.add.container(240, 135, [panel, title, resume, this.leave]).setDepth(90);
+    this.root = scene.add.container(cx, cy, [panel, title, resume, this.leave]).setDepth(90);
     VOLUMES.forEach(([key, label], index) => this.slider(-10 + index * 20, key, label));
     this.hide();
   }

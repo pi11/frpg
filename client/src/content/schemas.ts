@@ -338,7 +338,8 @@ export const AchievementSchema = z.object({
     z.object({
       type: z.literal('reported'),
       event: z.enum(['noMove', 'finishNoMove', 'noDamage', 'singleWeapon', 'evolved', 'bossFast',
-        'heroClicks', 'earlyDeath', 'earlyQuit', 'autopilotTime', 'pauses', 'hazardTime', 'nightHour']),
+        'knocks', 'lowHp', 'exactKills', 'crates', 'frozen', 'flips', 'autoPicks', 'noKills',
+        'alwaysMoving', 'landmarks', 'broke', 'bossIgnored', 'heroClicks', 'earlyDeath', 'earlyQuit', 'autopilotTime', 'pauses', 'hazardTime', 'nightHour']),
       value: z.number().int().positive(),
       minSeconds: z.number().int().nonnegative().default(0),
       boss: z.boolean().default(false),
@@ -377,6 +378,8 @@ export const BalanceSchema = z.object({
     /** Share of max HP a mini-boss or boss can lose per second, so strong builds still get a fight. */
     eliteMaxLossPerSecond: z.number().gt(0).max(1),
     bossMaxLossPerSecond: z.number().gt(0).max(1),
+    /** A random card is taken when the player does not choose in time. */
+    levelUpTimeoutMs: z.number().positive(),
     maxDodge: z.number().min(0).max(1),
     critMultiplier: z.number().min(1),
     reviveHpFraction: z.number().gt(0).max(1),

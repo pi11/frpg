@@ -10,8 +10,8 @@ import type { Catalog } from '../content/catalog';
 import type {
   EnemyDefinition, HeroDefinition, LocationDefinition, PassiveDefinition, StatKey, WeaponDefinition,
 } from '../content/schemas';
-import { inputState } from '../inputState';
-import { playMusic, playSfx } from '../sound';
+import { inputState, shelterState } from '../inputState';
+import { playMusic, playSfx, playTune } from '../sound';
 import { isReached, newRecord, type RunRecord } from '../systems/achievements';
 import { autopilotDirection, type Threat } from '../systems/autopilot';
 import { keepAwake } from '../platform/wakeLock';
@@ -20,6 +20,7 @@ import { refillBudget, softCap } from '../systems/limits';
 import { Rng } from '../systems/rng';
 import { availableEvolutions, evolutionSource } from '../systems/evolutions';
 import { COLORS, textStyle } from '../ui/theme';
+import { onLayoutChange } from '../ui/layout';
 import { levelChanges, levelStats, statBonus } from '../content/statText';
 import { WorldDecor, type ActiveLandmark } from '../systems/WorldDecor';
 import type { ResultData } from './ResultScene';
@@ -105,6 +106,8 @@ const LABEL_POOL_SIZE = 8;
 const HIT_FLASH_GAP_MS = 120;
 const REWARD_RING = 20;
 const TOAST_MS = 3500;
+/** Turns further apart than this are not a row. */
+const FLIP_GAP_MS = 600;
 const HERO_PRESS_RADIUS = 16;
 const AUTOPILOT_LOOT_RANGE = 260;
 /** Mortar shells drop from this height during the last part of their flight. */
@@ -218,6 +221,9 @@ export class RunScene extends Phaser.Scene {
   private ownedAchievements = new Set<string>();
   private bossSpawnedAt = 0;
   private checkedSecond = -1;
+  private flipAt = -Infinity;
+  private flipRow = 0;
+  private facing = 0;
   /** Free level-ups left to show at the start. */
   private headStart = 0;
   private orbiters = new Map<string, Phaser.GameObjects.Sprite[]>();
@@ -286,7 +292,11 @@ export class RunScene extends Phaser.Scene {
     this.blasts = [];
     this.beams = [];
     this.unlocks = new Set(data.unlocks);
-    this.record = newRecord(new Date().getHours());
+    this.record = newRecord(new Date().getHours(), shelterState.knocks);
+    shelterState.knocks = 0;
+    this.flipAt = -Infinity;
+    this.flipRow = 0;
+    this.facing = 0;
     this.reported = new Set();
     this.ownedAchievements = new Set(data.achievements);
     this.headStart = Math.floor(this.stat('headStart'));
@@ -314,8 +324,9 @@ export class RunScene extends Phaser.Scene {
   create(): void {
     const limits = this.catalog.balance.run;
     this.physics.world.setBounds(-100000, -100000, 200000, 200000);
-    this.ground = this.add.tileSprite(0, 0, 480, 270, this.location.groundSprite)
+    this.ground = this.add.tileSprite(0, 0, this.scale.width, this.scale.height, this.location.groundSprite)
       .setOrigin(0).setScrollFactor(0).setDepth(-100);
+    onLayoutChange(this, () => this.ground.setSize(this.scale.width, this.scale.height));
     this.hero = this.physics.add.sprite(0, 0, ATLAS, this.heroDefinition.sprite).setDepth(10);
     // The body stays small and sits on the feet of the taller sprite.
     (this.hero.body as Phaser.Physics.Arcade.Body).setSize(12, 14).setOffset(6, 9);
@@ -411,7 +422,7 @@ export class RunScene extends Phaser.Scene {
     this.scene.bringToTop('Hud');
     if (this.autopilotOn) void keepAwake(true);
     playSfx('sfx/run_start');
-    playMusic(this.location.music);
+    playTune(settings().runTune, this.location.music);
   }
 
   // --- contexts handed to behaviors ---------------------------------------------------
@@ -546,7 +557,7 @@ export class RunScene extends Phaser.Scene {
     this.updateBuffs();
     this.updateHazards(delta);
     if (this.finished) return;
-    this.moveHero();
+    this.moveHero(delta);
     const camera = this.cameras.main;
     this.ground.tilePositionX = camera.scrollX;
     this.ground.tilePositionY = camera.scrollY;
@@ -688,6 +699,8 @@ export class RunScene extends Phaser.Scene {
   private updateRecord(delta: number): void {
     if (this.autopilotOn) this.record.autopilotMs += delta;
     this.record.seconds = this.view.seconds;
+    this.record.kills = this.view.kills;
+    this.record.bossSpawned = this.bossSpawned;
     if (this.view.seconds === this.checkedSecond) return;
     this.checkedSecond = this.view.seconds;
     this.checkAchievements();
@@ -706,7 +719,33 @@ export class RunScene extends Phaser.Scene {
     }
   }
 
-  private moveHero(): void {
+  private recordMovement(x: number, y: number, delta: number): void {
+    if (x === 0 && y === 0) {
+      this.record.idleMs += delta;
+      return;
+    }
+    this.record.moved = true;
+    const side = Math.sign(Math.round(x * 2));
+    if (!side || side === this.facing) return;
+    if (this.facing) {
+      this.flipRow = this.elapsedMs - this.flipAt <= FLIP_GAP_MS ? this.flipRow + 1 : 1;
+      this.record.flips = Math.max(this.record.flips, this.flipRow);
+      this.flipAt = this.elapsedMs;
+    }
+    this.facing = side;
+  }
+
+  get levelUpTimeoutMs(): number {
+    return this.catalog.balance.run.levelUpTimeoutMs;
+  }
+
+  /** The player did not choose in time. */
+  randomChoice(): UpgradeChoice | undefined {
+    this.record.autoPicks += 1;
+    return this.choices[Math.floor(this.rng.next() * this.choices.length)];
+  }
+
+  private moveHero(delta: number): void {
     let x = inputState.x;
     let y = inputState.y;
     if (this.keys.A.isDown || this.cursors.left.isDown) x -= 1;
@@ -721,7 +760,7 @@ export class RunScene extends Phaser.Scene {
       if (way) ({ x, y } = way);
       else if (this.autopilotOn) ({ x, y } = this.autopilotStep() ?? { x: 0, y: 0 });
     }
-    if (x !== 0 || y !== 0) this.record.moved = true;
+    this.recordMovement(x, y, delta);
     const length = Math.hypot(x, y);
     const { softMoveSpeed, softMoveSpeedFactor } = this.catalog.balance.run;
     const speed = softCap(this.stat('moveSpeed'), softMoveSpeed, softMoveSpeedFactor) * (1 - this.hazardSlow);
@@ -799,6 +838,7 @@ export class RunScene extends Phaser.Scene {
 
   private moveEnemies(delta: number): void {
     const maxDistanceSquared = this.catalog.balance.run.despawnDistance ** 2;
+    let frozenCount = 0;
     for (const mob of this.mobs) {
       const sprite = mob.sprite;
       if (!sprite.active) continue;
@@ -830,11 +870,13 @@ export class RunScene extends Phaser.Scene {
         }
       }
       if (frozen) {
+        frozenCount += 1;
         mob.setVelocity(0, 0);
         continue;
       }
       enemyBehaviors[definition.ai.type]!.update(mob, this.enemyContext, definition.ai.params, delta);
     }
+    this.record.frozen = Math.max(this.record.frozen, frozenCount);
   }
 
   private maxLoss(definition: EnemyDefinition): number {
@@ -1371,6 +1413,8 @@ export class RunScene extends Phaser.Scene {
     this.decor.useLandmark(landmark);
     this.prompt.setVisible(false);
     this.view.caps -= definition.trigger.caps;
+    this.record.landmarks += 1;
+    if (definition.trigger.caps > 0 && this.view.caps === 0) this.record.broke = true;
     playSfx('sfx/landmark');
     const [min, max] = definition.rolls;
     const count = min + Math.floor(this.rng.next() * (max - min + 1));
@@ -1410,6 +1454,7 @@ export class RunScene extends Phaser.Scene {
     const hp = (crate.getData('hp') as number) - damage;
     crate.setData('hp', hp);
     if (hp > 0) return;
+    this.record.crates += 1;
     const { x, y } = crate;
     this.decor.breakCrate(crate);
     this.playEffect('decor/crate', 'break', x, y, false);
@@ -1694,7 +1739,8 @@ export class RunScene extends Phaser.Scene {
     this.view.caps += caps;
     this.chest = { granted, caps };
     this.hero.setVelocity(0, 0);
-    this.scene.launch('Chest');
+    // Explicit data: Phaser would reuse the last restart's otherwise.
+    this.scene.launch('Chest', { instant: false });
     this.scene.bringToTop('Chest');
     this.scene.pause();
   }
@@ -1720,6 +1766,7 @@ export class RunScene extends Phaser.Scene {
     this.record.damaged = true;
     playSfx('sfx/hero_hurt');
     this.view.hp = Math.max(0, this.view.hp - damage);
+    if (this.view.hp > 0) this.record.lowestHp = Math.min(this.record.lowestHp, this.view.hp);
     this.cameras.main.shake(80, 0.005);
     this.hero.setTint(0xff7777);
     this.time.delayedCall(100, () => this.hero.clearTint());
@@ -1764,6 +1811,7 @@ export class RunScene extends Phaser.Scene {
   private finish(reason: ResultData['reason']): void {
     this.finished = true;
     this.record.seconds = this.view.seconds;
+    this.record.kills = this.view.kills;
     this.record.end = reason;
     this.checkAchievements();
     this.hero.setVelocity(0, 0);

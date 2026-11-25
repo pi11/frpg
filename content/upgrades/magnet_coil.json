@@ -1,0 +1,13 @@
+{
+  "id": "magnet_coil",
+  "name": "Магнитная катушка",
+  "category": "scavenge",
+  "stat": "pickupRadius",
+  "mod": "flat",
+  "perLevel": 16,
+  "maxLevel": 10,
+  "cost": {
+    "base": 200,
+    "growth": 1.5
+  }
+}
