@@ -1,0 +1,12 @@
+{
+  "id": "veteran",
+  "name": "Ветеран пустоши",
+  "description": "Сыграть 100 забегов",
+  "hidden": true,
+  "emeralds": 20,
+  "condition": {
+    "type": "metric",
+    "metric": "runs",
+    "value": 100
+  }
+}

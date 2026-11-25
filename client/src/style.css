@@ -102,7 +102,8 @@ body.crt::after {
 .auth-telegram-details small { display: block; color: var(--term-dim); font-size: 8px; }
 [hidden] { display: none !important; }
 
-.hub-card { width: min(100%, 640px); }
+.hub-card { position: relative; width: min(100%, 640px); }
+.auth-card .hub-fullscreen { position: absolute; top: 12px; right: 12px; padding: 7px 9px; }
 /* Tabs differ in height: keep the card in place when switching. */
 .auth-overlay:has(.hub-card) { align-items: start; }
 /* Four 320×120 frames one under another (tools/assets/art_heroes.py). */
@@ -144,6 +145,9 @@ body.crt::after {
 .hub-goals { margin: 0; padding: 0; list-style: none; }
 .hub-goals li { display: flex; justify-content: space-between; gap: 12px; padding: 7px 0; border-top: 1px dashed var(--term-line); }
 .hub-goals li span:last-child { color: var(--term-warn); }
+.hub-daily li > span:first-child { flex: 1; }
+.hub-bar { display: block; height: 6px; margin: 8px 0 4px; background: var(--term-line); }
+.hub-bar span { display: block; height: 100%; background: var(--term-border); }
 .hub-goals .hub-done, .hub-goals .hub-done span:last-child { color: var(--term-dim); }
 .hub-card h2 { margin: 24px 0 8px; color: var(--term-bright); font-size: 8px; font-weight: normal; }
 .hub-card h2::before { content: '// '; color: var(--term-dim); }

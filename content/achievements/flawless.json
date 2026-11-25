@@ -1,0 +1,14 @@
+{
+  "id": "flawless",
+  "name": "Ни царапины",
+  "description": "Победить босса, ни разу не получив урона за весь забег",
+  "hidden": true,
+  "emeralds": 30,
+  "condition": {
+    "type": "reported",
+    "event": "flawless",
+    "value": 1,
+    "boss": true,
+    "minSeconds": 780
+  }
+}

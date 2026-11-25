@@ -1,0 +1,16 @@
+{
+  "id": "survive",
+  "text": "Продержаться {goal} в одном забеге",
+  "metric": "survive",
+  "goals": [
+    300,
+    480,
+    600
+  ],
+  "emeralds": [
+    2,
+    3,
+    5
+  ],
+  "weight": 3
+}

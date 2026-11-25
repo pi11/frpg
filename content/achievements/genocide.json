@@ -1,0 +1,12 @@
+{
+  "id": "genocide",
+  "name": "Чистильщик",
+  "description": "Убить 5000 врагов за забег",
+  "hidden": true,
+  "emeralds": 15,
+  "condition": {
+    "type": "metric",
+    "metric": "kills",
+    "value": 5000
+  }
+}

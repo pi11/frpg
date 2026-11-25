@@ -339,7 +339,8 @@ export const AchievementSchema = z.object({
       type: z.literal('reported'),
       event: z.enum(['noMove', 'finishNoMove', 'noDamage', 'singleWeapon', 'evolved', 'bossFast',
         'knocks', 'lowHp', 'exactKills', 'crates', 'frozen', 'flips', 'autoPicks', 'noKills',
-        'alwaysMoving', 'landmarks', 'broke', 'bossIgnored', 'heroClicks', 'earlyDeath', 'earlyQuit', 'autopilotTime', 'pauses', 'hazardTime', 'nightHour']),
+        'alwaysMoving', 'landmarks', 'broke', 'bossIgnored', 'flawless', 'bossOneGun', 'noPerks',
+        'noUpgrades', 'bossLowHp', 'evolutions', 'heroClicks', 'earlyDeath', 'earlyQuit', 'autopilotTime', 'pauses', 'hazardTime', 'nightHour']),
       value: z.number().int().positive(),
       minSeconds: z.number().int().nonnegative().default(0),
       boss: z.boolean().default(false),
@@ -348,6 +349,21 @@ export const AchievementSchema = z.object({
   ]),
 }).strict();
 export type AchievementDefinition = z.infer<typeof AchievementSchema>;
+
+/** A daily quest template; the server picks 3-4 per day (server/app/services/daily.py). */
+export const DailyTemplateSchema = z.object({
+  id: IdSchema,
+  /** `{goal}` is replaced by the amount (minutes for `survive`). */
+  text: z.string().min(1),
+  metric: z.enum(['kills', 'enemyKills', 'survive', 'runs', 'elites', 'caps', 'boss']),
+  goals: z.array(z.number().int().positive()).min(1),
+  emeralds: z.array(z.number().int().positive()).min(1),
+  weight: z.number().positive(),
+  enemy: IdSchema.optional(),
+}).strict().refine((item) => item.goals.length === item.emeralds.length,
+  'goals and emeralds need the same length')
+  .refine((item) => (item.metric === 'enemyKills') === Boolean(item.enemy), 'enemy goes with enemyKills');
+export type DailyTemplateDefinition = z.infer<typeof DailyTemplateSchema>;
 
 export const BalanceSchema = z.object({
   run: z.object({
@@ -391,6 +407,14 @@ export const BalanceSchema = z.object({
     landmarkDecayRate: z.number().nonnegative(),
     /** Off-screen landmarks closer than this get an arrow at the screen edge. */
     landmarkHintRange: z.number().nonnegative(),
+  }).strict(),
+  daily: z.object({
+    minQuests: z.number().int().positive(),
+    maxQuests: z.number().int().positive(),
+    /** Quests change at midnight of this time zone. */
+    utcOffsetHours: z.number().int().min(-12).max(14),
+    /** Shorter runs do not count for the `runs` quest. */
+    minRunSeconds: z.number().int().nonnegative(),
   }).strict(),
   xp: z.object({ base: z.number().positive(), growth: z.number().positive() }).strict(),
   reward: z.object({

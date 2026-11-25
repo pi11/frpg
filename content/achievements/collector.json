@@ -1,0 +1,13 @@
+{
+  "id": "collector",
+  "name": "Коллекционер",
+  "description": "Собрать три эволюции оружия за один забег",
+  "hidden": true,
+  "emeralds": 15,
+  "condition": {
+    "type": "reported",
+    "event": "evolutions",
+    "value": 3,
+    "minSeconds": 300
+  }
+}

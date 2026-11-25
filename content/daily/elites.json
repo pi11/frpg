@@ -1,0 +1,16 @@
+{
+  "id": "elites",
+  "text": "Победить мини-боссов: {goal}",
+  "metric": "elites",
+  "goals": [
+    1,
+    2,
+    4
+  ],
+  "emeralds": [
+    2,
+    3,
+    5
+  ],
+  "weight": 2
+}

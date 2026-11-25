@@ -1,7 +1,7 @@
 """Profile reads and versioned upgrade purchases."""
 
 import uuid
-from typing import Annotated
+from typing import Annotated, Any
 
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel, Field
@@ -13,8 +13,9 @@ from app.db import get_session
 from app.models.auth import AuthIdentity, Profile, User
 from app.services.achievements import grant_achievements
 from app.services.content import get_content
+from app.services.daily import DailyResponse, daily_view, game_day, pick_quests, today_state
 from app.services.economy import unlocked_heroes, unlocked_locations, upgrade_cost
-from app.services.tokens import current_user
+from app.services.tokens import current_user, utcnow
 
 router = APIRouter(tags=["profile"], responses={
     401: {"model": ErrorResponse}, 404: {"model": ErrorResponse},
@@ -44,6 +45,7 @@ class ProfileResponse(BaseModel):
     milestones: dict[str, list[int]]
     achievements: list[str]
     achievements_unclaimed: list[str]
+    daily: DailyResponse
     unlocked_locations: list[str]
     unlocked_heroes: list[str]
     identities: list[IdentityResponse]
@@ -51,6 +53,13 @@ class ProfileResponse(BaseModel):
 
 class BuyRequest(BaseModel):
     expected_version: int = Field(ge=0)
+
+
+def today_daily(data: dict[str, Any]) -> DailyResponse:
+    content = get_content()
+    rules = content.balance["daily"]
+    day = game_day(utcnow(), rules)
+    return daily_view(data, pick_quests(day, content.category("daily"), rules), day, rules)
 
 
 async def profile_response(session: AsyncSession, user: User, profile: Profile) -> ProfileResponse:
@@ -68,6 +77,7 @@ async def profile_response(session: AsyncSession, user: User, profile: Profile) 
         unlocks=sorted(data.get("unlocks", [])), milestones=data.get("milestones", {}),
         achievements=data.get("achievements", []),
         achievements_unclaimed=data.get("achievements_unclaimed", []),
+        daily=today_daily(data),
         unlocked_heroes=unlocked_heroes(get_content().category("heroes"), data),
         unlocked_locations=unlocked_locations(
             get_content().category("locations"), data.get("bosses_killed", []),
@@ -199,6 +209,45 @@ async def claim_achievement(
         ).values(version=Profile.version + 1, data={
             **data, "achievements_unclaimed": waiting,
             "emeralds": data.get("emeralds", 0) + achievement["emeralds"],
+        }).returning(Profile.user_id)
+    )
+    if changed.scalar_one_or_none() is None:
+        raise ApiError(409, ErrorCode.conflict, "Профиль изменился. Обновите данные")
+    await session.commit()
+    await session.refresh(profile)
+    return await profile_response(session, user, profile)
+
+
+@router.post("/daily/{quest_id}/claim", response_model=ProfileResponse)
+async def claim_daily(
+    quest_id: str, body: BuyRequest, user: UserDep, session: SessionDep,
+) -> ProfileResponse:
+    content = get_content()
+    rules = content.balance["daily"]
+    day = game_day(utcnow(), rules)
+    quest = next((item for item in pick_quests(day, content.category("daily"), rules)
+                  if item["id"] == quest_id), None)
+    if quest is None:
+        raise ApiError(404, ErrorCode.not_found, "Сегодня такого задания нет")
+    profile = await session.scalar(
+        select(Profile).where(Profile.user_id == user.id).with_for_update()
+    )
+    if profile is None:
+        raise ApiError(404, ErrorCode.not_found, "Профиль не найден")
+    if profile.version != body.expected_version:
+        raise ApiError(409, ErrorCode.conflict, "Профиль изменился. Обновите данные")
+    data = profile.data or {}
+    state = today_state(data, day)
+    if quest_id in state["claimed"]:
+        raise ApiError(409, ErrorCode.conflict, "Награда уже получена")
+    if int(state["progress"].get(quest_id, 0)) < quest["goal"]:
+        raise ApiError(409, ErrorCode.conflict, "Задание ещё не выполнено")
+    state["claimed"].append(quest_id)
+    changed = await session.execute(
+        update(Profile).where(
+            Profile.user_id == user.id, Profile.version == body.expected_version,
+        ).values(version=Profile.version + 1, data={
+            **data, "daily": state, "emeralds": data.get("emeralds", 0) + quest["emeralds"],
         }).returning(Profile.user_id)
     )
     if changed.scalar_one_or_none() is None:

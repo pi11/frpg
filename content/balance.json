@@ -59,5 +59,11 @@
         "amount": 3
       }
     ]
+  },
+  "daily": {
+    "minQuests": 3,
+    "maxQuests": 4,
+    "utcOffsetHours": 3,
+    "minRunSeconds": 60
   }
 }

@@ -230,7 +230,8 @@ export class RunScene extends Phaser.Scene {
   private auras = new Map<string, number>();
   private mobs: SpriteMob[] = [];
   private spawnCount = 0;
-  private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
+  private cursors!: { UP: Phaser.Input.Keyboard.Key; DOWN: Phaser.Input.Keyboard.Key;
+    LEFT: Phaser.Input.Keyboard.Key; RIGHT: Phaser.Input.Keyboard.Key };
   private keys!: { W: Phaser.Input.Keyboard.Key; A: Phaser.Input.Keyboard.Key;
     S: Phaser.Input.Keyboard.Key; D: Phaser.Input.Keyboard.Key };
   private rng!: Rng;
@@ -294,6 +295,7 @@ export class RunScene extends Phaser.Scene {
     this.unlocks = new Set(data.unlocks);
     this.record = newRecord(new Date().getHours(), shelterState.knocks);
     shelterState.knocks = 0;
+    this.record.upgrades = Object.values(data.upgrades).reduce((sum, level) => sum + level, 0);
     this.flipAt = -Infinity;
     this.flipRow = 0;
     this.facing = 0;
@@ -416,8 +418,9 @@ export class RunScene extends Phaser.Scene {
       this.takeDamage(shot.getData('damage') as number);
     });
 
-    this.cursors = this.input.keyboard!.createCursorKeys();
-    this.keys = this.input.keyboard!.addKeys('W,A,S,D') as typeof this.keys;
+    // No capture: Phaser would swallow these keys on the whole page, also in the shelter text fields.
+    this.cursors = this.input.keyboard!.addKeys('UP,DOWN,LEFT,RIGHT', false) as typeof this.cursors;
+    this.keys = this.input.keyboard!.addKeys('W,A,S,D', false) as typeof this.keys;
     this.scene.launch('Hud');
     this.scene.bringToTop('Hud');
     if (this.autopilotOn) void keepAwake(true);
@@ -748,10 +751,10 @@ export class RunScene extends Phaser.Scene {
   private moveHero(delta: number): void {
     let x = inputState.x;
     let y = inputState.y;
-    if (this.keys.A.isDown || this.cursors.left.isDown) x -= 1;
-    if (this.keys.D.isDown || this.cursors.right.isDown) x += 1;
-    if (this.keys.W.isDown || this.cursors.up.isDown) y -= 1;
-    if (this.keys.S.isDown || this.cursors.down.isDown) y += 1;
+    if (this.keys.A.isDown || this.cursors.LEFT.isDown) x -= 1;
+    if (this.keys.D.isDown || this.cursors.RIGHT.isDown) x += 1;
+    if (this.keys.W.isDown || this.cursors.UP.isDown) y -= 1;
+    if (this.keys.S.isDown || this.cursors.DOWN.isDown) y += 1;
     if (x !== 0 || y !== 0) {
       inputState.mouse.cancel();
     } else {
@@ -968,6 +971,7 @@ export class RunScene extends Phaser.Scene {
   private winByBoss(): void {
     this.bossKilled = true;
     this.record.bossSeconds = (this.elapsedMs - this.bossSpawnedAt) / 1000;
+    this.record.bossHp = this.view.hp / this.view.maxHp;
     this.finished = true;
     this.physics.pause();
     this.hero.setVelocity(0, 0);
@@ -1702,6 +1706,7 @@ export class RunScene extends Phaser.Scene {
       const state = source && this.weapons.get(source.id);
       if (!source || !state) return;
       this.record.evolved = true;
+      this.record.evolutions += 1;
       this.weapons.delete(source.id);
       this.weapons.set(choice.id, { ...state, level: 1 });
       this.placeOrbiters(source.id, source.projectileSprite, []);
@@ -1714,6 +1719,7 @@ export class RunScene extends Phaser.Scene {
       this.ownedPassives.set(choice.id, (this.ownedPassives.get(choice.id) ?? 0) + 1);
     }
     this.record.weapons = Math.max(this.record.weapons, this.weapons.size);
+    this.record.passives = Math.max(this.record.passives, this.ownedPassives.size);
     const maxHp = this.stat('maxHp');
     this.view.hp += Math.max(0, maxHp - this.view.maxHp);
     this.view.maxHp = maxHp;

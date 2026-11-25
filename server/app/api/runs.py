@@ -18,6 +18,7 @@ from app.models.auth import Profile, User
 from app.models.run import Run
 from app.services.achievements import RunFacts, grant_achievements
 from app.services.content import get_content
+from app.services.daily import add_run, game_day, pick_quests
 from app.services.economy import (
     accepted_elites,
     emerald_reward,
@@ -202,6 +203,14 @@ async def finish_run(
             boss_killed=boss_killed, autopilot=body.autopilot, reported=body.achievements,
         ),
     )
+    elites = accepted_elites(location, known_enemies, body.kills_by_type, duration)
+    if not body.autopilot:
+        daily_rules = content.balance["daily"]
+        day = game_day(now, daily_rules)
+        data = add_run(data, pick_quests(day, content.category("daily"), daily_rules), day, {
+            "kills": kills, "kills_by_type": body.kills_by_type, "duration": duration,
+            "elites": elites, "picked_caps": picked_caps, "boss_killed": boss_killed,
+        }, daily_rules)
     run.status = "finished"
     run.finished_at = now
     run.reward_caps = reward

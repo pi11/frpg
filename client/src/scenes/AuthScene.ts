@@ -25,6 +25,8 @@ export class AuthScene extends Phaser.Scene {
 
   create(): void {
     this.active = true;
+    // Text fields here need every key, also ones a run may have captured before.
+    this.input.keyboard?.clearCaptures();
     this.overlay = document.createElement('main');
     this.overlay.className = 'auth-overlay';
     this.overlay.innerHTML = `

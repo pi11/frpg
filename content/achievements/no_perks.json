@@ -1,0 +1,14 @@
+{
+  "id": "no_perks",
+  "name": "Аскет",
+  "description": "Победить босса, не взяв ни одного перка",
+  "hidden": true,
+  "emeralds": 20,
+  "condition": {
+    "type": "reported",
+    "event": "noPerks",
+    "value": 1,
+    "boss": true,
+    "minSeconds": 780
+  }
+}

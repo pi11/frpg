@@ -1,0 +1,12 @@
+{
+  "id": "tycoon",
+  "name": "Магнат",
+  "description": "Подобрать 500 крышек за забег",
+  "hidden": true,
+  "emeralds": 10,
+  "condition": {
+    "type": "metric",
+    "metric": "caps",
+    "value": 500
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "id": "kill_raiders",
+  "text": "Разогнать {goal} рейдеров",
+  "metric": "enemyKills",
+  "goals": [
+    30,
+    60,
+    100
+  ],
+  "emeralds": [
+    2,
+    3,
+    4
+  ],
+  "weight": 2,
+  "enemy": "raider"
+}

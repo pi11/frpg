@@ -2,6 +2,7 @@ import * as Phaser from 'phaser';
 import { ATLAS } from '../assets';
 import { playSfx } from '../sound';
 import { VirtualJoystick } from '../ui/VirtualJoystick';
+import { fullscreenAvailable, isFullscreen, toggleFullscreen } from '../platform/fullscreen';
 import { keepAwake } from '../platform/wakeLock';
 import { settings, updateSettings } from '../settings';
 import { PausePanel } from '../ui/PausePanel';
@@ -103,6 +104,29 @@ export class HudScene extends Phaser.Scene {
       backgroundColor: '#1d3322', padding: { x: 5, y: 4 },
     })).setInteractive({ useHandCursor: true });
     pauseButton.on('pointerdown', () => this.togglePause());
+    if (fullscreenAvailable()) {
+      const full = this.add.graphics().setInteractive(
+        new Phaser.Geom.Rectangle(width - 52, 4, 20, 18), Phaser.Geom.Rectangle.Contains);
+      const draw = (): void => {
+        full.clear().fillStyle(0x1d3322).fillRect(width - 52, 4, 20, 18).lineStyle(1, 0xe4ffd8);
+        const [l, t, r, b] = [width - 47, 8, width - 37, 18];
+        const out = isFullscreen() ? -1 : 1;
+        for (const [x, y, dx, dy] of [[l, t, 1, 1], [r, t, -1, 1], [l, b, 1, -1], [r, b, -1, -1]] as const) {
+          const cx = out > 0 ? x : x + dx * 3;
+          const cy = out > 0 ? y : y + dy * 3;
+          full.lineBetween(cx, cy, cx + dx * 3 * out, cy).lineBetween(cx, cy, cx, cy + dy * 3 * out);
+        }
+      };
+      draw();
+      full.on('pointerdown', () => void toggleFullscreen());
+      const redraw = (): void => draw();
+      document.addEventListener('fullscreenchange', redraw);
+      this.input.keyboard?.on('keydown-F', () => void toggleFullscreen());
+      this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+        document.removeEventListener('fullscreenchange', redraw);
+        this.input.keyboard?.off('keydown-F');
+      });
+    }
     this.toast = this.add.text(cx, portrait ? 92 : 66, '', textStyle(8, '#9bff6e', {
       backgroundColor: '#08120b', padding: { x: 8, y: 6 }, align: 'center', wordWrap: { width: width - 24 },
     })).setOrigin(0.5).setDepth(85).setVisible(false);

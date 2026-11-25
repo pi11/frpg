@@ -1,0 +1,14 @@
+{
+  "id": "last_breath",
+  "name": "На последнем издыхании",
+  "description": "Добить босса, когда у героя меньше десятой части здоровья",
+  "hidden": true,
+  "emeralds": 12,
+  "condition": {
+    "type": "reported",
+    "event": "bossLowHp",
+    "value": 10,
+    "boss": true,
+    "minSeconds": 780
+  }
+}

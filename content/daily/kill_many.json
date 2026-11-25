@@ -1,0 +1,16 @@
+{
+  "id": "kill_many",
+  "text": "Убить {goal} врагов",
+  "metric": "kills",
+  "goals": [
+    800,
+    1500,
+    2500
+  ],
+  "emeralds": [
+    2,
+    3,
+    4
+  ],
+  "weight": 3
+}

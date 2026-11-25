@@ -60,6 +60,23 @@ describe('achievements noticed by the client', () => {
     expect(reached('boss_waits', { seconds: 900, end: 'survived', bossSpawned: true, bossSeconds: 60 })).toBe(false);
   });
 
+  it('hard hidden ones', () => {
+    const won = { seconds: 800, bossSeconds: 50, bossSpawned: true, bossHp: 0.5 };
+    expect(reached('flawless', won)).toBe(true);
+    expect(reached('flawless', { ...won, damaged: true })).toBe(false);
+    expect(reached('flawless', { seconds: 800 })).toBe(false);
+    expect(reached('bare_hands', won)).toBe(true);
+    expect(reached('bare_hands', { ...won, weapons: 2 })).toBe(false);
+    expect(reached('no_perks', { ...won, passives: 1 })).toBe(false);
+    expect(reached('no_upgrades', { ...won, upgrades: 3 })).toBe(false);
+    expect(reached('no_upgrades', won)).toBe(true);
+    expect(reached('last_breath', won)).toBe(false);
+    expect(reached('last_breath', { ...won, bossHp: 0.09 })).toBe(true);
+    expect(reached('collector', { seconds: 400, evolutions: 3 })).toBe(true);
+    expect(reached('absolute_zero', { seconds: 60, frozen: 59 })).toBe(false);
+    expect(reached('true_pacifist', { seconds: 180 })).toBe(true);
+  });
+
   it('the autopilot earns only its own', () => {
     expect(reached('tea_time', { seconds: 700, autopilotMs: 600000 })).toBe(true);
     expect(reached('tea_time', { seconds: 700 })).toBe(false);

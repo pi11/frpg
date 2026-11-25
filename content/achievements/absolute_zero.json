@@ -1,0 +1,13 @@
+{
+  "id": "absolute_zero",
+  "name": "Абсолютный ноль",
+  "description": "Заморозить 60 врагов одновременно",
+  "hidden": true,
+  "emeralds": 10,
+  "condition": {
+    "type": "reported",
+    "event": "frozen",
+    "value": 60,
+    "minSeconds": 30
+  }
+}

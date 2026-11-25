@@ -1,6 +1,6 @@
 import * as Phaser from 'phaser';
 import { accountKey, ApiRequestError, authMethods, deleteAccount, loginByKey, saveSession, session } from '../api/auth';
-import { buyUnlock, buyUpgrade, claimAchievement, getProfile, startRun, type Profile } from '../api/game';
+import { buyUnlock, buyUpgrade, claimAchievement, claimDaily, getProfile, startRun, type Profile } from '../api/game';
 import { getCatalog } from '../content/catalog';
 import { orderedLocations } from '../content/locations';
 import { bundledContentHash } from '../content/hash';
@@ -9,6 +9,7 @@ import { heroTraits, statBonus } from '../content/statText';
 import { ATLAS, HUB_MUSIC, TUNES } from '../assets';
 import { upgradeCost } from '../economy';
 import { applyCrt, settings, updateSettings } from '../settings';
+import { fullscreenAvailable, isFullscreen, toggleFullscreen } from '../platform/fullscreen';
 import { shelterState } from '../inputState';
 import { playSfx, playTune } from '../sound';
 import type { RunData } from './RunScene';
@@ -24,7 +25,7 @@ const CATEGORIES: readonly [UpgradeDefinition['category'], string][] = [
 ];
 
 const TABS = [
-  ['run', 'Вылазка'], ['heroes', 'Герои'], ['upgrades', 'Улучшения'], ['weapons', 'Оружие'], ['passives', 'Перки'],
+  ['run', 'Вылазка'], ['daily', 'Задания'], ['heroes', 'Герои'], ['upgrades', 'Улучшения'], ['weapons', 'Оружие'], ['passives', 'Перки'],
   ['emeralds', 'Изумруды'],
   ['achievements', 'Достижения'], ['settings', 'Настройки'],
 ] as const;
@@ -75,10 +76,13 @@ export class HubScene extends Phaser.Scene {
     this.active = true;
     this.profile = null;
     this.busy = false;
+    // Text fields here need every key, also ones a run may have captured before.
+    this.input.keyboard?.clearCaptures();
     this.overlay = document.createElement('main');
     this.overlay.className = 'auth-overlay';
     this.overlay.innerHTML = `
       <section class="auth-card hub-card" aria-labelledby="hub-title">
+        <button id="hub-fullscreen" class="hub-fullscreen" type="button" hidden></button>
         <div class="auth-eyebrow">УБЕЖИЩЕ · ТЕРМИНАЛ</div>
         <h1 id="hub-title">ПУСТОШЬ</h1>
         <p id="hub-status" class="auth-status" role="status">Загружаем профиль…</p>
@@ -102,6 +106,10 @@ export class HubScene extends Phaser.Scene {
             <p id="hub-autopilot-note" class="hub-note"></p>
             <button id="hub-start" class="auth-primary" type="button">Отправиться на вылазку</button>
             <p id="hub-location" class="hub-note"></p>
+          </section>
+          <section id="hub-panel-daily" role="tabpanel" aria-labelledby="hub-tab-daily">
+            <p id="hub-daily-reset" class="hub-help"></p>
+            <ul id="hub-daily" class="hub-goals hub-daily"></ul>
           </section>
           <section id="hub-panel-heroes" role="tabpanel" aria-labelledby="hub-tab-heroes">
             <ul id="hub-heroes" class="hub-heroes"></ul>
@@ -133,7 +141,7 @@ export class HubScene extends Phaser.Scene {
               <label><input type="checkbox" data-setting="crt"> ЭЛТ-эффект</label>
             </fieldset>
             <h2>Управление</h2>
-            <p class="hub-help">Мышь: клик — идти в точку, удержание — идти за курсором.<br>Клавиши: WASD или стрелки.<br>Телефон: джойстик под пальцем.<br>Esc, P или II — пауза, громкость и возврат в убежище. R — перебросить карточки. I — автопилот, если куплен.<br>Наведите мышь на слот в забеге, чтобы увидеть описание.</p>
+            <p class="hub-help">Мышь: клик — идти в точку, удержание — идти за курсором.<br>Клавиши: WASD или стрелки.<br>Телефон: джойстик под пальцем.<br>Esc, P или II — пауза, громкость и возврат в убежище. R — перебросить карточки. F — во весь экран. I — автопилот, если куплен.<br>Наведите мышь на слот в забеге, чтобы увидеть описание.</p>
             <h2>Ключ аккаунта</h2>
             <p class="hub-help">Введите этот ключ на другом устройстве, и игра продолжится с того же места. Храните его как пароль: по нему откроется ваш аккаунт.</p>
             <div class="auth-row"><input id="hub-key" type="text" readonly value="•••••-•••••-•••••-•••••" aria-label="Ключ аккаунта"><button id="hub-key-show" type="button">Показать</button><button id="hub-key-copy" type="button" hidden>Копировать</button></div>
@@ -195,10 +203,23 @@ export class HubScene extends Phaser.Scene {
       shelterState.knocks = door ? shelterState.knocks + 1 : 0;
       if (door) playSfx('sfx/crate_break', 0.6);
     };
+    this.el('hub-daily').onclick = (event) => {
+      const button = (event.target as HTMLElement).closest<HTMLButtonElement>('button[data-daily]');
+      if (button?.dataset.daily) void this.act(() => this.claimQuest(button.dataset.daily!));
+    };
     this.el('hub-achievements').onclick = (event) => {
       const button = (event.target as HTMLElement).closest<HTMLButtonElement>('button[data-claim]');
       if (button?.dataset.claim) void this.act(() => this.claim(button.dataset.claim!));
     };
+    const full = this.el<HTMLButtonElement>('hub-fullscreen');
+    const label = (): void => {
+      full.textContent = isFullscreen() ? 'Окно' : 'Во весь экран';
+    };
+    full.hidden = !fullscreenAvailable();
+    label();
+    full.onclick = () => void toggleFullscreen();
+    document.addEventListener('fullscreenchange', label);
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => document.removeEventListener('fullscreenchange', label));
     const autopilot = this.el<HTMLInputElement>('hub-autopilot');
     autopilot.checked = settings().autopilot;
     autopilot.onchange = () => {
@@ -371,6 +392,7 @@ export class HubScene extends Phaser.Scene {
     this.renderItems(profile);
     this.renderEmeralds(profile);
     this.renderAchievements(profile);
+    this.renderDaily(profile);
     const pilot = catalog.upgrades.autopilot;
     const bought = (profile.upgrades.autopilot ?? 0) > 0;
     this.el<HTMLInputElement>('hub-autopilot').disabled = !bought;
@@ -515,6 +537,39 @@ export class HubScene extends Phaser.Scene {
       <h2>Скрытые: ${found.length} из ${hidden.length}</h2>
       <ul class="hub-goals">${shown.map(row).join('')}${left
         ? `<li><span>??? Ещё не найдено: ${left}</span><span></span></li>` : ''}</ul>`;
+  }
+
+  private renderDaily(profile: Profile): void {
+    const { quests, resets_at: reset } = profile.daily;
+    const ready = quests.filter((quest) => quest.progress >= quest.goal && !quest.claimed).length;
+    this.el('hub-tab-daily').textContent = ready ? `Задания (${ready})` : 'Задания';
+    const hours = Math.max(0, Math.ceil((Date.parse(reset) - Date.now()) / 3600000));
+    this.el('hub-daily-reset').textContent = `Одинаковые для всех игроков. Новые задания через ${hours} ч. Забеги с автопилотом не считаются.`;
+    this.el('hub-daily').innerHTML = quests.map((quest) => {
+      const done = quest.progress >= quest.goal;
+      const shown = quest.metric === 'survive'
+        ? `${formatTime(quest.progress)} / ${formatTime(quest.goal)}` : `${quest.progress} / ${quest.goal}`;
+      const reward = quest.claimed ? 'получено' : done
+        ? `<button type="button" data-daily="${escapeHtml(quest.id)}">Забрать +${quest.emeralds}</button>`
+        : `+${quest.emeralds}`;
+      return `<li class="${quest.claimed ? 'hub-done' : ''}"><span><strong>${escapeHtml(quest.text)}</strong>
+        <span class="hub-bar"><span style="width:${Math.round(100 * Math.min(1, quest.progress / quest.goal))}%"></span></span>
+        <small>${shown}</small></span><span>${reward}</span></li>`;
+    }).join('');
+  }
+
+  private async claimQuest(id: string): Promise<void> {
+    if (!this.profile) return;
+    try {
+      this.render(await claimDaily(id, this.profile.version));
+      playSfx('sfx/emerald');
+      this.status('Награда за задание получена.');
+    } catch (error) {
+      if (error instanceof ApiRequestError && error.status === 409) {
+        this.render(await getProfile());
+      }
+      throw error;
+    }
   }
 
   private async claim(id: string): Promise<void> {

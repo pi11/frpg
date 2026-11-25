@@ -1,0 +1,14 @@
+{
+  "id": "no_upgrades",
+  "name": "С чистого листа",
+  "description": "Победить босса без единого улучшения убежища",
+  "hidden": true,
+  "emeralds": 25,
+  "condition": {
+    "type": "reported",
+    "event": "noUpgrades",
+    "value": 1,
+    "boss": true,
+    "minSeconds": 780
+  }
+}

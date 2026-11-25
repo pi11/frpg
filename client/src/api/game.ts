@@ -11,6 +11,12 @@ export interface Profile {
   achievements: string[];
   /** Earned, but the emeralds are not taken yet. */
   achievements_unclaimed: string[];
+  daily: {
+    date: string;
+    resets_at: string;
+    quests: { id: string; text: string; metric: string; goal: number; emeralds: number;
+      progress: number; claimed: boolean }[];
+  };
   milestones: Record<string, number[]>;
   version: number;
   schema_version: number;
@@ -65,6 +71,12 @@ export function buyUpgrade(id: string, expectedVersion: number): Promise<Profile
 
 export function buyUnlock(id: string, expectedVersion: number): Promise<Profile> {
   return request<Profile>(`/unlocks/${encodeURIComponent(id)}/buy`, {
+    method: 'POST', body: JSON.stringify({ expected_version: expectedVersion }),
+  }, true);
+}
+
+export function claimDaily(id: string, expectedVersion: number): Promise<Profile> {
+  return request<Profile>(`/daily/${encodeURIComponent(id)}/claim`, {
     method: 'POST', body: JSON.stringify({ expected_version: expectedVersion }),
   }, true);
 }

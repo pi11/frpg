@@ -29,6 +29,12 @@ export interface RunRecord {
   landmarks: number;
   broke: boolean;
   bossSpawned: boolean;
+  /** Most perks owned at once, evolutions taken, shelter upgrade levels at the start. */
+  passives: number;
+  evolutions: number;
+  upgrades: number;
+  /** Share of HP left when the boss died. */
+  bossHp: number | null;
   /** Set when the run is over. */
   end: 'death' | 'survived' | 'quit' | null;
 }
@@ -39,6 +45,7 @@ export function newRecord(startHour: number, knocks = 0): RunRecord {
     heroClicks: 0, pauses: 0, hazardMs: 0, startHour, autopilotMs: 0, end: null,
     knocks, lowestHp: Infinity, kills: 0, crates: 0, frozen: 0, flips: 0, autoPicks: 0, idleMs: 0,
     landmarks: 0, broke: false, bossSpawned: false,
+    passives: 0, evolutions: 0, upgrades: 0, bossHp: null,
   };
 }
 
@@ -70,6 +77,12 @@ export function isReached(achievement: AchievementDefinition, record: RunRecord)
     case 'broke': return record.broke;
     case 'bossIgnored':
       return record.end === 'survived' && record.bossSpawned && record.bossSeconds === null;
+    case 'flawless': return record.bossSeconds !== null && !record.damaged;
+    case 'bossOneGun': return record.bossSeconds !== null && record.weapons <= 1;
+    case 'noPerks': return record.bossSeconds !== null && record.passives === 0;
+    case 'noUpgrades': return record.bossSeconds !== null && record.upgrades === 0;
+    case 'bossLowHp': return record.bossHp !== null && record.bossHp * 100 < value;
+    case 'evolutions': return record.evolutions >= value;
     case 'evolved': return record.evolved;
     case 'bossFast': return record.bossSeconds !== null && record.bossSeconds < value;
     case 'heroClicks': return record.heroClicks >= value;

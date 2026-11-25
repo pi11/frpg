@@ -1,0 +1,14 @@
+{
+  "id": "bare_hands",
+  "name": "Голыми руками",
+  "description": "Победить босса, имея за весь забег одно оружие",
+  "hidden": true,
+  "emeralds": 25,
+  "condition": {
+    "type": "reported",
+    "event": "bossOneGun",
+    "value": 1,
+    "boss": true,
+    "minSeconds": 780
+  }
+}

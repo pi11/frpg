@@ -1,0 +1,17 @@
+{
+  "id": "kill_roaches",
+  "text": "Раздавить {goal} ржавых тараканов",
+  "metric": "enemyKills",
+  "goals": [
+    100,
+    200,
+    350
+  ],
+  "emeralds": [
+    2,
+    3,
+    4
+  ],
+  "weight": 2,
+  "enemy": "roach"
+}

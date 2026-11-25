@@ -1,0 +1,12 @@
+{
+  "id": "boss",
+  "text": "Победить босса",
+  "metric": "boss",
+  "goals": [
+    1
+  ],
+  "emeralds": [
+    6
+  ],
+  "weight": 1
+}

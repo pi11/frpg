@@ -105,6 +105,16 @@ describe('shared content catalog', () => {
     expect(() => validateContent({ ...rawFiles, [path]: raw })).toThrow('unknown unlock location');
   });
 
+  it('rejects broken daily quest templates', () => {
+    const path = Object.keys(rawFiles).find((key) => key.endsWith('daily/kill_ghouls.json'))!;
+    const raw = structuredClone(rawFiles[path] as { enemy: string; emeralds: number[] });
+    raw.enemy = 'brute';
+    expect(() => validateContent({ ...rawFiles, [path]: raw })).toThrow('unknown ordinary enemy');
+    raw.enemy = 'ghoul';
+    raw.emeralds.pop();
+    expect(() => validateContent({ ...rawFiles, [path]: raw })).toThrow('same length');
+  });
+
   it('rejects a boss phase with an unknown AI', () => {
     const bossPath = Object.keys(rawFiles).find((path) => path.endsWith('junk_king.json'));
     const boss = structuredClone(rawFiles[bossPath!] as { ai: { params: { phases: { ai: { type: string } }[] } } });

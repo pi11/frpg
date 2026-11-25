@@ -1,0 +1,17 @@
+{
+  "id": "kill_ghouls",
+  "text": "Убить {goal} пепельных бродяг",
+  "metric": "enemyKills",
+  "goals": [
+    150,
+    300,
+    500
+  ],
+  "emeralds": [
+    2,
+    3,
+    4
+  ],
+  "weight": 2,
+  "enemy": "ghoul"
+}
