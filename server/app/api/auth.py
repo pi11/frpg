@@ -73,6 +73,13 @@ class KeyResponse(BaseModel):
     key: str
 
 
+class MethodsResponse(BaseModel):
+    """Optional ways to sign in; guests and account keys always work."""
+
+    email: bool
+    telegram: bool
+
+
 class OkResponse(BaseModel):
     status: str = "ok"
 
@@ -113,6 +120,12 @@ async def resolve_identity(
     return user
 
 
+@router.get("/methods", response_model=MethodsResponse)
+async def methods() -> MethodsResponse:
+    settings = get_settings()
+    return MethodsResponse(email=settings.mail_enabled, telegram=settings.telegram_enabled)
+
+
 @router.post("/guest", response_model=TokenPair)
 async def guest(
     request: Request, session: SessionDep,
@@ -131,6 +144,8 @@ async def email_start(
     user: OptionalUserDep,
     session: SessionDep,
 ) -> OkResponse:
+    if not get_settings().mail_enabled:
+        raise ApiError(503, ErrorCode.not_configured, "Вход по почте не настроен")
     email = str(body.email).lower()
     ip = request.client.host if request.client else "unknown"
     now = utcnow()

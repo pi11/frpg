@@ -50,7 +50,7 @@ async def telegram_start(
     session: SessionDep,
 ) -> TelegramStartResponse:
     username = get_settings().telegram_bot_username.removeprefix("@")
-    if not username:
+    if not get_settings().telegram_enabled:
         raise ApiError(503, ErrorCode.not_configured, "Telegram-бот не настроен")
     ip = request.client.host if request.client else "unknown"
     count = await session.scalar(

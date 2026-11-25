@@ -1,5 +1,5 @@
 import * as Phaser from 'phaser';
-import { accountKey, ApiRequestError, deleteAccount, loginByKey, saveSession, session } from '../api/auth';
+import { accountKey, ApiRequestError, authMethods, deleteAccount, loginByKey, saveSession, session } from '../api/auth';
 import { buyUnlock, buyUpgrade, claimAchievement, getProfile, startRun, type Profile } from '../api/game';
 import { getCatalog } from '../content/catalog';
 import { orderedLocations } from '../content/locations';
@@ -144,7 +144,7 @@ export class HubScene extends Phaser.Scene {
             </form>
             <h2>Аккаунт</h2>
             <div class="hub-account">
-              <button id="hub-link" class="auth-secondary" type="button"></button>
+              <button id="hub-link" class="auth-secondary" type="button" hidden></button>
               <button id="hub-delete" class="auth-back hub-danger" type="button">Удалить аккаунт и данные</button>
             </div>
           </section>
@@ -285,6 +285,9 @@ export class HubScene extends Phaser.Scene {
       if (this.tab === 'run' && this.profile) void this.act(() => this.beginRun());
     });
     void this.loadProfile();
+    void authMethods().then(({ email, telegram }) => {
+      if (this.active) this.el('hub-link').hidden = !email && !telegram;
+    });
   }
 
   private el<T extends HTMLElement = HTMLElement>(id: string): T {

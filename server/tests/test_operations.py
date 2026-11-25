@@ -5,7 +5,7 @@ from uuid import UUID
 
 import httpx
 import pytest
-from app.config import Settings
+from app.config import Settings, get_settings
 from app.models.auth import LoginToken, Profile, RefreshToken, TelegramLoginRequest, User
 from app.services.check_config import production_problems
 from app.services.cleanup import cleanup
@@ -105,10 +105,38 @@ def test_production_settings_are_accepted() -> None:
     {"mail_backend": "console"},
     {"resend_api_key": ""},
     {"telegram_webhook_secret": ""},
+    {"telegram_bot_token": ""},
     {"cors_origins": ["*"]},
 ])
 def test_unsafe_production_settings_are_rejected(changes: dict[str, object]) -> None:
     assert len(production_problems(production_settings(**changes))) == 1
+
+
+def test_mail_and_telegram_are_optional() -> None:
+    off = production_settings(
+        mail_backend="disabled", resend_api_key="", mail_from="", telegram_bot_token="",
+        telegram_bot_username="", telegram_webhook_secret="",
+    )
+    assert production_problems(off) == []
+    assert not off.mail_enabled and not off.telegram_enabled
+    assert production_settings().mail_enabled and production_settings().telegram_enabled
+
+
+@pytest.mark.anyio
+async def test_disabled_sign_in_methods(
+    api: dict[str, object], monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    client: httpx.AsyncClient = api["client"]  # type: ignore[assignment]
+    assert (await client.get("/api/v1/auth/methods")).json() == {"email": True, "telegram": True}
+    monkeypatch.setenv("MAIL_BACKEND", "disabled")
+    monkeypatch.setenv("TELEGRAM_BOT_TOKEN", "")
+    get_settings.cache_clear()
+    assert (await client.get("/api/v1/auth/methods")).json() == {"email": False, "telegram": False}
+    mail = await client.post("/api/v1/auth/email/start", json={"email": "a@example.com"})
+    telegram = await client.post("/api/v1/auth/telegram/start")
+    assert mail.status_code == telegram.status_code == 503
+    assert mail.json()["code"] == telegram.json()["code"] == "not_configured"
+    assert (await client.post("/api/v1/auth/guest")).status_code == 200
 
 
 class FakeBot:

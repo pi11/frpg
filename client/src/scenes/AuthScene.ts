@@ -1,7 +1,7 @@
 import * as Phaser from 'phaser';
 import QRCode from 'qrcode';
 import {
-  createGuest, isTransientError, loginByKey, pollTelegram, restoreSession, saveSession, session,
+  authMethods, createGuest, isTransientError, loginByKey, pollTelegram, restoreSession, saveSession, session,
   startEmail, startTelegram, verifyEmail,
   webPage, type TelegramStart, type TokenPair,
 } from '../api/auth';
@@ -42,7 +42,7 @@ export class AuthScene extends Phaser.Scene {
             <div class="auth-row"><input id="auth-key" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="40" required placeholder="XXXXX-XXXXX-XXXXX-XXXXX"><button type="submit">Войти</button></div>
             <small class="auth-hint">Ключ показан в настройках убежища на вашем устройстве.</small>
           </form>
-          <details id="auth-more" class="auth-more"><summary>Другие способы: почта, Telegram</summary>
+          <details id="auth-more" class="auth-more"><summary>Другие способы входа</summary>
           <p id="auth-link-warning" class="auth-warning" hidden>Если этот адрес или Telegram уже принадлежит другому аккаунту, откроется он. Прогресс текущего гостя не перенесётся.</p>
           <form id="auth-email-form" class="auth-form">
             <label for="auth-email">Вход по почте</label>
@@ -165,8 +165,12 @@ export class AuthScene extends Phaser.Scene {
         this.status(this.message(error), true);
       }
     }
+    const methods = await authMethods();
     if (!this.active) return;
     this.showMethods();
+    this.el('auth-email-form').hidden = !methods.email;
+    this.el('auth-telegram').hidden = !methods.telegram;
+    this.el('auth-more').hidden = !methods.email && !methods.telegram;
     if (!magicToken && !session()) this.status('Начните новую игру или введите ключ.');
     if (this.linking) this.status('Выберите способ привязки.');
   }

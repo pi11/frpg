@@ -25,6 +25,15 @@ class Settings(BaseSettings):
     android_package: str = ""
     android_cert_fingerprints: list[str] = []
 
+    @property
+    def mail_enabled(self) -> bool:
+        return self.mail_backend == "console" or bool(
+            self.mail_backend == "resend" and self.resend_api_key and self.mail_from)
+
+    @property
+    def telegram_enabled(self) -> bool:
+        return bool(self.telegram_bot_token and self.telegram_bot_username)
+
 
 @lru_cache
 def get_settings() -> Settings:

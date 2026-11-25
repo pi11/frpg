@@ -149,6 +149,17 @@ export async function createGuest(): Promise<TokenPair> {
   return request<TokenPair>('/auth/guest', { method: 'POST' });
 }
 
+export interface AuthMethods { email: boolean; telegram: boolean }
+
+/** Optional ways to sign in that the server has set up; none if it cannot be asked. */
+export async function authMethods(): Promise<AuthMethods> {
+  try {
+    return await request<AuthMethods>('/auth/methods');
+  } catch {
+    return { email: false, telegram: false };
+  }
+}
+
 export async function startEmail(email: string): Promise<void> {
   await request('/auth/email/start', {
     method: 'POST', body: JSON.stringify({ email }),

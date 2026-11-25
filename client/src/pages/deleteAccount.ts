@@ -1,6 +1,6 @@
 import './page';
 import {
-  deleteAccount, forgetStoredSession, initSession, isTransientError, pollTelegram, saveSession,
+  authMethods, deleteAccount, forgetStoredSession, initSession, isTransientError, pollTelegram, saveSession,
   session, startEmail, startTelegram, verifyEmail, type TelegramStart, type TokenPair,
 } from '../api/auth';
 import { browserTokenStore } from '../platform/tokenStore';
@@ -119,3 +119,9 @@ el('delete-confirm').onclick = () => void act(async () => {
 
 await initSession(browserTokenStore);
 el('delete-current').hidden = !session();
+const methods = await authMethods();
+el('delete-email-form').hidden = !methods.email;
+el('delete-telegram').hidden = !methods.telegram;
+if (!methods.email && !methods.telegram && !session()) {
+  status('Откройте игру в этом браузере, войдите по ключу и вернитесь на эту страницу.');
+}
