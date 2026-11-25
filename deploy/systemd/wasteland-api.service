@@ -6,11 +6,12 @@ Wants=network-online.target
 [Service]
 User=wasteland
 Group=wasteland
-WorkingDirectory=/srv/wasteland/app/server
+WorkingDirectory=/var/www/webii/wasteland.lol/frpg/server
+Environment=API_PORT=8010
 EnvironmentFile=/etc/wasteland/wasteland.env
 Environment=PYTHONDONTWRITEBYTECODE=1
-ExecStartPre=/srv/wasteland/app/server/.venv/bin/python -m app.services.check_config
-ExecStart=/srv/wasteland/app/server/.venv/bin/uvicorn app.main:app --host 127.0.0.1 --port 8010 --workers 2 --proxy-headers --forwarded-allow-ips 127.0.0.1 --no-access-log
+ExecStartPre=/var/www/webii/wasteland.lol/frpg/server/.venv/bin/python -m app.services.check_config
+ExecStart=/var/www/webii/wasteland.lol/frpg/server/.venv/bin/uvicorn app.main:app --host 127.0.0.1 --port ${API_PORT} --workers 2 --proxy-headers --forwarded-allow-ips 127.0.0.1 --no-access-log
 Restart=on-failure
 RestartSec=3
 NoNewPrivileges=yes

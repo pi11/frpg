@@ -6,10 +6,10 @@ After=postgresql.service pgbouncer.service
 Type=oneshot
 User=wasteland
 Group=wasteland
-WorkingDirectory=/srv/wasteland/app/server
+WorkingDirectory=/var/www/webii/wasteland.lol/frpg/server
 EnvironmentFile=/etc/wasteland/wasteland.env
 Environment=PYTHONDONTWRITEBYTECODE=1
-ExecStart=/srv/wasteland/app/server/.venv/bin/python -m app.services.cleanup
+ExecStart=/var/www/webii/wasteland.lol/frpg/server/.venv/bin/python -m app.services.cleanup
 NoNewPrivileges=yes
 ProtectSystem=strict
 ProtectHome=yes

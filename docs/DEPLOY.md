@@ -1,47 +1,92 @@
 # Развёртывание
 
-Один сервер (Ubuntu 24.04+ / Debian 13), без Docker: nginx → uvicorn (`127.0.0.1:8010`) → PgBouncer → PostgreSQL 16+. Конфиги лежат в `deploy/`. Везде замените `game.example.com` на свой домен. Команды — от root, из `/srv/wasteland/app`.
+Один сервер (Ubuntu 24.04+ / Debian 13), без Docker: nginx → uvicorn (`127.0.0.1:8010`) → PostgreSQL 16+ (через PgBouncer, если он есть). На сервере могут жить и другие сайты. Конфиги лежат в `deploy/`. Команды — от root, из каталога репозитория.
+
+| Что | Где |
+| --- | --- |
+| Код (git clone) | `/var/www/webii/wasteland.lol/frpg` |
+| Готовый сайт, корень nginx | `/var/www/webii/wasteland.lol/web` |
+| Своя Node.js и Python | `…/wasteland.lol/node`, `…/wasteland.lol/python` |
+| Секреты | `/etc/wasteland/` |
+| Бэкапы | `/var/lib/wasteland-backups/` |
+
+Домен в файлах — `wasteland.lol`. Если домен или путь другие, замените их в `deploy/nginx/*.conf`, `deploy/systemd/*.service` и `wasteland.env`; `deploy.sh` сам находит путь по своему расположению.
 
 ## 1. Что нужно заранее
 
-- Сервер: от 1 ГБ памяти (на 1 ГБ добавьте 1–2 ГБ swap, иначе сборка клиента может не пройти), 5 ГБ диска, открыты порты 22, 80, 443.
+- Сервер: от 1 ГБ свободной памяти на сборку (на 1 ГБ добавьте 1–2 ГБ swap, иначе сборка клиента может не пройти), 5 ГБ диска, открыты порты 80 и 443.
 - Домен с записями A/AAAA на сервер (AAAA — только если IPv6 работает, иначе сертификат не выдадут), второй хост для бэкапов с `rsync` и доступом по SSH-ключу.
 - Необязательно: аккаунт Resend и бот от @BotFather (отдельный от тестового). Основной вход — по ключу аккаунта; почту и Telegram можно включить позже.
 - Код отправлен в `origin/master` (`git push`) и CI зелёный: сервер берёт код оттуда, а не с вашего компьютера.
 - Почта и имя владельца игры: они публикуются в `/privacy` и `/delete-account`. До запуска покажите политику юристу (152-ФЗ, передача адресов в Resend — США).
 
-## 2. Пакеты, пользователь, код
+## 1а. На сервере уже есть другие сайты
+
+Ничего общего не перезаписываем: свои файлы с префиксом `wasteland`, свой порт, своя база. Сначала посмотрите, что занято:
 
 ```bash
-apt install nginx postgresql pgbouncer certbot git curl rsync sudo
-# Node.js 22.13+ (или 24+) — из NodeSource или другого доверенного источника, проверьте: node --version
-# uv — в /usr/local/bin/uv (скачайте архив с github.com/astral-sh/uv/releases и сверьте sha256)
-useradd --system --create-home --home-dir /srv/wasteland --shell /usr/sbin/nologin wasteland
-chmod 755 /srv/wasteland
-sudo -u wasteland -H git clone <адрес репозитория> /srv/wasteland/app
-install -d -o wasteland -g wasteland /srv/wasteland/web
-sudo -u wasteland -H /usr/local/bin/uv python install 3.12
-cd /srv/wasteland/app
+ss -ltnp | grep -E ':(80|443|8010|5432|6432)\b'    # 80/443 должен держать nginx, 8010 — быть свободен
+nginx -v; nginx -t; nginx -T 2>/dev/null | grep -E 'listen|include .*(sites-enabled|conf.d)|default_server'
+id wasteland; ls /etc/nginx/snippets /etc/nginx/conf.d 2>/dev/null
+pg_lsclusters; sudo -u postgres psql -l | grep wasteland
+node --version; ufw status
+cp -a /etc/nginx /root/nginx-backup-$(date +%F)
 ```
 
-Адрес репозитория — по HTTPS (`https://github.com/pi11/frpg.git`): ключ не нужен, пока репозиторий публичный. Если закроете его, создайте пользователю `wasteland` ключ (`sudo -u wasteland -H ssh-keygen -t ed25519`) и добавьте как Deploy key только на чтение.
+- **80/443 занят не nginx** (Apache, Caddy, Docker, панель) — не продолжайте: добавьте домен в ту систему, проксируя `/api/` и `/.well-known/assetlinks.json` на `127.0.0.1:8010`, остальное — файлы из каталога `web` (заголовки и правила — в `deploy/nginx/`).
+- **Порт 8010 занят** — выберите другой и поставьте его в `API_PORT` и в `wasteland-proxy.conf`.
+- **Другие сайты слушают конкретный IP** (`listen 1.2.3.4:443`) — впишите тот же адрес в `listen` наших файлов, иначе запросы до игры не дойдут.
+- **`nginx -t` уже ругается** до наших правок — сначала почините это.
+- **Нет `sites-enabled` или `snippets`** в конфиге — положите наши два сайта в `conf.d/`, а каталог `snippets` создайте: `include snippets/…` ищется в `/etc/nginx/`.
 
-Файрвол: `ufw allow OpenSSH && ufw allow 80,443/tcp && ufw enable` (сначала SSH, иначе потеряете доступ).
+## 2. Пакеты, пользователь, код
 
-## 3. База и PgBouncer
+Ставьте только то, чего нет; имеющиеся nginx, PostgreSQL, PgBouncer и Node не обновляйте.
+
+```bash
+apt-get install --no-upgrade nginx postgresql certbot git curl rsync sudo xz-utils
+# uv — в /usr/local/bin/uv (скачайте архив с github.com/astral-sh/uv/releases и сверьте sha256)
+BASE=/var/www/webii/wasteland.lol
+OWNER=$(stat -c %U $BASE/frpg); sudo -u $OWNER git -C $BASE/frpg remote -v; sudo -u $OWNER git -C $BASE/frpg status -sb   # git clone, без своих правок
+stat -c '%U %a %n' /var/www/webii $BASE $BASE/frpg               # владелец не root, есть вход (x)
+# Отдельный пользователь службы: читает код, но не меняет его
+useradd --system --create-home --home-dir /srv/wasteland --shell /usr/sbin/nologin wasteland
+for u in wasteland www-data; do sudo -u $u test -x $BASE && echo "$u: ok" || echo "$u: НЕТ ДОСТУПА"; done
+# Своя Node.js 22.13+ (или 24+), чтобы не трогать системную: архив linux-x64 с nodejs.org/dist, сверьте sha256
+install -d $BASE/node && tar -xJf node-v*-linux-x64.tar.xz -C $BASE/node --strip-components=1
+$BASE/node/bin/node --version
+cd $BASE/frpg
+```
+
+Если доступа нет, дайте только проход, не открывая содержимое: `apt-get install --no-upgrade acl; setfacl -m u:wasteland:x,u:www-data:x /var/www/webii $BASE`. Если репозиторий принадлежит root, отдайте его обычному пользователю сайта: `chown -R webii: $BASE` (имя проверьте). Код, Node и Python ставит владелец репозитория, сервис работает от `wasteland`.
+
+**Корень сайта — только `web`.** Если для домена уже есть сайт nginx с корнем `/var/www/webii/wasteland.lol`, отключите его: иначе наружу попадут исходники и `frpg/.git`.
+
+`deploy.sh` берёт Node из `node/bin` рядом с репозиторием, а если её нет — системную. Репозиторий публичный, ключ не нужен; если закроете его, создайте владельцу репозитория ключ (`ssh-keygen -t ed25519`) и добавьте как Deploy key только на чтение.
+
+Файрвол: если `ufw` уже включён, проверьте, что 80 и 443 открыты. Не включайте его впервые ради игры: можно закрыть порты других сервисов.
+
+## 3. База
 
 ```bash
 sudo -u postgres createuser --pwprompt wasteland      # пароль: openssl rand -hex 24
 sudo -u postgres createdb --owner=wasteland wasteland
-cp deploy/pgbouncer/pgbouncer.ini /etc/pgbouncer/pgbouncer.ini
-# Проверочная строка SCRAM подходит, если она одинакова в PostgreSQL и userlist.txt:
-sudo -u postgres psql -Atc "select format('\"%s\" \"%s\"', usename, passwd) from pg_shadow where usename='wasteland'" > /etc/pgbouncer/userlist.txt
-chown postgres:postgres /etc/pgbouncer/userlist.txt && chmod 600 /etc/pgbouncer/userlist.txt
-systemctl restart pgbouncer
-psql 'postgresql://wasteland:ПАРОЛЬ@127.0.0.1:6432/wasteland' -c 'select 1'   # проверка пути через PgBouncer
+psql 'postgresql://wasteland:ПАРОЛЬ@127.0.0.1:5432/wasteland' -c 'select 1'
 ```
 
-PgBouncer и PostgreSQL должны слушать только localhost. Пул соединений — transaction; миграции и `pg_dump` ходят напрямую в PostgreSQL (5432). Если на сервере уже есть PgBouncer, не заменяйте его файл, а добавьте базу в `[databases]` и строку в `userlist.txt`.
+Порт возьмите из `pg_lsclusters`, нужна версия 16+. PostgreSQL должен слушать только localhost. Если кластеров несколько, добавьте к командам `-p ПОРТ`.
+
+**PgBouncer необязателен.** Если его нет, не ставьте: в `DATABASE_URL` укажите порт PostgreSQL (5432). Если он уже работает, не заменяйте `pgbouncer.ini` и не перезапускайте службу, а добавьте своё и перечитайте настройки:
+
+```bash
+# в /etc/pgbouncer/pgbouncer.ini, раздел [databases]:
+#   wasteland = host=127.0.0.1 port=5432 dbname=wasteland pool_mode=transaction
+sudo -u postgres psql -Atc "select format('\"%s\" \"%s\"', usename, passwd) from pg_shadow where usename='wasteland'" >> /etc/pgbouncer/userlist.txt
+systemctl reload pgbouncer
+psql 'postgresql://wasteland:ПАРОЛЬ@127.0.0.1:6432/wasteland' -c 'select 1'
+```
+
+Для этого у него должно быть `auth_type = scram-sha-256` и `auth_file`; если настроено иначе, идите напрямую в PostgreSQL. `deploy/pgbouncer/pgbouncer.ini` — пример только для сервера без PgBouncer. Миграции и `pg_dump` всегда ходят напрямую.
 
 ## 4. Секреты
 
@@ -60,27 +105,40 @@ install -m 600 deploy/backup.env.example /etc/wasteland/backup.env
 
 ## 5. nginx и TLS
 
+Если nginx ещё нет ни одного чужого сайта, шаги те же. После каждого шага — `nginx -t`; перезагрузка идёт через `reload`, он не рвёт соединения других сайтов.
+
 ```bash
-install -d /var/www/letsencrypt
-cp deploy/nginx/wasteland-limits.conf /etc/nginx/conf.d/
-cp deploy/nginx/wasteland-{headers,proxy}.conf /etc/nginx/snippets/
+DOMAIN=wasteland.lol
+install -d /var/www/letsencrypt /etc/nginx/snippets
+install -d -o www-data -g adm -m 750 /var/log/nginx/wasteland
+install -m 644 deploy/logrotate/wasteland /etc/logrotate.d/wasteland-nginx
+cp -n deploy/nginx/wasteland-limits.conf /etc/nginx/conf.d/
+cp -n deploy/nginx/wasteland-{headers,proxy}.conf /etc/nginx/snippets/
 for f in wasteland-http wasteland; do
-  sed 's/game.example.com/ВАШ_ДОМЕН/g' deploy/nginx/$f.conf > /etc/nginx/sites-available/$f.conf
+  cp -n deploy/nginx/$f.conf /etc/nginx/sites-available/
 done
 ln -s ../sites-available/wasteland-http.conf /etc/nginx/sites-enabled/
 nginx -t && systemctl reload nginx
-certbot certonly --webroot -w /var/www/letsencrypt -d ВАШ_ДОМЕН --deploy-hook 'systemctl reload nginx'
+certbot certonly --webroot -w /var/www/letsencrypt -d $DOMAIN --deploy-hook 'nginx -t && systemctl reload nginx'
 ln -s ../sites-available/wasteland.conf /etc/nginx/sites-enabled/
 nginx -t && systemctl reload nginx
-certbot renew --dry-run
+certbot renew --dry-run --cert-name $DOMAIN
 ```
 
-Адрес клиента берётся из `X-Forwarded-For`, который nginx перезаписывает. Если перед сервером появится CDN, настройте `real_ip`, иначе лимиты будут общими на всех. Журнал nginx не содержит query-строк и Referer (в ссылке входа — одноразовый токен); срок его хранения — 14 дней (`rotate 14` в `/etc/logrotate.d/nginx`), как обещано в политике.
+`certonly --webroot` не правит конфиги nginx (не запускайте `certbot --nginx`). После включения откройте остальные сайты и убедитесь, что они работают.
+
+Проверка, что исходники не видны: `curl -sI https://$DOMAIN/.git/config` и `/frpg/.git/config` отдают страницу игры (`text/html`), а не файл.
+
+**Откат:** `rm /etc/nginx/sites-enabled/wasteland{,-http}.conf /etc/nginx/conf.d/wasteland-limits.conf && nginx -t && systemctl reload nginx`.
+
+Что общего с другими сайтами: в `conf.d` объявлены только зоны `wl_*` и формат журнала `wasteland`, сами лимиты, заголовки (HSTS, CSP), gzip и журналы заданы внутри нашего `server`. `default_server` и `http2` в `listen` не используются. HSTS без `includeSubDomains`.
+
+Адрес клиента берётся из `X-Forwarded-For`, который nginx перезаписывает. Если перед сервером CDN, настройте `real_ip`, иначе лимиты будут общими на всех. Журнал игры не содержит query-строк и Referer, лежит в `/var/log/nginx/wasteland/` и хранится 14 дней, как обещано в политике.
 
 ## 6. Сервисы и первая выкладка
 
 ```bash
-cp deploy/systemd/* /etc/systemd/system/ && systemctl daemon-reload
+cp deploy/systemd/wasteland-* /etc/systemd/system/ && systemctl daemon-reload
 systemctl enable wasteland-api
 deploy/deploy.sh            # далее — так же для обновлений; можно указать тег или коммит
 systemctl enable --now wasteland-cleanup.timer wasteland-backup.timer
@@ -93,7 +151,7 @@ systemctl enable --now wasteland-cleanup.timer wasteland-backup.timer
 ## 7. Почта и Telegram (если включаете)
 
 - **Resend:** добавьте домен-отправитель и внесите в DNS показанные там записи SPF и DKIM, затем DMARC: `_dmarc TXT "v=DMARC1; p=none; rua=mailto:ВАША_ПОЧТА"`; после проверки отчётов — `p=quarantine`. `MAIL_FROM` должен быть на этом домене.
-- **Бот:** `systemd-run --wait --pipe --collect --uid=wasteland -p EnvironmentFile=/etc/wasteland/wasteland.env -p WorkingDirectory=/srv/wasteland/app/server /srv/wasteland/app/server/.venv/bin/python -m app.services.telegram_webhook set`. С аргументом `info` — состояние и последняя ошибка. `make bot-poll` с боевым токеном не запускать: он удалит вебхук.
+- **Бот:** `systemd-run --wait --pipe --collect --uid=wasteland -p EnvironmentFile=/etc/wasteland/wasteland.env -p WorkingDirectory=/var/www/webii/wasteland.lol/frpg/server /var/www/webii/wasteland.lol/frpg/server/.venv/bin/python -m app.services.telegram_webhook set`. С аргументом `info` — состояние и последняя ошибка. `make bot-poll` с боевым токеном не запускать: он удалит вебхук.
 
 ## 8. Бэкапы и восстановление
 
@@ -119,7 +177,8 @@ sudo -u postgres dropdb wasteland_restore
 7. Ключ: «Настройки» → «Показать», войдите по нему в другом браузере — тот же баланс; неверный ключ даёт ошибку. Кнопка «Копировать» работает только по HTTPS.
 8. После забега с убийством 100 врагов на вкладке «Достижения» есть «Забрать»; изумруды прибавились. Закрытый герой выбрать нельзя.
 9. С телефона: вертикально и после поворота игра занимает экран, звук и мелодии играют, в консоли браузера нет ошибок CSP (предупреждение Zod про `new Function` допустимо).
-10. Перезагрузите сервер: игра поднялась сама.
+10. Автозапуск: `systemctl is-enabled wasteland-api wasteland-cleanup.timer wasteland-backup.timer` → `enabled`. Перезагружать сервер с другими сайтами не нужно.
+11. Другие сайты на сервере открываются, `nginx -t` без новых предупреждений.
 
 Прогресс с домашнего компьютера на сервер не переносится: база там новая.
 
