@@ -1,0 +1,16 @@
+{
+  "id": "toxic_marsh_x200",
+  "name": "Мелиорация на перемотке",
+  "description": "Победить Мать топей на скорости ×2",
+  "hidden": false,
+  "emeralds": 16,
+  "condition": {
+    "type": "victory",
+    "speed": 200,
+    "locations": [
+      "toxic_marsh"
+    ],
+    "heroes": [],
+    "every": false
+  }
+}

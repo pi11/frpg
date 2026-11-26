@@ -7,7 +7,8 @@ import { HealerEnemyBehavior } from './enemies/Healer';
 import { RangedEnemyBehavior } from './enemies/Ranged';
 import { WeaverEnemyBehavior } from './enemies/Weaver';
 import {
-  BlastEffect, BuffEffect, CapsEffect, ChestEffect, FreezeEffect, HealEffect, MagnetEffect, XpEffect,
+  BlastEffect, BuffEffect, CapsEffect, ChestEffect, BulletShieldEffect,
+  FreezeEffect, HealEffect, MagnetEffect, XpEffect,
 } from './pickups/effects';
 import type { EnemyBehavior, PickupEffect, WeaponBehavior } from './types';
 import { AuraWeaponBehavior } from './weapons/Aura';
@@ -58,4 +59,5 @@ export const pickupEffects: Record<string, PickupEffect<unknown> | undefined> = 
   buff: new BuffEffect() as PickupEffect<unknown>,
   xp: new XpEffect() as PickupEffect<unknown>,
   freeze: new FreezeEffect() as PickupEffect<unknown>,
+  bullet_shield: new BulletShieldEffect() as PickupEffect<unknown>,
 };

@@ -90,3 +90,11 @@ describe('achievements noticed by the client', () => {
     expect(reached('first_hundred', { seconds: 900 })).toBe(false);
   });
 });
+
+describe('speed achievements', () => {
+  it('need the game speed', () => {
+    const win = { seconds: 650, bossSeconds: 40, end: 'survived' as const };
+    expect(reached('boss_blitz_x200', { ...win, speed: 150 })).toBe(false);
+    expect(reached('boss_blitz_x200', { ...win, speed: 200 })).toBe(true);
+  });
+});

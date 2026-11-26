@@ -9,8 +9,11 @@ from app.services.economy import (
     accepted_elites,
     emerald_reward,
     new_milestones,
+    record_win,
     run_reward,
+    speed_win_emeralds,
     unlocked_heroes,
+    unlocked_speeds,
     upgrade_cost,
 )
 
@@ -87,3 +90,19 @@ def test_heroes_open_by_their_conditions() -> None:
     assert "marksman" not in unlocked_heroes(heroes, {"milestones": {"dead_city": [370]}})
     assert "chemist" in unlocked_heroes(heroes, {"achievements": list("abcdefgh")})
     assert "chemist" not in unlocked_heroes(heroes, {"achievements": list("abcdefg")})
+
+
+def test_speeds_open_after_wins_and_pay_once() -> None:
+    speeds = get_content().balance["speeds"]
+    assert unlocked_speeds(speeds, {}, "dead_city") == [100]
+    assert unlocked_speeds(speeds, {"bosses_killed": ["dead_city"]}, "dead_city") == [100, 150]
+    data = record_win({}, "dead_city", "spark", 150)
+    assert unlocked_speeds(speeds, data, "dead_city") == [100, 150, 200]
+    assert unlocked_speeds(speeds, data, "toxic_marsh") == [100]
+    assert record_win(data, "dead_city", "spark", 100)["wins"] == {"dead_city": {"spark": 150}}
+    bonus = {item["percent"]: item["firstWinEmeralds"] for item in speeds}
+    assert speed_win_emeralds(speeds, {}, "dead_city", 100) == 0
+    assert speed_win_emeralds(speeds, {"bosses_killed": ["dead_city"]}, "dead_city", 150) == (
+        bonus[150])
+    assert speed_win_emeralds(speeds, data, "dead_city", 150) == 0
+    assert speed_win_emeralds(speeds, data, "dead_city", 200) == bonus[200]

@@ -1,0 +1,16 @@
+{
+  "id": "hero_spark_x200",
+  "name": "Короткое замыкание",
+  "description": "Победить любого босса на скорости ×2 за Искру",
+  "hidden": false,
+  "emeralds": 8,
+  "condition": {
+    "type": "victory",
+    "speed": 200,
+    "locations": [],
+    "heroes": [
+      "spark"
+    ],
+    "every": false
+  }
+}

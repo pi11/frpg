@@ -216,3 +216,6 @@ body.crt::after {
   .hub-card { padding: 14px; }
   .hub-hero-stage { width: 72px; height: 84px; background-size: 72px 84px, auto; }
 }
+.hub-speeds { flex-wrap: nowrap; align-items: center; margin: 0 0 4px; }
+.hub-speeds-title { flex: none; margin-right: 6px; color: var(--term-dim); }
+.hub-speeds button { flex: 1 1 0; }

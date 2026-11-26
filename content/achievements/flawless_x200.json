@@ -1,0 +1,15 @@
+{
+  "id": "flawless_x200",
+  "name": "Ни царапины на перемотке",
+  "description": "Победить босса на скорости ×2, ни разу не получив урона",
+  "hidden": true,
+  "emeralds": 30,
+  "condition": {
+    "type": "reported",
+    "event": "flawless",
+    "value": 1,
+    "boss": true,
+    "minSeconds": 600,
+    "minSpeed": 200
+  }
+}

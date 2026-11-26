@@ -1,0 +1,16 @@
+{
+  "id": "hero_bruiser_x200",
+  "name": "Кувалда без тормозов",
+  "description": "Победить любого босса на скорости ×2 за Молота",
+  "hidden": false,
+  "emeralds": 8,
+  "condition": {
+    "type": "victory",
+    "speed": 200,
+    "locations": [],
+    "heroes": [
+      "bruiser"
+    ],
+    "every": false
+  }
+}

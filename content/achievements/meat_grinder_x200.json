@@ -1,0 +1,13 @@
+{
+  "id": "meat_grinder_x200",
+  "name": "Скоростная мясорубка",
+  "description": "Убить 3000 врагов за забег на скорости ×2",
+  "hidden": false,
+  "emeralds": 10,
+  "condition": {
+    "type": "metric",
+    "metric": "kills",
+    "value": 3000,
+    "minSpeed": 200
+  }
+}

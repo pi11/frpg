@@ -106,3 +106,21 @@ async def test_run_finish_grants_achievements(api: dict[str, object]) -> None:
     assert (await claim("tickle", taken["version"])).status_code == 409
     last = (await claim("first_hundred", taken["version"])).json()
     assert last["emeralds"] == total and last["achievements_unclaimed"] == []
+
+
+def test_victory_and_speed_conditions() -> None:
+    wins = {"wins": {"shelter_outskirts": {"wanderer": 200}}}
+    got = earned(None, wins)
+    assert {"shelter_outskirts_x150", "shelter_outskirts_x200", "hero_wanderer_x150",
+            "hero_wanderer_x200"} <= set(got)
+    assert "team_shelter_outskirts_x150" not in got and "time_master" not in got
+    heroes = list(get_content().category("heroes"))
+    locations = list(get_content().category("locations"))
+    everyone = {"wins": {location: dict.fromkeys(heroes, 200) for location in locations}}
+    assert "time_master" in earned(None, everyone)
+    assert "full_time_x150" not in earned(facts(duration=690))
+    assert "full_time_x150" in earned(facts(duration=690, speed=150))
+    assert earned(facts(duration=650, reported=["flawless_x200"], boss_killed=True, speed=150)) == [
+        "junk_king_down"]
+    assert "flawless_x200" in earned(
+        facts(duration=650, reported=["flawless_x200"], boss_killed=True, speed=200))

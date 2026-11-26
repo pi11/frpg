@@ -1,0 +1,22 @@
+{
+  "id": "team_toxic_marsh_x200",
+  "name": "Сборная на форсаже: Ядовитые топи",
+  "description": "Победить Мать топей на скорости ×2 каждым героем",
+  "hidden": true,
+  "emeralds": 35,
+  "condition": {
+    "type": "victory",
+    "speed": 200,
+    "locations": [
+      "toxic_marsh"
+    ],
+    "heroes": [
+      "wanderer",
+      "spark",
+      "bruiser",
+      "marksman",
+      "chemist"
+    ],
+    "every": true
+  }
+}

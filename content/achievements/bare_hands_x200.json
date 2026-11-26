@@ -1,0 +1,15 @@
+{
+  "id": "bare_hands_x200",
+  "name": "Один ствол, двойная скорость",
+  "description": "Победить босса на скорости ×2, имея за весь забег одно оружие",
+  "hidden": true,
+  "emeralds": 20,
+  "condition": {
+    "type": "reported",
+    "event": "bossOneGun",
+    "value": 1,
+    "boss": true,
+    "minSeconds": 600,
+    "minSpeed": 200
+  }
+}

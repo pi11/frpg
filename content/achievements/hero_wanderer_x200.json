@@ -1,0 +1,16 @@
+{
+  "id": "hero_wanderer_x200",
+  "name": "Скиталец на форсаже",
+  "description": "Победить любого босса на скорости ×2 за Скитальца",
+  "hidden": false,
+  "emeralds": 8,
+  "condition": {
+    "type": "victory",
+    "speed": 200,
+    "locations": [],
+    "heroes": [
+      "wanderer"
+    ],
+    "every": false
+  }
+}

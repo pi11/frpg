@@ -1,0 +1,22 @@
+{
+  "id": "team_dead_city_x200",
+  "name": "Сборная на форсаже: Мёртвый город",
+  "description": "Победить Железного мэра на скорости ×2 каждым героем",
+  "hidden": true,
+  "emeralds": 30,
+  "condition": {
+    "type": "victory",
+    "speed": 200,
+    "locations": [
+      "dead_city"
+    ],
+    "heroes": [
+      "wanderer",
+      "spark",
+      "bruiser",
+      "marksman",
+      "chemist"
+    ],
+    "every": true
+  }
+}

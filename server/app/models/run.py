@@ -4,7 +4,18 @@ import uuid
 from datetime import datetime
 from typing import Any
 
-from sqlalchemy import ARRAY, JSON, BigInteger, DateTime, ForeignKey, Index, Integer, String, text
+from sqlalchemy import (
+    ARRAY,
+    JSON,
+    BigInteger,
+    DateTime,
+    ForeignKey,
+    Index,
+    Integer,
+    SmallInteger,
+    String,
+    text,
+)
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -24,6 +35,8 @@ class Run(Base):
     location_id: Mapped[str] = mapped_column(String(80))
     hero_id: Mapped[str] = mapped_column(String(80))
     seed: Mapped[int] = mapped_column(BigInteger)
+    #: Game speed in percent; time in the run passes this much faster than on the wall clock.
+    speed: Mapped[int] = mapped_column(SmallInteger, default=100, server_default="100")
     content_hash: Mapped[str] = mapped_column(String(64))
     status: Mapped[str] = mapped_column(String(16), default="started")
     started_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)

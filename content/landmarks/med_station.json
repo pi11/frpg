@@ -24,6 +24,10 @@
     {
       "pickup": "shield_cell",
       "weight": 1
+    },
+    {
+      "pickup": "bullet_shield",
+      "weight": 1
     }
   ]
 }

@@ -14,7 +14,12 @@ from app.models.auth import AuthIdentity, Profile, User
 from app.services.achievements import grant_achievements
 from app.services.content import get_content
 from app.services.daily import DailyResponse, daily_view, game_day, pick_quests, today_state
-from app.services.economy import unlocked_heroes, unlocked_locations, upgrade_cost
+from app.services.economy import (
+    unlocked_heroes,
+    unlocked_locations,
+    unlocked_speeds,
+    upgrade_cost,
+)
 from app.services.tokens import current_user, utcnow
 
 router = APIRouter(tags=["profile"], responses={
@@ -48,6 +53,10 @@ class ProfileResponse(BaseModel):
     daily: DailyResponse
     unlocked_locations: list[str]
     unlocked_heroes: list[str]
+    #: Game speeds (percent) open per location.
+    speeds: dict[str, list[int]]
+    #: Best boss win speed per location and hero.
+    wins: dict[str, dict[str, int]]
     identities: list[IdentityResponse]
 
 
@@ -82,6 +91,11 @@ async def profile_response(session: AsyncSession, user: User, profile: Profile) 
         unlocked_locations=unlocked_locations(
             get_content().category("locations"), data.get("bosses_killed", []),
         ),
+        speeds={
+            location: unlocked_speeds(get_content().balance["speeds"], data, location)
+            for location in get_content().category("locations")
+        },
+        wins=data.get("wins", {}),
         identities=[IdentityResponse(provider=item.provider, subject=item.subject)
                     for item in identities],
     )

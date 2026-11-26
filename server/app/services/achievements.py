@@ -4,7 +4,8 @@ An earned achievement waits in `achievements_unclaimed` until the player takes i
 
 `metric` conditions are computed here from accepted run data. `reported` ones (standing still,
 clicking the hero) cannot be seen by the server: the client names them and the server only checks
-the limits written in content (minimum duration, boss kill, autopilot).
+the limits written in content (minimum duration, boss kill, autopilot, game speed).
+`victory` ones read the boss wins per location, hero and speed kept in `data["wins"]`.
 """
 
 from collections.abc import Collection, Mapping
@@ -23,6 +24,8 @@ class RunFacts:
     boss_killed: bool
     autopilot: bool
     reported: Collection[str] = field(default_factory=tuple)
+    #: Game speed in percent.
+    speed: int = 100
 
 
 def metric_value(
@@ -39,10 +42,36 @@ def metric_value(
     return {"kills": run.kills, "duration": run.duration, "caps": run.picked_caps}[metric]
 
 
+def has_victory(condition: Mapping[str, Any], data: Mapping[str, Any]) -> bool:
+    """Boss wins at the speed or faster: for every listed location × hero, or for any of them.
+
+    An empty list means any location (or hero); `every` needs both lists filled.
+    """
+    speed = int(condition["speed"])
+    wins: Mapping[str, Mapping[str, int]] = data.get("wins", {})
+    locations: list[str] = condition["locations"]
+    heroes: list[str] = condition["heroes"]
+    if condition["every"]:
+        return all(
+            int(wins.get(location, {}).get(hero, 0)) >= speed
+            for location in locations for hero in heroes
+        )
+    return any(
+        int(value) >= speed
+        for location, by_hero in wins.items() if not locations or location in locations
+        for hero, value in by_hero.items() if not heroes or hero in heroes
+    )
+
+
 def is_earned(
     achievement: Mapping[str, Any], data: Mapping[str, Any], run: RunFacts | None,
 ) -> bool:
     condition = achievement["condition"]
+    if condition["type"] == "victory":
+        return has_victory(condition, data)
+    min_speed = int(condition.get("minSpeed", 100))
+    if min_speed > 100 and (run is None or run.speed < min_speed):
+        return False
     if condition["type"] == "metric":
         return metric_value(condition["metric"], data, run, condition) >= int(condition["value"])
     return (

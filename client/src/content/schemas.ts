@@ -319,7 +319,8 @@ export type UpgradeDefinition = z.infer<typeof UpgradeSchema>;
 /**
  * `metric` conditions are computed by the server (server/app/services/achievements.py).
  * `reported` events are noticed by the client (systems/achievements.ts); the server only checks
- * minSeconds, boss and autopilot.
+ * minSeconds, boss, autopilot and minSpeed. `victory` reads the boss wins per location, hero and
+ * game speed kept by the server.
  */
 export const AchievementSchema = z.object({
   id: IdSchema,
@@ -334,6 +335,8 @@ export const AchievementSchema = z.object({
       metric: z.enum(['kills', 'duration', 'caps', 'boss', 'runs', 'unlocks']),
       value: z.number().int().positive(),
       location: IdSchema.optional(),
+      /** Only in a run at this game speed (percent) or faster. */
+      minSpeed: z.number().int().min(100).optional(),
     }).strict(),
     z.object({
       type: z.literal('reported'),
@@ -345,6 +348,17 @@ export const AchievementSchema = z.object({
       minSeconds: z.number().int().nonnegative().default(0),
       boss: z.boolean().default(false),
       autopilot: z.boolean().default(false),
+      minSpeed: z.number().int().min(100).default(100),
+    }).strict(),
+    z.object({
+      type: z.literal('victory'),
+      /** Boss beaten at this game speed (percent) or faster. */
+      speed: z.number().int().min(100),
+      /** Empty: any location (or hero). */
+      locations: z.array(IdSchema),
+      heroes: z.array(IdSchema),
+      /** Every location × hero pair, not just one. */
+      every: z.boolean(),
     }).strict(),
   ]),
 }).strict();
@@ -416,6 +430,12 @@ export const BalanceSchema = z.object({
     /** Shorter runs do not count for the `runs` quest. */
     minRunSeconds: z.number().int().nonnegative(),
   }).strict(),
+  /** Game speeds in percent; each next one opens after a boss win at the previous one. */
+  speeds: z.array(z.object({
+    percent: z.number().int().min(100),
+    /** Once per location, for the first boss win at this speed. */
+    firstWinEmeralds: z.number().int().nonnegative(),
+  }).strict()).min(1),
   xp: z.object({ base: z.number().positive(), growth: z.number().positive() }).strict(),
   reward: z.object({
     base: z.number().nonnegative(),

@@ -1,0 +1,16 @@
+{
+  "id": "dead_city_x150",
+  "name": "Досрочные выборы",
+  "description": "Победить Железного мэра на скорости ×1,5",
+  "hidden": false,
+  "emeralds": 8,
+  "condition": {
+    "type": "victory",
+    "speed": 150,
+    "locations": [
+      "dead_city"
+    ],
+    "heroes": [],
+    "every": false
+  }
+}

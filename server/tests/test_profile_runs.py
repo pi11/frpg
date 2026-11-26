@@ -461,3 +461,70 @@ async def test_locked_hero_cannot_start_a_run(api: dict[str, object]) -> None:
     assert profile["unlocked_heroes"] == ["spark", "wanderer"]
     started = await client.post("/api/v1/runs/start", json=body, headers=headers(guest))
     assert started.status_code == 200
+
+
+@pytest.mark.anyio
+async def test_speeds_open_one_by_one_and_scale_the_time_check(api: dict[str, object]) -> None:
+    client: httpx.AsyncClient = api["client"]  # type: ignore[assignment]
+    factory: async_sessionmaker[AsyncSession] = api["factory"]  # type: ignore[assignment]
+    guest = (await client.post("/api/v1/auth/guest")).json()
+    auth = headers(guest)
+    location = get_content().category("locations")["shelter_outskirts"]
+    boss = location["boss"]
+    profile = (await client.get("/api/v1/profile", headers=auth)).json()
+    assert profile["speeds"]["shelter_outskirts"] == [100] and profile["wins"] == {}
+    fast = {"location_id": "shelter_outskirts", "hero_id": "wanderer", "speed": 150}
+    locked = await client.post("/api/v1/runs/start", json=fast, headers=auth)
+    assert locked.status_code == 403 and locked.json()["code"] == "locked"
+    odd = await client.post("/api/v1/runs/start", json={**fast, "speed": 120}, headers=auth)
+    assert odd.status_code == 403
+
+    async def win(speed: int) -> dict[str, object]:
+        started = (await client.post(
+            "/api/v1/runs/start", json={**fast, "speed": speed}, headers=auth,
+        )).json()
+        duration = boss["atSecond"] + 10
+        async with factory() as session:
+            run = await session.get(Run, UUID(started["run_id"]))
+            assert run is not None and run.speed == speed
+            # Wall-clock time that fits `duration` game seconds only at this speed.
+            run.started_at = run.started_at - timedelta(seconds=duration * 100 / speed)
+            await session.commit()
+        finished = await client.post(f"/api/v1/runs/{started['run_id']}/finish", json={
+            "content_hash": get_content().hash, "kills_by_type": {boss["enemy"]: 1},
+            "wave_reached": 1, "boss_killed": True, "picked_caps": 0,
+            "duration_seconds": duration,
+        }, headers=auth)
+        assert finished.status_code == 200
+        result: dict[str, object] = finished.json()
+        return result
+
+    first = await win(100)
+    assert first["flags"] == []
+    assert first["profile"]["speeds"]["shelter_outskirts"] == [100, 150]  # type: ignore[index]
+    speeds = {item["percent"]: item["firstWinEmeralds"] for item in get_content().balance["speeds"]}
+    emeralds = location["emeralds"]
+    second = await win(150)
+    assert second["flags"] == []
+    assert second["reward_emeralds"] == emeralds["boss"] + speeds[150]
+    assert "shelter_outskirts_x150" in second["achievements"]  # type: ignore[operator]
+    assert "hero_wanderer_x150" in second["achievements"]  # type: ignore[operator]
+    profile = second["profile"]
+    assert profile["speeds"]["shelter_outskirts"] == [100, 150, 200]  # type: ignore[index]
+    assert profile["wins"] == {"shelter_outskirts": {"wanderer": 150}}  # type: ignore[index]
+    again = await win(150)
+    assert again["reward_emeralds"] == emeralds["boss"]
+    # A run at ×2 that claims more game time than the wall clock allows is clamped.
+    started = (await client.post(
+        "/api/v1/runs/start", json={**fast, "speed": 200}, headers=auth,
+    )).json()
+    async with factory() as session:
+        run = await session.get(Run, UUID(started["run_id"]))
+        assert run is not None
+        run.started_at = run.started_at - timedelta(seconds=100)
+        await session.commit()
+    clamped = (await client.post(f"/api/v1/runs/{started['run_id']}/finish", json={
+        "content_hash": get_content().hash, "kills_by_type": {}, "wave_reached": 1,
+        "boss_killed": False, "picked_caps": 0, "duration_seconds": 400,
+    }, headers=auth)).json()
+    assert "duration_clamped" in clamped["flags"]

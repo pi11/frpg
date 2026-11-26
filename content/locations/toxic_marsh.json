@@ -138,7 +138,7 @@
     },
     {
       "atSecond": 370,
-      "spawnIntervalMs": 90,
+      "spawnIntervalMs": 68,
       "hpMultiplier": 4.28,
       "speedMultiplier": 1.15,
       "enemies": [
@@ -167,7 +167,7 @@
     },
     {
       "atSecond": 460,
-      "spawnIntervalMs": 70,
+      "spawnIntervalMs": 52,
       "hpMultiplier": 6.08,
       "speedMultiplier": 1.18,
       "enemies": [
@@ -196,7 +196,7 @@
     },
     {
       "atSecond": 555,
-      "spawnIntervalMs": 60,
+      "spawnIntervalMs": 45,
       "hpMultiplier": 7.36,
       "speedMultiplier": 1.2,
       "enemies": [
@@ -486,6 +486,10 @@
         {
           "pickup": "data_disk",
           "weight": 1
+        },
+        {
+          "pickup": "bullet_shield",
+          "weight": 2
         }
       ]
     },

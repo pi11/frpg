@@ -196,6 +196,24 @@ def shield_cell() -> Image:
     return icon(draw, 14, 14)
 
 
+def bullet_shield() -> Image:
+    """A small heater shield with a bullet glancing off it."""
+    def draw(c: Canvas) -> None:
+        for y, (left, right) in enumerate(
+            [(3, 10), (3, 10), (3, 10), (3, 10), (3, 10), (4, 9), (4, 9), (5, 8), (6, 7)], start=3,
+        ):
+            c.rect(left, y, right - left + 1, 1, "T")
+        inner = [(4, 9), (4, 9), (4, 9), (5, 8), (5, 8), (6, 7)]
+        for y, (left, right) in enumerate(inner, start=4):
+            c.rect(left, y, right - left + 1, 1, "t")
+        c.rect(5, 5, 1, 3, "w")
+        c.rect(11, 1, 2, 1, "y")
+        c.rect(12, 2, 1, 1, "r")
+        c.rect(1, 1, 1, 1, "w")
+        c.rect(12, 5, 1, 1, "w")
+    return icon(draw, 14, 14)
+
+
 def ammo_belt() -> Image:
     def draw(c: Canvas) -> None:
         for index in range(4):
@@ -599,6 +617,7 @@ def frames() -> dict[str, Image]:
         "pickups/rage_shot": syringe("r", "R"),
         "pickups/adrenaline": syringe("g", "G"),
         "pickups/shield_cell": shield_cell(),
+        "pickups/bullet_shield": bullet_shield(),
         "pickups/ammo_belt": ammo_belt(),
         "pickups/data_disk": data_disk(),
         "pickups/cryo_bomb": cryo_bomb(),

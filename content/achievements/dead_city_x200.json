@@ -1,0 +1,16 @@
+{
+  "id": "dead_city_x200",
+  "name": "Импичмент за минуту",
+  "description": "Победить Железного мэра на скорости ×2",
+  "hidden": false,
+  "emeralds": 13,
+  "condition": {
+    "type": "victory",
+    "speed": 200,
+    "locations": [
+      "dead_city"
+    ],
+    "heroes": [],
+    "every": false
+  }
+}

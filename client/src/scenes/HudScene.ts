@@ -171,7 +171,7 @@ export class HudScene extends Phaser.Scene {
       .fillStyle(COLORS.xp).fillRect(26, 16, Math.round(this.barWidth * xp), 6);
     const minutes = Math.floor(view.seconds / 60).toString().padStart(2, '0');
     const seconds = (view.seconds % 60).toString().padStart(2, '0');
-    this.timer.setText(`${minutes}:${seconds}`);
+    this.timer.setText(view.speed > 1 ? `${minutes}:${seconds} ×${String(view.speed).replace('.', ',')}` : `${minutes}:${seconds}`);
     this.level.setText(`${Math.ceil(view.hp)}/${Math.round(view.maxHp)}  УР.${view.level}`);
     this.stats.setText(`ВОЛНА ${view.wave}  УБИТО ${view.kills}${view.revives ? '  ♥' : ''}`);
     this.caps.setText(String(view.caps));

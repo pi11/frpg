@@ -1,6 +1,6 @@
 {
   "run": {
-    "enemyLimit": 500,
+    "enemyLimit": 600,
     "projectileLimit": 500,
     "xpLimit": 500,
     "spawnDistance": 320,
@@ -65,5 +65,19 @@
     "maxQuests": 4,
     "utcOffsetHours": 3,
     "minRunSeconds": 60
-  }
+  },
+  "speeds": [
+    {
+      "percent": 100,
+      "firstWinEmeralds": 0
+    },
+    {
+      "percent": 150,
+      "firstWinEmeralds": 10
+    },
+    {
+      "percent": 200,
+      "firstWinEmeralds": 20
+    }
+  ]
 }

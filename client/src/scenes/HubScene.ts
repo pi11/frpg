@@ -80,6 +80,11 @@ function formatTime(totalSeconds: number): string {
 
 const LOCATION_KEY = 'wasteland.location.v1';
 const HERO_KEY = 'wasteland.hero.v1';
+const SPEED_KEY = 'wasteland.speed.v1';
+
+function speedLabel(percent: number): string {
+  return `×${String(percent / 100).replace('.', ',')}`;
+}
 
 function loadChoice(key: string): string {
   try { return localStorage.getItem(key) ?? ''; } catch { return ''; }
@@ -106,6 +111,8 @@ export class HubScene extends Phaser.Scene {
   /** Location chosen in the list; remembered per browser. */
   private selected = loadChoice(LOCATION_KEY);
   private hero = loadChoice(HERO_KEY);
+  /** Wanted game speed in percent; lowered to what the chosen location has open. */
+  private speed = Number(loadChoice(SPEED_KEY)) || 100;
   private category: UpgradeDefinition['category'] = 'survival';
 
   constructor() { super('Hub'); }
@@ -138,6 +145,8 @@ export class HubScene extends Phaser.Scene {
             <div class="shelter-view" role="img" aria-label="Закат над пустошью и вход в убежище"></div>
             <button id="hub-hero" class="hub-hero" type="button"></button>
             <ul id="hub-locations" class="hub-locations"></ul>
+            <div id="hub-speeds" class="hub-subtabs hub-speeds" role="group" aria-label="Скорость игры"></div>
+            <p id="hub-speed-note" class="hub-note"></p>
             <label class="hub-autopilot"><input id="hub-autopilot" type="checkbox"> <span>Автопилот: героем управляет ИИ</span></label>
             <p id="hub-autopilot-note" class="hub-note"></p>
             <button id="hub-start" class="auth-primary" type="button">Отправиться на вылазку</button>
@@ -306,6 +315,14 @@ export class HubScene extends Phaser.Scene {
       this.render(this.profile);
     };
     this.el('hub-hero').onclick = () => this.openTab('heroes', true);
+    this.el('hub-speeds').onclick = (event) => {
+      const button = (event.target as HTMLElement).closest<HTMLButtonElement>('button[data-speed]');
+      if (!button?.dataset.speed || !this.profile) return;
+      this.speed = Number(button.dataset.speed);
+      saveChoice(SPEED_KEY, String(this.speed));
+      playSfx('sfx/ui_click');
+      this.render(this.profile);
+    };
     this.el('hub-heroes').onclick = (event) => {
       const button = (event.target as HTMLElement).closest<HTMLButtonElement>('button[data-hero]');
       if (!button?.dataset.hero || !this.profile) return;
@@ -436,10 +453,11 @@ export class HubScene extends Phaser.Scene {
         <small>${escapeHtml(open ? location.description : lock)}</small></button></li>`;
     }).join('');
     const location = catalog.locations[this.selected];
+    this.renderSpeeds(profile);
     this.renderHeroes(profile);
     const hero = catalog.heroes[this.hero];
     this.el('hub-location').textContent = location && hero
-      ? `${location.name} · ${hero.name} · пробел — начать` : '';
+      ? `${location.name} · ${hero.name} · ${speedLabel(this.runSpeed(profile))} · пробел — начать` : '';
     this.renderItems(profile);
     this.renderPurchaseBadges(profile);
     this.renderEmeralds(profile);
@@ -467,6 +485,34 @@ export class HubScene extends Phaser.Scene {
         <button type="button" data-upgrade="${escapeHtml(upgrade.id)}" ${maxed || cost > funds ? 'disabled' : ''}>${label}</button>
       </li>`;
     }).join('');
+  }
+
+  /** The wanted speed, or the fastest open one below it here. */
+  private runSpeed(profile: Profile): number {
+    const open = profile.speeds[this.selected] ?? [100];
+    return [...open].reverse().find((percent) => percent <= this.speed) ?? 100;
+  }
+
+  private renderSpeeds(profile: Profile): void {
+    const { speeds } = getCatalog().balance;
+    const open = profile.speeds[this.selected] ?? [100];
+    const current = this.runSpeed(profile);
+    this.el('hub-speeds').innerHTML = '<span class="hub-speeds-title">Скорость</span>' + speeds.map(({ percent }) => {
+      const unlocked = open.includes(percent);
+      return `<button type="button" data-speed="${percent}" aria-pressed="${percent === current}"
+        ${unlocked ? '' : 'disabled'} aria-label="Скорость ${speedLabel(percent)}">${speedLabel(percent)}</button>`;
+    }).join('');
+    const next = speeds.find(({ percent }) => !open.includes(percent));
+    const previous = next && speeds[speeds.indexOf(next) - 1];
+    const bonus = speeds.find(({ percent }) => percent === current)?.firstWinEmeralds ?? 0;
+    const beaten = Object.values(profile.wins[this.selected] ?? {}).some((value) => value >= current);
+    const parts: string[] = [];
+    if (current > 100) parts.push('Всё в забеге идёт быстрее, время на таймере — игровое.');
+    if (bonus && !beaten) parts.push(`Первая победа над боссом на ${speedLabel(current)}: +${bonus} изумр.`);
+    if (next && previous) {
+      parts.push(`${speedLabel(next.percent)} откроется после победы над боссом на ${speedLabel(previous.percent)}.`);
+    }
+    this.el('hub-speed-note').textContent = parts.join(' ');
   }
 
   private heroCondition(hero: HeroDefinition, profile: Profile): string {
@@ -583,6 +629,9 @@ export class HubScene extends Phaser.Scene {
           ${row('Каждый мини-босс', elite)}${row('Каждая победа над боссом', boss)}
           ${row('Первая победа над боссом', firstBoss, profile.bosses_killed.includes(location.id))}
           ${marks.map((mark) => row(`Впервые продержаться ${formatTime(mark.atSecond)}`, mark.amount, reached.some((value) => value >= mark.atSecond))).join('')}
+          ${catalog.balance.speeds.filter((item) => item.firstWinEmeralds > 0).map((item) => row(
+            `Первая победа над боссом на скорости ${speedLabel(item.percent)}`, item.firstWinEmeralds,
+            Object.values(profile.wins[location.id] ?? {}).some((value) => value >= item.percent))).join('')}
         </ul>`;
       }).join('')}`;
   }
@@ -718,7 +767,7 @@ export class HubScene extends Phaser.Scene {
     playSfx('sfx/ui_click');
     this.status('Открываем шлюз…');
     const [run, contentHash] = await Promise.all([
-      startRun(location.id, this.hero), bundledContentHash(),
+      startRun(location.id, this.hero, this.runSpeed(this.profile)), bundledContentHash(),
     ]);
     if (!this.active) return;
     const params = new URLSearchParams(window.location.search);
@@ -732,6 +781,7 @@ export class HubScene extends Phaser.Scene {
       seed, wave, locationId: location.id, heroId: this.hero,
       runId: run.run_id, contentHash, upgrades: { ...this.profile.upgrades },
       unlocks: [...this.profile.unlocks], achievements: [...this.profile.achievements],
+      speed: this.runSpeed(this.profile),
     };
     this.scene.start('Run', data);
   }

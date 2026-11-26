@@ -189,6 +189,22 @@ export function validateContent(files: Record<string, unknown>): Catalog {
       && !locations[condition.location ?? '']) {
       throw new Error(`achievement ${achievement.id}: unknown location ${condition.location}`);
     }
+    const speed = condition.type === 'victory' ? condition.speed : condition.minSpeed ?? 100;
+    if (!balance.speeds.some((item) => item.percent === speed)) {
+      throw new Error(`achievement ${achievement.id}: no game speed ${speed}`);
+    }
+    if (condition.type === 'victory') {
+      const unknown = [...condition.locations.filter((id) => !locations[id]),
+        ...condition.heroes.filter((id) => !heroes[id])];
+      if (unknown.length) throw new Error(`achievement ${achievement.id}: unknown ${unknown.join(', ')}`);
+      if (condition.every && (!condition.locations.length || !condition.heroes.length)) {
+        throw new Error(`achievement ${achievement.id}: "every" needs locations and heroes`);
+      }
+    }
+  }
+  const percents = balance.speeds.map((item) => item.percent);
+  if (percents[0] !== 100 || percents.some((value, index) => index > 0 && value <= percents[index - 1]!)) {
+    throw new Error('balance.speeds must start at 100 and grow');
   }
   if (!pickups.cap) throw new Error('content/pickups/cap.json is required for caps drops');
   if (!Object.values(locations).some((location) => location.unlock.type === 'default')) {

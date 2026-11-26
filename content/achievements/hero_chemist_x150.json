@@ -1,0 +1,16 @@
+{
+  "id": "hero_chemist_x150",
+  "name": "Плесень растёт быстрее",
+  "description": "Победить любого босса на скорости ×1,5 за Плесень",
+  "hidden": false,
+  "emeralds": 5,
+  "condition": {
+    "type": "victory",
+    "speed": 150,
+    "locations": [],
+    "heroes": [
+      "chemist"
+    ],
+    "every": false
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "id": "hero_chemist_x200",
+  "name": "Ускоренная реакция",
+  "description": "Победить любого босса на скорости ×2 за Плесень",
+  "hidden": false,
+  "emeralds": 8,
+  "condition": {
+    "type": "victory",
+    "speed": 200,
+    "locations": [],
+    "heroes": [
+      "chemist"
+    ],
+    "every": false
+  }
+}

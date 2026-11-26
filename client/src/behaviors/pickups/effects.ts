@@ -89,3 +89,12 @@ export class FreezeEffect implements PickupEffect<z.infer<typeof FreezeParamsSch
     context.freezeEnemies(params.durationMs);
   }
 }
+
+export const BulletShieldParamsSchema = z.object({ durationMs: z.number().positive() }).strict();
+/** Enemy shots that reach the hero break on a field instead of hurting; a repeat restarts it. */
+export class BulletShieldEffect implements PickupEffect<z.infer<typeof BulletShieldParamsSchema>> {
+  readonly paramsSchema = BulletShieldParamsSchema;
+  apply(context: PickupContext, params: z.infer<typeof BulletShieldParamsSchema>, pickupId: string): void {
+    context.shieldFromShots(pickupId, params.durationMs);
+  }
+}

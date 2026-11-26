@@ -26,6 +26,8 @@ import { WorldDecor, type ActiveLandmark } from '../systems/WorldDecor';
 import type { ResultData } from './ResultScene';
 
 export interface RunView {
+  /** Game speed, 1 = normal. */
+  speed: number;
   hp: number;
   maxHp: number;
   xp: number;
@@ -90,6 +92,8 @@ export interface RunData {
   unlocks: string[];
   /** Already earned achievements. */
   achievements: string[];
+  /** Game speed in percent (100, 150, 200); the server checked that it is open. */
+  speed?: number;
 }
 
 /** Presentation constants (not balance). */
@@ -188,7 +192,7 @@ interface PendingBlast extends BlastSpec {
 
 export class RunScene extends Phaser.Scene {
   readonly view: RunView = {
-    hp: 0, maxHp: 0, xp: 0, nextXp: 0, level: 1, kills: 0, caps: 0, seconds: 0,
+    speed: 1, hp: 0, maxHp: 0, xp: 0, nextXp: 0, level: 1, kills: 0, caps: 0, seconds: 0,
     wave: 1, enemyCount: 0, projectileCount: 0, seed: 0, boss: null, warning: '',
     rerolls: 0, revives: 0, buffs: [], emeralds: 0, toast: '',
   };
@@ -255,6 +259,8 @@ export class RunScene extends Phaser.Scene {
   private finished = false;
   private buffs = new Map<string, { stat: StatKey; amount: number; until: number; durationMs: number }>();
   private frozenUntil = 0;
+  /** Bullet shield from a pickup: enemy shots break on it until `until`. */
+  private shotShield: { id: string; until: number; durationMs: number } | null = null;
   private hazardClock = 0;
   private invulnerableUntil = 0;
   private hazardSlow = 0;
@@ -293,7 +299,7 @@ export class RunScene extends Phaser.Scene {
     this.blasts = [];
     this.beams = [];
     this.unlocks = new Set(data.unlocks);
-    this.record = newRecord(new Date().getHours(), shelterState.knocks);
+    this.record = newRecord(new Date().getHours(), shelterState.knocks, data.speed ?? 100);
     shelterState.knocks = 0;
     this.record.upgrades = Object.values(data.upgrades).reduce((sum, level) => sum + level, 0);
     this.flipAt = -Infinity;
@@ -308,10 +314,12 @@ export class RunScene extends Phaser.Scene {
     this.mobs = [];
     this.buffs = new Map();
     this.frozenUntil = 0;
+    this.shotShield = null;
     this.hazardClock = 0;
     this.hazardSlow = 0;
     this.invulnerableUntil = 0;
     Object.assign(this.view, {
+      speed: (data.speed ?? 100) / 100,
       hp: this.stat('maxHp'), maxHp: this.stat('maxHp'), xp: 0,
       nextXp: this.catalog.balance.xp.base, level: 1, kills: 0, caps: 0,
       seconds: Math.floor(this.elapsedMs / 1000), wave: this.waveIndex + 1,
@@ -326,6 +334,14 @@ export class RunScene extends Phaser.Scene {
   create(): void {
     const limits = this.catalog.balance.run;
     this.physics.world.setBounds(-100000, -100000, 200000, 200000);
+    // A faster game: physics, timers, tweens and animations all run `speed` times quicker,
+    // and update() scales its delta, so the game clock and cooldowns follow.
+    const { speed } = this.view;
+    this.physics.world.timeScale = 1 / speed;
+    this.time.timeScale = speed;
+    this.tweens.timeScale = speed;
+    this.anims.globalTimeScale = speed;
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => { this.anims.globalTimeScale = 1; });
     this.ground = this.add.tileSprite(0, 0, this.scale.width, this.scale.height, this.location.groundSprite)
       .setOrigin(0).setScrollFactor(0).setDepth(-100);
     onLayoutChange(this, () => this.ground.setSize(this.scale.width, this.scale.height));
@@ -415,6 +431,10 @@ export class RunScene extends Phaser.Scene {
       const shot = item as Phaser.Physics.Arcade.Sprite;
       if (!shot.active) return;
       shot.disableBody(true, true);
+      if (this.shotShield && this.elapsedMs < this.shotShield.until) {
+        this.playEffect('fx/hit', 'burst', shot.x, shot.y, false);
+        return;
+      }
       this.takeDamage(shot.getData('damage') as number);
     });
 
@@ -525,13 +545,18 @@ export class RunScene extends Phaser.Scene {
         this.frozenUntil = this.elapsedMs + durationMs;
         this.cameras.main.flash(160, 160, 220, 255);
       },
+      shieldFromShots: (id, durationMs) => {
+        const lasts = durationMs * (1 + this.stat('buffDuration'));
+        this.shotShield = { id, until: this.elapsedMs + lasts, durationMs: lasts };
+      },
     };
   }
 
   // --- loop --------------------------------------------------------------------------
 
-  update(_time: number, delta: number): void {
+  update(_time: number, frameDelta: number): void {
     if (this.finished) return;
+    const delta = frameDelta * this.view.speed;
     this.elapsedMs += delta;
     this.combat.now = this.elapsedMs;
     this.enemyContext.now = this.elapsedMs;
@@ -1299,6 +1324,15 @@ export class RunScene extends Phaser.Scene {
       graphics.fillStyle(0x9bff6e, 0.08 + 0.05 * pulse).fillCircle(this.hero.x, this.hero.y, radius);
       graphics.lineStyle(1, 0x9bff6e, 0.35 + 0.2 * pulse).strokeCircle(this.hero.x, this.hero.y, radius);
     }
+    if (this.shotShield) {
+      // Blinks during the last two seconds so the end does not come as a surprise.
+      const left = this.shotShield.until - this.elapsedMs;
+      const shown = left > 2000 || Math.floor(left / 150) % 2 === 0;
+      if (shown) {
+        graphics.fillStyle(0x7fd8ff, 0.08 + 0.04 * pulse).fillCircle(this.hero.x, this.hero.y, 16);
+        graphics.lineStyle(1, 0xbff0ff, 0.5 + 0.3 * pulse).strokeCircle(this.hero.x, this.hero.y, 16);
+      }
+    }
     for (const zone of this.zones) {
       if (zone.active) graphics.fillStyle(zone.pull ? 0x8a559c : 0xd9602a, 0.18).fillCircle(zone.x, zone.y, zone.radius);
     }
@@ -1349,6 +1383,11 @@ export class RunScene extends Phaser.Scene {
           fraction: left / buff.durationMs });
       }
     }
+    const shield = this.shotShield;
+    if (shield && shield.until > this.elapsedMs) {
+      const { sprite, name } = this.catalog.pickups[shield.id]!;
+      buffs.push({ sprite, name, text: 'пули не ранят', fraction: (shield.until - this.elapsedMs) / shield.durationMs });
+    } else this.shotShield = null;
     this.view.buffs = buffs;
   }
 

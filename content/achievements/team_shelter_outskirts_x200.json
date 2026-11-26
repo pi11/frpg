@@ -1,0 +1,22 @@
+{
+  "id": "team_shelter_outskirts_x200",
+  "name": "Сборная на форсаже: Пустошь у убежища",
+  "description": "Победить Короля свалки на скорости ×2 каждым героем",
+  "hidden": true,
+  "emeralds": 25,
+  "condition": {
+    "type": "victory",
+    "speed": 200,
+    "locations": [
+      "shelter_outskirts"
+    ],
+    "heroes": [
+      "wanderer",
+      "spark",
+      "bruiser",
+      "marksman",
+      "chemist"
+    ],
+    "every": true
+  }
+}

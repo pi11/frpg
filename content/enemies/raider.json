@@ -36,6 +36,11 @@
       "item": "pickup",
       "id": "magnet",
       "chance": 0.003
+    },
+    {
+      "item": "pickup",
+      "id": "bullet_shield",
+      "chance": 0.004
     }
   ],
   "tags": [

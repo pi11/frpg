@@ -32,6 +32,10 @@
     {
       "pickup": "medkit",
       "weight": 3
+    },
+    {
+      "pickup": "bullet_shield",
+      "weight": 2
     }
   ]
 }

@@ -1,0 +1,15 @@
+{
+  "id": "no_perks_x150",
+  "name": "Без перков и без тормозов",
+  "description": "Победить босса на скорости ×1,5, не взяв ни одного перка",
+  "hidden": true,
+  "emeralds": 15,
+  "condition": {
+    "type": "reported",
+    "event": "noPerks",
+    "value": 1,
+    "boss": true,
+    "minSeconds": 600,
+    "minSpeed": 150
+  }
+}

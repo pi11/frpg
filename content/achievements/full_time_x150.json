@@ -1,0 +1,13 @@
+{
+  "id": "full_time_x150",
+  "name": "Секундомер",
+  "description": "Продержаться до конца забега на скорости ×1,5",
+  "hidden": false,
+  "emeralds": 6,
+  "condition": {
+    "type": "metric",
+    "metric": "duration",
+    "value": 690,
+    "minSpeed": 150
+  }
+}

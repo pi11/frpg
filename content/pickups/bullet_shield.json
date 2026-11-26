@@ -1,0 +1,13 @@
+{
+  "id": "bullet_shield",
+  "name": "Отражатель пуль",
+  "sprite": "pickups/bullet_shield",
+  "sound": "sfx/powerup",
+  "attract": false,
+  "effect": {
+    "type": "bullet_shield",
+    "params": {
+      "durationMs": 15000
+    }
+  }
+}

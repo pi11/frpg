@@ -1,0 +1,24 @@
+{
+  "id": "time_master",
+  "name": "Хозяин времени",
+  "description": "Победить всех боссов на скорости ×2 каждым героем",
+  "hidden": true,
+  "emeralds": 100,
+  "condition": {
+    "type": "victory",
+    "speed": 200,
+    "locations": [
+      "shelter_outskirts",
+      "dead_city",
+      "toxic_marsh"
+    ],
+    "heroes": [
+      "wanderer",
+      "spark",
+      "bruiser",
+      "marksman",
+      "chemist"
+    ],
+    "every": true
+  }
+}

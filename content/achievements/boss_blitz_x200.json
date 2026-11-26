@@ -1,0 +1,15 @@
+{
+  "id": "boss_blitz_x200",
+  "name": "Молниеносный",
+  "description": "Убить босса на скорости ×2 быстрее чем за 55 секунд",
+  "hidden": true,
+  "emeralds": 15,
+  "condition": {
+    "type": "reported",
+    "event": "bossFast",
+    "value": 55,
+    "boss": true,
+    "minSeconds": 600,
+    "minSpeed": 200
+  }
+}

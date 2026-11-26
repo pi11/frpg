@@ -1,0 +1,20 @@
+{
+  "id": "legend_bruiser",
+  "name": "Легенда Пустоши: Молот",
+  "description": "Победить всех трёх боссов на скорости ×2 за Молота",
+  "hidden": true,
+  "emeralds": 20,
+  "condition": {
+    "type": "victory",
+    "speed": 200,
+    "locations": [
+      "shelter_outskirts",
+      "dead_city",
+      "toxic_marsh"
+    ],
+    "heroes": [
+      "bruiser"
+    ],
+    "every": true
+  }
+}

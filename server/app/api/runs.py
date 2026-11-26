@@ -23,9 +23,12 @@ from app.services.economy import (
     accepted_elites,
     emerald_reward,
     new_milestones,
+    record_win,
     run_reward,
+    speed_win_emeralds,
     unlocked_heroes,
     unlocked_locations,
+    unlocked_speeds,
 )
 from app.services.tokens import as_utc, current_user, utcnow
 
@@ -40,6 +43,8 @@ UserDep = Annotated[User, Depends(current_user)]
 class RunStartRequest(BaseModel):
     location_id: str
     hero_id: str
+    #: Game speed in percent, one of `balance.speeds`.
+    speed: int = 100
 
 
 class RunStartResponse(BaseModel):
@@ -86,6 +91,8 @@ async def start_run(
         raise ApiError(403, ErrorCode.locked, "Локация ещё закрыта")
     if body.hero_id not in unlocked_heroes(content.category("heroes"), data):
         raise ApiError(403, ErrorCode.locked, "Персонаж ещё не открыт")
+    if body.speed not in unlocked_speeds(content.balance["speeds"], data, body.location_id):
+        raise ApiError(403, ErrorCode.locked, "Эта скорость ещё не открыта")
     await session.scalar(select(User).where(User.id == user.id).with_for_update())
     now = utcnow()
     active = (await session.scalars(
@@ -97,7 +104,7 @@ async def start_run(
         age = now - as_utc(previous.started_at)
         previous.flags = ["abandoned"] if age < timedelta(hours=1) else ["expired"]
     run = Run(
-        user_id=user.id, location_id=body.location_id, hero_id=body.hero_id,
+        user_id=user.id, location_id=body.location_id, hero_id=body.hero_id, speed=body.speed,
         seed=secrets.randbits(32), content_hash=content.hash, status="started",
         started_at=now, flags=[],
     )
@@ -140,10 +147,11 @@ async def finish_run(
     flags: list[str] = []
     if body.content_hash != run.content_hash or content.hash != run.content_hash:
         flags.append("content_hash_mismatch")
+    # Durations are in game seconds: at a higher speed they pass faster than wall-clock ones.
+    wall_seconds = max(0.0, (now - as_utc(run.started_at)).total_seconds())
     max_duration = min(
         location["durationSeconds"],
-        max(0, int((now - as_utc(run.started_at)).total_seconds()))
-        + rules["durationGraceSeconds"],
+        int(wall_seconds * run.speed / 100) + rules["durationGraceSeconds"],
     )
     duration = min(body.duration_seconds, max_duration)
     if duration != body.duration_seconds:
@@ -188,6 +196,11 @@ async def finish_run(
         accepted_elites(location, known_enemies, body.kills_by_type, duration),
         boss_killed, run.location_id not in bosses, passed,
     )
+    if boss_killed and not body.autopilot:
+        emeralds += speed_win_emeralds(
+            content.balance["speeds"], data, run.location_id, run.speed,
+        )
+        data = record_win(data, run.location_id, run.hero_id, run.speed)
     if passed:
         marks[run.location_id] = sorted([*reached, *passed])
     if boss_killed and run.location_id not in bosses:
@@ -201,6 +214,7 @@ async def finish_run(
         RunFacts(
             location=run.location_id, duration=duration, kills=kills, picked_caps=picked_caps,
             boss_killed=boss_killed, autopilot=body.autopilot, reported=body.achievements,
+            speed=run.speed,
         ),
     )
     elites = accepted_elites(location, known_enemies, body.kills_by_type, duration)
@@ -220,7 +234,7 @@ async def finish_run(
         "accepted": {
             "duration_seconds": duration, "kills": kills, "wave_reached": wave,
             "boss_killed": boss_killed, "picked_caps": picked_caps,
-            "emeralds": emeralds, "achievements": achievements,
+            "emeralds": emeralds, "achievements": achievements, "speed": run.speed,
         },
     }
     profile.caps += reward

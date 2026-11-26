@@ -397,7 +397,7 @@ describe('heavy weapon behaviors', () => {
 describe('pickup effects', () => {
   function pickupContext(random: number, luck = 0) {
     const log = { caps: 0, heal: 0, attract: 0, blast: 0, chest: [] as number[][],
-      buffs: [] as unknown[][], xp: 0, freeze: 0 };
+      buffs: [] as unknown[][], xp: 0, freeze: 0, shield: [] as unknown[][] };
     const context: PickupContext = {
       rng: () => random, luck: () => luck, hero: { x: 0, y: 0 },
       heal: (fraction) => { log.heal += fraction; },
@@ -408,6 +408,7 @@ describe('pickup effects', () => {
       addBuff: (...args) => { log.buffs.push(args); },
       addXpFraction: (fraction) => { log.xp += fraction; },
       freezeEnemies: (durationMs) => { log.freeze += durationMs; },
+      shieldFromShots: (...args) => { log.shield.push(args); },
     };
     return { context, log };
   }
@@ -438,6 +439,8 @@ describe('pickup effects', () => {
     expect(log.buffs).toEqual([['rage_shot', 'attackSpeed', params('rage_shot').amount, params('rage_shot').durationMs]]);
     expect(log.xp).toBe(params('data_disk').fraction);
     expect(log.freeze).toBe(params('cryo_bomb').durationMs);
+    apply('bullet_shield', context);
+    expect(log.shield).toEqual([['bullet_shield', params('bullet_shield').durationMs]]);
   });
 
   it('a bonus cannot change run-long stats', () => {

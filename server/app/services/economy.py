@@ -115,3 +115,49 @@ def hero_progress(unlock: Mapping[str, Any], data: Mapping[str, Any]) -> bool:
             reached = data.get("milestones", {}).get(unlock["location"], [])
             return any(int(mark) >= int(unlock["atSecond"]) for mark in reached)
     return False
+
+
+def speed_percents(speeds: Sequence[Mapping[str, int]]) -> list[int]:
+    return sorted(int(item["percent"]) for item in speeds)
+
+
+def best_win(data: Mapping[str, Any], location: str) -> int:
+    """Highest game speed (percent) a boss of this location was beaten at, 0 if never.
+
+    Profiles from before speeds only list the location in `bosses_killed`: that is a win at 100.
+    """
+    wins = data.get("wins", {}).get(location, {})
+    best = max((int(value) for value in wins.values()), default=0)
+    if location in data.get("bosses_killed", []):
+        best = max(best, 100)
+    return best
+
+
+def unlocked_speeds(
+    speeds: Sequence[Mapping[str, int]], data: Mapping[str, Any], location: str,
+) -> list[int]:
+    """The base speed, and each next one after a boss win at the previous speed."""
+    percents = speed_percents(speeds)
+    best = best_win(data, location)
+    return [
+        percent for index, percent in enumerate(percents)
+        if index == 0 or best >= percents[index - 1]
+    ]
+
+
+def speed_win_emeralds(
+    speeds: Sequence[Mapping[str, int]], data: Mapping[str, Any], location: str, speed: int,
+) -> int:
+    """Bonus for the first boss win at a speed (and every slower one skipped) here."""
+    best = best_win(data, location)
+    return sum(
+        int(item["firstWinEmeralds"]) for item in speeds
+        if best < int(item["percent"]) <= speed
+    )
+
+
+def record_win(data: Mapping[str, Any], location: str, hero: str, speed: int) -> dict[str, Any]:
+    wins = {key: dict(value) for key, value in data.get("wins", {}).items()}
+    heroes = wins.setdefault(location, {})
+    heroes[hero] = max(int(heroes.get(hero, 0)), speed)
+    return {**data, "wins": wins}

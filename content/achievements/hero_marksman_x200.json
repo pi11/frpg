@@ -1,0 +1,16 @@
+{
+  "id": "hero_marksman_x200",
+  "name": "Выстрел на бегу",
+  "description": "Победить любого босса на скорости ×2 за Ласку",
+  "hidden": false,
+  "emeralds": 8,
+  "condition": {
+    "type": "victory",
+    "speed": 200,
+    "locations": [],
+    "heroes": [
+      "marksman"
+    ],
+    "every": false
+  }
+}

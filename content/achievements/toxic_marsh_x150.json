@@ -1,0 +1,16 @@
+{
+  "id": "toxic_marsh_x150",
+  "name": "Осушение болот",
+  "description": "Победить Мать топей на скорости ×1,5",
+  "hidden": false,
+  "emeralds": 10,
+  "condition": {
+    "type": "victory",
+    "speed": 150,
+    "locations": [
+      "toxic_marsh"
+    ],
+    "heroes": [],
+    "every": false
+  }
+}

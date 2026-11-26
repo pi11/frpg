@@ -1,0 +1,16 @@
+{
+  "id": "shelter_outskirts_x200",
+  "name": "Мусоровоз на форсаже",
+  "description": "Победить Короля свалки на скорости ×2",
+  "hidden": false,
+  "emeralds": 10,
+  "condition": {
+    "type": "victory",
+    "speed": 200,
+    "locations": [
+      "shelter_outskirts"
+    ],
+    "heroes": [],
+    "every": false
+  }
+}

@@ -35,17 +35,19 @@ export interface RunRecord {
   upgrades: number;
   /** Share of HP left when the boss died. */
   bossHp: number | null;
+  /** Game speed in percent. */
+  speed: number;
   /** Set when the run is over. */
   end: 'death' | 'survived' | 'quit' | null;
 }
 
-export function newRecord(startHour: number, knocks = 0): RunRecord {
+export function newRecord(startHour: number, knocks = 0, speed = 100): RunRecord {
   return {
     seconds: 0, moved: false, damaged: false, weapons: 1, evolved: false, bossSeconds: null,
     heroClicks: 0, pauses: 0, hazardMs: 0, startHour, autopilotMs: 0, end: null,
     knocks, lowestHp: Infinity, kills: 0, crates: 0, frozen: 0, flips: 0, autoPicks: 0, idleMs: 0,
     landmarks: 0, broke: false, bossSpawned: false,
-    passives: 0, evolutions: 0, upgrades: 0, bossHp: null,
+    passives: 0, evolutions: 0, upgrades: 0, bossHp: null, speed,
   };
 }
 
@@ -55,6 +57,7 @@ const IDLE_GRACE_MS = 1500;
 export function isReached(achievement: AchievementDefinition, record: RunRecord): boolean {
   const { condition } = achievement;
   if (condition.type !== 'reported' || record.seconds < condition.minSeconds) return false;
+  if (record.speed < condition.minSpeed) return false;
   // With the autopilot only its own achievements count.
   if (condition.autopilot !== record.autopilotMs > 0) return false;
   if (condition.boss && record.bossSeconds === null) return false;

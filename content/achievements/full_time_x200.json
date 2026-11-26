@@ -1,0 +1,13 @@
+{
+  "id": "full_time_x200",
+  "name": "Перемотка до упора",
+  "description": "Продержаться до конца забега на скорости ×2",
+  "hidden": false,
+  "emeralds": 10,
+  "condition": {
+    "type": "metric",
+    "metric": "duration",
+    "value": 690,
+    "minSpeed": 200
+  }
+}

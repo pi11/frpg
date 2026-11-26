@@ -28,6 +28,10 @@ export interface Profile {
   /** Locations open for this profile (checked again by the server on run start). */
   unlocked_locations: string[];
   unlocked_heroes: string[];
+  /** Game speeds (percent) open per location. */
+  speeds: Record<string, number[]>;
+  /** Best boss win speed (percent) per location and hero. */
+  wins: Record<string, Record<string, number>>;
   identities: { provider: string; subject: string }[];
 }
 
@@ -87,9 +91,9 @@ export function claimAchievement(id: string, expectedVersion: number): Promise<P
   }, true);
 }
 
-export function startRun(locationId: string, heroId: string): Promise<RunStart> {
+export function startRun(locationId: string, heroId: string, speed = 100): Promise<RunStart> {
   return request<RunStart>('/runs/start', {
-    method: 'POST', body: JSON.stringify({ location_id: locationId, hero_id: heroId }),
+    method: 'POST', body: JSON.stringify({ location_id: locationId, hero_id: heroId, speed }),
   }, true);
 }
 

@@ -156,6 +156,8 @@ export interface PickupContext {
   addBuff(id: string, stat: StatKey, amount: number, durationMs: number): void;
   addXpFraction(fraction: number): void;
   freezeEnemies(durationMs: number): void;
+  /** Enemy shots do no harm for a while; one shield at a time, a repeat restarts it. */
+  shieldFromShots(id: string, durationMs: number): void;
 }
 
 export interface PickupEffect<P> {
