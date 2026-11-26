@@ -1377,7 +1377,7 @@ export class RunScene extends Phaser.Scene {
     const view = this.cameras.main.worldView;
     for (const mob of this.mobs) {
       if (mob.sprite.active && mob.definition.role !== 'normal' && !view.contains(mob.x, mob.y)) {
-        this.drawHint(hints, mob, 0xff5a4a);
+        this.drawThreatArrow(hints, mob);
       }
     }
     const nearby: ActiveLandmark[] = [];
@@ -1440,16 +1440,36 @@ export class RunScene extends Phaser.Scene {
 
   /** Arrow at the screen edge towards an off-screen landmark. */
   private drawHint(graphics: Phaser.GameObjects.Graphics, target: Point, color = 0xf2c46b): void {
-    const { width, height } = this.cameras.main;
-    const angle = Math.atan2(target.y - this.hero.y, target.x - this.hero.x);
-    const scale = Math.min((width / 2 - 12) / Math.max(0.001, Math.abs(Math.cos(angle))),
-      (height / 2 - 36) / Math.max(0.001, Math.abs(Math.sin(angle))));
+    this.drawEdgeArrow(graphics, target, color, 6, 0.85);
+  }
+
+  /** Big pulsing red arrow at the screen edge pointing to an off-screen mini-boss or boss. */
+  private drawThreatArrow(graphics: Phaser.GameObjects.Graphics, mob: SpriteMob): void {
+    const pulse = 0.7 + 0.3 * Math.sin(this.elapsedMs / 120);
+    const size = mob.definition.role === 'boss' ? 13 : 10;
+    this.drawEdgeArrow(graphics, mob, 0xff2a2a, size * (0.9 + 0.1 * pulse), pulse, true);
+  }
+
+  private drawEdgeArrow(graphics: Phaser.GameObjects.Graphics, target: Point, color: number,
+    size: number, alpha: number, outline = false): void {
+    const camera = this.cameras.main;
+    const { width, height } = camera;
+    const view = camera.worldView;
+    const angle = Math.atan2(target.y - view.centerY, target.x - view.centerX);
+    const margin = size + 6;
+    const scale = Math.min((width / 2 - margin) / Math.max(0.001, Math.abs(Math.cos(angle))),
+      (height / 2 - margin - 40) / Math.max(0.001, Math.abs(Math.sin(angle))));
     const x = width / 2 + Math.cos(angle) * scale;
     const y = height / 2 + Math.sin(angle) * scale;
-    const corner = (turn: number, size: number): [number, number] =>
-      [x + Math.cos(angle + turn) * size, y + Math.sin(angle + turn) * size];
-    graphics.fillStyle(color, 0.85)
-      .fillTriangle(...corner(0, 6), ...corner(2.5, 5), ...corner(-2.5, 5));
+    const corner = (turn: number, length: number): [number, number] =>
+      [x + Math.cos(angle + turn) * length, y + Math.sin(angle + turn) * length];
+    const tip = corner(0, size);
+    const left = corner(2.5, size * 0.85);
+    const right = corner(-2.5, size * 0.85);
+    graphics.fillStyle(color, alpha).fillTriangle(...tip, ...left, ...right);
+    if (outline) {
+      graphics.lineStyle(1, 0x2a0000, alpha).strokeTriangle(...tip, ...left, ...right);
+    }
   }
 
   // --- loot --------------------------------------------------------------------------

@@ -15,7 +15,7 @@
   "groundSprite": "ground/marsh",
   "music": "music/marsh",
   "bossMusic": "music/boss",
-  "durationSeconds": 900,
+  "durationSeconds": 690,
   "startingHero": "wanderer",
   "waves": [
     {
@@ -35,7 +35,7 @@
       ]
     },
     {
-      "atSecond": 60,
+      "atSecond": 45,
       "spawnIntervalMs": 480,
       "hpMultiplier": 2.1,
       "speedMultiplier": 1,
@@ -55,7 +55,7 @@
       ]
     },
     {
-      "atSecond": 120,
+      "atSecond": 90,
       "spawnIntervalMs": 400,
       "hpMultiplier": 2.44,
       "speedMultiplier": 1.05,
@@ -79,7 +79,7 @@
       ]
     },
     {
-      "atSecond": 240,
+      "atSecond": 185,
       "spawnIntervalMs": 330,
       "hpMultiplier": 3.02,
       "speedMultiplier": 1.1,
@@ -108,7 +108,7 @@
       ]
     },
     {
-      "atSecond": 360,
+      "atSecond": 275,
       "spawnIntervalMs": 270,
       "hpMultiplier": 3.86,
       "speedMultiplier": 1.15,
@@ -137,7 +137,7 @@
       ]
     },
     {
-      "atSecond": 480,
+      "atSecond": 370,
       "spawnIntervalMs": 220,
       "hpMultiplier": 5.04,
       "speedMultiplier": 1.15,
@@ -166,7 +166,7 @@
       ]
     },
     {
-      "atSecond": 600,
+      "atSecond": 460,
       "spawnIntervalMs": 180,
       "hpMultiplier": 7.15,
       "speedMultiplier": 1.18,
@@ -195,7 +195,7 @@
       ]
     },
     {
-      "atSecond": 720,
+      "atSecond": 555,
       "spawnIntervalMs": 150,
       "hpMultiplier": 8.66,
       "speedMultiplier": 1.2,
@@ -224,7 +224,7 @@
       ]
     },
     {
-      "atSecond": 780,
+      "atSecond": 600,
       "spawnIntervalMs": 950,
       "hpMultiplier": 8.66,
       "speedMultiplier": 1.2,
@@ -246,28 +246,28 @@
   ],
   "events": [
     {
-      "atSecond": 270,
+      "atSecond": 210,
       "enemy": "slime_queen",
       "count": 1
     },
     {
-      "atSecond": 510,
+      "atSecond": 390,
       "enemy": "great_worm",
       "count": 1
     },
     {
-      "atSecond": 690,
+      "atSecond": 530,
       "enemy": "slime_queen",
       "count": 1
     },
     {
-      "atSecond": 700,
+      "atSecond": 540,
       "enemy": "great_worm",
       "count": 1
     }
   ],
   "boss": {
-    "atSecond": 780,
+    "atSecond": 600,
     "enemy": "marsh_mother"
   },
   "decor": {

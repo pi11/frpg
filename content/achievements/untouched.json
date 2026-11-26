@@ -1,13 +1,13 @@
 {
   "id": "untouched",
   "name": "Неприкасаемый",
-  "description": "Не получить урона первые 3 минуты",
+  "description": "Не получить урона первые 2:20",
   "hidden": false,
   "emeralds": 4,
   "condition": {
     "type": "reported",
     "event": "noDamage",
-    "value": 180,
-    "minSeconds": 180
+    "value": 140,
+    "minSeconds": 140
   }
 }

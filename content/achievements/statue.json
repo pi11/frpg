@@ -8,6 +8,6 @@
     "type": "reported",
     "event": "finishNoMove",
     "value": 1,
-    "minSeconds": 780
+    "minSeconds": 600
   }
 }

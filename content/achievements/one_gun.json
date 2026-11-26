@@ -1,13 +1,13 @@
 {
   "id": "one_gun",
   "name": "Однолюб",
-  "description": "Продержаться 6 минут с одним оружием",
+  "description": "Продержаться 4:35 с одним оружием",
   "hidden": false,
   "emeralds": 5,
   "condition": {
     "type": "reported",
     "event": "singleWeapon",
-    "value": 360,
-    "minSeconds": 360
+    "value": 275,
+    "minSeconds": 275
   }
 }

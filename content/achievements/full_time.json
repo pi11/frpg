@@ -1,12 +1,12 @@
 {
   "id": "full_time",
   "name": "До последней минуты",
-  "description": "Продержаться 15 минут",
+  "description": "Продержаться до конца забега (11:30)",
   "hidden": false,
   "emeralds": 5,
   "condition": {
     "type": "metric",
     "metric": "duration",
-    "value": 900
+    "value": 690
   }
 }

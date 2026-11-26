@@ -8,6 +8,6 @@
     "type": "reported",
     "event": "evolutions",
     "value": 3,
-    "minSeconds": 300
+    "minSeconds": 230
   }
 }

@@ -59,10 +59,15 @@ def accepted_elites(
 def new_milestones(
     milestones: Sequence[Mapping[str, int]], duration: int, reached: Collection[int],
 ) -> list[int]:
-    """Survival marks passed for the first time in this location."""
+    """Survival marks passed for the first time in this location.
+
+    A stored mark at or after this one also counts: profiles keep the marks of
+    older, longer timelines.
+    """
+    best = max(reached, default=0)
     return [
         mark["atSecond"] for mark in milestones
-        if mark["atSecond"] <= duration and mark["atSecond"] not in reached
+        if mark["atSecond"] <= duration and mark["atSecond"] > best
     ]
 
 
@@ -107,5 +112,6 @@ def hero_progress(unlock: Mapping[str, Any], data: Mapping[str, Any]) -> bool:
         case "bossKilled":
             return unlock["location"] in data.get("bosses_killed", [])
         case "milestone":
-            return unlock["atSecond"] in data.get("milestones", {}).get(unlock["location"], [])
+            reached = data.get("milestones", {}).get(unlock["location"], [])
+            return any(int(mark) >= int(unlock["atSecond"]) for mark in reached)
     return False

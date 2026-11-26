@@ -47,15 +47,15 @@
     "durationGraceSeconds": 30,
     "emeraldMilestones": [
       {
-        "atSecond": 300,
+        "atSecond": 230,
         "amount": 1
       },
       {
-        "atSecond": 480,
+        "atSecond": 370,
         "amount": 2
       },
       {
-        "atSecond": 720,
+        "atSecond": 555,
         "amount": 3
       }
     ]

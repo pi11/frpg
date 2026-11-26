@@ -24,12 +24,50 @@ const CATEGORIES: readonly [UpgradeDefinition['category'], string][] = [
   ['survival', 'Выживание'], ['combat', 'Бой'], ['scavenge', 'Добыча'], ['slots', 'Слоты'], ['special', 'Особое'],
 ];
 
+/** 12×12 pixel icons for the tab rail, '#' is a lit pixel. */
+const ICONS = {
+  run: ['.######.....', '.#....#.....', '.#....#..#..', '.#....#..##.', '.#..########', '.#..########',
+    '.#....#..##.', '.#....#..#..', '.#....#.....', '.#....#.....', '.######.....', '............'],
+  daily: ['.##########.', '.#........#.', '.#..#.....#.', '.#.#..###.#.', '.##.......#.', '.#........#.',
+    '.#..#.....#.', '.#.#..###.#.', '.##.......#.', '.#........#.', '.##########.', '............'],
+  heroes: ['....####....', '...######...', '...######...', '....####....', '.....##.....', '..########..',
+    '.##########.', '.#.######.#.', '.#.######.#.', '...##..##...', '...##..##...', '..###..###..'],
+  upgrades: ['.....##.....', '....####....', '...######...', '..########..', '.####..####.', '.....##.....',
+    '....####....', '...######...', '..########..', '.####..####.', '....####....', '....####....'],
+  weapons: ['............', '..#.........', '.##########.', '.##########.', '.####.##....', '.###..#.....',
+    '.###.##.....', '.###........', '.###........', '.###........', '............', '............'],
+  passives: ['.......###..', '......###...', '.....###....', '....###.....', '...#######..', '.......###..',
+    '......###...', '.....###....', '....###.....', '...##.......', '..#.........', '............'],
+  emeralds: ['............', '...######...', '..#.#..#.#..', '.##########.', '.##.####.##.', '..##.##.##..',
+    '...##..##...', '....####....', '.....##.....', '............', '............', '............'],
+  achievements: ['.##########.', '##.######.##', '#..######..#', '#..######..#', '.#.######.#.', '..########..',
+    '....####....', '.....##.....', '.....##.....', '...######...', '..########..', '............'],
+  settings: ['.....##.....', '..#..##..#..', '.##########.', '..###..###..', '.###....###.', '####....####',
+    '####....####', '.###....###.', '..###..###..', '.##########.', '..#..##..#..', '.....##.....'],
+} as const;
+
 const TABS = [
-  ['run', 'Вылазка'], ['daily', 'Задания'], ['heroes', 'Герои'], ['upgrades', 'Улучшения'], ['weapons', 'Оружие'], ['passives', 'Перки'],
-  ['emeralds', 'Изумруды'],
-  ['achievements', 'Достижения'], ['settings', 'Настройки'],
+  ['run', 'Вылазка', 'Выберите героя и локацию и отправляйтесь в Пустошь.'],
+  ['daily', 'Задания', 'Новые каждый день, за выполнение — изумруды.'],
+  ['heroes', 'Герои', 'У каждого своё оружие и характер. Новых героев открывают успехи в Пустоши.'],
+  ['upgrades', 'Улучшения', 'Постоянные улучшения за крышки и изумруды. Действуют в каждом забеге.'],
+  ['weapons', 'Оружие', 'Открытое оружие встречается среди карточек забега.'],
+  ['passives', 'Перки', 'Перки усиливают героя в забеге, редкие открываются за изумруды.'],
+  ['emeralds', 'Изумруды', 'Редкая валюта: откуда она берётся и на что её тратить.'],
+  ['achievements', 'Достижения', 'Награды за подвиги и странные поступки.'],
+  ['settings', 'Настройки', 'Звук, управление, ключ аккаунта и вход.'],
 ] as const;
 type Tab = (typeof TABS)[number][0];
+
+function pixelIcon(rows: readonly string[]): string {
+  const cells = rows.flatMap((row, y) => [...row].map((cell, x) => (cell === '#' ? `M${x} ${y}h1v1h-1z` : '')));
+  return `<svg viewBox="0 0 12 12" aria-hidden="true" shape-rendering="crispEdges"><path fill="currentColor" d="${cells.join('')}"/></svg>`;
+}
+
+function panelHead(tab: Tab): string {
+  const [, title, about] = TABS.find(([id]) => id === tab)!;
+  return `<h2 class="hub-panel-title">${title}</h2><p class="hub-panel-about">${about}</p>`;
+}
 
 function escapeHtml(value: string): string {
   return value.replace(/[&<>"']/g, (char) => `&#${char.charCodeAt(0)};`);
@@ -94,11 +132,9 @@ export class HubScene extends Phaser.Scene {
             <div><dt>Забегов</dt><dd id="hub-runs"></dd></div>
           </dl>
           <p id="hub-guest-hint" class="auth-warning" hidden>Сохраните ключ аккаунта (вкладка «Настройки»): с ним можно продолжить на другом устройстве.</p>
-          <div class="hub-tabs" role="tablist" aria-label="Разделы убежища">
-            ${TABS.map(([id, title]) => `<button type="button" role="tab" id="hub-tab-${id}"
-              data-tab="${id}" aria-controls="hub-panel-${id}">${title}</button>`).join('')}
-          </div>
+          <div class="hub-layout"><div class="hub-main">
           <section id="hub-panel-run" role="tabpanel" aria-labelledby="hub-tab-run">
+            ${panelHead('run')}
             <div class="shelter-view" role="img" aria-label="Закат над пустошью и вход в убежище"></div>
             <button id="hub-hero" class="hub-hero" type="button"></button>
             <ul id="hub-locations" class="hub-locations"></ul>
@@ -108,29 +144,37 @@ export class HubScene extends Phaser.Scene {
             <p id="hub-location" class="hub-note"></p>
           </section>
           <section id="hub-panel-daily" role="tabpanel" aria-labelledby="hub-tab-daily">
+            ${panelHead('daily')}
             <p id="hub-daily-reset" class="hub-help"></p>
             <ul id="hub-daily" class="hub-goals hub-daily"></ul>
           </section>
           <section id="hub-panel-heroes" role="tabpanel" aria-labelledby="hub-tab-heroes">
+            ${panelHead('heroes')}
             <ul id="hub-heroes" class="hub-heroes"></ul>
           </section>
           <section id="hub-panel-upgrades" role="tabpanel" aria-labelledby="hub-tab-upgrades">
+            ${panelHead('upgrades')}
             <div id="hub-categories" class="hub-subtabs" role="group" aria-label="Виды улучшений"></div>
             <ul id="hub-upgrades" class="hub-upgrades"></ul>
           </section>
           <section id="hub-panel-weapons" role="tabpanel" aria-labelledby="hub-tab-weapons">
+            ${panelHead('weapons')}
             <ul id="hub-weapons" class="hub-upgrades hub-items"></ul>
           </section>
           <section id="hub-panel-passives" role="tabpanel" aria-labelledby="hub-tab-passives">
+            ${panelHead('passives')}
             <ul id="hub-passives" class="hub-upgrades hub-items"></ul>
           </section>
           <section id="hub-panel-emeralds" role="tabpanel" aria-labelledby="hub-tab-emeralds">
+            ${panelHead('emeralds')}
             <div id="hub-emerald-info"></div>
           </section>
           <section id="hub-panel-achievements" role="tabpanel" aria-labelledby="hub-tab-achievements">
+            ${panelHead('achievements')}
             <div id="hub-achievements"></div>
           </section>
           <section id="hub-panel-settings" role="tabpanel" aria-labelledby="hub-tab-settings">
+            ${panelHead('settings')}
             <fieldset class="hub-settings">
               <legend>Звук и картинка</legend>
               ${VOLUMES.map(([key, title]) => `<label class="hub-volume">${title}
@@ -156,6 +200,11 @@ export class HubScene extends Phaser.Scene {
               <button id="hub-delete" class="auth-back hub-danger" type="button">Удалить аккаунт и данные</button>
             </div>
           </section>
+          </div>
+          <nav class="hub-tabs" role="tablist" aria-label="Разделы убежища" aria-orientation="vertical">
+            ${TABS.map(([id, title]) => `<button type="button" role="tab" id="hub-tab-${id}" title="${title}"
+              aria-label="${title}" data-tab="${id}" aria-controls="hub-panel-${id}">${pixelIcon(ICONS[id])}<span class="hub-badge" hidden></span></button>`).join('')}
+          </nav></div>
         </div>
         <button id="hub-retry" class="auth-secondary" type="button" hidden>Повторить</button>
       </section>`;
@@ -291,8 +340,10 @@ export class HubScene extends Phaser.Scene {
       if (tab) this.openTab(tab, true);
     };
     tabs.onkeydown = (event) => {
-      const step = event.key === 'ArrowRight' ? 1 : event.key === 'ArrowLeft' ? -1 : 0;
+      const step = event.key === 'ArrowDown' || event.key === 'ArrowRight' ? 1
+        : event.key === 'ArrowUp' || event.key === 'ArrowLeft' ? -1 : 0;
       if (!step) return;
+      event.preventDefault();
       const open = TABS.filter(([id]) => !this.el(`hub-tab-${id}`).hidden);
       const index = open.findIndex(([id]) => id === this.tab);
       const next = open[(index + step + open.length) % open.length]![0];
@@ -390,6 +441,7 @@ export class HubScene extends Phaser.Scene {
     this.el('hub-location').textContent = location && hero
       ? `${location.name} · ${hero.name} · пробел — начать` : '';
     this.renderItems(profile);
+    this.renderPurchaseBadges(profile);
     this.renderEmeralds(profile);
     this.renderAchievements(profile);
     this.renderDaily(profile);
@@ -491,6 +543,32 @@ export class HubScene extends Phaser.Scene {
         perks.filter((perk) => perk.unlock.type === 'default').map((perk) => row(perk, note(perk))));
   }
 
+  /** Counts of what the emeralds on hand can buy right now, on the rail icons. */
+  private renderPurchaseBadges(profile: Profile): void {
+    const { upgrades, weapons, passives } = getCatalog();
+    const upgradesReady = Object.values(upgrades).filter((upgrade) => {
+      const level = profile.upgrades[upgrade.id] ?? 0;
+      return upgrade.currency === 'emeralds' && level < upgrade.maxLevel
+        && upgradeCost(upgrade, level) <= profile.emeralds;
+    }).length;
+    const unlockable = (items: (WeaponDefinition | PassiveDefinition)[]): number => items.filter((item) =>
+      item.unlock.type === 'emeralds' && !profile.unlocks.includes(item.id)
+      && item.unlock.emeralds <= profile.emeralds).length;
+    this.badge('upgrades', upgradesReady, false);
+    this.badge('weapons', unlockable(Object.values(weapons)), false);
+    this.badge('passives', unlockable(Object.values(passives)), false);
+  }
+
+  private badge(tab: Tab, count: number, blink: boolean): void {
+    const button = this.el(`hub-tab-${tab}`);
+    const mark = button.querySelector<HTMLElement>('.hub-badge')!;
+    mark.hidden = count === 0;
+    mark.textContent = String(count);
+    button.classList.toggle('hub-blink', blink);
+    const title = TABS.find(([id]) => id === tab)![1];
+    button.setAttribute('aria-label', count ? `${title}: ${count}` : title);
+  }
+
   private renderEmeralds(profile: Profile): void {
     const catalog = getCatalog();
     const marks = catalog.balance.reward.emeraldMilestones;
@@ -504,7 +582,7 @@ export class HubScene extends Phaser.Scene {
         return `<h2>${escapeHtml(location.name)}</h2><ul class="hub-goals">
           ${row('Каждый мини-босс', elite)}${row('Каждая победа над боссом', boss)}
           ${row('Первая победа над боссом', firstBoss, profile.bosses_killed.includes(location.id))}
-          ${marks.map((mark) => row(`Впервые продержаться ${formatTime(mark.atSecond)}`, mark.amount, reached.includes(mark.atSecond))).join('')}
+          ${marks.map((mark) => row(`Впервые продержаться ${formatTime(mark.atSecond)}`, mark.amount, reached.some((value) => value >= mark.atSecond))).join('')}
         </ul>`;
       }).join('')}`;
   }
@@ -516,7 +594,7 @@ export class HubScene extends Phaser.Scene {
     const waiting = new Set(profile.achievements_unclaimed);
     const tab = this.el('hub-tab-achievements');
     tab.hidden = owned.size === 0;
-    tab.textContent = waiting.size ? `Достижения (${waiting.size})` : 'Достижения';
+    this.badge('achievements', waiting.size, waiting.size > 0);
     const row = (item: AchievementDefinition): string => {
       const done = owned.has(item.id);
       const reward = waiting.has(item.id)
@@ -542,7 +620,7 @@ export class HubScene extends Phaser.Scene {
   private renderDaily(profile: Profile): void {
     const { quests, resets_at: reset } = profile.daily;
     const ready = quests.filter((quest) => quest.progress >= quest.goal && !quest.claimed).length;
-    this.el('hub-tab-daily').textContent = ready ? `Задания (${ready})` : 'Задания';
+    this.badge('daily', ready, ready > 0);
     const hours = Math.max(0, Math.ceil((Date.parse(reset) - Date.now()) / 3600000));
     this.el('hub-daily-reset').textContent = `Одинаковые для всех игроков. Новые задания через ${hours} ч. Забеги с автопилотом не считаются.`;
     this.el('hub-daily').innerHTML = quests.map((quest) => {

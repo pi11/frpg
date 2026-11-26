@@ -58,6 +58,8 @@ def test_milestones_are_paid_once() -> None:
     assert new_milestones(marks, 299, []) == []
     assert new_milestones(marks, 500, []) == [300, 480]
     assert new_milestones(marks, 500, [300]) == [480]
+    # Marks of an older, longer timeline count as reached.
+    assert new_milestones(marks, 500, [720]) == []
 
 
 def test_content_digest_vectors() -> None:
@@ -79,7 +81,9 @@ def test_heroes_open_by_their_conditions() -> None:
     assert "spark" in unlocked_heroes(heroes, {"runs_count": 5})
     assert "bruiser" in unlocked_heroes(heroes, {"bosses_killed": ["shelter_outskirts"]})
     assert "bruiser" not in unlocked_heroes(heroes, {"bosses_killed": ["dead_city"]})
-    assert "marksman" in unlocked_heroes(heroes, {"milestones": {"dead_city": [300, 720]}})
-    assert "marksman" not in unlocked_heroes(heroes, {"milestones": {"toxic_marsh": [720]}})
+    assert "marksman" in unlocked_heroes(heroes, {"milestones": {"dead_city": [230, 555]}})
+    assert "marksman" not in unlocked_heroes(heroes, {"milestones": {"toxic_marsh": [555]}})
+    assert "marksman" in unlocked_heroes(heroes, {"milestones": {"dead_city": [720]}})
+    assert "marksman" not in unlocked_heroes(heroes, {"milestones": {"dead_city": [370]}})
     assert "chemist" in unlocked_heroes(heroes, {"achievements": list("abcdefgh")})
     assert "chemist" not in unlocked_heroes(heroes, {"achievements": list("abcdefg")})

@@ -1,14 +1,14 @@
 {
   "id": "tea_time",
   "name": "Чаепитие",
-  "description": "Автопилот продержался 10 минут",
+  "description": "Автопилот продержался 7:40",
   "hidden": true,
   "emeralds": 3,
   "condition": {
     "type": "reported",
     "event": "autopilotTime",
-    "value": 600,
-    "minSeconds": 600,
+    "value": 460,
+    "minSeconds": 460,
     "autopilot": true
   }
 }

@@ -15,7 +15,7 @@
   "groundSprite": "ground/city",
   "music": "music/city",
   "bossMusic": "music/boss",
-  "durationSeconds": 900,
+  "durationSeconds": 690,
   "startingHero": "wanderer",
   "waves": [
     {
@@ -36,7 +36,7 @@
       ]
     },
     {
-      "atSecond": 60,
+      "atSecond": 45,
       "spawnIntervalMs": 440,
       "hpMultiplier": 2.04,
       "speedMultiplier": 1,
@@ -57,7 +57,7 @@
       ]
     },
     {
-      "atSecond": 120,
+      "atSecond": 90,
       "spawnIntervalMs": 360,
       "hpMultiplier": 2.4,
       "speedMultiplier": 1.05,
@@ -78,7 +78,7 @@
       ]
     },
     {
-      "atSecond": 240,
+      "atSecond": 185,
       "spawnIntervalMs": 300,
       "hpMultiplier": 3.0,
       "speedMultiplier": 1.1,
@@ -103,7 +103,7 @@
       ]
     },
     {
-      "atSecond": 360,
+      "atSecond": 275,
       "spawnIntervalMs": 250,
       "hpMultiplier": 3.84,
       "speedMultiplier": 1.15,
@@ -132,7 +132,7 @@
       ]
     },
     {
-      "atSecond": 480,
+      "atSecond": 370,
       "spawnIntervalMs": 200,
       "hpMultiplier": 5.04,
       "speedMultiplier": 1.15,
@@ -161,7 +161,7 @@
       ]
     },
     {
-      "atSecond": 600,
+      "atSecond": 460,
       "spawnIntervalMs": 165,
       "hpMultiplier": 7.26,
       "speedMultiplier": 1.18,
@@ -190,7 +190,7 @@
       ]
     },
     {
-      "atSecond": 720,
+      "atSecond": 555,
       "spawnIntervalMs": 140,
       "hpMultiplier": 8.87,
       "speedMultiplier": 1.2,
@@ -219,7 +219,7 @@
       ]
     },
     {
-      "atSecond": 780,
+      "atSecond": 600,
       "spawnIntervalMs": 900,
       "hpMultiplier": 8.87,
       "speedMultiplier": 1.2,
@@ -242,23 +242,23 @@
   ],
   "events": [
     {
-      "atSecond": 270,
+      "atSecond": 210,
       "enemy": "riot_mech",
       "count": 1
     },
     {
-      "atSecond": 510,
+      "atSecond": 390,
       "enemy": "war_bot",
       "count": 2
     },
     {
-      "atSecond": 690,
+      "atSecond": 530,
       "enemy": "riot_mech",
       "count": 2
     }
   ],
   "boss": {
-    "atSecond": 780,
+    "atSecond": 600,
     "enemy": "iron_mayor"
   },
   "decor": {

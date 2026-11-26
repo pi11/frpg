@@ -9,6 +9,6 @@
     "event": "bossFast",
     "value": 55,
     "boss": true,
-    "minSeconds": 780
+    "minSeconds": 600
   }
 }

@@ -1,13 +1,13 @@
 {
   "id": "true_pacifist",
   "name": "Убеждённый пацифист",
-  "description": "Продержаться 3 минуты, никого не убив",
+  "description": "Продержаться 2:20, никого не убив",
   "hidden": true,
   "emeralds": 15,
   "condition": {
     "type": "reported",
     "event": "noKills",
-    "value": 180,
-    "minSeconds": 180
+    "value": 140,
+    "minSeconds": 140
   }
 }

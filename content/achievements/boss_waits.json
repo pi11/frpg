@@ -8,6 +8,6 @@
     "type": "reported",
     "event": "bossIgnored",
     "value": 1,
-    "minSeconds": 880
+    "minSeconds": 675
   }
 }

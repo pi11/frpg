@@ -38,10 +38,10 @@ def test_metric_conditions() -> None:
 
 def test_reported_conditions_have_limits() -> None:
     assert earned(facts(duration=1, reported=["tickle"])) == ["tickle"]
-    assert earned(facts(duration=119, reported=["rooted"])) == []
-    assert earned(facts(duration=120, reported=["rooted"])) == ["rooted"]
-    assert earned(facts(duration=800, reported=["boss_blitz"])) == []
-    assert "boss_blitz" in earned(facts(duration=800, reported=["boss_blitz"], boss_killed=True))
+    assert earned(facts(duration=89, reported=["rooted"])) == []
+    assert earned(facts(duration=90, reported=["rooted"])) == ["rooted"]
+    assert earned(facts(duration=650, reported=["boss_blitz"])) == []
+    assert "boss_blitz" in earned(facts(duration=650, reported=["boss_blitz"], boss_killed=True))
     assert earned(facts(duration=600, reported=["tea_time"])) == []
     assert earned(facts(duration=600, reported=["tea_time", "rooted"], autopilot=True)) == [
         "tea_time"]

@@ -9,6 +9,6 @@
     "event": "bossLowHp",
     "value": 10,
     "boss": true,
-    "minSeconds": 780
+    "minSeconds": 600
   }
 }

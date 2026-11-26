@@ -133,9 +133,20 @@ body.crt::after {
 .hub-subtabs { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 6px; }
 .hub-subtabs button { flex: 1 1 auto; padding: 7px 6px; border-color: transparent; background: transparent; color: var(--term-dim); border-bottom: 2px solid var(--term-line); }
 .hub-subtabs button[aria-pressed='true'] { border-bottom-color: var(--term-warn); color: var(--term-warn); }
-.hub-tabs { display: flex; flex-wrap: wrap; gap: 4px; margin: 0 0 14px; padding-bottom: 8px; border-bottom: 1px solid var(--term-line); }
-.hub-tabs button { flex: 1 1 auto; padding: 9px 6px; border-color: var(--term-line); color: var(--term-dim); }
-.hub-tabs button[aria-selected='true'] { border-color: var(--term-border); background: var(--term-border); color: var(--term-bg); text-shadow: none; }
+.hub-layout { display: flex; gap: 12px; align-items: flex-start; }
+.hub-main { flex: 1; min-width: 0; }
+/* Section icons down the right side, big enough for a thumb; they stay in view while the page scrolls. */
+.hub-tabs { position: sticky; top: 8px; flex: none; display: flex; flex-direction: column; gap: 6px; }
+.auth-card .hub-tabs button { position: relative; display: grid; place-items: center; width: 48px; height: 48px; padding: 0; border-color: var(--term-line); color: var(--term-dim); }
+.hub-tabs svg { width: 24px; height: 24px; }
+.auth-card .hub-tabs button[aria-selected='true'] { border-color: var(--term-border); background: var(--term-border); color: var(--term-bg); }
+.hub-badge { position: absolute; top: -6px; right: -6px; min-width: 18px; height: 18px; padding: 0 4px; box-sizing: border-box; border-radius: 9px; background: var(--term-warn); color: var(--term-bg); font-size: 8px; line-height: 18px; text-align: center; text-shadow: none; pointer-events: none; }
+.auth-card .hub-tabs button.hub-blink { animation: tab-blink 0.9s steps(1) infinite; }
+@keyframes tab-blink { 0%, 100% { border-color: var(--term-warn); color: var(--term-warn); box-shadow: 0 0 10px rgba(242, 196, 107, 0.55); } 50% { border-color: var(--term-line); box-shadow: none; } }
+@media (prefers-reduced-motion: reduce) { .auth-card .hub-tabs button.hub-blink { animation: none; border-color: var(--term-warn); color: var(--term-warn); } }
+.hub-panel-title { margin: 0 0 4px; color: var(--term-bright); font-size: 12px; font-weight: normal; }
+.hub-panel-about { margin: 0 0 12px; color: var(--term-dim); line-height: 1.8; }
+@media (max-width: 420px) { .hub-layout { gap: 8px; } .auth-card .hub-tabs button { width: 44px; height: 44px; } }
 .hub-help { color: var(--term-dim); line-height: 2; }
 .hub-items li { justify-content: flex-start; }
 .hub-items li > div { flex: 1; }

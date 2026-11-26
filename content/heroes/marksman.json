@@ -7,7 +7,7 @@
   "unlock": {
     "type": "milestone",
     "location": "dead_city",
-    "atSecond": 720
+    "atSecond": 555
   },
   "baseStats": {
     "maxHp": 70,

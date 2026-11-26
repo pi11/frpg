@@ -9,6 +9,6 @@
     "event": "bossOneGun",
     "value": 1,
     "boss": true,
-    "minSeconds": 780
+    "minSeconds": 600
   }
 }
