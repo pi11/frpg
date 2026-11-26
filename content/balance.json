@@ -1,8 +1,8 @@
 {
   "run": {
-    "enemyLimit": 300,
+    "enemyLimit": 500,
     "projectileLimit": 500,
-    "xpLimit": 400,
+    "xpLimit": 500,
     "spawnDistance": 320,
     "despawnDistance": 650,
     "contactCooldownMs": 500,
@@ -39,10 +39,10 @@
   "reward": {
     "base": 5,
     "perSecond": 0.25,
-    "perKill": 0.15,
+    "perKill": 0.08,
     "perWave": 2,
     "bossBonus": 30,
-    "maxKillsPerSecond": 8,
+    "maxKillsPerSecond": 20,
     "maxCapsPerSecond": 3,
     "durationGraceSeconds": 30,
     "emeraldMilestones": [

@@ -8,9 +8,9 @@
     "params": {
       "turnRate": 4,
       "preferredRange": 110,
-      "fireCooldownMs": 2400,
+      "fireCooldownMs": 3200,
       "projectileSpeed": 115,
-      "projectileDamage": 9,
+      "projectileDamage": 6,
       "projectileSprite": "projectiles/slug",
       "lifetimeMs": 2600,
       "shots": 1,

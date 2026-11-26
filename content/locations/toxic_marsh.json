@@ -20,8 +20,8 @@
   "waves": [
     {
       "atSecond": 0,
-      "spawnIntervalMs": 600,
-      "hpMultiplier": 1.85,
+      "spawnIntervalMs": 240,
+      "hpMultiplier": 1.57,
       "speedMultiplier": 1,
       "enemies": [
         {
@@ -36,8 +36,8 @@
     },
     {
       "atSecond": 45,
-      "spawnIntervalMs": 480,
-      "hpMultiplier": 2.1,
+      "spawnIntervalMs": 190,
+      "hpMultiplier": 1.78,
       "speedMultiplier": 1,
       "enemies": [
         {
@@ -56,8 +56,8 @@
     },
     {
       "atSecond": 90,
-      "spawnIntervalMs": 400,
-      "hpMultiplier": 2.44,
+      "spawnIntervalMs": 160,
+      "hpMultiplier": 2.07,
       "speedMultiplier": 1.05,
       "enemies": [
         {
@@ -80,8 +80,8 @@
     },
     {
       "atSecond": 185,
-      "spawnIntervalMs": 330,
-      "hpMultiplier": 3.02,
+      "spawnIntervalMs": 130,
+      "hpMultiplier": 2.57,
       "speedMultiplier": 1.1,
       "enemies": [
         {
@@ -109,8 +109,8 @@
     },
     {
       "atSecond": 275,
-      "spawnIntervalMs": 270,
-      "hpMultiplier": 3.86,
+      "spawnIntervalMs": 110,
+      "hpMultiplier": 3.28,
       "speedMultiplier": 1.15,
       "enemies": [
         {
@@ -138,8 +138,8 @@
     },
     {
       "atSecond": 370,
-      "spawnIntervalMs": 220,
-      "hpMultiplier": 5.04,
+      "spawnIntervalMs": 90,
+      "hpMultiplier": 4.28,
       "speedMultiplier": 1.15,
       "enemies": [
         {
@@ -167,8 +167,8 @@
     },
     {
       "atSecond": 460,
-      "spawnIntervalMs": 180,
-      "hpMultiplier": 7.15,
+      "spawnIntervalMs": 70,
+      "hpMultiplier": 6.08,
       "speedMultiplier": 1.18,
       "enemies": [
         {
@@ -196,8 +196,8 @@
     },
     {
       "atSecond": 555,
-      "spawnIntervalMs": 150,
-      "hpMultiplier": 8.66,
+      "spawnIntervalMs": 60,
+      "hpMultiplier": 7.36,
       "speedMultiplier": 1.2,
       "enemies": [
         {
@@ -226,7 +226,7 @@
     {
       "atSecond": 600,
       "spawnIntervalMs": 950,
-      "hpMultiplier": 8.66,
+      "hpMultiplier": 7.36,
       "speedMultiplier": 1.2,
       "enemies": [
         {
