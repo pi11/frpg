@@ -6,9 +6,9 @@
   "stat": "weaponSlots",
   "mod": "flat",
   "perLevel": 1,
-  "maxLevel": 3,
+  "maxLevel": 2,
   "cost": {
-    "base": 4,
+    "base": 8,
     "growth": 2
   }
 }

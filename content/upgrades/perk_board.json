@@ -8,7 +8,7 @@
   "perLevel": 1,
   "maxLevel": 3,
   "cost": {
-    "base": 3,
+    "base": 6,
     "growth": 2
   }
 }

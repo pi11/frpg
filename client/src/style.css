@@ -30,6 +30,13 @@ body,
     env(safe-area-inset-bottom, 0) env(safe-area-inset-left, 0);
 }
 
+/* Phaser measures its parent with padding included: the canvas lives in the padded box. */
+#game-area {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
 #game canvas {
   display: block;
   image-rendering: pixelated;
@@ -137,9 +144,11 @@ body.crt::after {
 .hub-main { flex: 1; min-width: 0; }
 /* Section icons down the right side, big enough for a thumb; they stay in view while the page scrolls. */
 .hub-tabs { position: sticky; top: 8px; flex: none; display: flex; flex-direction: column; gap: 6px; }
-.auth-card .hub-tabs button { position: relative; display: grid; place-items: center; width: 48px; height: 48px; padding: 0; border-color: var(--term-line); color: var(--term-dim); }
+.auth-card .hub-tabs button { position: relative; display: grid; place-items: center; width: 48px; height: 48px; padding: 0; border-color: color-mix(in srgb, var(--tab) 40%, transparent); background: color-mix(in srgb, var(--tab) 10%, var(--term-bg)); color: var(--tab); }
+.auth-card .hub-tabs button:hover, .auth-card .hub-tabs button:focus-visible { border-color: var(--tab); background: color-mix(in srgb, var(--tab) 25%, var(--term-bg)); color: var(--tab); }
 .hub-tabs svg { width: 24px; height: 24px; }
-.auth-card .hub-tabs button[aria-selected='true'] { border-color: var(--term-border); background: var(--term-border); color: var(--term-bg); }
+.auth-card .hub-tabs button[aria-selected='true'] { border-color: var(--tab); background: var(--tab); color: var(--term-bg); box-shadow: 0 0 8px color-mix(in srgb, var(--tab) 60%, transparent); }
+.hub-subcount { display: inline-block; min-width: 14px; padding: 0 3px; border-radius: 7px; background: var(--term-warn); color: var(--term-bg); text-shadow: none; }
 .hub-badge { position: absolute; top: -6px; right: -6px; min-width: 18px; height: 18px; padding: 0 4px; box-sizing: border-box; border-radius: 9px; background: var(--term-warn); color: var(--term-bg); font-size: 8px; line-height: 18px; text-align: center; text-shadow: none; pointer-events: none; }
 .auth-card .hub-tabs button.hub-blink { animation: tab-blink 0.9s steps(1) infinite; }
 @keyframes tab-blink { 0%, 100% { border-color: var(--term-warn); color: var(--term-warn); box-shadow: 0 0 10px rgba(242, 196, 107, 0.55); } 50% { border-color: var(--term-line); box-shadow: none; } }

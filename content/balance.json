@@ -14,7 +14,7 @@
     "eliteFocusRange": 200,
     "collectRadius": 14,
     "magnetSpeed": 260,
-    "maxWeapons": 6,
+    "maxWeapons": 5,
     "maxPassives": 6,
     "critMultiplier": 2,
     "reviveHpFraction": 0.5,

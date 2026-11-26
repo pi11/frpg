@@ -21,9 +21,16 @@ const DOOR = { left: 0.75, right: 0.89, top: 0.55, bottom: 0.93 };
 
 const VOLUMES = [['music', 'Музыка'], ['sfx', 'Звуки']] as const;
 
+/** Upgrades for caps; the emerald ones (slots, special) live on the emerald tab. */
 const CATEGORIES: readonly [UpgradeDefinition['category'], string][] = [
-  ['survival', 'Выживание'], ['combat', 'Бой'], ['scavenge', 'Добыча'], ['slots', 'Слоты'], ['special', 'Особое'],
+  ['survival', 'Выживание'], ['combat', 'Бой'], ['scavenge', 'Добыча'],
 ];
+
+/** Sections of the emerald tab; slots and special are upgrade categories. */
+const SHOP_TABS = [
+  ['weapons', 'Оружие'], ['passives', 'Перки'], ['slots', 'Слоты'], ['special', 'Особое'], ['info', 'Где добыть'],
+] as const;
+type ShopTab = (typeof SHOP_TABS)[number][0];
 
 /** 12×12 pixel icons for the tab rail, '#' is a lit pixel. */
 const ICONS = {
@@ -35,11 +42,7 @@ const ICONS = {
     '.##########.', '.#.######.#.', '.#.######.#.', '...##..##...', '...##..##...', '..###..###..'],
   upgrades: ['.....##.....', '....####....', '...######...', '..########..', '.####..####.', '.....##.....',
     '....####....', '...######...', '..########..', '.####..####.', '....####....', '....####....'],
-  weapons: ['............', '..#.........', '.##########.', '.##########.', '.####.##....', '.###..#.....',
-    '.###.##.....', '.###........', '.###........', '.###........', '............', '............'],
-  passives: ['.......###..', '......###...', '.....###....', '....###.....', '...#######..', '.......###..',
-    '......###...', '.....###....', '....###.....', '...##.......', '..#.........', '............'],
-  emeralds: ['............', '...######...', '..#.#..#.#..', '.##########.', '.##.####.##.', '..##.##.##..',
+  shop: ['............', '...######...', '..#.#..#.#..', '.##########.', '.##.####.##.', '..##.##.##..',
     '...##..##...', '....####....', '.....##.....', '............', '............', '............'],
   achievements: ['.##########.', '##.######.##', '#..######..#', '#..######..#', '.#.######.#.', '..########..',
     '....####....', '.....##.....', '.....##.....', '...######...', '..########..', '............'],
@@ -51,13 +54,17 @@ const TABS = [
   ['run', 'Вылазка', 'Выберите героя и локацию и отправляйтесь в Пустошь.'],
   ['daily', 'Задания', 'Новые каждый день, за выполнение — изумруды.'],
   ['heroes', 'Герои', 'У каждого своё оружие и характер. Новых героев открывают успехи в Пустоши.'],
-  ['upgrades', 'Улучшения', 'Постоянные улучшения за крышки и изумруды. Действуют в каждом забеге.'],
-  ['weapons', 'Оружие', 'Открытое оружие встречается среди карточек забега.'],
-  ['passives', 'Перки', 'Перки усиливают героя в забеге, редкие открываются за изумруды.'],
-  ['emeralds', 'Изумруды', 'Редкая валюта: откуда она берётся и на что её тратить.'],
+  ['upgrades', 'Улучшения', 'Постоянные улучшения за крышки. Действуют в каждом забеге.'],
+  ['shop', 'За изумруды', 'Новое оружие и перки для карточек забега, слоты и особые вещи.'],
   ['achievements', 'Достижения', 'Награды за подвиги и странные поступки.'],
   ['settings', 'Настройки', 'Звук, управление, ключ аккаунта и вход.'],
 ] as const;
+
+/** Each rail icon has its own colour, so a thumb finds it without reading. */
+const TAB_COLORS: Record<Tab, string> = {
+  run: '#9bff6e', daily: '#f2c46b', heroes: '#ff9f5a', upgrades: '#6ec8ff',
+  shop: '#3ee08a', achievements: '#ffd84a', settings: '#b9c6be',
+};
 type Tab = (typeof TABS)[number][0];
 
 function pixelIcon(rows: readonly string[]): string {
@@ -115,6 +122,7 @@ export class HubScene extends Phaser.Scene {
   /** Wanted game speed in percent; lowered to what the chosen location has open. */
   private speed = Number(loadChoice(SPEED_KEY)) || 100;
   private category: UpgradeDefinition['category'] = 'survival';
+  private shopTab: ShopTab = 'weapons';
 
   constructor() { super('Hub'); }
 
@@ -167,16 +175,12 @@ export class HubScene extends Phaser.Scene {
             <div id="hub-categories" class="hub-subtabs" role="group" aria-label="Виды улучшений"></div>
             <ul id="hub-upgrades" class="hub-upgrades"></ul>
           </section>
-          <section id="hub-panel-weapons" role="tabpanel" aria-labelledby="hub-tab-weapons">
-            ${panelHead('weapons')}
+          <section id="hub-panel-shop" role="tabpanel" aria-labelledby="hub-tab-shop">
+            ${panelHead('shop')}
+            <div id="hub-shop-tabs" class="hub-subtabs" role="group" aria-label="Покупки за изумруды"></div>
             <ul id="hub-weapons" class="hub-upgrades hub-items"></ul>
-          </section>
-          <section id="hub-panel-passives" role="tabpanel" aria-labelledby="hub-tab-passives">
-            ${panelHead('passives')}
             <ul id="hub-passives" class="hub-upgrades hub-items"></ul>
-          </section>
-          <section id="hub-panel-emeralds" role="tabpanel" aria-labelledby="hub-tab-emeralds">
-            ${panelHead('emeralds')}
+            <ul id="hub-shop-upgrades" class="hub-upgrades"></ul>
             <div id="hub-emerald-info"></div>
           </section>
           <section id="hub-panel-achievements" role="tabpanel" aria-labelledby="hub-tab-achievements">
@@ -213,7 +217,7 @@ export class HubScene extends Phaser.Scene {
           </section>
           </div>
           <nav class="hub-tabs" role="tablist" aria-label="Разделы убежища" aria-orientation="vertical">
-            ${TABS.map(([id, title]) => `<button type="button" role="tab" id="hub-tab-${id}" title="${title}"
+            ${TABS.map(([id, title]) => `<button type="button" role="tab" id="hub-tab-${id}" title="${title}" style="--tab:${TAB_COLORS[id]}"
               aria-label="${title}" data-tab="${id}" aria-controls="hub-panel-${id}">${pixelIcon(ICONS[id])}<span class="hub-badge" hidden></span></button>`).join('')}
           </nav></div>
         </div>
@@ -342,9 +346,20 @@ export class HubScene extends Phaser.Scene {
       this.render(this.profile);
       this.el('hub-categories').querySelector<HTMLButtonElement>(`[data-category="${category}"]`)?.focus();
     };
-    this.el('hub-upgrades').onclick = (event) => {
-      const button = (event.target as HTMLElement).closest<HTMLButtonElement>('button[data-upgrade]');
-      if (button?.dataset.upgrade) void this.act(() => this.buy(button.dataset.upgrade!));
+    for (const list of ['hub-upgrades', 'hub-shop-upgrades']) {
+      this.el(list).onclick = (event) => {
+        const button = (event.target as HTMLElement).closest<HTMLButtonElement>('button[data-upgrade]');
+        if (button?.dataset.upgrade) void this.act(() => this.buy(button.dataset.upgrade!));
+      };
+    }
+    this.el('hub-shop-tabs').onclick = (event) => {
+      const button = (event.target as HTMLElement).closest<HTMLButtonElement>('button[data-shop]');
+      const tab = SHOP_TABS.find(([id]) => id === button?.dataset.shop)?.[0];
+      if (!tab || !this.profile) return;
+      this.shopTab = tab;
+      playSfx('sfx/ui_click');
+      this.render(this.profile);
+      this.el('hub-shop-tabs').querySelector<HTMLButtonElement>(`[data-shop="${tab}"]`)?.focus();
     };
     for (const list of ['hub-weapons', 'hub-passives']) {
       this.el(list).onclick = (event) => {
@@ -474,12 +489,12 @@ export class HubScene extends Phaser.Scene {
     this.el<HTMLInputElement>('hub-autopilot').disabled = !bought;
     this.el('hub-autopilot-note').textContent = bought
       ? 'Не закрывайте вкладку игры. В забеге переключается клавишей I.'
-      : pilot ? `Купите за ${upgradeCost(pilot, 0)} изумр. на вкладке «Улучшения».` : '';
+      : pilot ? `Купите за ${upgradeCost(pilot, 0)} изумр.: вкладка «За изумруды», раздел «Особое».` : '';
     this.el('hub-categories').innerHTML = CATEGORIES.map(([category, title]) =>
       `<button type="button" data-category="${category}" aria-pressed="${category === this.category}">${title}</button>`).join('');
-    this.el('hub-upgrades').innerHTML = Object.values(catalog.upgrades)
-      .filter((upgrade) => upgrade.category === this.category).map((upgrade) => {
-      const level = profile.upgrades[upgrade.id] ?? 0;
+    const row = (upgrade: UpgradeDefinition): string => {
+      // A level bought before the maximum was lowered still counts only up to the maximum.
+      const level = Math.min(profile.upgrades[upgrade.id] ?? 0, upgrade.maxLevel);
       const maxed = level >= upgrade.maxLevel;
       const cost = maxed ? 0 : upgradeCost(upgrade, level);
       const emeralds = upgrade.currency === 'emeralds';
@@ -490,7 +505,26 @@ export class HubScene extends Phaser.Scene {
         <small>${escapeHtml(effectText(upgrade, level))}</small></div>
         <button type="button" data-upgrade="${escapeHtml(upgrade.id)}" ${maxed || cost > funds ? 'disabled' : ''}>${label}</button>
       </li>`;
+    };
+    const all = Object.values(catalog.upgrades);
+    this.el('hub-upgrades').innerHTML = all.filter((upgrade) => upgrade.category === this.category)
+      .map(row).join('');
+    this.el('hub-shop-upgrades').innerHTML = all.filter((upgrade) => upgrade.category === this.shopTab)
+      .map(row).join('');
+    this.renderShopTabs(profile);
+  }
+
+  private renderShopTabs(profile: Profile): void {
+    const counts = this.purchasable(profile);
+    this.el('hub-shop-tabs').innerHTML = SHOP_TABS.map(([id, title]) => {
+      const count = id === 'info' ? 0 : counts[id];
+      return `<button type="button" data-shop="${id}" aria-pressed="${id === this.shopTab}">${title}${
+        count ? ` <span class="hub-subcount">${count}</span>` : ''}</button>`;
     }).join('');
+    this.el('hub-weapons').hidden = this.shopTab !== 'weapons';
+    this.el('hub-passives').hidden = this.shopTab !== 'passives';
+    this.el('hub-shop-upgrades').hidden = this.shopTab !== 'slots' && this.shopTab !== 'special';
+    this.el('hub-emerald-info').hidden = this.shopTab !== 'info';
   }
 
   /** The wanted speed, or the fastest open one below it here. */
@@ -595,20 +629,27 @@ export class HubScene extends Phaser.Scene {
         perks.filter((perk) => perk.unlock.type === 'default').map((perk) => row(perk, note(perk))));
   }
 
-  /** Counts of what the emeralds on hand can buy right now, on the rail icons. */
-  private renderPurchaseBadges(profile: Profile): void {
+  /** What the emeralds on hand can buy right now, per section of the emerald tab. */
+  private purchasable(profile: Profile): Record<Exclude<ShopTab, 'info'>, number> {
     const { upgrades, weapons, passives } = getCatalog();
-    const upgradesReady = Object.values(upgrades).filter((upgrade) => {
+    const upgradesReady = (category: string): number => Object.values(upgrades).filter((upgrade) => {
       const level = profile.upgrades[upgrade.id] ?? 0;
-      return upgrade.currency === 'emeralds' && level < upgrade.maxLevel
-        && upgradeCost(upgrade, level) <= profile.emeralds;
+      return upgrade.currency === 'emeralds' && upgrade.category === category
+        && level < upgrade.maxLevel && upgradeCost(upgrade, level) <= profile.emeralds;
     }).length;
     const unlockable = (items: (WeaponDefinition | PassiveDefinition)[]): number => items.filter((item) =>
       item.unlock.type === 'emeralds' && !profile.unlocks.includes(item.id)
       && item.unlock.emeralds <= profile.emeralds).length;
-    this.badge('upgrades', upgradesReady, false);
-    this.badge('weapons', unlockable(Object.values(weapons)), false);
-    this.badge('passives', unlockable(Object.values(passives)), false);
+    return {
+      weapons: unlockable(Object.values(weapons)), passives: unlockable(Object.values(passives)),
+      slots: upgradesReady('slots'), special: upgradesReady('special'),
+    };
+  }
+
+  /** The emerald tab shows how many things can be bought right now. */
+  private renderPurchaseBadges(profile: Profile): void {
+    const total = Object.values(this.purchasable(profile)).reduce((sum, count) => sum + count, 0);
+    this.badge('shop', total, false);
   }
 
   private badge(tab: Tab, count: number, blink: boolean): void {
@@ -627,7 +668,7 @@ export class HubScene extends Phaser.Scene {
     const row = (title: string, amount: number, done = false): string =>
       `<li class="${done ? 'hub-done' : ''}"><span>${escapeHtml(title)}</span><span>${done ? 'получено' : `+${amount}`}</span></li>`;
     this.el('hub-emerald-info').innerHTML = `
-      <p class="hub-help">За изумруды открывают тяжёлое оружие и редкие перки (они появляются среди карточек забега) и докупают слоты (вкладка «Улучшения»). Изумруды начисляются в конце забега, даже если герой погиб.</p>
+      <p class="hub-help">За изумруды открывают тяжёлое оружие и редкие перки (они появляются среди карточек забега), докупают слоты и автопилот. Изумруды начисляются в конце забега, даже если герой погиб.</p>
       ${orderedLocations(catalog).map((location) => {
         const { elite, boss, firstBoss } = location.emeralds;
         const reached = profile.milestones[location.id] ?? [];

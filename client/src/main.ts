@@ -17,10 +17,16 @@ import './style.css';
 
 await Promise.all([initSession(platformTokenStore()), preparePlatform()]);
 
+/** The room left for the game inside the safe-area padding (camera cutout, gesture bar). */
+function areaSize(): { width: number; height: number } {
+  const area = document.getElementById('game-area');
+  return gameSize(area?.clientWidth || window.innerWidth, area?.clientHeight || window.innerHeight);
+}
+
 export const game = new Phaser.Game({
   type: Phaser.AUTO,
-  parent: 'game',
-  ...gameSize(window.innerWidth, window.innerHeight),
+  parent: 'game-area',
+  ...areaSize(),
   backgroundColor: '#08120b',
   pixelArt: true,
   roundPixels: true,
@@ -37,10 +43,15 @@ export const game = new Phaser.Game({
 
 setupPlatform(game);
 
-window.addEventListener('resize', () => {
-  const { width, height } = gameSize(window.innerWidth, window.innerHeight);
+function fitGame(): void {
+  const { width, height } = areaSize();
   if (width !== game.scale.width || height !== game.scale.height) game.scale.setGameSize(width, height);
-});
+  // Entering full screen changes the safe-area padding without always resizing the window.
+  game.scale.refresh();
+}
+window.addEventListener('resize', fitGame);
+document.addEventListener('fullscreenchange', () => requestAnimationFrame(fitGame));
+new ResizeObserver(fitGame).observe(document.getElementById('game-area')!);
 
 if (import.meta.env.DEV) {
   (window as Window & { __wastelandGame?: Phaser.Game }).__wastelandGame = game;
