@@ -1,5 +1,6 @@
 import * as Phaser from 'phaser';
 import { accountKey, ApiRequestError, authMethods, deleteAccount, loginByKey, saveSession, session } from '../api/auth';
+import { identityLines } from '../api/identities';
 import { buyUnlock, buyUpgrade, claimAchievement, claimDaily, getProfile, startRun, type Profile } from '../api/game';
 import { getCatalog } from '../content/catalog';
 import { orderedLocations } from '../content/locations';
@@ -204,6 +205,7 @@ export class HubScene extends Phaser.Scene {
               <div class="auth-row"><input id="hub-key-other" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="40" required placeholder="XXXXX-XXXXX-XXXXX-XXXXX"><button type="submit">Войти</button></div>
             </form>
             <h2>Аккаунт</h2>
+            <ul id="hub-identities" class="hub-identities"></ul>
             <div class="hub-account">
               <button id="hub-link" class="auth-secondary" type="button" hidden></button>
               <button id="hub-delete" class="auth-back hub-danger" type="button">Удалить аккаунт и данные</button>
@@ -436,7 +438,11 @@ export class HubScene extends Phaser.Scene {
     this.el('hub-best').textContent = formatTime(profile.best_time_s);
     this.el('hub-runs').textContent = String(profile.runs_count);
     this.el('hub-guest-hint').hidden = !(profile.is_guest && profile.runs_count >= 1);
-    this.el('hub-link').textContent = profile.is_guest ? 'Привязать вход' : 'Способы входа';
+    this.el('hub-link').textContent = profile.is_guest ? 'Привязать почту или Telegram' : 'Добавить способ входа';
+    const lines = identityLines(profile.identities);
+    this.el('hub-identities').innerHTML = lines.length
+      ? lines.map((line) => `<li>${escapeHtml(line)}</li>`).join('')
+      : '<li class="hub-identities-none">Вход только по ключу аккаунта: почта и Telegram не привязаны.</li>';
     const locations = orderedLocations(catalog);
     if (!profile.unlocked_locations.includes(this.selected)) {
       this.selected = locations.find((item) => profile.unlocked_locations.includes(item.id))?.id ?? '';

@@ -219,3 +219,9 @@ body.crt::after {
 .hub-speeds { flex-wrap: nowrap; align-items: center; margin: 0 0 4px; }
 .hub-speeds-title { flex: none; margin-right: 6px; color: var(--term-dim); }
 .hub-speeds button { flex: 1 1 0; }
+.hub-identities { margin: 0 0 10px; padding: 0; list-style: none; line-height: 2; color: var(--term-bright); }
+.hub-identities li::before { content: '> '; color: var(--term-warn); }
+.hub-identities .hub-identities-none { color: var(--term-dim); }
+.hub-identities .hub-identities-none::before { content: ''; }
+.auth-linked { margin: 0 0 8px; color: var(--term-dim); }
+.auth-linked .hub-identities { margin: 4px 0 0; }

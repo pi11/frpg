@@ -5,6 +5,8 @@ import {
   startEmail, startTelegram, verifyEmail,
   webPage, type TelegramStart, type TokenPair,
 } from '../api/auth';
+import { getProfile } from '../api/game';
+import { identityLines } from '../api/identities';
 import { isNative, openExternal, takeLaunchToken } from '../platform/native';
 
 export class AuthScene extends Phaser.Scene {
@@ -36,6 +38,7 @@ export class AuthScene extends Phaser.Scene {
         <h1 id="auth-title">ПУСТОШЬ</h1>
         <p class="auth-intro">${this.linking ? 'Привяжите вход, чтобы сохранить доступ к аккаунту.' : 'Выживите за пределами убежища. Начните новую игру или продолжите свою.'}</p>
         <p id="auth-status" class="auth-status" role="status">Подключаемся к серверу…</p>
+        <div id="auth-linked" class="auth-linked" hidden><span>Вы вошли:</span><ul id="auth-identities" class="hub-identities"></ul></div>
         <div id="auth-methods" hidden>
           <button id="auth-continue" class="auth-primary" type="button" hidden>Продолжить текущий аккаунт</button>
           <button id="auth-guest" class="auth-primary" type="button">Новая игра</button>
@@ -175,6 +178,21 @@ export class AuthScene extends Phaser.Scene {
     this.el('auth-more').hidden = !methods.email && !methods.telegram;
     if (!magicToken && !session()) this.status('Начните новую игру или введите ключ.');
     if (this.linking) this.status('Выберите способ привязки.');
+    if (session()) void this.showIdentities();
+  }
+
+  /** The sign-ins the current account already has; a guest without any sees nothing. */
+  private async showIdentities(): Promise<void> {
+    try {
+      const lines = identityLines((await getProfile()).identities);
+      if (!this.active || !lines.length) return;
+      this.el('auth-identities').replaceChildren(...lines.map((line) => {
+        const item = document.createElement('li');
+        item.textContent = line;
+        return item;
+      }));
+      this.el('auth-linked').hidden = false;
+    } catch { /* only a hint: the sign-in options work without it */ }
   }
 
   private async act(action: () => Promise<void>): Promise<void> {
