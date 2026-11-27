@@ -1,4 +1,5 @@
 
+from app.models.admin import AdminAction
 from app.models.auth import (
     AuthIdentity,
     LoginToken,
@@ -12,6 +13,6 @@ from app.models.base import Base
 from app.models.run import Run
 
 __all__ = [
-    "AuthIdentity", "Base", "LoginToken", "Profile", "RecoveryKey",
+    "AdminAction", "AuthIdentity", "Base", "LoginToken", "Profile", "RecoveryKey",
     "RefreshToken", "Run", "TelegramLoginRequest", "User",
 ]

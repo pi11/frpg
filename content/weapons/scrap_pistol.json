@@ -65,8 +65,14 @@
   "tags": [
     "ballistic"
   ],
-  "evolution": {
-    "passive": "trigger_spring",
-    "into": "nail_gun"
-  }
+  "evolutions": [
+    {
+      "passive": "trigger_spring",
+      "into": "nail_gun"
+    },
+    {
+      "passive": "nimble",
+      "into": "twin_pistols"
+    }
+  ]
 }

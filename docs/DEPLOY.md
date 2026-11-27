@@ -157,6 +157,16 @@ systemctl enable --now wasteland-cleanup.timer wasteland-backup.timer
 - **Resend:** добавьте домен-отправитель и внесите в DNS показанные там записи SPF и DKIM, затем DMARC: `_dmarc TXT "v=DMARC1; p=none; rua=mailto:ВАША_ПОЧТА"`; после проверки отчётов — `p=quarantine`. `MAIL_FROM` должен быть на этом домене.
 - **Бот:** `systemd-run --wait --pipe --collect --uid=wasteland -p EnvironmentFile=/etc/wasteland/wasteland.env -p WorkingDirectory=/var/www/webii/wasteland.lol/frpg/server /var/www/webii/wasteland.lol/frpg/server/.venv/bin/python -m app.services.telegram_webhook set`. С аргументом `info` — состояние и последняя ошибка. `make bot-poll` с боевым токеном не запускать: он удалит вебхук.
 
+## 7а. Администратор
+
+Права админа выдаются только из консоли сервера. `ID аккаунта` виден в игре: «Настройки» → «Аккаунт». Вместо ID подойдёт почта, если аккаунт входит по почте.
+
+```bash
+systemd-run --wait --pipe --collect --uid=wasteland -p EnvironmentFile=/etc/wasteland/wasteland.env -p WorkingDirectory=/var/www/webii/wasteland.lol/frpg/server /var/www/webii/wasteland.lol/frpg/server/.venv/bin/python -m app.services.admin grant ID_ИЛИ_ПОЧТА
+```
+
+`revoke ID_ИЛИ_ПОЧТА` снимает права, `list` показывает всех админов. После выдачи обновите страницу: в настройках появится кнопка «Админ-панель» (статистика, игроки, выдача крышек и изумрудов, подозрительные забеги, журнал действий). Все выдачи и смены прав пишутся в таблицу `admin_actions`. Локально то же самое: `make admin WHO=…`, `make admin-revoke WHO=…`, `make admins`.
+
 ## 8. Бэкапы и восстановление
 
 Ключ SSH пользователя `wasteland` добавьте на второй хост, один раз подключитесь вручную (`sudo -u wasteland -H ssh …`), затем `systemctl start wasteland-backup && journalctl -u wasteland-backup -n 20`. Копии — в `/var/lib/wasteland-backups` и на втором хосте, 14 дней; `BACKUP_KEEP_DAYS` и `VITE_BACKUP_DAYS` должны совпадать. Второй хост зеркалит сервер: это защита от потери сервера, но не от его взлома — при желании делайте там снимки.

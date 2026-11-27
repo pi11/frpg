@@ -1,0 +1,28 @@
+{
+  "id": "fire_ring",
+  "name": "Огненное кольцо",
+  "description": "Пламя бьёт во все стороны разом",
+  "sprite": "weapons/fire_ring",
+  "projectileSprite": "projectiles/flame",
+  "fireSound": "sfx/flame",
+  "behavior": {
+    "type": "projectile",
+    "params": {
+      "speed": 200,
+      "lifetimeMs": 380
+    }
+  },
+  "levels": [
+    {
+      "damage": 10,
+      "cooldownMs": 260,
+      "shots": 10,
+      "spreadDegrees": 360,
+      "pierce": 6
+    }
+  ],
+  "tags": [
+    "fire"
+  ],
+  "evolved": true
+}

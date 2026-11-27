@@ -81,8 +81,18 @@
   "tags": [
     "energy"
   ],
-  "evolution": {
-    "passive": "scrap_magnet",
-    "into": "drone_swarm"
+  "evolutions": [
+    {
+      "passive": "scrap_magnet",
+      "into": "drone_swarm"
+    },
+    {
+      "passive": "scrap_plating",
+      "into": "shield_drones"
+    }
+  ],
+  "unlock": {
+    "type": "runs",
+    "count": 3
   }
 }

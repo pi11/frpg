@@ -80,8 +80,18 @@
   "tags": [
     "explosive"
   ],
-  "evolution": {
-    "passive": "thick_hide",
-    "into": "minefield"
+  "evolutions": [
+    {
+      "passive": "thick_hide",
+      "into": "minefield"
+    },
+    {
+      "passive": "heavy_rounds",
+      "into": "demo_charge"
+    }
+  ],
+  "unlock": {
+    "type": "runs",
+    "count": 1
   }
 }

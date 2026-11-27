@@ -1,0 +1,29 @@
+{
+  "id": "smart_warhead",
+  "name": "Умная боеголовка",
+  "description": "Одна огромная ракета находит цель",
+  "sprite": "weapons/smart_warhead",
+  "projectileSprite": "projectiles/rocket",
+  "fireSound": "sfx/rocket",
+  "behavior": {
+    "type": "rocket",
+    "params": {
+      "speed": 240,
+      "lifetimeMs": 2800,
+      "turnRate": 8
+    }
+  },
+  "levels": [
+    {
+      "damage": 220,
+      "cooldownMs": 1400,
+      "shots": 1,
+      "spreadDegrees": 0,
+      "radius": 90
+    }
+  ],
+  "tags": [
+    "explosive"
+  ],
+  "evolved": true
+}

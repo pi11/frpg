@@ -1,0 +1,28 @@
+{
+  "id": "demo_charge",
+  "name": "Подрывной заряд",
+  "description": "Редкие, но страшные взрывы",
+  "sprite": "weapons/demo_charge",
+  "projectileSprite": "projectiles/mine",
+  "fireSound": "sfx/mine",
+  "behavior": {
+    "type": "mine",
+    "params": {
+      "scatter": 40
+    }
+  },
+  "levels": [
+    {
+      "damage": 160,
+      "cooldownMs": 1600,
+      "shots": 2,
+      "spreadDegrees": 0,
+      "radius": 80,
+      "durationMs": 12000
+    }
+  ],
+  "tags": [
+    "explosive"
+  ],
+  "evolved": true
+}

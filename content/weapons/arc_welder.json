@@ -1,0 +1,29 @@
+{
+  "id": "arc_welder",
+  "name": "Сварочная дуга",
+  "description": "Короткие молнии почти без перерыва",
+  "sprite": "weapons/arc_welder",
+  "projectileSprite": "projectiles/spark",
+  "fireSound": "sfx/tesla",
+  "behavior": {
+    "type": "chain",
+    "params": {
+      "range": 180,
+      "jumpRange": 80,
+      "falloff": 0.85
+    }
+  },
+  "levels": [
+    {
+      "damage": 22,
+      "cooldownMs": 260,
+      "shots": 2,
+      "spreadDegrees": 0,
+      "jumps": 3
+    }
+  ],
+  "tags": [
+    "energy"
+  ],
+  "evolved": true
+}

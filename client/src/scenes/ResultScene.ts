@@ -78,6 +78,7 @@ export class ResultScene extends Phaser.Scene {
     this.sending = true;
     const summary = this.result.summary;
     const catalog = getCatalog();
+    const { cx } = layoutOf(this);
     const estimate = runReward(catalog.balance.reward, {
       duration: summary.duration_seconds,
       kills: Object.values(summary.kills_by_type).reduce((sum, value) => sum + value, 0),
@@ -104,6 +105,8 @@ export class ResultScene extends Phaser.Scene {
       );
       this.actionLabel.setText('В УБЕЖИЩЕ');
       playSfx('sfx/reward');
+      if (response.reward_emeralds) this.burst(cx, this.rewardLabel.y - 18, Math.min(10, response.reward_emeralds));
+      this.showAchievements(response.achievements);
     } catch (error) {
       if (!this.scene.isActive()) return;
       const message = error instanceof Error ? error.message : 'Не удалось связаться с сервером.';
@@ -112,6 +115,55 @@ export class ResultScene extends Phaser.Scene {
       playSfx('sfx/ui_error');
     } finally {
       this.sending = false;
+    }
+  }
+
+  /** Each new achievement slides up at the bottom edge in turn (the leave link is gone by then), with a flash and a spray of emeralds. */
+  private showAchievements(ids: readonly string[]): void {
+    const { achievements } = getCatalog();
+    const { cx, width, height } = layoutOf(this);
+    const cardWidth = Math.min(width - 24, 300);
+    ids.forEach((id, index) => {
+      const item = achievements[id];
+      const delay = 500 + index * 1900;
+      const y = height - 20;
+      const away = height + 40;
+      const card = this.add.container(cx, away).setDepth(10);
+      const ray = this.add.image(0, 0, ATLAS, 'fx/ray').setScale(1.6).setAlpha(0).setBlendMode(Phaser.BlendModes.ADD);
+      const box = this.add.rectangle(0, 0, cardWidth, 34, 0x1d2a12, 0.96).setStrokeStyle(2, 0xffd84a);
+      const icon = this.add.image(-cardWidth / 2 + 20, 0, ATLAS, 'ui/emerald').setScale(2);
+      const head = this.add.text(-cardWidth / 2 + 38, -12, 'ДОСТИЖЕНИЕ!', textStyle(8, COLORS.warn));
+      const name = this.add.text(-cardWidth / 2 + 38, 0, item?.name ?? id, textStyle(8, COLORS.bright, {
+        wordWrap: { width: cardWidth - 92 } }));
+      const prize = this.add.text(cardWidth / 2 - 8, 0, item ? `+${item.emeralds}` : '', textStyle(8, COLORS.bright))
+        .setOrigin(1, 0.5);
+      const shine = this.add.rectangle(-cardWidth / 2, 0, 10, 32, 0xffffff, 0.35).setAngle(18)
+        .setBlendMode(Phaser.BlendModes.ADD);
+      card.add([ray, box, icon, head, name, prize, shine]);
+      this.tweens.chain({ targets: card, tweens: [
+        { y, delay, duration: 380, ease: 'Back.easeOut', onStart: () => playSfx('sfx/emerald') },
+        { scale: 1.06, duration: 120, yoyo: true, onComplete: () => this.burst(cx - cardWidth / 2 + 20, y, 8) },
+        { y, duration: 1100 },
+        { y: away, alpha: 0, duration: 260, ease: 'Quad.easeIn', onComplete: () => card.destroy() },
+      ] });
+      this.tweens.add({ targets: ray, alpha: { from: 0, to: 0.7 }, angle: 90, delay: delay + 300,
+        duration: 700, yoyo: true });
+      this.tweens.add({ targets: shine, x: cardWidth / 2, delay: delay + 380, duration: 520, ease: 'Sine.easeInOut' });
+      this.tweens.add({ targets: icon, angle: { from: -12, to: 12 }, delay, duration: 160, yoyo: true, repeat: 3 });
+    });
+  }
+
+  /** A spray of emeralds that fall and fade. */
+  private burst(x: number, y: number, count: number): void {
+    for (let index = 0; index < count; index += 1) {
+      const angle = -Math.PI / 2 + (index / Math.max(1, count - 1) - 0.5) * 2.4;
+      const speed = 34 + (index % 3) * 14;
+      const gem = this.add.image(x, y, ATLAS, 'ui/emerald').setDepth(11).setScale(1.4);
+      this.tweens.add({
+        targets: gem, x: x + Math.cos(angle) * speed, y: y + Math.sin(angle) * speed + 26,
+        angle: (index % 2 ? 1 : -1) * 180, alpha: 0, scale: 0.6, duration: 700 + index * 25, ease: 'Quad.easeOut',
+        onComplete: () => gem.destroy(),
+      });
     }
   }
 }

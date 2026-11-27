@@ -74,8 +74,18 @@
   "tags": [
     "explosive"
   ],
-  "evolution": {
-    "passive": "field_notes",
-    "into": "rocket_barrage"
+  "evolutions": [
+    {
+      "passive": "field_notes",
+      "into": "rocket_barrage"
+    },
+    {
+      "passive": "trophy_hunter",
+      "into": "smart_warhead"
+    }
+  ],
+  "unlock": {
+    "type": "bossKilled",
+    "location": "shelter_outskirts"
   }
 }

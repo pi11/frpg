@@ -1,0 +1,28 @@
+{
+  "id": "twin_pistols",
+  "name": "Парные пистолеты",
+  "description": "Два ствола бьют веером без устали",
+  "sprite": "weapons/twin_pistols",
+  "projectileSprite": "projectiles/bullet",
+  "fireSound": "sfx/shot_pistol",
+  "behavior": {
+    "type": "projectile",
+    "params": {
+      "speed": 340,
+      "lifetimeMs": 1100
+    }
+  },
+  "levels": [
+    {
+      "damage": 18,
+      "cooldownMs": 300,
+      "shots": 4,
+      "spreadDegrees": 30,
+      "pierce": 1
+    }
+  ],
+  "tags": [
+    "ballistic"
+  ],
+  "evolved": true
+}

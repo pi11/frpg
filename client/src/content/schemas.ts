@@ -57,6 +57,15 @@ const spriteKey = (folder: string) => z.string().regex(
 /** Audio keys map to client/public/assets/<key>.wav (sfx) or .ogg/.mp3 (music). */
 const soundKey = (folder: 'sfx' | 'music') => spriteKey(folder);
 
+/** Conditions met by playing; checked by hero_progress in economy.py and progressMet on the client. */
+const PROGRESS_UNLOCKS = [
+  z.object({ type: z.literal('runs'), count: z.number().int().positive() }).strict(),
+  z.object({ type: z.literal('achievements'), count: z.number().int().positive() }).strict(),
+  z.object({ type: z.literal('bossKilled'), location: IdSchema }).strict(),
+  z.object({ type: z.literal('milestone'), location: IdSchema,
+    atSecond: z.number().int().positive() }).strict(),
+] as const;
+
 export const HeroSchema = z.object({
   id: IdSchema,
   name: z.string().min(1),
@@ -65,22 +74,20 @@ export const HeroSchema = z.object({
   startingWeapon: IdSchema,
   /** Checked by the server (unlocked_heroes in economy.py). */
   unlock: z.discriminatedUnion('type', [
-    z.object({ type: z.literal('default') }).strict(),
-    z.object({ type: z.literal('runs'), count: z.number().int().positive() }).strict(),
-    z.object({ type: z.literal('achievements'), count: z.number().int().positive() }).strict(),
-    z.object({ type: z.literal('bossKilled'), location: IdSchema }).strict(),
-    z.object({ type: z.literal('milestone'), location: IdSchema,
-      atSecond: z.number().int().positive() }).strict(),
+    z.object({ type: z.literal('default') }).strict(), ...PROGRESS_UNLOCKS,
   ]),
   baseStats: StatsSchema,
 }).strict();
 export type HeroDefinition = z.infer<typeof HeroSchema>;
 
-/** Weapons and perks are offered in runs at once or after being bought for emeralds. */
+/** Weapons and perks are offered in runs at once, after progress, or after being bought for emeralds. */
 const ItemUnlockSchema = z.discriminatedUnion('type', [
   z.object({ type: z.literal('default') }).strict(),
   z.object({ type: z.literal('emeralds'), emeralds: z.number().int().positive() }).strict(),
+  ...PROGRESS_UNLOCKS,
 ]).default({ type: 'default' });
+export type ItemUnlock = z.infer<typeof ItemUnlockSchema>;
+export type ProgressUnlock = Exclude<ItemUnlock, { type: 'default' | 'emeralds' }>;
 
 /**
  * One weapon level. `shots` is projectiles per volley, drones in orbit or bottles per throw;
@@ -109,8 +116,8 @@ export const WeaponSchema = z.object({
   behavior: z.object({ type: IdSchema, params: z.unknown() }).strict(),
   levels: z.array(WeaponLevelSchema).min(1).max(8),
   tags: z.array(z.string()),
-  /** Base weapon at its last level + this passive owned → the `into` weapon is offered. */
-  evolution: z.object({ passive: IdSchema, into: IdSchema }).strict().optional(),
+  /** Base weapon at its last level + one of these passives owned → its `into` weapon is offered. */
+  evolutions: z.array(z.object({ passive: IdSchema, into: IdSchema }).strict()).default([]),
   /** Evolved weapons have a single level and are never offered as new weapons. */
   evolved: z.boolean().default(false),
   /** Heavy weapons use their own slots, have 5 levels and do not evolve. */
@@ -124,8 +131,8 @@ export const WeaponSchema = z.object({
     context.addIssue({ code: 'custom', path: ['levels'],
       message: `${weapon.evolved ? 'evolved' : weapon.heavy ? 'heavy' : 'base'} weapon needs ${expected} level(s)` });
   }
-  if ((weapon.evolved || weapon.heavy) && weapon.evolution) {
-    context.addIssue({ code: 'custom', path: ['evolution'], message: 'evolved and heavy weapons cannot evolve' });
+  if ((weapon.evolved || weapon.heavy) && weapon.evolutions.length) {
+    context.addIssue({ code: 'custom', path: ['evolutions'], message: 'evolved and heavy weapons cannot evolve' });
   }
 });
 export type WeaponDefinition = z.infer<typeof WeaponSchema>;
@@ -409,6 +416,8 @@ export const BalanceSchema = z.object({
     eliteMaxLossPerSecond: z.number().gt(0).max(1),
     bossMaxLossPerSecond: z.number().gt(0).max(1),
     /** A random card is taken when the player does not choose in time. */
+    /** Pace of every run before the chosen speed: 0.8 makes ×1 a calmer game. */
+    timeScale: z.number().positive().max(1),
     levelUpTimeoutMs: z.number().positive(),
     maxDodge: z.number().min(0).max(1),
     critMultiplier: z.number().min(1),

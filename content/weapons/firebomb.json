@@ -82,8 +82,18 @@
   "tags": [
     "fire"
   ],
-  "evolution": {
-    "passive": "wide_bore",
-    "into": "napalm"
+  "evolutions": [
+    {
+      "passive": "wide_bore",
+      "into": "napalm"
+    },
+    {
+      "passive": "capacitor",
+      "into": "fire_rain"
+    }
+  ],
+  "unlock": {
+    "type": "runs",
+    "count": 2
   }
 }

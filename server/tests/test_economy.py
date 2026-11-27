@@ -9,6 +9,7 @@ from app.services.economy import (
     accepted_elites,
     emerald_reward,
     new_milestones,
+    open_items,
     record_win,
     run_reward,
     speed_win_emeralds,
@@ -90,6 +91,21 @@ def test_heroes_open_by_their_conditions() -> None:
     assert "marksman" not in unlocked_heroes(heroes, {"milestones": {"dead_city": [370]}})
     assert "chemist" in unlocked_heroes(heroes, {"achievements": list("abcdefgh")})
     assert "chemist" not in unlocked_heroes(heroes, {"achievements": list("abcdefg")})
+
+
+def test_weapons_and_perks_open_by_progress_or_emeralds() -> None:
+    content = get_content()
+    items = {**content.category("weapons"), **content.category("passives")}
+    start = open_items(items, {})
+    assert {"scrap_pistol", "scattergun", "heavy_rounds"} <= set(start)
+    assert not {"trap_mine", "tesla_coil", "rocket_tube", "lucky_cap", "rail_gun"} & set(start)
+    after_run = open_items(items, {"runs_count": 1})
+    assert set(after_run) - set(start) == {"trap_mine"}
+    assert "tesla_coil" in open_items(items, {"milestones": {"shelter_outskirts": [230]}})
+    assert "rocket_tube" in open_items(items, {"bosses_killed": ["shelter_outskirts"]})
+    assert "rail_gun" in open_items(items, {"unlocks": ["rail_gun"]})
+    # Buying a progress item does nothing: only emerald items read `unlocks`.
+    assert "laser_rifle" not in open_items(items, {"unlocks": ["laser_rifle"]})
 
 
 def test_speeds_open_after_wins_and_pay_once() -> None:

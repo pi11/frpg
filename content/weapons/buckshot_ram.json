@@ -1,0 +1,28 @@
+{
+  "id": "buckshot_ram",
+  "name": "Картечный таран",
+  "description": "Чудовищный залп в упор",
+  "sprite": "weapons/buckshot_ram",
+  "projectileSprite": "projectiles/pellet",
+  "fireSound": "sfx/shot_scatter",
+  "behavior": {
+    "type": "projectile",
+    "params": {
+      "speed": 260,
+      "lifetimeMs": 450
+    }
+  },
+  "levels": [
+    {
+      "damage": 26,
+      "cooldownMs": 600,
+      "shots": 9,
+      "spreadDegrees": 40,
+      "pierce": 2
+    }
+  ],
+  "tags": [
+    "ballistic"
+  ],
+  "evolved": true
+}

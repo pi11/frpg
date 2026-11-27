@@ -1,4 +1,4 @@
-.PHONY: requirements install dev bot-poll migrate test content-check assets android-debug android-aab
+.PHONY: requirements install dev bot-poll admin admin-revoke admins migrate test content-check assets android-debug android-aab
 
 install:
 	cd client && npm ci
@@ -6,6 +6,16 @@ install:
 
 dev:
 	bash scripts/dev.sh
+
+# Admin rights: make admin WHO=<user id or sign-in email>; make admin-revoke WHO=...; make admins
+admin:
+	cd server && uv run --locked python -m app.services.admin grant "$(WHO)"
+
+admin-revoke:
+	cd server && uv run --locked python -m app.services.admin revoke "$(WHO)"
+
+admins:
+	cd server && uv run --locked python -m app.services.admin list
 
 bot-poll:
 	cd server && uv run --locked python -m app.services.telegram_polling

@@ -1,6 +1,7 @@
 import '@fontsource/press-start-2p/cyrillic-400.css';
 import '@fontsource/press-start-2p/latin-400.css';
 import * as Phaser from 'phaser';
+import { AdminScene } from './scenes/AdminScene';
 import { AuthScene } from './scenes/AuthScene';
 import { BootScene } from './scenes/BootScene';
 import { ChestScene } from './scenes/ChestScene';
@@ -38,7 +39,7 @@ export const game = new Phaser.Game({
   physics: {
     default: 'arcade',
   },
-  scene: [AuthScene, BootScene, HubScene, RunScene, HudScene, LevelUpScene, ChestScene, ResultScene],
+  scene: [AuthScene, BootScene, HubScene, AdminScene, RunScene, HudScene, LevelUpScene, ChestScene, ResultScene],
 });
 
 setupPlatform(game);

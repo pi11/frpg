@@ -6,5 +6,9 @@
   "stat": "dodge",
   "mod": "flat",
   "perLevel": 0.04,
-  "maxLevel": 5
+  "maxLevel": 5,
+  "unlock": {
+    "type": "runs",
+    "count": 6
+  }
 }

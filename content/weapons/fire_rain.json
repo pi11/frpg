@@ -1,0 +1,30 @@
+{
+  "id": "fire_rain",
+  "name": "Огненный ливень",
+  "description": "Россыпь бутылок поджигает всё вокруг",
+  "sprite": "weapons/fire_rain",
+  "projectileSprite": "projectiles/bottle",
+  "fireSound": "sfx/firebomb",
+  "behavior": {
+    "type": "zone",
+    "params": {
+      "range": 240,
+      "tickMs": 400,
+      "fireSprite": "fx/fire"
+    }
+  },
+  "levels": [
+    {
+      "damage": 12,
+      "cooldownMs": 1700,
+      "shots": 9,
+      "spreadDegrees": 0,
+      "radius": 30,
+      "durationMs": 6500
+    }
+  ],
+  "tags": [
+    "fire"
+  ],
+  "evolved": true
+}

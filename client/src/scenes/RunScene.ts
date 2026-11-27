@@ -88,8 +88,8 @@ export interface RunData {
   contentHash: string;
   /** Shelter upgrade levels from the server profile. */
   upgrades: Record<string, number>;
-  /** Weapons and perks bought for emeralds. */
-  unlocks: string[];
+  /** Weapons and perks this profile may be offered (open, reached by progress or bought). */
+  openItems: string[];
   /** Already earned achievements. */
   achievements: string[];
   /** Game speed in percent (100, 150, 200); the server checked that it is open. */
@@ -219,7 +219,7 @@ export class RunScene extends Phaser.Scene {
   private zones: Zone[] = [];
   private blasts: PendingBlast[] = [];
   private beams: [Point, Point][] = [];
-  private unlocks = new Set<string>();
+  private openItems = new Set<string>();
   private record: RunRecord = newRecord(0);
   private reported = new Set<string>();
   private ownedAchievements = new Set<string>();
@@ -298,7 +298,7 @@ export class RunScene extends Phaser.Scene {
     this.zones = [];
     this.blasts = [];
     this.beams = [];
-    this.unlocks = new Set(data.unlocks);
+    this.openItems = new Set(data.openItems);
     this.record = newRecord(new Date().getHours(), shelterState.knocks, data.speed ?? 100);
     shelterState.knocks = 0;
     this.record.upgrades = Object.values(data.upgrades).reduce((sum, level) => sum + level, 0);
@@ -336,7 +336,7 @@ export class RunScene extends Phaser.Scene {
     this.physics.world.setBounds(-100000, -100000, 200000, 200000);
     // A faster game: physics, timers, tweens and animations all run `speed` times quicker,
     // and update() scales its delta, so the game clock and cooldowns follow.
-    const { speed } = this.view;
+    const speed = this.timeScale();
     this.physics.world.timeScale = 1 / speed;
     this.time.timeScale = speed;
     this.tweens.timeScale = speed;
@@ -556,7 +556,7 @@ export class RunScene extends Phaser.Scene {
 
   update(_time: number, frameDelta: number): void {
     if (this.finished) return;
-    const delta = frameDelta * this.view.speed;
+    const delta = frameDelta * this.timeScale();
     this.elapsedMs += delta;
     this.combat.now = this.elapsedMs;
     this.enemyContext.now = this.elapsedMs;
@@ -613,6 +613,11 @@ export class RunScene extends Phaser.Scene {
     this.view.projectileCount = this.projectiles.countActive();
     this.view.boss = this.strongestElite();
     if (this.elapsedMs >= this.warningUntil) this.view.warning = '';
+  }
+
+  /** Game time per wall-clock time: the chosen speed times the calm base pace. */
+  private timeScale(): number {
+    return this.view.speed * this.catalog.balance.run.timeScale;
   }
 
   private currentWave(): LocationDefinition['waves'][number] {
@@ -1419,6 +1424,13 @@ export class RunScene extends Phaser.Scene {
         this.drawThreatArrow(hints, mob);
       }
     }
+    for (const item of this.pickups.getChildren()) {
+      const pickup = item as Phaser.Physics.Arcade.Sprite;
+      if (pickup.active && !view.contains(pickup.x, pickup.y)
+        && this.catalog.pickups[pickup.getData('pickupId') as string]?.effect.type === 'chest') {
+        this.drawChestArrow(hints, pickup);
+      }
+    }
     const nearby: ActiveLandmark[] = [];
     this.decor.eachLandmark((landmark) => {
       if (landmark.used) return;
@@ -1487,6 +1499,12 @@ export class RunScene extends Phaser.Scene {
     const pulse = 0.7 + 0.3 * Math.sin(this.elapsedMs / 120);
     const size = mob.definition.role === 'boss' ? 13 : 10;
     this.drawEdgeArrow(graphics, mob, 0xff2a2a, size * (0.9 + 0.1 * pulse), pulse, true);
+  }
+
+  /** Golden arrow to a chest left behind (a boss or mini-boss dropped it), pulsing slower. */
+  private drawChestArrow(graphics: Phaser.GameObjects.Graphics, chest: Point): void {
+    const pulse = 0.75 + 0.25 * Math.sin(this.elapsedMs / 200);
+    this.drawEdgeArrow(graphics, chest, 0xffd84a, 11 * (0.9 + 0.1 * pulse), pulse, true);
   }
 
   private drawEdgeArrow(graphics: Phaser.GameObjects.Graphics, target: Point, color: number,
@@ -1630,7 +1648,7 @@ export class RunScene extends Phaser.Scene {
         ? levelChanges(weapon.levels[owned.level - 1]!, weapon.levels[owned.level]!) : [];
       pool.push({ kind: 'weapon', id: weapon.id, name: weapon.name, sprite: weapon.sprite,
         description: owned ? [`Уровень ${owned.level + 1}`, ...changes].join('\n') : `${weapon.heavy ? 'Тяжёлое оружие' : 'Новое оружие'}\n${weapon.description}`,
-        pairs: weapon.evolution ? [this.catalog.passives[weapon.evolution.passive]!.sprite] : [] });
+        pairs: weapon.evolutions.map((path) => this.catalog.passives[path.passive]!.sprite) });
     }
     for (const passive of Object.values(this.catalog.passives)) {
       const level = this.ownedPassives.get(passive.id) ?? 0;
@@ -1640,7 +1658,8 @@ export class RunScene extends Phaser.Scene {
         description: `${level ? `Уровень ${level + 1}` : 'Новый перк'}\n${
           statBonus(passive.stat, passive.perLevel, passive.mod)}`,
         pairs: [...this.weapons.keys()].map((id) => this.catalog.weapons[id]!)
-          .filter((weapon) => weapon.evolution?.passive === passive.id).map((weapon) => weapon.sprite) });
+          .filter((weapon) => weapon.evolutions.some((path) => path.passive === passive.id))
+          .map((weapon) => weapon.sprite) });
     }
     return pool;
   }
@@ -1652,12 +1671,12 @@ export class RunScene extends Phaser.Scene {
   }
 
   private isOpen(item: WeaponDefinition | PassiveDefinition): boolean {
-    return item.unlock.type === 'default' || this.unlocks.has(item.id);
+    return this.openItems.has(item.id);
   }
 
   /** The evolved form is already in hand, so the base weapon must not come back. */
-  private hasEvolved(weapon: { evolution?: { into: string } | undefined }): boolean {
-    return weapon.evolution !== undefined && this.weapons.has(weapon.evolution.into);
+  private hasEvolved(weapon: WeaponDefinition): boolean {
+    return weapon.evolutions.some((path) => this.weapons.has(path.into));
   }
 
   /** Every slot the shelter can give, for the HUD. */
@@ -1682,8 +1701,7 @@ export class RunScene extends Phaser.Scene {
       const weapon = this.catalog.weapons[id]!;
       const details = [weapon.description, `Уровень ${state.level}/${weapon.levels.length}`,
         ...levelStats(weapon.levels[state.level - 1]!)];
-      if (weapon.evolution) {
-        const { passive, into } = weapon.evolution;
+      for (const { passive, into } of weapon.evolutions) {
         details.push(`Эволюция: ${this.catalog.weapons[into]!.name}, нужен перк «${
           this.catalog.passives[passive]!.name}»`);
       }
@@ -1711,14 +1729,17 @@ export class RunScene extends Phaser.Scene {
     });
   }
 
-  /** Three cards; a ready evolution comes first and one card is a weapon while any is left. */
+  /**
+   * Three cards; ready evolutions come first (both paths when a weapon has two ready, so
+   * the player picks one) and one card is a weapon while any is left.
+   */
   private rollChoices(): UpgradeChoice[] {
     const pool = this.upgradePool(false);
     for (let index = pool.length - 1; index > 0; index -= 1) {
       const chosen = Math.floor(this.rng.next() * (index + 1));
       [pool[index], pool[chosen]] = [pool[chosen]!, pool[index]!];
     }
-    const ready = this.evolutionChoices().slice(0, 1);
+    const ready = this.evolutionChoices().slice(0, 2);
     const cards = [...ready, ...pool].slice(0, 3);
     if (!cards.some((card) => card.kind !== 'passive')) {
       const weapon = pool.find((card) => card.kind === 'weapon');

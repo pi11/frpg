@@ -3,6 +3,8 @@ import { request } from './auth';
 export interface Profile {
   user_id: string;
   is_guest: boolean;
+  /** Opens the admin panel; the server checks it again on every admin request. */
+  is_admin: boolean;
   caps: number;
   emeralds: number;
   /** Weapons and perks bought for emeralds. */
@@ -28,6 +30,8 @@ export interface Profile {
   /** Locations open for this profile (checked again by the server on run start). */
   unlocked_locations: string[];
   unlocked_heroes: string[];
+  /** Weapons and perks runs may offer: open from the start, reached by progress or bought. */
+  open_items: string[];
   /** Game speeds (percent) open per location. */
   speeds: Record<string, number[]>;
   /** Best boss win speed (percent) per location and hero. */

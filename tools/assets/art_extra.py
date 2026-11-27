@@ -26,6 +26,37 @@ def recolored(image: Image, table: dict[str, str]) -> Image:
     return result
 
 
+#: The second evolution of each base weapon: id and colour swaps for its icon.
+SECOND_EVOLUTIONS: dict[str, tuple[str, dict[str, str]]] = {
+    "scrap_pistol": ("twin_pistols", {"m": "t", "M": "T", "r": "p", "R": "P"}),
+    "scattergun": ("buckshot_ram", {"m": "n", "M": "a", "r": "R", "R": "K", "B": "M", "b": "A"}),
+    "firebomb": ("fire_rain", {"t": "o", "T": "r", "o": "w", "y": "o"}),
+    "flamethrower": ("fire_ring", {"r": "p", "o": "v", "M": "T"}),
+    "laser_rifle": ("sniper_beam", {"t": "M", "T": "A", "g": "r"}),
+    "orbit_drone": ("shield_drones", {"m": "t", "M": "T", "g": "w"}),
+    "rad_aura": ("rad_halo", {"g": "p", "G": "P"}),
+    "rocket_tube": ("smart_warhead", {"h": "M", "H": "A", "r": "t"}),
+    "saw_blade": ("ripper", {"m": "r", "M": "R"}),
+    "tesla_coil": ("arc_welder", {"m": "o", "r": "y", "c": "w", "t": "o"}),
+    "trap_mine": ("demo_charge", {"h": "R", "H": "K", "r": "o"}),
+}
+
+
+def second_path(image: Image, table: dict[str, str]) -> Image:
+    """Icon of a weapon's second evolution: swapped colours and a teal star, not a gold one."""
+    swap = {color(old): color(new) for old, new in table.items()}
+    result = [[swap.get(pixel, pixel) for pixel in row] for row in image]
+    for (x, y), char in {(13, 0): "t", (12, 1): "t", (13, 1): "w", (14, 1): "t",
+                         (13, 2): "t"}.items():
+        result[y][x] = color(char)
+    return result
+
+
+def second_evolutions(frames: dict[str, Image]) -> dict[str, Image]:
+    return {f"weapons/{into}": second_path(frames[f"weapons/{base}"], table)
+            for base, (into, table) in SECOND_EVOLUTIONS.items()}
+
+
 # --- weapons -------------------------------------------------------------------------
 
 def tesla_coil() -> Image:

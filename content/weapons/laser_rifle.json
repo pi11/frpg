@@ -73,8 +73,19 @@
   "tags": [
     "energy"
   ],
-  "evolution": {
-    "passive": "extra_mag",
-    "into": "prism_emitter"
+  "evolutions": [
+    {
+      "passive": "extra_mag",
+      "into": "prism_emitter"
+    },
+    {
+      "passive": "scope",
+      "into": "sniper_beam"
+    }
+  ],
+  "unlock": {
+    "type": "milestone",
+    "location": "dead_city",
+    "atSecond": 230
   }
 }

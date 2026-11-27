@@ -1,0 +1,29 @@
+{
+  "id": "shield_drones",
+  "name": "Щитовые дроны",
+  "description": "Плотный рой дронов не отлетает от героя",
+  "sprite": "weapons/shield_drones",
+  "projectileSprite": "projectiles/drone",
+  "fireSound": "sfx/drone",
+  "behavior": {
+    "type": "orbit",
+    "params": {
+      "orbitSpeed": 5,
+      "hitCooldownMs": 300
+    }
+  },
+  "levels": [
+    {
+      "damage": 22,
+      "cooldownMs": 900,
+      "shots": 10,
+      "spreadDegrees": 0,
+      "radius": 40,
+      "durationMs": 900
+    }
+  ],
+  "tags": [
+    "energy"
+  ],
+  "evolved": true
+}

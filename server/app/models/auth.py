@@ -30,6 +30,8 @@ class User(Base):
 
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
     is_guest: Mapped[bool] = mapped_column(Boolean, default=True)
+    #: Opens the admin API; granted only from the server shell (python -m app.services.admin).
+    is_admin: Mapped[bool] = mapped_column(Boolean, default=False, server_default="false")
     display_name: Mapped[str | None] = mapped_column(String(80), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
     last_seen_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)

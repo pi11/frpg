@@ -1,0 +1,29 @@
+{
+  "id": "ripper",
+  "name": "Потрошитель",
+  "description": "Две тяжёлые пилы летят далеко",
+  "sprite": "weapons/ripper",
+  "projectileSprite": "projectiles/saw",
+  "fireSound": "sfx/saw",
+  "behavior": {
+    "type": "boomerang",
+    "params": {
+      "speed": 330,
+      "outMs": 700,
+      "returnSpeed": 340,
+      "lifetimeMs": 3000
+    }
+  },
+  "levels": [
+    {
+      "damage": 60,
+      "cooldownMs": 700,
+      "shots": 2,
+      "spreadDegrees": 30
+    }
+  ],
+  "tags": [
+    "ballistic"
+  ],
+  "evolved": true
+}

@@ -70,8 +70,18 @@
   "tags": [
     "radiation"
   ],
-  "evolution": {
-    "passive": "rad_sponge",
-    "into": "reactor_core"
+  "evolutions": [
+    {
+      "passive": "rad_sponge",
+      "into": "reactor_core"
+    },
+    {
+      "passive": "lead_lining",
+      "into": "rad_halo"
+    }
+  ],
+  "unlock": {
+    "type": "runs",
+    "count": 8
   }
 }

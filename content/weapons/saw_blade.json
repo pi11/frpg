@@ -67,8 +67,19 @@
   "tags": [
     "ballistic"
   ],
-  "evolution": {
-    "passive": "scrap_plating",
-    "into": "buzz_storm"
+  "evolutions": [
+    {
+      "passive": "scrap_plating",
+      "into": "buzz_storm"
+    },
+    {
+      "passive": "quickstep",
+      "into": "ripper"
+    }
+  ],
+  "unlock": {
+    "type": "milestone",
+    "location": "shelter_outskirts",
+    "atSecond": 370
   }
 }

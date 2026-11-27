@@ -6,5 +6,10 @@
   "stat": "duration",
   "mod": "flat",
   "perLevel": 0.12,
-  "maxLevel": 5
+  "maxLevel": 5,
+  "unlock": {
+    "type": "milestone",
+    "location": "shelter_outskirts",
+    "atSecond": 230
+  }
 }

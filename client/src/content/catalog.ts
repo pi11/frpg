@@ -4,7 +4,7 @@ import {
   StructureSchema, UpgradeSchema, WeaponSchema,
 } from './schemas';
 import type {
-  AchievementDefinition, BalanceDefinition, DailyTemplateDefinition, EnemyDefinition, HeroDefinition, LandmarkDefinition, LocationDefinition,
+  AchievementDefinition, BalanceDefinition, DailyTemplateDefinition, EnemyDefinition, HeroDefinition, ItemUnlock, LandmarkDefinition, LocationDefinition,
   PassiveDefinition, PickupDefinition, StructureDefinition, UpgradeDefinition, WeaponDefinition,
 } from './schemas';
 
@@ -95,29 +95,34 @@ export function validateContent(files: Record<string, unknown>): Catalog {
       }
     });
   }
-  for (const hero of Object.values(heroes)) {
-    const { unlock } = hero;
+  const checkUnlock = (owner: string, unlock: HeroDefinition['unlock'] | ItemUnlock): void => {
     if ('location' in unlock && !locations[unlock.location]) {
-      throw new Error(`hero ${hero.id}: unknown unlock location ${unlock.location}`);
+      throw new Error(`${owner}: unknown unlock location ${unlock.location}`);
     }
     if (unlock.type === 'milestone' && !balance.reward.emeraldMilestones
       .some((mark) => mark.atSecond === unlock.atSecond)) {
-      throw new Error(`hero ${hero.id}: no milestone at ${unlock.atSecond}`);
+      throw new Error(`${owner}: no milestone at ${unlock.atSecond}`);
     }
-    if (weapons[hero.startingWeapon]!.unlock.type !== 'default') {
-      throw new Error(`hero ${hero.id}: starting weapon must be open`);
+  };
+  for (const item of [...Object.values(weapons), ...Object.values(passives)]) {
+    checkUnlock(`item ${item.id}`, item.unlock);
+  }
+  for (const hero of Object.values(heroes)) {
+    checkUnlock(`hero ${hero.id}`, hero.unlock);
+    if (weapons[hero.startingWeapon]!.unlock.type === 'emeralds') {
+      throw new Error(`hero ${hero.id}: starting weapon cannot cost emeralds`);
     }
   }
   const evolutionTargets = new Set<string>();
   for (const weapon of Object.values(weapons)) {
-    if (!weapon.evolution) continue;
-    const { passive, into } = weapon.evolution;
+    for (const { passive, into } of weapon.evolutions) {
     if (!passives[passive]) throw new Error(`weapon ${weapon.id}: unknown evolution passive ${passive}`);
     if (!weapons[into]?.evolved) {
       throw new Error(`weapon ${weapon.id}: evolution target ${into} must be an evolved weapon`);
     }
     if (evolutionTargets.has(into)) throw new Error(`weapon ${into}: more than one evolution source`);
     evolutionTargets.add(into);
+    }
   }
   for (const weapon of Object.values(weapons)) {
     if (weapon.evolved && !evolutionTargets.has(weapon.id)) {

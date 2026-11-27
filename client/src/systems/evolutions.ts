@@ -9,8 +9,9 @@ export interface EvolutionOption {
 }
 
 /**
- * Evolutions the hero can take now: the base weapon is at its last level, the paired
- * passive is owned at any level, and the evolved weapon is not owned yet.
+ * Evolutions the hero can take now: the base weapon is at its last level, one of its
+ * paired passives is owned at any level, and that evolved weapon is not owned yet.
+ * A weapon with two ready paths lists both; taking one replaces the base weapon.
  */
 export function availableEvolutions(
   weapons: Readonly<Record<string, WeaponDefinition>>,
@@ -20,10 +21,11 @@ export function availableEvolutions(
   const options: EvolutionOption[] = [];
   for (const [id, state] of ownedWeapons) {
     const weapon = weapons[id];
-    if (!weapon?.evolution || state.level < weapon.levels.length) continue;
-    const { passive, into } = weapon.evolution;
-    if (!(ownedPassives.get(passive) ?? 0) || ownedWeapons.has(into)) continue;
-    options.push({ from: id, into, passive });
+    if (!weapon || state.level < weapon.levels.length) continue;
+    for (const { passive, into } of weapon.evolutions) {
+      if (!(ownedPassives.get(passive) ?? 0) || ownedWeapons.has(into)) continue;
+      options.push({ from: id, into, passive });
+    }
   }
   return options;
 }
@@ -32,5 +34,5 @@ export function availableEvolutions(
 export function evolutionSource(
   weapons: Readonly<Record<string, WeaponDefinition>>, into: string,
 ): WeaponDefinition | undefined {
-  return Object.values(weapons).find((weapon) => weapon.evolution?.into === into);
+  return Object.values(weapons).find((weapon) => weapon.evolutions.some((path) => path.into === into));
 }

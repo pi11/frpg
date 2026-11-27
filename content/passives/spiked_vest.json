@@ -6,5 +6,9 @@
   "stat": "thorns",
   "mod": "flat",
   "perLevel": 8,
-  "maxLevel": 5
+  "maxLevel": 5,
+  "unlock": {
+    "type": "runs",
+    "count": 4
+  }
 }

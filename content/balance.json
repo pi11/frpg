@@ -30,7 +30,8 @@
     "softMoveSpeedFactor": 0.4,
     "eliteMaxLossPerSecond": 0.08,
     "bossMaxLossPerSecond": 0.02,
-    "levelUpTimeoutMs": 10000
+    "levelUpTimeoutMs": 10000,
+    "timeScale": 0.8
   },
   "xp": {
     "base": 5,

@@ -49,36 +49,38 @@ describe('shared content catalog', () => {
 
   it('rejects broken weapon evolutions', () => {
     const find = (name: string): string => Object.keys(rawFiles).find((path) => path.endsWith(name))!;
-    type Raw = { evolution?: { passive: string; into: string }; evolved?: boolean; levels: unknown[] };
+    type Path = { passive: string; into: string };
+    type Raw = { evolutions?: Path[]; evolved?: boolean; levels: unknown[] };
     const pistolPath = find('scrap_pistol.json');
     const pistol = structuredClone(rawFiles[pistolPath] as Raw);
-    pistol.evolution!.passive = 'missing_perk';
+    pistol.evolutions![1]!.passive = 'missing_perk';
     expect(() => validateContent({ ...rawFiles, [pistolPath]: pistol })).toThrow('unknown evolution passive');
-    pistol.evolution = { passive: 'trigger_spring', into: 'scattergun' };
+    pistol.evolutions![1] = { passive: 'nimble', into: 'scattergun' };
     expect(() => validateContent({ ...rawFiles, [pistolPath]: pistol })).toThrow('must be an evolved weapon');
+    pistol.evolutions![1] = { passive: 'nimble', into: 'scrap_cannon' };
+    expect(() => validateContent({ ...rawFiles, [pistolPath]: pistol })).toThrow('more than one evolution source');
 
     const nailPath = find('nail_gun.json');
     const nailGun = structuredClone(rawFiles[nailPath] as Raw);
     nailGun.levels.push(nailGun.levels[0]);
     expect(() => validateContent({ ...rawFiles, [nailPath]: nailGun })).toThrow('evolved weapon needs 1 level');
-    const orphan = { ...pistol, evolution: undefined };
-    delete orphan.evolution;
+    const orphan = { ...pistol, evolutions: [] };
     expect(() => validateContent({ ...rawFiles, [pistolPath]: orphan })).toThrow('has no evolution source');
   });
 
-  it('rejects a heavy weapon with evolutions or a locked starting weapon', () => {
+  it('rejects a heavy weapon with evolutions or a starting weapon sold for emeralds', () => {
     const find = (name: string): string => Object.keys(rawFiles).find((path) => path.endsWith(name))!;
     const railPath = find('rail_gun.json');
-    const rail = structuredClone(rawFiles[railPath] as { levels: unknown[]; evolution?: unknown });
-    rail.evolution = { passive: 'scope', into: 'nail_gun' };
+    const rail = structuredClone(rawFiles[railPath] as { levels: unknown[]; evolutions?: unknown });
+    rail.evolutions = [{ passive: 'scope', into: 'nail_gun' }];
     expect(() => validateContent({ ...rawFiles, [railPath]: rail })).toThrow('cannot evolve');
-    delete rail.evolution;
+    delete rail.evolutions;
     rail.levels.pop();
     expect(() => validateContent({ ...rawFiles, [railPath]: rail })).toThrow('heavy weapon needs 5 level');
     const pistolPath = find('scrap_pistol.json');
     const pistol = structuredClone(rawFiles[pistolPath] as { unlock?: unknown });
     pistol.unlock = { type: 'emeralds', emeralds: 5 };
-    expect(() => validateContent({ ...rawFiles, [pistolPath]: pistol })).toThrow('must be open');
+    expect(() => validateContent({ ...rawFiles, [pistolPath]: pistol })).toThrow('cannot cost emeralds');
   });
 
   it('has clearly bigger and tougher mini-bosses than ordinary enemies', () => {

@@ -73,8 +73,18 @@
   "tags": [
     "fire"
   ],
-  "evolution": {
-    "passive": "quickstep",
-    "into": "furnace"
+  "evolutions": [
+    {
+      "passive": "quickstep",
+      "into": "furnace"
+    },
+    {
+      "passive": "thick_hide",
+      "into": "fire_ring"
+    }
+  ],
+  "unlock": {
+    "type": "runs",
+    "count": 5
   }
 }

@@ -13,6 +13,12 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 
+def wall(game_seconds: float, speed: int = 100) -> timedelta:
+    """Wall-clock time in which a run at this speed plays `game_seconds`."""
+    pace = float(get_content().balance["run"]["timeScale"])
+    return timedelta(seconds=game_seconds * 100 / speed / pace)
+
+
 def headers(pair: dict[str, object]) -> dict[str, str]:
     return {"Authorization": f"Bearer {pair['access_token']}"}
 
@@ -162,7 +168,7 @@ async def test_honest_run_gets_exact_reward_without_flags(api: dict[str, object]
     async with factory() as session:
         run = await session.get(Run, UUID(started["run_id"]))
         assert run is not None
-        run.started_at = run.started_at - timedelta(seconds=150)
+        run.started_at = run.started_at - wall(150)
         await session.commit()
     summary = {
         "content_hash": get_content().hash, "duration_seconds": 130,
@@ -263,7 +269,7 @@ async def test_boss_kill_counts_only_after_the_boss_appears(api: dict[str, objec
     async with factory() as session:
         run = await session.get(Run, UUID(late["run_id"]))
         assert run is not None
-        run.started_at = run.started_at - timedelta(seconds=boss["atSecond"] + 20)
+        run.started_at = run.started_at - wall(boss["atSecond"] + 20)
         await session.commit()
     waves = sum(1 for wave in location["waves"] if wave["atSecond"] <= boss["atSecond"] + 10)
     accepted = await client.post(f"/api/v1/runs/{late['run_id']}/finish", json={
@@ -299,7 +305,7 @@ async def test_locations_unlock_after_their_boss_and_scale_the_reward(
     async with factory() as session:
         run = await session.get(Run, UUID(started["run_id"]))
         assert run is not None
-        run.started_at = run.started_at - timedelta(seconds=boss["atSecond"] + 20)
+        run.started_at = run.started_at - wall(boss["atSecond"] + 20)
         await session.commit()
     duration = boss["atSecond"] + 10
     waves = sum(1 for wave in outskirts["waves"] if wave["atSecond"] <= duration)
@@ -321,7 +327,7 @@ async def test_locations_unlock_after_their_boss_and_scale_the_reward(
     async with factory() as session:
         run = await session.get(Run, UUID(started["run_id"]))
         assert run is not None
-        run.started_at = run.started_at - timedelta(seconds=150)
+        run.started_at = run.started_at - wall(150)
         await session.commit()
     result = (await client.post(f"/api/v1/runs/{started['run_id']}/finish", json={
         "content_hash": get_content().hash, "duration_seconds": 130,
@@ -356,7 +362,7 @@ async def test_emeralds_are_earned_once_and_open_items(api: dict[str, object]) -
         async with factory() as session:
             run = await session.get(Run, UUID(started["run_id"]))
             assert run is not None
-            run.started_at = run.started_at - timedelta(seconds=duration + 10)
+            run.started_at = run.started_at - wall(duration + 10)
             await session.commit()
         url = f"/api/v1/runs/{started['run_id']}/finish"
         body = {
@@ -459,6 +465,7 @@ async def test_locked_hero_cannot_start_a_run(api: dict[str, object]) -> None:
         await session.commit()
     profile = (await client.get("/api/v1/profile", headers=headers(guest))).json()
     assert profile["unlocked_heroes"] == ["spark", "wanderer"]
+    assert {"trap_mine", "firebomb", "orbit_drone", "flamethrower"} <= set(profile["open_items"])
     started = await client.post("/api/v1/runs/start", json=body, headers=headers(guest))
     assert started.status_code == 200
 
@@ -488,7 +495,7 @@ async def test_speeds_open_one_by_one_and_scale_the_time_check(api: dict[str, ob
             run = await session.get(Run, UUID(started["run_id"]))
             assert run is not None and run.speed == speed
             # Wall-clock time that fits `duration` game seconds only at this speed.
-            run.started_at = run.started_at - timedelta(seconds=duration * 100 / speed)
+            run.started_at = run.started_at - wall(duration, speed)
             await session.commit()
         finished = await client.post(f"/api/v1/runs/{started['run_id']}/finish", json={
             "content_hash": get_content().hash, "kills_by_type": {boss["enemy"]: 1},

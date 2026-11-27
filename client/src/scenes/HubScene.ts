@@ -5,7 +5,9 @@ import { buyUnlock, buyUpgrade, claimAchievement, claimDaily, getProfile, startR
 import { getCatalog } from '../content/catalog';
 import { orderedLocations } from '../content/locations';
 import { bundledContentHash } from '../content/hash';
-import type { AchievementDefinition, HeroDefinition, PassiveDefinition, UpgradeDefinition, WeaponDefinition } from '../content/schemas';
+import type {
+  AchievementDefinition, HeroDefinition, PassiveDefinition, ProgressUnlock, UpgradeDefinition, WeaponDefinition,
+} from '../content/schemas';
 import { heroTraits, statBonus } from '../content/statText';
 import { ATLAS, HUB_MUSIC, TUNES } from '../assets';
 import { upgradeCost } from '../economy';
@@ -13,6 +15,7 @@ import { applyCrt, settings, updateSettings } from '../settings';
 import { fullscreenAvailable, isFullscreen, toggleFullscreen } from '../platform/fullscreen';
 import { shelterState } from '../inputState';
 import { playSfx, playTune } from '../sound';
+import { isGated, loadSeen, newSince, openedNow, saveSeen, tabHint, tabOpen, type Opened } from '../ui/progression';
 import type { RunData } from './RunScene';
 
 const TUNE_PLACES = [['hubTune', 'В убежище'], ['runTune', 'В забеге']] as const;
@@ -49,6 +52,9 @@ const ICONS = {
   settings: ['.....##.....', '..#..##..#..', '.##########.', '..###..###..', '.###....###.', '####....####',
     '####....####', '.###....###.', '..###..###..', '.##########.', '..#..##..#..', '.....##.....'],
 } as const;
+
+const LOCK = ['............', '....####....', '...#....#...', '...#....#...', '...#....#...', '..########..',
+  '..###..###..', '..###..###..', '..####.###..', '..########..', '..########..', '............'] as const;
 
 const TABS = [
   ['run', 'Вылазка', 'Выберите героя и локацию и отправляйтесь в Пустошь.'],
@@ -123,6 +129,8 @@ export class HubScene extends Phaser.Scene {
   private speed = Number(loadChoice(SPEED_KEY)) || 100;
   private category: UpgradeDefinition['category'] = 'survival';
   private shopTab: ShopTab = 'weapons';
+  /** Tabs, items and heroes this browser has shown the player, for the "new" marks. */
+  private seen: (Opened & { visited: string[] }) | null = null;
 
   constructor() { super('Hub'); }
 
@@ -210,15 +218,20 @@ export class HubScene extends Phaser.Scene {
             </form>
             <h2>Аккаунт</h2>
             <ul id="hub-identities" class="hub-identities"></ul>
+            <p class="hub-help">ID аккаунта: <span id="hub-user-id" class="hub-user-id"></span></p>
             <div class="hub-account">
               <button id="hub-link" class="auth-secondary" type="button" hidden></button>
+              <button id="hub-admin" class="auth-secondary" type="button" hidden>Админ-панель</button>
               <button id="hub-delete" class="auth-back hub-danger" type="button">Удалить аккаунт и данные</button>
             </div>
+          </section>
+          <section id="hub-panel-locked" class="hub-locked-panel" role="tabpanel" hidden>
+            ${pixelIcon(LOCK)}<h2 id="hub-locked-title"></h2><p id="hub-locked-hint" class="hub-help"></p>
           </section>
           </div>
           <nav class="hub-tabs" role="tablist" aria-label="Разделы убежища" aria-orientation="vertical">
             ${TABS.map(([id, title]) => `<button type="button" role="tab" id="hub-tab-${id}" title="${title}" style="--tab:${TAB_COLORS[id]}"
-              aria-label="${title}" data-tab="${id}" aria-controls="hub-panel-${id}">${pixelIcon(ICONS[id])}<span class="hub-badge" hidden></span></button>`).join('')}
+              aria-label="${title}" data-tab="${id}" aria-controls="hub-panel-${id}">${pixelIcon(ICONS[id])}<span class="hub-badge" hidden></span><span class="hub-lock">${pixelIcon(LOCK)}</span></button>`).join('')}
           </nav></div>
         </div>
         <button id="hub-retry" class="auth-secondary" type="button" hidden>Повторить</button>
@@ -269,11 +282,16 @@ export class HubScene extends Phaser.Scene {
     };
     this.el('hub-daily').onclick = (event) => {
       const button = (event.target as HTMLElement).closest<HTMLButtonElement>('button[data-daily]');
-      if (button?.dataset.daily) void this.act(() => this.claimQuest(button.dataset.daily!));
+      if (button?.dataset.daily) void this.act(() => this.claimQuest(button.dataset.daily!, button.getBoundingClientRect()));
     };
     this.el('hub-achievements').onclick = (event) => {
+      const all = (event.target as HTMLElement).closest<HTMLButtonElement>('button[data-claim-all]');
+      if (all) {
+        void this.act(() => this.claimAll(all.getBoundingClientRect()));
+        return;
+      }
       const button = (event.target as HTMLElement).closest<HTMLButtonElement>('button[data-claim]');
-      if (button?.dataset.claim) void this.act(() => this.claim(button.dataset.claim!));
+      if (button?.dataset.claim) void this.act(() => this.claim(button.dataset.claim!, button.getBoundingClientRect()));
     };
     const full = this.el<HTMLButtonElement>('hub-fullscreen');
     const label = (): void => {
@@ -311,6 +329,7 @@ export class HubScene extends Phaser.Scene {
     this.el<HTMLButtonElement>('hub-start').onclick = () => void this.act(() => this.beginRun());
     this.el<HTMLButtonElement>('hub-retry').onclick = () => void this.loadProfile();
     this.el<HTMLButtonElement>('hub-link').onclick = () => this.scene.start('Auth', { linkAccount: true });
+    this.el<HTMLButtonElement>('hub-admin').onclick = () => this.scene.start('Admin');
     this.el<HTMLButtonElement>('hub-delete').onclick = () => void this.act(() => this.removeAccount());
     this.el('hub-locations').onclick = (event) => {
       const button = (event.target as HTMLElement).closest<HTMLButtonElement>('button[data-location]');
@@ -402,17 +421,168 @@ export class HubScene extends Phaser.Scene {
 
   private openTab(tab: Tab, sound: boolean): void {
     this.tab = tab;
+    const locked = !this.isTabOpen(tab);
     for (const [id] of TABS) {
       const selected = id === tab;
       const button = this.el<HTMLButtonElement>(`hub-tab-${id}`);
       button.setAttribute('aria-selected', String(selected));
       button.tabIndex = selected ? 0 : -1;
-      this.el(`hub-panel-${id}`).hidden = !selected;
+      this.el(`hub-panel-${id}`).hidden = !selected || locked;
     }
+    this.el('hub-panel-locked').hidden = !locked;
+    if (locked && isGated(tab)) {
+      this.el('hub-locked-title').textContent = `${TABS.find(([id]) => id === tab)![1]}: пока закрыто`;
+      this.el('hub-locked-hint').textContent = `${tabHint(tab)}. Возвращайтесь из Пустоши — в убежище всё время появляется новое.`;
+    }
+    if (!locked) this.markVisited(tab);
     if (sound) {
       playSfx('sfx/ui_click');
       playTune(settings().hubTune, HUB_MUSIC);
     }
+  }
+
+  private isTabOpen(tab: Tab): boolean {
+    if (!isGated(tab)) return true;
+    if (!this.profile) return false;
+    return tabOpen(tab, this.profile) || Boolean(this.seen?.tabs.includes(tab));
+  }
+
+  /** A newly opened tab glows until the player looks inside. */
+  private markVisited(tab: Tab): void {
+    if (!this.seen || !this.profile || this.seen.visited.includes(tab)) return;
+    this.seen.visited.push(tab);
+    saveSeen(this.profile.user_id, this.seen);
+    this.el(`hub-tab-${tab}`).classList.remove('hub-new');
+  }
+
+  /**
+   * Locks and "new" marks on the rail, and a window listing what opened since the last
+   * visit. Opened tabs stay open in this browser even if the rule stops holding
+   * (all emeralds spent).
+   */
+  private renderProgress(profile: Profile): void {
+    const now = openedNow(profile);
+    const before = this.seen ?? loadSeen(profile.user_id);
+    now.tabs = [...new Set([...now.tabs, ...(before?.tabs ?? [])])];
+    const fresh = newSince(before, now);
+    const visited = before ? before.visited : [...now.tabs];
+    this.seen = { ...now, visited };
+    saveSeen(profile.user_id, this.seen);
+    for (const [id] of TABS) {
+      if (!isGated(id)) continue;
+      const open = now.tabs.includes(id);
+      const button = this.el(`hub-tab-${id}`);
+      button.classList.toggle('hub-tab-locked', !open);
+      button.classList.toggle('hub-new', open && !visited.includes(id));
+      button.title = open ? TABS.find(([tab]) => tab === id)![1] : `${TABS.find(([tab]) => tab === id)![1]} — ${tabHint(id).toLowerCase()}`;
+    }
+    this.el('hub-hero').hidden = !now.tabs.includes('heroes');
+    if (fresh.tabs.length || fresh.items.length || fresh.heroes.length) this.celebrate(fresh);
+    if (!this.isTabOpen(this.tab)) this.openTab(this.tab, false);
+    else this.el('hub-panel-locked').hidden = true;
+  }
+
+  /** "Открыто новое!": a window with what this visit brought, shown once. */
+  private celebrate(fresh: Opened): void {
+    const { weapons, passives, heroes } = getCatalog();
+    const rows: string[] = [];
+    const row = (picture: string, title: string, text: string): void => {
+      rows.push(`<li style="--i:${rows.length}">${picture}<span><strong>${escapeHtml(title)}</strong><small>${escapeHtml(text)}</small></span></li>`);
+    };
+    const sprite = (key: string): string => `<img alt="" src="${this.textures.getBase64(ATLAS, key)}">`;
+    for (const id of fresh.tabs) {
+      const tab = TABS.find(([key]) => key === id);
+      if (tab) row(`<span class="hub-celebrate-icon" style="--tab:${TAB_COLORS[tab[0]]}">${pixelIcon(ICONS[tab[0]])}</span>`, `Новый раздел: ${tab[1]}`, tab[2]);
+    }
+    for (const id of fresh.heroes) {
+      const hero = heroes[id];
+      if (hero) row(sprite(hero.sprite), `Новый герой: ${hero.name}`, hero.description);
+    }
+    const items = [...fresh.items].sort((a, b) => Number(Boolean(weapons[b])) - Number(Boolean(weapons[a])));
+    for (const id of items) {
+      const item = weapons[id] ?? passives[id];
+      // Bought ones the player chose themselves; only gifts of progress are news.
+      if (!item || item.unlock.type === 'emeralds' || item.unlock.type === 'default') continue;
+      row(sprite(item.sprite), `${weapons[id] ? 'Новое оружие' : 'Новый перк'}: ${item.name}`,
+        `${item.description}. Теперь встречается в забегах.`);
+    }
+    if (!rows.length) return;
+    this.overlay?.querySelector('.hub-celebrate')?.remove();
+    const dialog = document.createElement('div');
+    dialog.className = 'hub-celebrate';
+    dialog.setAttribute('role', 'dialog');
+    dialog.setAttribute('aria-modal', 'true');
+    dialog.setAttribute('aria-labelledby', 'hub-celebrate-title');
+    dialog.innerHTML = `<div class="hub-celebrate-card"><div class="hub-celebrate-rays" aria-hidden="true"></div>
+      <h2 id="hub-celebrate-title">Открыто новое!</h2><ul>${rows.join('')}</ul>
+      <button type="button">Отлично!</button></div>`;
+    const close = (): void => {
+      dialog.remove();
+      playSfx('sfx/ui_click');
+    };
+    dialog.querySelector('button')!.onclick = close;
+    dialog.onclick = (event) => { if (event.target === dialog) close(); };
+    this.overlay?.append(dialog);
+    dialog.querySelector('button')!.focus();
+    playSfx('sfx/powerup');
+  }
+
+  /** Emeralds fly from the claim button into the counter, which counts up as they land. */
+  private flyEmeralds(from: DOMRect, amount: number): void {
+    const counter = this.el('hub-emeralds');
+    const target = this.el('hub-emerald-icon').getBoundingClientRect();
+    const total = this.profile?.emeralds ?? 0;
+    const startValue = Math.max(0, total - amount);
+    const x = from.left + from.width / 2;
+    const y = from.top + from.height / 2;
+    const float = document.createElement('div');
+    float.className = 'hub-float';
+    float.textContent = `+${amount}`;
+    float.style.left = `${x}px`;
+    float.style.top = `${y}px`;
+    this.overlay?.append(float);
+    float.addEventListener('animationend', () => float.remove());
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || !target.width) {
+      this.bump(counter, total);
+      return;
+    }
+    counter.textContent = String(startValue);
+    const count = Math.max(3, Math.min(amount, 14));
+    const src = this.el<HTMLImageElement>('hub-emerald-icon').src;
+    let landed = 0;
+    for (let index = 0; index < count; index += 1) {
+      const gem = document.createElement('img');
+      gem.className = 'hub-fly';
+      gem.alt = '';
+      gem.src = src;
+      gem.style.left = `${x}px`;
+      gem.style.top = `${y}px`;
+      this.overlay?.append(gem);
+      const angle = (index / count) * Math.PI * 2;
+      const spread = 30 + (index % 3) * 16;
+      const dx = target.left + target.width / 2 - x;
+      const dy = target.top + target.height / 2 - y;
+      const animation = gem.animate([
+        { transform: 'translate(-50%, -50%) scale(0.4)', opacity: 0 },
+        { transform: `translate(calc(-50% + ${Math.cos(angle) * spread}px), calc(-50% + ${Math.sin(angle) * spread}px)) scale(1.6) rotate(${index * 40}deg)`, opacity: 1, offset: 0.3 },
+        { transform: `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) scale(0.9) rotate(${index * 40 + 360}deg)`, opacity: 1 },
+      ], { duration: 820 + index * 45, delay: index * 35, easing: 'cubic-bezier(.45,.05,.55,1)', fill: 'backwards' });
+      animation.onfinish = () => {
+        gem.remove();
+        landed += 1;
+        if (!this.active) return;
+        this.bump(counter, landed === count ? total : startValue + Math.round(amount * landed / count));
+        if (landed % 2 === 1 || landed === count) playSfx('sfx/xp_pickup', 0.5);
+      };
+    }
+  }
+
+  private bump(counter: HTMLElement, value: number): void {
+    counter.textContent = String(value);
+    const box = counter.closest('div');
+    box?.classList.remove('hub-bump');
+    void box?.offsetWidth;
+    box?.classList.add('hub-bump');
   }
 
   private status(message: string, error = false): void {
@@ -454,6 +624,8 @@ export class HubScene extends Phaser.Scene {
     this.el('hub-runs').textContent = String(profile.runs_count);
     this.el('hub-guest-hint').hidden = !(profile.is_guest && profile.runs_count >= 1);
     this.el('hub-link').textContent = profile.is_guest ? 'Привязать почту или Telegram' : 'Добавить способ входа';
+    this.el('hub-admin').hidden = !profile.is_admin;
+    this.el('hub-user-id').textContent = profile.user_id;
     const lines = identityLines(profile.identities);
     this.el('hub-identities').innerHTML = lines.length
       ? lines.map((line) => `<li>${escapeHtml(line)}</li>`).join('')
@@ -486,6 +658,12 @@ export class HubScene extends Phaser.Scene {
     this.renderDaily(profile);
     const pilot = catalog.upgrades.autopilot;
     const bought = (profile.upgrades.autopilot ?? 0) > 0;
+    // Early on the start screen is only hero, location and the button.
+    const fast = Object.values(profile.speeds).some((open) => open.length > 1);
+    this.el('hub-speeds').hidden = !fast;
+    this.el('hub-speed-note').hidden = !fast && !profile.bosses_killed.length;
+    this.el<HTMLElement>('hub-autopilot').closest('label')!.hidden = !bought;
+    this.el('hub-autopilot-note').hidden = !bought && !this.isTabOpen('shop');
     this.el<HTMLInputElement>('hub-autopilot').disabled = !bought;
     this.el('hub-autopilot-note').textContent = bought
       ? 'Не закрывайте вкладку игры. В забеге переключается клавишей I.'
@@ -512,6 +690,7 @@ export class HubScene extends Phaser.Scene {
     this.el('hub-shop-upgrades').innerHTML = all.filter((upgrade) => upgrade.category === this.shopTab)
       .map(row).join('');
     this.renderShopTabs(profile);
+    this.renderProgress(profile);
   }
 
   private renderShopTabs(profile: Profile): void {
@@ -556,10 +735,12 @@ export class HubScene extends Phaser.Scene {
   }
 
   private heroCondition(hero: HeroDefinition, profile: Profile): string {
-    const { unlock } = hero;
+    return hero.unlock.type === 'default' ? '' : this.progressText(hero.unlock, profile);
+  }
+
+  private progressText(unlock: ProgressUnlock, profile: Profile): string {
     const { locations } = getCatalog();
     switch (unlock.type) {
-      case 'default': return '';
       case 'runs': return `Сыграйте ${unlock.count} забегов (${Math.min(profile.runs_count, unlock.count)}/${unlock.count})`;
       case 'achievements': return `Получите ${unlock.count} достижений (${Math.min(profile.achievements.length, unlock.count)}/${unlock.count})`;
       case 'bossKilled': return `Победите босса: ${locations[unlock.location]!.name}`;
@@ -599,32 +780,44 @@ export class HubScene extends Phaser.Scene {
   private renderItems(profile: Profile): void {
     const { weapons, passives } = getCatalog();
     const row = (item: WeaponDefinition | PassiveDefinition, note: string): string => {
-      const cost = item.unlock.type === 'emeralds' ? item.unlock.emeralds : 0;
-      const open = !cost || profile.unlocks.includes(item.id);
-      const action = open ? `<span class="hub-open">${cost ? 'Открыто' : 'Доступно'}</span>`
-        : `<button type="button" data-unlock="${escapeHtml(item.id)}" ${cost > profile.emeralds ? 'disabled' : ''}>Открыть · ${cost}</button>`;
+      const { unlock } = item;
+      const open = profile.open_items.includes(item.id);
+      let action = `<span class="hub-open">${unlock.type === 'emeralds' ? 'Открыто' : 'Доступно'}</span>`;
+      if (open || unlock.type === 'default') {
+        // Shown as open.
+      } else if (unlock.type === 'emeralds') {
+        action = `<button type="button" data-unlock="${escapeHtml(item.id)}" ${unlock.emeralds > profile.emeralds ? 'disabled' : ''}>Открыть · ${unlock.emeralds}</button>`;
+      } else {
+        action = `<span class="hub-open hub-pending">${pixelIcon(LOCK)}</span>`;
+        note = [`Откроется: ${this.progressText(unlock, profile)}`, note].filter(Boolean).join('\n');
+      }
       return `<li class="${open ? '' : 'hub-locked'}">
         <img class="hub-icon" alt="" src="${this.textures.getBase64(ATLAS, item.sprite)}">
         <div><strong>${escapeHtml(item.name)}</strong>
-        <small>${escapeHtml(item.description)}${note ? `<br>${escapeHtml(note)}` : ''}</small></div>${action}</li>`;
+        <small>${escapeHtml(item.description)}${note ? `<br>${escapeHtml(note).replace(/\n/g, '<br>')}` : ''}</small></div>${action}</li>`;
     };
     const section = (title: string, rows: string[]): string =>
-      `<li class="hub-category">${title}</li>${rows.join('')}`;
+      rows.length ? `<li class="hub-category">${title}</li>${rows.join('')}` : '';
     const byCost = <T extends WeaponDefinition | PassiveDefinition>(items: T[]): T[] =>
       items.sort((a, b) => (a.unlock.type === 'emeralds' ? a.unlock.emeralds : 0)
         - (b.unlock.type === 'emeralds' ? b.unlock.emeralds : 0));
+    // Open ones first, then the closest locks.
+    const byOpen = <T extends WeaponDefinition | PassiveDefinition>(items: T[]): T[] =>
+      items.sort((a, b) => Number(profile.open_items.includes(b.id)) - Number(profile.open_items.includes(a.id)));
     const guns = Object.values(weapons);
     const heavy = byCost(guns.filter((weapon) => weapon.heavy));
-    this.el('hub-weapons').innerHTML = section('Тяжёлое оружие', heavy.map((weapon) =>
-      row(weapon, `Встречается в забеге с ${weapon.minHeroLevel} уровня`)))
-      + section('Обычное оружие', guns.filter((weapon) => !weapon.heavy && !weapon.evolved).map((weapon) =>
-        row(weapon, weapon.evolution
-          ? `Эволюция: ${weapons[weapon.evolution.into]!.name} (перк «${passives[weapon.evolution.passive]!.name}»)` : '')));
+    const evolutions = (weapon: WeaponDefinition): string => weapon.evolutions.map(({ into, passive }) =>
+      `Эволюция: ${weapons[into]!.name} (перк «${passives[passive]!.name}»)`).join('\n');
+    this.el('hub-weapons').innerHTML = section('Обычное оружие', byOpen(guns.filter((weapon) => !weapon.heavy && !weapon.evolved))
+      .map((weapon) => row(weapon, evolutions(weapon))))
+      + section('Тяжёлое оружие', heavy.map((weapon) => row(weapon, `Встречается в забеге с ${weapon.minHeroLevel} уровня`)));
     const perks = Object.values(passives);
     const note = (perk: PassiveDefinition): string =>
       `${statBonus(perk.stat, perk.perLevel, perk.mod)} за уровень, уровней: ${perk.maxLevel}`;
+    const progress = (perk: PassiveDefinition): boolean => perk.unlock.type !== 'emeralds' && perk.unlock.type !== 'default';
     this.el('hub-passives').innerHTML = section('За изумруды',
       byCost(perks.filter((perk) => perk.unlock.type === 'emeralds')).map((perk) => row(perk, note(perk))))
+      + section('Откроются в пути', byOpen(perks.filter(progress)).map((perk) => row(perk, note(perk))))
       + section('Доступны сразу',
         perks.filter((perk) => perk.unlock.type === 'default').map((perk) => row(perk, note(perk))));
   }
@@ -683,13 +876,10 @@ export class HubScene extends Phaser.Scene {
       }).join('')}`;
   }
 
-  /** The tab stays a secret until the first achievement. */
   private renderAchievements(profile: Profile): void {
     const all = Object.values(getCatalog().achievements);
     const owned = new Set(profile.achievements);
     const waiting = new Set(profile.achievements_unclaimed);
-    const tab = this.el('hub-tab-achievements');
-    tab.hidden = owned.size === 0;
     this.badge('achievements', waiting.size, waiting.size > 0);
     const row = (item: AchievementDefinition): string => {
       const done = owned.has(item.id);
@@ -706,7 +896,8 @@ export class HubScene extends Phaser.Scene {
     const left = hidden.length - found.length;
     this.el('hub-achievements').innerHTML = `
       <p class="hub-help">Получено ${all.filter((item) => owned.has(item.id)).length} из ${all.length}. Нажмите «Забрать», чтобы получить изумруды.</p>
-      ${ready.length ? `<h2>Заберите награду</h2><ul class="hub-goals">${ready.map(row).join('')}</ul><h2>Список</h2>` : ''}
+      ${ready.length ? `<h2>Заберите награду</h2>${ready.length > 1 ? `<button type="button" class="auth-primary hub-claim-all" data-claim-all>Забрать всё · +${ready.reduce((sum, item) => sum + item.emeralds, 0)}</button>` : ''}
+        <ul class="hub-goals hub-ready">${ready.map(row).join('')}</ul><h2>Список</h2>` : ''}
       <ul class="hub-goals">${open.map(row).join('')}</ul>
       <h2>Скрытые: ${found.length} из ${hidden.length}</h2>
       <ul class="hub-goals">${shown.map(row).join('')}${left
@@ -732,11 +923,13 @@ export class HubScene extends Phaser.Scene {
     }).join('');
   }
 
-  private async claimQuest(id: string): Promise<void> {
+  private async claimQuest(id: string, from: DOMRect): Promise<void> {
     if (!this.profile) return;
     try {
+      const before = this.profile.emeralds;
       this.render(await claimDaily(id, this.profile.version));
       playSfx('sfx/emerald');
+      this.flyEmeralds(from, this.profile.emeralds - before);
       this.status('Награда за задание получена.');
     } catch (error) {
       if (error instanceof ApiRequestError && error.status === 409) {
@@ -746,18 +939,37 @@ export class HubScene extends Phaser.Scene {
     }
   }
 
-  private async claim(id: string): Promise<void> {
+  private async claim(id: string, from: DOMRect): Promise<void> {
     if (!this.profile) return;
     try {
+      const before = this.profile.emeralds;
       this.render(await claimAchievement(id, this.profile.version));
       playSfx('sfx/emerald');
-      this.status(`Изумруды получены: +${getCatalog().achievements[id]?.emeralds ?? 0}.`);
+      this.flyEmeralds(from, this.profile.emeralds - before);
+      this.status(`«${getCatalog().achievements[id]?.name ?? id}»: +${this.profile.emeralds - before} изумр.`);
     } catch (error) {
       if (error instanceof ApiRequestError && error.status === 409) {
         this.render(await getProfile());
       }
       throw error;
     }
+  }
+
+  /** One request per achievement; the emeralds of all of them fly together at the end. */
+  private async claimAll(from: DOMRect): Promise<void> {
+    if (!this.profile) return;
+    const before = this.profile.emeralds;
+    const ids = [...this.profile.achievements_unclaimed];
+    try {
+      for (const id of ids) {
+        this.profile = await claimAchievement(id, this.profile.version);
+      }
+    } finally {
+      this.render(this.profile);
+    }
+    playSfx('sfx/emerald');
+    this.flyEmeralds(from, this.profile.emeralds - before);
+    this.status(`Награды за ${ids.length} достижений: +${this.profile.emeralds - before} изумр.`);
   }
 
   private async showKey(renew: boolean): Promise<void> {
@@ -827,7 +1039,7 @@ export class HubScene extends Phaser.Scene {
     const data: RunData = {
       seed, wave, locationId: location.id, heroId: this.hero,
       runId: run.run_id, contentHash, upgrades: { ...this.profile.upgrades },
-      unlocks: [...this.profile.unlocks], achievements: [...this.profile.achievements],
+      openItems: [...this.profile.open_items], achievements: [...this.profile.achievements],
       speed: this.runSpeed(this.profile),
     };
     this.scene.start('Run', data);

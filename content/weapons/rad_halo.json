@@ -1,0 +1,25 @@
+{
+  "id": "rad_halo",
+  "name": "Ядерный ореол",
+  "description": "Тесное поле, но жжёт втрое сильнее",
+  "sprite": "weapons/rad_halo",
+  "projectileSprite": "projectiles/rad",
+  "fireSound": "sfx/aura",
+  "behavior": {
+    "type": "aura",
+    "params": {}
+  },
+  "levels": [
+    {
+      "damage": 30,
+      "cooldownMs": 420,
+      "shots": 1,
+      "spreadDegrees": 0,
+      "radius": 70
+    }
+  ],
+  "tags": [
+    "radiation"
+  ],
+  "evolved": true
+}

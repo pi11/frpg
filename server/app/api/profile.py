@@ -15,6 +15,7 @@ from app.services.achievements import grant_achievements
 from app.services.content import get_content
 from app.services.daily import DailyResponse, daily_view, game_day, pick_quests, today_state
 from app.services.economy import (
+    open_items,
     unlocked_heroes,
     unlocked_locations,
     unlocked_speeds,
@@ -38,6 +39,7 @@ class IdentityResponse(BaseModel):
 class ProfileResponse(BaseModel):
     user_id: uuid.UUID
     is_guest: bool
+    is_admin: bool
     caps: int
     emeralds: int
     version: int
@@ -53,6 +55,8 @@ class ProfileResponse(BaseModel):
     daily: DailyResponse
     unlocked_locations: list[str]
     unlocked_heroes: list[str]
+    #: Weapons and perks that runs may offer (open, reached by progress or bought).
+    open_items: list[str]
     #: Game speeds (percent) open per location.
     speeds: dict[str, list[int]]
     #: Best boss win speed per location and hero.
@@ -77,7 +81,7 @@ async def profile_response(session: AsyncSession, user: User, profile: Profile) 
     )).all()
     data = profile.data or {}
     return ProfileResponse(
-        user_id=user.id, is_guest=user.is_guest, caps=profile.caps,
+        user_id=user.id, is_guest=user.is_guest, is_admin=user.is_admin, caps=profile.caps,
         emeralds=data.get("emeralds", 0),
         version=profile.version, schema_version=profile.schema_version,
         best_time_s=profile.best_time_s, upgrades=data.get("upgrades", {}),
@@ -88,6 +92,9 @@ async def profile_response(session: AsyncSession, user: User, profile: Profile) 
         achievements_unclaimed=data.get("achievements_unclaimed", []),
         daily=today_daily(data),
         unlocked_heroes=unlocked_heroes(get_content().category("heroes"), data),
+        open_items=open_items(
+            {**get_content().category("weapons"), **get_content().category("passives")}, data,
+        ),
         unlocked_locations=unlocked_locations(
             get_content().category("locations"), data.get("bosses_killed", []),
         ),

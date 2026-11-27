@@ -1,0 +1,28 @@
+{
+  "id": "sniper_beam",
+  "name": "Снайперский луч",
+  "description": "Один луч прошивает всю толпу",
+  "sprite": "weapons/sniper_beam",
+  "projectileSprite": "projectiles/laser",
+  "fireSound": "sfx/laser",
+  "behavior": {
+    "type": "projectile",
+    "params": {
+      "speed": 700,
+      "lifetimeMs": 900
+    }
+  },
+  "levels": [
+    {
+      "damage": 120,
+      "cooldownMs": 700,
+      "shots": 1,
+      "spreadDegrees": 0,
+      "pierce": 20
+    }
+  ],
+  "tags": [
+    "energy"
+  ],
+  "evolved": true
+}

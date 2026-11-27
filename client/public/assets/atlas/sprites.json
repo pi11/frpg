@@ -42,8 +42,8 @@
   },
   "decor/barrel": {
    "frame": {
-    "x": 456,
-    "y": 730,
+    "x": 152,
+    "y": 747,
     "w": 10,
     "h": 13
    },
@@ -102,8 +102,8 @@
   },
   "decor/bones": {
    "frame": {
-    "x": 153,
-    "y": 760,
+    "x": 352,
+    "y": 762,
     "w": 14,
     "h": 6
    },
@@ -162,7 +162,7 @@
   },
   "decor/campfire": {
    "frame": {
-    "x": 205,
+    "x": 392,
     "y": 730,
     "w": 16,
     "h": 14
@@ -182,7 +182,7 @@
   },
   "decor/car_wreck": {
    "frame": {
-    "x": 222,
+    "x": 409,
     "y": 730,
     "w": 32,
     "h": 14
@@ -202,7 +202,7 @@
   },
   "decor/concrete_block": {
    "frame": {
-    "x": 255,
+    "x": 442,
     "y": 730,
     "w": 18,
     "h": 14
@@ -242,8 +242,8 @@
   },
   "decor/crate": {
    "frame": {
-    "x": 467,
-    "y": 730,
+    "x": 163,
+    "y": 747,
     "w": 12,
     "h": 12
    },
@@ -262,8 +262,8 @@
   },
   "decor/crate/break_0": {
    "frame": {
-    "x": 480,
-    "y": 730,
+    "x": 176,
+    "y": 747,
     "w": 12,
     "h": 12
    },
@@ -282,8 +282,8 @@
   },
   "decor/crate/break_1": {
    "frame": {
-    "x": 493,
-    "y": 730,
+    "x": 189,
+    "y": 747,
     "w": 12,
     "h": 12
    },
@@ -302,7 +302,7 @@
   },
   "decor/crate/break_2": {
    "frame": {
-    "x": 1,
+    "x": 202,
     "y": 747,
     "w": 12,
     "h": 12
@@ -582,7 +582,7 @@
   },
   "decor/mushrooms": {
    "frame": {
-    "x": 14,
+    "x": 215,
     "y": 747,
     "w": 14,
     "h": 12
@@ -602,7 +602,7 @@
   },
   "decor/oil_puddle": {
    "frame": {
-    "x": 274,
+    "x": 461,
     "y": 730,
     "w": 30,
     "h": 14
@@ -682,8 +682,8 @@
   },
   "decor/rad_puddle": {
    "frame": {
-    "x": 305,
-    "y": 730,
+    "x": 1,
+    "y": 747,
     "w": 28,
     "h": 14
    },
@@ -762,8 +762,8 @@
   },
   "decor/rocks": {
    "frame": {
-    "x": 12,
-    "y": 760,
+    "x": 211,
+    "y": 762,
     "w": 14,
     "h": 8
    },
@@ -922,8 +922,8 @@
   },
   "decor/stump": {
    "frame": {
-    "x": 334,
-    "y": 730,
+    "x": 30,
+    "y": 747,
     "w": 16,
     "h": 14
    },
@@ -962,8 +962,8 @@
   },
   "decor/tires": {
    "frame": {
-    "x": 318,
-    "y": 747,
+    "x": 14,
+    "y": 762,
     "w": 14,
     "h": 11
    },
@@ -3942,8 +3942,8 @@
   },
   "enemies/slimelet": {
    "frame": {
-    "x": 372,
-    "y": 747,
+    "x": 68,
+    "y": 762,
     "w": 10,
     "h": 10
    },
@@ -3962,8 +3962,8 @@
   },
   "enemies/slimelet/death_0": {
    "frame": {
-    "x": 383,
-    "y": 747,
+    "x": 79,
+    "y": 762,
     "w": 10,
     "h": 10
    },
@@ -3982,8 +3982,8 @@
   },
   "enemies/slimelet/death_1": {
    "frame": {
-    "x": 394,
-    "y": 747,
+    "x": 90,
+    "y": 762,
     "w": 10,
     "h": 10
    },
@@ -4002,8 +4002,8 @@
   },
   "enemies/slimelet/death_2": {
    "frame": {
-    "x": 405,
-    "y": 747,
+    "x": 101,
+    "y": 762,
     "w": 10,
     "h": 10
    },
@@ -4022,8 +4022,8 @@
   },
   "enemies/slimelet/death_3": {
    "frame": {
-    "x": 416,
-    "y": 747,
+    "x": 112,
+    "y": 762,
     "w": 10,
     "h": 10
    },
@@ -4042,8 +4042,8 @@
   },
   "enemies/slimelet/walk_0": {
    "frame": {
-    "x": 427,
-    "y": 747,
+    "x": 123,
+    "y": 762,
     "w": 10,
     "h": 10
    },
@@ -4062,8 +4062,8 @@
   },
   "enemies/slimelet/walk_1": {
    "frame": {
-    "x": 438,
-    "y": 747,
+    "x": 134,
+    "y": 762,
     "w": 10,
     "h": 10
    },
@@ -4082,8 +4082,8 @@
   },
   "enemies/slimelet/walk_2": {
    "frame": {
-    "x": 449,
-    "y": 747,
+    "x": 145,
+    "y": 762,
     "w": 10,
     "h": 10
    },
@@ -4102,8 +4102,8 @@
   },
   "enemies/slimelet/walk_3": {
    "frame": {
-    "x": 460,
-    "y": 747,
+    "x": 156,
+    "y": 762,
     "w": 10,
     "h": 10
    },
@@ -4902,7 +4902,7 @@
   },
   "fx/fire": {
    "frame": {
-    "x": 29,
+    "x": 230,
     "y": 747,
     "w": 12,
     "h": 12
@@ -4922,7 +4922,7 @@
   },
   "fx/fire/burn_0": {
    "frame": {
-    "x": 42,
+    "x": 243,
     "y": 747,
     "w": 12,
     "h": 12
@@ -4942,7 +4942,7 @@
   },
   "fx/fire/burn_1": {
    "frame": {
-    "x": 55,
+    "x": 256,
     "y": 747,
     "w": 12,
     "h": 12
@@ -4962,7 +4962,7 @@
   },
   "fx/fire/burn_2": {
    "frame": {
-    "x": 68,
+    "x": 269,
     "y": 747,
     "w": 12,
     "h": 12
@@ -5082,8 +5082,8 @@
   },
   "fx/hit": {
    "frame": {
-    "x": 27,
-    "y": 760,
+    "x": 226,
+    "y": 762,
     "w": 8,
     "h": 8
    },
@@ -5102,8 +5102,8 @@
   },
   "fx/hit/burst_0": {
    "frame": {
-    "x": 36,
-    "y": 760,
+    "x": 235,
+    "y": 762,
     "w": 8,
     "h": 8
    },
@@ -5122,8 +5122,8 @@
   },
   "fx/hit/burst_1": {
    "frame": {
-    "x": 45,
-    "y": 760,
+    "x": 244,
+    "y": 762,
     "w": 8,
     "h": 8
    },
@@ -5142,8 +5142,8 @@
   },
   "fx/hit/burst_2": {
    "frame": {
-    "x": 54,
-    "y": 760,
+    "x": 253,
+    "y": 762,
     "w": 8,
     "h": 8
    },
@@ -5262,7 +5262,7 @@
   },
   "fx/vortex": {
    "frame": {
-    "x": 81,
+    "x": 282,
     "y": 747,
     "w": 12,
     "h": 12
@@ -5282,7 +5282,7 @@
   },
   "fx/vortex/burn_0": {
    "frame": {
-    "x": 94,
+    "x": 295,
     "y": 747,
     "w": 12,
     "h": 12
@@ -5302,7 +5302,7 @@
   },
   "fx/vortex/burn_1": {
    "frame": {
-    "x": 107,
+    "x": 308,
     "y": 747,
     "w": 12,
     "h": 12
@@ -5322,7 +5322,7 @@
   },
   "fx/vortex/burn_2": {
    "frame": {
-    "x": 120,
+    "x": 321,
     "y": 747,
     "w": 12,
     "h": 12
@@ -7462,8 +7462,8 @@
   },
   "pickups/adrenaline": {
    "frame": {
-    "x": 351,
-    "y": 730,
+    "x": 47,
+    "y": 747,
     "w": 14,
     "h": 14
    },
@@ -7482,8 +7482,8 @@
   },
   "pickups/ammo_belt": {
    "frame": {
-    "x": 366,
-    "y": 730,
+    "x": 62,
+    "y": 747,
     "w": 14,
     "h": 14
    },
@@ -7502,8 +7502,8 @@
   },
   "pickups/bullet_shield": {
    "frame": {
-    "x": 381,
-    "y": 730,
+    "x": 77,
+    "y": 747,
     "w": 14,
     "h": 14
    },
@@ -7522,8 +7522,8 @@
   },
   "pickups/cap": {
    "frame": {
-    "x": 63,
-    "y": 760,
+    "x": 262,
+    "y": 762,
     "w": 8,
     "h": 8
    },
@@ -7542,8 +7542,8 @@
   },
   "pickups/caps_stash": {
    "frame": {
-    "x": 333,
-    "y": 747,
+    "x": 29,
+    "y": 762,
     "w": 12,
     "h": 11
    },
@@ -7562,7 +7562,7 @@
   },
   "pickups/chest": {
    "frame": {
-    "x": 133,
+    "x": 334,
     "y": 747,
     "w": 16,
     "h": 12
@@ -7582,7 +7582,7 @@
   },
   "pickups/chest/idle_0": {
    "frame": {
-    "x": 150,
+    "x": 351,
     "y": 747,
     "w": 16,
     "h": 12
@@ -7602,7 +7602,7 @@
   },
   "pickups/chest/idle_1": {
    "frame": {
-    "x": 167,
+    "x": 368,
     "y": 747,
     "w": 16,
     "h": 12
@@ -7622,7 +7622,7 @@
   },
   "pickups/chest/idle_2": {
    "frame": {
-    "x": 184,
+    "x": 385,
     "y": 747,
     "w": 16,
     "h": 12
@@ -7642,7 +7642,7 @@
   },
   "pickups/chest/idle_3": {
    "frame": {
-    "x": 201,
+    "x": 402,
     "y": 747,
     "w": 16,
     "h": 12
@@ -7662,8 +7662,8 @@
   },
   "pickups/cryo_bomb": {
    "frame": {
-    "x": 396,
-    "y": 730,
+    "x": 92,
+    "y": 747,
     "w": 14,
     "h": 14
    },
@@ -7682,8 +7682,8 @@
   },
   "pickups/data_disk": {
    "frame": {
-    "x": 411,
-    "y": 730,
+    "x": 107,
+    "y": 747,
     "w": 14,
     "h": 14
    },
@@ -7702,8 +7702,8 @@
   },
   "pickups/magnet": {
    "frame": {
-    "x": 346,
-    "y": 747,
+    "x": 42,
+    "y": 762,
     "w": 12,
     "h": 11
    },
@@ -7722,7 +7722,7 @@
   },
   "pickups/medkit": {
    "frame": {
-    "x": 218,
+    "x": 419,
     "y": 747,
     "w": 12,
     "h": 12
@@ -7742,8 +7742,8 @@
   },
   "pickups/pulse_bomb": {
    "frame": {
-    "x": 359,
-    "y": 747,
+    "x": 55,
+    "y": 762,
     "w": 12,
     "h": 11
    },
@@ -7762,8 +7762,8 @@
   },
   "pickups/rage_shot": {
    "frame": {
-    "x": 426,
-    "y": 730,
+    "x": 122,
+    "y": 747,
     "w": 14,
     "h": 14
    },
@@ -7782,8 +7782,8 @@
   },
   "pickups/shield_cell": {
    "frame": {
-    "x": 441,
-    "y": 730,
+    "x": 137,
+    "y": 747,
     "w": 14,
     "h": 14
    },
@@ -7802,8 +7802,8 @@
   },
   "projectiles/bottle": {
    "frame": {
-    "x": 114,
-    "y": 760,
+    "x": 313,
+    "y": 762,
     "w": 6,
     "h": 7
    },
@@ -7822,8 +7822,8 @@
   },
   "projectiles/bullet": {
    "frame": {
-    "x": 265,
-    "y": 760,
+    "x": 464,
+    "y": 762,
     "w": 4,
     "h": 4
    },
@@ -7842,8 +7842,8 @@
   },
   "projectiles/drone": {
    "frame": {
-    "x": 168,
-    "y": 760,
+    "x": 367,
+    "y": 762,
     "w": 8,
     "h": 6
    },
@@ -7862,8 +7862,8 @@
   },
   "projectiles/drone/spin_0": {
    "frame": {
-    "x": 177,
-    "y": 760,
+    "x": 376,
+    "y": 762,
     "w": 8,
     "h": 6
    },
@@ -7882,8 +7882,8 @@
   },
   "projectiles/drone/spin_1": {
    "frame": {
-    "x": 186,
-    "y": 760,
+    "x": 385,
+    "y": 762,
     "w": 8,
     "h": 6
    },
@@ -7902,8 +7902,8 @@
   },
   "projectiles/flame": {
    "frame": {
-    "x": 471,
-    "y": 747,
+    "x": 167,
+    "y": 762,
     "w": 10,
     "h": 10
    },
@@ -7922,8 +7922,8 @@
   },
   "projectiles/flame/burn_0": {
    "frame": {
-    "x": 482,
-    "y": 747,
+    "x": 178,
+    "y": 762,
     "w": 10,
     "h": 10
    },
@@ -7942,8 +7942,8 @@
   },
   "projectiles/flame/burn_1": {
    "frame": {
-    "x": 493,
-    "y": 747,
+    "x": 189,
+    "y": 762,
     "w": 10,
     "h": 10
    },
@@ -7962,8 +7962,8 @@
   },
   "projectiles/flame/burn_2": {
    "frame": {
-    "x": 1,
-    "y": 760,
+    "x": 200,
+    "y": 762,
     "w": 10,
     "h": 10
    },
@@ -7982,8 +7982,8 @@
   },
   "projectiles/ice_shard": {
    "frame": {
-    "x": 121,
-    "y": 760,
+    "x": 320,
+    "y": 762,
     "w": 10,
     "h": 7
    },
@@ -8002,8 +8002,8 @@
   },
   "projectiles/laser": {
    "frame": {
-    "x": 280,
-    "y": 760,
+    "x": 479,
+    "y": 762,
     "w": 8,
     "h": 3
    },
@@ -8022,8 +8022,8 @@
   },
   "projectiles/mine": {
    "frame": {
-    "x": 72,
-    "y": 760,
+    "x": 271,
+    "y": 762,
     "w": 10,
     "h": 8
    },
@@ -8042,8 +8042,8 @@
   },
   "projectiles/mine/idle_0": {
    "frame": {
-    "x": 83,
-    "y": 760,
+    "x": 282,
+    "y": 762,
     "w": 10,
     "h": 8
    },
@@ -8062,8 +8062,8 @@
   },
   "projectiles/mine/idle_1": {
    "frame": {
-    "x": 94,
-    "y": 760,
+    "x": 293,
+    "y": 762,
     "w": 10,
     "h": 8
    },
@@ -8082,8 +8082,8 @@
   },
   "projectiles/needle": {
    "frame": {
-    "x": 289,
-    "y": 760,
+    "x": 488,
+    "y": 762,
     "w": 8,
     "h": 3
    },
@@ -8102,8 +8102,8 @@
   },
   "projectiles/pellet": {
    "frame": {
-    "x": 270,
-    "y": 760,
+    "x": 469,
+    "y": 762,
     "w": 4,
     "h": 4
    },
@@ -8122,8 +8122,8 @@
   },
   "projectiles/rad": {
    "frame": {
-    "x": 237,
-    "y": 760,
+    "x": 436,
+    "y": 762,
     "w": 6,
     "h": 5
    },
@@ -8142,8 +8142,8 @@
   },
   "projectiles/rail_slug": {
    "frame": {
-    "x": 244,
-    "y": 760,
+    "x": 443,
+    "y": 762,
     "w": 20,
     "h": 5
    },
@@ -8162,8 +8162,8 @@
   },
   "projectiles/rocket": {
    "frame": {
-    "x": 132,
-    "y": 760,
+    "x": 331,
+    "y": 762,
     "w": 12,
     "h": 7
    },
@@ -8182,7 +8182,7 @@
   },
   "projectiles/saw": {
    "frame": {
-    "x": 231,
+    "x": 432,
     "y": 747,
     "w": 12,
     "h": 12
@@ -8202,7 +8202,7 @@
   },
   "projectiles/saw/spin_0": {
    "frame": {
-    "x": 244,
+    "x": 445,
     "y": 747,
     "w": 12,
     "h": 12
@@ -8222,7 +8222,7 @@
   },
   "projectiles/saw/spin_1": {
    "frame": {
-    "x": 257,
+    "x": 458,
     "y": 747,
     "w": 12,
     "h": 12
@@ -8242,7 +8242,7 @@
   },
   "projectiles/saw/spin_2": {
    "frame": {
-    "x": 270,
+    "x": 471,
     "y": 747,
     "w": 12,
     "h": 12
@@ -8262,7 +8262,7 @@
   },
   "projectiles/saw/spin_3": {
    "frame": {
-    "x": 283,
+    "x": 484,
     "y": 747,
     "w": 12,
     "h": 12
@@ -8282,7 +8282,7 @@
   },
   "projectiles/shell": {
    "frame": {
-    "x": 296,
+    "x": 497,
     "y": 747,
     "w": 8,
     "h": 12
@@ -8302,8 +8302,8 @@
   },
   "projectiles/slug": {
    "frame": {
-    "x": 275,
-    "y": 760,
+    "x": 474,
+    "y": 762,
     "w": 4,
     "h": 4
    },
@@ -8322,8 +8322,8 @@
   },
   "projectiles/spark": {
    "frame": {
-    "x": 195,
-    "y": 760,
+    "x": 394,
+    "y": 762,
     "w": 6,
     "h": 6
    },
@@ -8342,8 +8342,8 @@
   },
   "projectiles/spit": {
    "frame": {
-    "x": 145,
-    "y": 760,
+    "x": 344,
+    "y": 762,
     "w": 7,
     "h": 7
    },
@@ -8362,8 +8362,8 @@
   },
   "projectiles/tracer": {
    "frame": {
-    "x": 298,
-    "y": 760,
+    "x": 497,
+    "y": 762,
     "w": 7,
     "h": 3
    },
@@ -8442,8 +8442,8 @@
   },
   "ui/cap": {
    "frame": {
-    "x": 105,
-    "y": 760,
+    "x": 304,
+    "y": 762,
     "w": 8,
     "h": 8
    },
@@ -8462,8 +8462,8 @@
   },
   "ui/emerald": {
    "frame": {
-    "x": 305,
-    "y": 747,
+    "x": 1,
+    "y": 762,
     "w": 12,
     "h": 12
    },
@@ -8500,7 +8500,7 @@
     "h": 16
    }
   },
-  "weapons/beam_cutter": {
+  "weapons/arc_welder": {
    "frame": {
     "x": 205,
     "y": 713,
@@ -8520,7 +8520,7 @@
     "h": 16
    }
   },
-  "weapons/buzz_storm": {
+  "weapons/beam_cutter": {
    "frame": {
     "x": 222,
     "y": 713,
@@ -8540,7 +8540,7 @@
     "h": 16
    }
   },
-  "weapons/cryo_cannon": {
+  "weapons/buckshot_ram": {
    "frame": {
     "x": 239,
     "y": 713,
@@ -8560,7 +8560,7 @@
     "h": 16
    }
   },
-  "weapons/drone_swarm": {
+  "weapons/buzz_storm": {
    "frame": {
     "x": 256,
     "y": 713,
@@ -8580,7 +8580,7 @@
     "h": 16
    }
   },
-  "weapons/firebomb": {
+  "weapons/cryo_cannon": {
    "frame": {
     "x": 273,
     "y": 713,
@@ -8600,7 +8600,7 @@
     "h": 16
    }
   },
-  "weapons/flamethrower": {
+  "weapons/demo_charge": {
    "frame": {
     "x": 290,
     "y": 713,
@@ -8620,7 +8620,7 @@
     "h": 16
    }
   },
-  "weapons/furnace": {
+  "weapons/drone_swarm": {
    "frame": {
     "x": 307,
     "y": 713,
@@ -8640,7 +8640,7 @@
     "h": 16
    }
   },
-  "weapons/gravity_trap": {
+  "weapons/fire_rain": {
    "frame": {
     "x": 324,
     "y": 713,
@@ -8660,7 +8660,7 @@
     "h": 16
    }
   },
-  "weapons/laser_rifle": {
+  "weapons/fire_ring": {
    "frame": {
     "x": 341,
     "y": 713,
@@ -8680,7 +8680,7 @@
     "h": 16
    }
   },
-  "weapons/minefield": {
+  "weapons/firebomb": {
    "frame": {
     "x": 358,
     "y": 713,
@@ -8700,7 +8700,7 @@
     "h": 16
    }
   },
-  "weapons/mortar": {
+  "weapons/flamethrower": {
    "frame": {
     "x": 375,
     "y": 713,
@@ -8720,7 +8720,7 @@
     "h": 16
    }
   },
-  "weapons/nail_gun": {
+  "weapons/furnace": {
    "frame": {
     "x": 392,
     "y": 713,
@@ -8740,7 +8740,7 @@
     "h": 16
    }
   },
-  "weapons/napalm": {
+  "weapons/gravity_trap": {
    "frame": {
     "x": 409,
     "y": 713,
@@ -8760,7 +8760,7 @@
     "h": 16
    }
   },
-  "weapons/needle_sphere": {
+  "weapons/laser_rifle": {
    "frame": {
     "x": 426,
     "y": 713,
@@ -8780,7 +8780,7 @@
     "h": 16
    }
   },
-  "weapons/orbit_drone": {
+  "weapons/minefield": {
    "frame": {
     "x": 443,
     "y": 713,
@@ -8800,7 +8800,7 @@
     "h": 16
    }
   },
-  "weapons/prism_emitter": {
+  "weapons/mortar": {
    "frame": {
     "x": 460,
     "y": 713,
@@ -8820,7 +8820,7 @@
     "h": 16
    }
   },
-  "weapons/rad_aura": {
+  "weapons/nail_gun": {
    "frame": {
     "x": 477,
     "y": 713,
@@ -8840,7 +8840,7 @@
     "h": 16
    }
   },
-  "weapons/rail_gun": {
+  "weapons/napalm": {
    "frame": {
     "x": 494,
     "y": 713,
@@ -8860,7 +8860,7 @@
     "h": 16
    }
   },
-  "weapons/reactor_core": {
+  "weapons/needle_sphere": {
    "frame": {
     "x": 1,
     "y": 730,
@@ -8880,7 +8880,7 @@
     "h": 16
    }
   },
-  "weapons/rocket_barrage": {
+  "weapons/orbit_drone": {
    "frame": {
     "x": 18,
     "y": 730,
@@ -8900,7 +8900,7 @@
     "h": 16
    }
   },
-  "weapons/rocket_tube": {
+  "weapons/prism_emitter": {
    "frame": {
     "x": 35,
     "y": 730,
@@ -8920,7 +8920,7 @@
     "h": 16
    }
   },
-  "weapons/rotary_gun": {
+  "weapons/rad_aura": {
    "frame": {
     "x": 52,
     "y": 730,
@@ -8940,7 +8940,7 @@
     "h": 16
    }
   },
-  "weapons/saw_blade": {
+  "weapons/rad_halo": {
    "frame": {
     "x": 69,
     "y": 730,
@@ -8960,7 +8960,7 @@
     "h": 16
    }
   },
-  "weapons/scattergun": {
+  "weapons/rail_gun": {
    "frame": {
     "x": 86,
     "y": 730,
@@ -8980,7 +8980,7 @@
     "h": 16
    }
   },
-  "weapons/scrap_cannon": {
+  "weapons/reactor_core": {
    "frame": {
     "x": 103,
     "y": 730,
@@ -9000,7 +9000,7 @@
     "h": 16
    }
   },
-  "weapons/scrap_pistol": {
+  "weapons/ripper": {
    "frame": {
     "x": 120,
     "y": 730,
@@ -9020,7 +9020,7 @@
     "h": 16
    }
   },
-  "weapons/sentry_turret": {
+  "weapons/rocket_barrage": {
    "frame": {
     "x": 137,
     "y": 730,
@@ -9040,7 +9040,7 @@
     "h": 16
    }
   },
-  "weapons/storm_core": {
+  "weapons/rocket_tube": {
    "frame": {
     "x": 154,
     "y": 730,
@@ -9060,7 +9060,7 @@
     "h": 16
    }
   },
-  "weapons/tesla_coil": {
+  "weapons/rotary_gun": {
    "frame": {
     "x": 171,
     "y": 730,
@@ -9080,7 +9080,7 @@
     "h": 16
    }
   },
-  "weapons/trap_mine": {
+  "weapons/saw_blade": {
    "frame": {
     "x": 188,
     "y": 730,
@@ -9100,10 +9100,230 @@
     "h": 16
    }
   },
+  "weapons/scattergun": {
+   "frame": {
+    "x": 205,
+    "y": 730,
+    "w": 16,
+    "h": 16
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 16
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 16
+   }
+  },
+  "weapons/scrap_cannon": {
+   "frame": {
+    "x": 222,
+    "y": 730,
+    "w": 16,
+    "h": 16
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 16
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 16
+   }
+  },
+  "weapons/scrap_pistol": {
+   "frame": {
+    "x": 239,
+    "y": 730,
+    "w": 16,
+    "h": 16
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 16
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 16
+   }
+  },
+  "weapons/sentry_turret": {
+   "frame": {
+    "x": 256,
+    "y": 730,
+    "w": 16,
+    "h": 16
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 16
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 16
+   }
+  },
+  "weapons/shield_drones": {
+   "frame": {
+    "x": 273,
+    "y": 730,
+    "w": 16,
+    "h": 16
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 16
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 16
+   }
+  },
+  "weapons/smart_warhead": {
+   "frame": {
+    "x": 290,
+    "y": 730,
+    "w": 16,
+    "h": 16
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 16
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 16
+   }
+  },
+  "weapons/sniper_beam": {
+   "frame": {
+    "x": 307,
+    "y": 730,
+    "w": 16,
+    "h": 16
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 16
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 16
+   }
+  },
+  "weapons/storm_core": {
+   "frame": {
+    "x": 324,
+    "y": 730,
+    "w": 16,
+    "h": 16
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 16
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 16
+   }
+  },
+  "weapons/tesla_coil": {
+   "frame": {
+    "x": 341,
+    "y": 730,
+    "w": 16,
+    "h": 16
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 16
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 16
+   }
+  },
+  "weapons/trap_mine": {
+   "frame": {
+    "x": 358,
+    "y": 730,
+    "w": 16,
+    "h": 16
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 16
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 16
+   }
+  },
+  "weapons/twin_pistols": {
+   "frame": {
+    "x": 375,
+    "y": 730,
+    "w": 16,
+    "h": 16
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 16
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 16
+   }
+  },
   "xp/green": {
    "frame": {
-    "x": 202,
-    "y": 760,
+    "x": 401,
+    "y": 762,
     "w": 6,
     "h": 6
    },
@@ -9122,8 +9342,8 @@
   },
   "xp/green/idle_0": {
    "frame": {
-    "x": 209,
-    "y": 760,
+    "x": 408,
+    "y": 762,
     "w": 6,
     "h": 6
    },
@@ -9142,8 +9362,8 @@
   },
   "xp/green/idle_1": {
    "frame": {
-    "x": 216,
-    "y": 760,
+    "x": 415,
+    "y": 762,
     "w": 6,
     "h": 6
    },
@@ -9162,8 +9382,8 @@
   },
   "xp/green/idle_2": {
    "frame": {
-    "x": 223,
-    "y": 760,
+    "x": 422,
+    "y": 762,
     "w": 6,
     "h": 6
    },
@@ -9182,8 +9402,8 @@
   },
   "xp/green/idle_3": {
    "frame": {
-    "x": 230,
-    "y": 760,
+    "x": 429,
+    "y": 762,
     "w": 6,
     "h": 6
    },

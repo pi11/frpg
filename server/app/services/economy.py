@@ -101,6 +101,22 @@ def unlocked_heroes(heroes: Mapping[str, Mapping[str, Any]], data: Mapping[str, 
     )
 
 
+def open_items(
+    items: Mapping[str, Mapping[str, Any]], data: Mapping[str, Any],
+) -> list[str]:
+    """Weapons and perks offered in runs: open from the start, by progress, or bought."""
+    bought = set(data.get("unlocks", []))
+    result = []
+    for item_id, item in items.items():
+        unlock = item.get("unlock", {"type": "default"})
+        if unlock["type"] == "emeralds":
+            if item_id in bought:
+                result.append(item_id)
+        elif hero_progress(unlock, data):
+            result.append(item_id)
+    return sorted(result)
+
+
 def hero_progress(unlock: Mapping[str, Any], data: Mapping[str, Any]) -> bool:
     match unlock["type"]:
         case "default":

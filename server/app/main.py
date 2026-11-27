@@ -3,6 +3,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.api.admin import router as admin_router
 from app.api.auth import account_router
 from app.api.auth import router as auth_router
 from app.api.content import router as content_router
@@ -33,4 +34,5 @@ app.include_router(telegram_router, prefix="/api/v1")
 app.include_router(content_router, prefix="/api/v1")
 app.include_router(profile_router, prefix="/api/v1")
 app.include_router(runs_router, prefix="/api/v1")
+app.include_router(admin_router, prefix="/api/v1")
 app.include_router(wellknown_router)

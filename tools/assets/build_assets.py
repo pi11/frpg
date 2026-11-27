@@ -276,6 +276,7 @@ def sprite_frames() -> dict[str, Image]:
     })
     frames.update(extra.frames())
     frames.update(heavy.frames())
+    frames.update(extra.second_evolutions(frames))
     return frames
 
 

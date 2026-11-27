@@ -65,8 +65,14 @@
   "tags": [
     "ballistic"
   ],
-  "evolution": {
-    "passive": "heavy_rounds",
-    "into": "scrap_cannon"
-  }
+  "evolutions": [
+    {
+      "passive": "heavy_rounds",
+      "into": "scrap_cannon"
+    },
+    {
+      "passive": "spiked_vest",
+      "into": "buckshot_ram"
+    }
+  ]
 }

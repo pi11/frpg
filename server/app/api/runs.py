@@ -147,11 +147,12 @@ async def finish_run(
     flags: list[str] = []
     if body.content_hash != run.content_hash or content.hash != run.content_hash:
         flags.append("content_hash_mismatch")
-    # Durations are in game seconds: at a higher speed they pass faster than wall-clock ones.
+    # Durations are in game seconds: they pass at the chosen speed times the base pace.
     wall_seconds = max(0.0, (now - as_utc(run.started_at)).total_seconds())
     max_duration = min(
         location["durationSeconds"],
-        int(wall_seconds * run.speed / 100) + rules["durationGraceSeconds"],
+        int(wall_seconds * run.speed / 100 * content.balance["run"]["timeScale"])
+        + rules["durationGraceSeconds"],
     )
     duration = min(body.duration_seconds, max_duration)
     if duration != body.duration_seconds:
