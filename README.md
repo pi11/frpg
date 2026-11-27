@@ -124,7 +124,7 @@ Android-сборка — та же веб-сборка в Capacitor 8 (`client/a
 
 Инструкция с нуля и проверка — [docs/DEPLOY.md](docs/DEPLOY.md); конфиги nginx, systemd, PgBouncer, бэкап и выкладка — в `deploy/`. Служебные команды (из `server/`): `python -m app.services.check_config` (проверка боевых настроек), `… cleanup` (удаление гостей без активности 90 дней и просроченных входов; systemd timer), `… telegram_webhook set|info`.
 
-Публичные страницы `/privacy` и `/delete-account` собираются вместе с клиентом; контакты задаются при сборке через `VITE_CONTACT_EMAIL`, `VITE_OPERATOR`, `VITE_BACKUP_DAYS`. Страница удаления входит отдельно от игры и не затрагивает гостевую сессию. Локально: `make dev`, затем `http://localhost:5173/delete-account`.
+Публичные страницы `/privacy`, `/delete-account`, `/help` и `/changelog` собираются вместе с клиентом. «Помощь» берёт героев, оружие с эволюциями, перки, усиления и локации прямо из `content/` (иконки — из атласа), «Что нового» — из `client/src/changelog.ts`: каждый коммит добавляет версию (третья цифра, большие изменения — вторая), первая запись — версия игры в «Настройках», совпадает с `client/package.json` (проверяет тест). Ссылки на обе страницы — во вкладке «Настройки»; контакты задаются при сборке через `VITE_CONTACT_EMAIL`, `VITE_OPERATOR`, `VITE_BACKUP_DAYS`. Страница удаления входит отдельно от игры и не затрагивает гостевую сессию. Локально: `make dev`, затем `http://localhost:5173/delete-account`.
 
 ## Проверка вручную
 

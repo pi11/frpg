@@ -25,7 +25,7 @@ const cleanUrls: Plugin = {
   configureServer: (server) => {
     server.middlewares.use((request, _response, next) => {
       const path = request.url?.split('?')[0];
-      if (path === '/privacy' || path === '/delete-account') request.url = `${path}.html`;
+      if (path && ['/privacy', '/delete-account', '/help', '/changelog'].includes(path)) request.url = `${path}.html`;
       next();
     });
   },
@@ -34,7 +34,7 @@ const cleanUrls: Plugin = {
 export default defineConfig(({ mode }) => ({
   plugins: [contacts(loadEnv(mode, import.meta.dirname, 'VITE_')), cleanUrls],
   build: {
-    rollupOptions: { input: ['index.html', 'privacy.html', 'delete-account.html'] },
+    rollupOptions: { input: ['index.html', 'privacy.html', 'delete-account.html', 'help.html', 'changelog.html'] },
   },
   server: {
     proxy: { '/api': 'http://127.0.0.1:8000' },

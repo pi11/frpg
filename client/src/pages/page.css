@@ -8,3 +8,11 @@ html:has(.page), .page { height: auto; overflow: auto; }
 .page li { margin-bottom: 8px; }
 .page .auth-form label, .page .auth-row input, .page .auth-card button { font-size: 14px !important; }
 @media (max-width: 480px) { .page .auth-row { flex-direction: column; } }
+.page-date { margin: 0; color: var(--term-dim); font-size: 13px; }
+.page-release + .page-release { margin-top: 28px; border-top: 1px dashed var(--term-line); }
+.help-toc { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 14px; }
+.help-list { margin: 0; padding: 0; list-style: none; }
+.help-card { display: flex; gap: 12px; align-items: flex-start; padding: 8px 0; border-top: 1px dashed var(--term-line); }
+.help-card strong { display: block; }
+.help-card small { display: block; color: var(--term-dim); font-size: 13px; line-height: 1.5; }
+.help-icon { flex: none; background-image: url('/assets/atlas/sprites.png'); background-repeat: no-repeat; image-rendering: pixelated; }

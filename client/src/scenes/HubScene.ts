@@ -1,5 +1,7 @@
 import * as Phaser from 'phaser';
-import { accountKey, ApiRequestError, authMethods, deleteAccount, loginByKey, saveSession, session } from '../api/auth';
+import { accountKey, ApiRequestError, authMethods, deleteAccount, loginByKey, saveSession, session, webPage } from '../api/auth';
+import { VERSION } from '../changelog';
+import { openExternal } from '../platform/native';
 import { identityLines } from '../api/identities';
 import { buyBoost, buyUnlock, buyUpgrade, claimAchievement, claimDaily, getProfile, startRun, type Profile } from '../api/game';
 import { getCatalog } from '../content/catalog';
@@ -228,6 +230,12 @@ export class HubScene extends Phaser.Scene {
               <button id="hub-admin" class="auth-secondary" type="button" hidden>Админ-панель</button>
               <button id="hub-delete" class="auth-back hub-danger" type="button">Удалить аккаунт и данные</button>
             </div>
+            <h2>Об игре</h2>
+            <p class="hub-help">Версия ${VERSION}</p>
+            <div class="hub-account">
+              <button id="hub-help" class="auth-secondary" type="button">Помощь</button>
+              <button id="hub-changelog" class="auth-secondary" type="button">Что нового</button>
+            </div>
           </section>
           <section id="hub-panel-locked" class="hub-locked-panel" role="tabpanel" hidden>
             ${pixelIcon(LOCK)}<h2 id="hub-locked-title"></h2><p id="hub-locked-hint" class="hub-help"></p>
@@ -334,6 +342,8 @@ export class HubScene extends Phaser.Scene {
     this.el<HTMLButtonElement>('hub-retry').onclick = () => void this.loadProfile();
     this.el<HTMLButtonElement>('hub-link').onclick = () => this.scene.start('Auth', { linkAccount: true });
     this.el<HTMLButtonElement>('hub-admin').onclick = () => this.scene.start('Admin');
+    this.el<HTMLButtonElement>('hub-help').onclick = () => void openExternal(webPage('/help'));
+    this.el<HTMLButtonElement>('hub-changelog').onclick = () => void openExternal(webPage('/changelog'));
     this.el<HTMLButtonElement>('hub-delete').onclick = () => void this.act(() => this.removeAccount());
     this.el('hub-locations').onclick = (event) => {
       const button = (event.target as HTMLElement).closest<HTMLButtonElement>('button[data-location]');
