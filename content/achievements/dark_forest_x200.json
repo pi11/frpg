@@ -1,0 +1,16 @@
+{
+  "id": "dark_forest_x200",
+  "name": "Лесной пожар",
+  "description": "Победить Хозяина леса на скорости ×2",
+  "hidden": false,
+  "emeralds": 17,
+  "condition": {
+    "type": "victory",
+    "speed": 200,
+    "locations": [
+      "dark_forest"
+    ],
+    "heroes": [],
+    "every": false
+  }
+}

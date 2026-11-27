@@ -535,3 +535,111 @@ async def test_speeds_open_one_by_one_and_scale_the_time_check(api: dict[str, ob
         "boss_killed": False, "picked_caps": 0, "duration_seconds": 400,
     }, headers=auth)).json()
     assert "duration_clamped" in clamped["flags"]
+
+
+async def give_emeralds(
+    factory: async_sessionmaker[AsyncSession], user_id: str, amount: int,
+) -> None:
+    async with factory() as session:
+        profile = await session.get(Profile, UUID(user_id))
+        assert profile is not None
+        profile.data = {**(profile.data or {}), "emeralds": amount}
+        await session.commit()
+
+
+@pytest.mark.anyio
+async def test_boosts_cost_emeralds_and_are_used_by_the_next_run(api: dict[str, object]) -> None:
+    client: httpx.AsyncClient = api["client"]  # type: ignore[assignment]
+    factory: async_sessionmaker[AsyncSession] = api["factory"]  # type: ignore[assignment]
+    guest = (await client.post("/api/v1/auth/guest")).json()
+    auth = headers(guest)
+    boosts = get_content().category("boosts")
+    bag = boosts["caps_bag"]
+    assert (await client.post(
+        "/api/v1/boosts/missing/buy", json={"expected_version": 0}, headers=auth,
+    )).status_code == 404
+    poor = await client.post(
+        "/api/v1/boosts/caps_bag/buy", json={"expected_version": 0}, headers=auth,
+    )
+    assert poor.status_code == 409 and poor.json()["code"] == "conflict"
+    await give_emeralds(factory, guest["user_id"], bag["emeralds"] + 3)
+    stale = await client.post(
+        "/api/v1/boosts/caps_bag/buy", json={"expected_version": 5}, headers=auth,
+    )
+    assert stale.status_code == 409
+    bought = await client.post(
+        "/api/v1/boosts/caps_bag/buy", json={"expected_version": 0}, headers=auth,
+    )
+    assert bought.status_code == 200
+    assert bought.json()["boosts"] == ["caps_bag"]
+    assert bought.json()["emeralds"] == 3 and bought.json()["version"] == 1
+    again = await client.post(
+        "/api/v1/boosts/caps_bag/buy", json={"expected_version": 1}, headers=auth,
+    )
+    assert again.status_code == 409
+
+    started = (await client.post("/api/v1/runs/start", json={
+        "location_id": "shelter_outskirts", "hero_id": "wanderer"}, headers=auth)).json()
+    assert started["boosts"] == ["caps_bag"]
+    profile = (await client.get("/api/v1/profile", headers=auth)).json()
+    assert profile["boosts"] == [] and profile["emeralds"] == 3
+    async with factory() as session:
+        run = await session.get(Run, UUID(started["run_id"]))
+        assert run is not None and run.boosts == ["caps_bag"]
+        run.started_at = run.started_at - wall(150)
+        await session.commit()
+    result = (await client.post(f"/api/v1/runs/{started['run_id']}/finish", json={
+        "content_hash": get_content().hash, "duration_seconds": 130,
+        "kills_by_type": {"ghoul": 100}, "wave_reached": 2,
+        "boss_killed": False, "picked_caps": 7,
+    }, headers=auth)).json()
+    rules = get_content().balance["reward"]
+    outskirts = get_content().category("locations")["shelter_outskirts"]
+    multiplier = float(outskirts["rewardMultiplier"]) * (1 + float(bag["rewardBonus"]))
+    assert result["flags"] == []
+    assert result["reward_caps"] == run_reward(rules, 130, 100, 2, False, 7, multiplier)
+    assert result["reward_caps"] > run_reward(rules, 130, 100, 2, False, 7)
+
+    # The next run starts without them.
+    plain = (await client.post("/api/v1/runs/start", json={
+        "location_id": "shelter_outskirts", "hero_id": "wanderer"}, headers=auth)).json()
+    assert plain["boosts"] == []
+
+
+@pytest.mark.anyio
+async def test_boost_achievement_needs_a_bought_boost(api: dict[str, object]) -> None:
+    """«Лошок» is reported by the client, but the server checks that the run took a boost."""
+    client: httpx.AsyncClient = api["client"]  # type: ignore[assignment]
+    factory: async_sessionmaker[AsyncSession] = api["factory"]  # type: ignore[assignment]
+    guest = (await client.post("/api/v1/auth/guest")).json()
+    auth = headers(guest)
+    summary = {
+        "content_hash": get_content().hash, "duration_seconds": 20,
+        "kills_by_type": {"ghoul": 3}, "wave_reached": 1,
+        "boss_killed": False, "picked_caps": 0, "achievements": ["loshok"],
+    }
+    plain = (await client.post("/api/v1/runs/start", json={
+        "location_id": "shelter_outskirts", "hero_id": "wanderer"}, headers=auth)).json()
+    async with factory() as session:
+        run = await session.get(Run, UUID(plain["run_id"]))
+        assert run is not None
+        run.started_at = run.started_at - wall(30)
+        await session.commit()
+    first = (await client.post(
+        f"/api/v1/runs/{plain['run_id']}/finish", json=summary, headers=auth)).json()
+    assert "loshok" not in first["achievements"]
+
+    await give_emeralds(factory, guest["user_id"], 10)
+    version = (await client.get("/api/v1/profile", headers=auth)).json()["version"]
+    assert (await client.post("/api/v1/boosts/jet_boots/buy", json={
+        "expected_version": version}, headers=auth)).status_code == 200
+    boosted = (await client.post("/api/v1/runs/start", json={
+        "location_id": "shelter_outskirts", "hero_id": "wanderer"}, headers=auth)).json()
+    async with factory() as session:
+        run = await session.get(Run, UUID(boosted["run_id"]))
+        assert run is not None
+        run.started_at = run.started_at - wall(30)
+        await session.commit()
+    second = (await client.post(
+        f"/api/v1/runs/{boosted['run_id']}/finish", json=summary, headers=auth)).json()
+    assert "loshok" in second["achievements"]

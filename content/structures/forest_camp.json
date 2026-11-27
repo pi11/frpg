@@ -1,0 +1,52 @@
+{
+  "id": "forest_camp",
+  "items": [
+    {
+      "kind": "patch",
+      "sprite": "decor/scorch",
+      "x": 0,
+      "y": 6
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/campfire",
+      "x": 0,
+      "y": 0
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/tent",
+      "x": -40,
+      "y": -24
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/fallen_log",
+      "x": 36,
+      "y": 22
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/fallen_log",
+      "x": -30,
+      "y": 30
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/pine",
+      "x": 56,
+      "y": -30
+    },
+    {
+      "kind": "crate",
+      "x": 60,
+      "y": 10
+    },
+    {
+      "kind": "landmark",
+      "landmark": "med_station",
+      "x": 30,
+      "y": -26
+    }
+  ]
+}

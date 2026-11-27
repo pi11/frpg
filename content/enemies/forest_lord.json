@@ -1,0 +1,121 @@
+{
+  "id": "forest_lord",
+  "name": "Хозяин леса",
+  "sprite": "enemies/forest_lord",
+  "role": "boss",
+  "scale": 1.5,
+  "ai": {
+    "type": "boss_phases",
+    "params": {
+      "phases": [
+        {
+          "hpBelow": 1,
+          "ai": {
+            "type": "ranged",
+            "params": {
+              "turnRate": 3.5,
+              "preferredRange": 110,
+              "fireCooldownMs": 1100,
+              "projectileSpeed": 150,
+              "projectileDamage": 19,
+              "projectileSprite": "projectiles/spore",
+              "lifetimeMs": 3000,
+              "shots": 10,
+              "spreadDegrees": 100
+            }
+          }
+        },
+        {
+          "hpBelow": 0.8,
+          "ai": {
+            "type": "charger",
+            "params": {
+              "turnRate": 4.5,
+              "chargeRange": 230,
+              "windupMs": 550,
+              "chargeSpeed": 270,
+              "chargeMs": 750,
+              "cooldownMs": 1000
+            }
+          },
+          "summon": {
+            "enemy": "mutant_wolf",
+            "count": 14
+          }
+        },
+        {
+          "hpBelow": 0.55,
+          "ai": {
+            "type": "ranged",
+            "params": {
+              "turnRate": 3.5,
+              "preferredRange": 90,
+              "fireCooldownMs": 1000,
+              "projectileSpeed": 140,
+              "projectileDamage": 20,
+              "projectileSprite": "projectiles/spore",
+              "lifetimeMs": 3000,
+              "shots": 24,
+              "spreadDegrees": 345
+            }
+          },
+          "summon": {
+            "enemy": "tick",
+            "count": 20
+          }
+        },
+        {
+          "hpBelow": 0.35,
+          "ai": {
+            "type": "burrower",
+            "params": {
+              "turnRate": 3.5,
+              "surfaceMs": 3600,
+              "undergroundSpeed": 240,
+              "maxBurrowMs": 2600,
+              "emergeRange": 24,
+              "windupMs": 650,
+              "emergeRadius": 84,
+              "emergeDamage": 40
+            }
+          },
+          "summon": {
+            "enemy": "spore_shroom",
+            "count": 8
+          }
+        },
+        {
+          "hpBelow": 0.15,
+          "ai": {
+            "type": "ranged",
+            "params": {
+              "turnRate": 3.5,
+              "preferredRange": 80,
+              "fireCooldownMs": 800,
+              "projectileSpeed": 160,
+              "projectileDamage": 21,
+              "projectileSprite": "projectiles/spore",
+              "lifetimeMs": 3000,
+              "shots": 16,
+              "spreadDegrees": 160
+            }
+          },
+          "summon": {
+            "enemy": "mutant_wolf",
+            "count": 18
+          }
+        }
+      ]
+    }
+  },
+  "stats": {
+    "hp": 34000,
+    "speed": 86,
+    "damage": 38,
+    "xp": 0
+  },
+  "drops": [],
+  "tags": [
+    "boss"
+  ]
+}

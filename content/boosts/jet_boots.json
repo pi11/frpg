@@ -1,0 +1,19 @@
+{
+  "id": "jet_boots",
+  "name": "Реактивные ботинки",
+  "description": "Быстрее бег и шире радиус сбора",
+  "sprite": "boosts/jet_boots",
+  "emeralds": 2,
+  "effects": [
+    {
+      "stat": "moveSpeed",
+      "mod": "flat",
+      "value": 25
+    },
+    {
+      "stat": "pickupRadius",
+      "mod": "flat",
+      "value": 40
+    }
+  ]
+}

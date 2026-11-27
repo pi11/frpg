@@ -1,0 +1,15 @@
+{
+  "id": "no_shoulder_straps",
+  "name": "Без погон",
+  "description": "Победить Стального генерала без единого перка",
+  "hidden": true,
+  "emeralds": 8,
+  "condition": {
+    "type": "reported",
+    "event": "noPerks",
+    "value": 1,
+    "minSeconds": 0,
+    "boss": true,
+    "location": "military_base"
+  }
+}

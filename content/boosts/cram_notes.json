@@ -1,0 +1,19 @@
+{
+  "id": "cram_notes",
+  "name": "Шпаргалка",
+  "description": "Опыт быстрее и уровень сразу на старте",
+  "sprite": "boosts/cram_notes",
+  "emeralds": 3,
+  "effects": [
+    {
+      "stat": "xpGain",
+      "mod": "flat",
+      "value": 0.3
+    },
+    {
+      "stat": "headStart",
+      "mod": "flat",
+      "value": 1
+    }
+  ]
+}

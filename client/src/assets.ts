@@ -17,7 +17,8 @@ export const HUB_MUSIC = 'music/shelter';
 export const TUNES = [
   ['music/shelter', 'Убежище'], ['music/sunset', 'Закат'], ['music/road', 'Дорога'],
   ['music/rain', 'Дождь'], ['music/wasteland', 'Пустошь'], ['music/city', 'Город'],
-  ['music/marsh', 'Топи'],
+  ['music/marsh', 'Топи'], ['music/forest', 'Лес'], ['music/winter', 'Перевал'], ['music/dungeon', 'Подземелье'],
+  ['music/military', 'База'], ['music/desert', 'Пустыня'],
 ] as const;
 
 /** Presentation timing per animation name (frames per second, loop or not). */

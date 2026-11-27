@@ -28,6 +28,7 @@ import art  # noqa: E402
 import art_extra as extra  # noqa: E402
 import art_heavy as heavy  # noqa: E402
 import art_heroes as heroes  # noqa: E402
+import art_lands as lands  # noqa: E402
 import art_more as more  # noqa: E402
 import art_world as world  # noqa: E402
 import audio  # noqa: E402
@@ -211,6 +212,8 @@ def sprite_frames() -> dict[str, Image]:
         **heavy.animations(),
         **{f"enemies/{name}": with_death([draw(i) for i in range(4)], residue, seed)
            for name, (draw, residue, seed) in heavy.ELITES.items()},
+        **{f"enemies/{name}": with_death([draw(i) for i in range(4)], residue, seed)
+           for name, (draw, residue, seed) in lands.ENEMIES.items()},
     }
     frames: dict[str, Image] = {}
     for key, animation in animated.items():
@@ -277,6 +280,8 @@ def sprite_frames() -> dict[str, Image]:
     frames.update(extra.frames())
     frames.update(heavy.frames())
     frames.update(extra.second_evolutions(frames))
+    # The new cap and pink enemy spit replace the older drawings.
+    frames.update(lands.frames())
     return frames
 
 
@@ -372,6 +377,8 @@ def build_images(preview: Path | None) -> None:
     (OUT / "ground" / "wasteland.png").write_bytes(png(ground))
     (OUT / "ground" / "city.png").write_bytes(png(more.city_ground()))
     (OUT / "ground" / "marsh.png").write_bytes(png(more.marsh_ground()))
+    for name, draw in lands.GROUNDS.items():
+        (OUT / "ground" / f"{name}.png").write_bytes(png(draw()))
     (OUT / "ui").mkdir(parents=True, exist_ok=True)
     (OUT / "ui" / "shelter.png").write_bytes(png(heroes.shelter_strip()))
     build_android(frames)

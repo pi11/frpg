@@ -4,7 +4,8 @@ An earned achievement waits in `achievements_unclaimed` until the player takes i
 
 `metric` conditions are computed here from accepted run data. `reported` ones (standing still,
 clicking the hero) cannot be seen by the server: the client names them and the server only checks
-the limits written in content (minimum duration, boss kill, autopilot, game speed).
+the limits written in content (minimum duration, boss kill, autopilot, game speed, location and
+boosts taken).
 `victory` ones read the boss wins per location, hero and speed kept in `data["wins"]`.
 """
 
@@ -26,6 +27,8 @@ class RunFacts:
     reported: Collection[str] = field(default_factory=tuple)
     #: Game speed in percent.
     speed: int = 100
+    #: One-run boosts the run took.
+    boosts: int = 0
 
 
 def metric_value(
@@ -79,6 +82,8 @@ def is_earned(
         and run.autopilot == condition.get("autopilot", False)
         and run.duration >= condition.get("minSeconds", 0)
         and (run.boss_killed or not condition.get("boss", False))
+        and condition.get("location", run.location) == run.location
+        and run.boosts >= int(condition.get("minBoosts", 0))
     )
 
 

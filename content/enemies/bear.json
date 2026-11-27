@@ -1,0 +1,79 @@
+{
+  "id": "bear",
+  "name": "Медведь-шатун",
+  "sprite": "enemies/bear",
+  "role": "elite",
+  "ai": {
+    "type": "boss_phases",
+    "params": {
+      "phases": [
+        {
+          "hpBelow": 1,
+          "ai": {
+            "type": "chaser",
+            "params": {
+              "turnRate": 3
+            }
+          }
+        },
+        {
+          "hpBelow": 0.7,
+          "ai": {
+            "type": "charger",
+            "params": {
+              "turnRate": 3.5,
+              "chargeRange": 190,
+              "windupMs": 600,
+              "chargeSpeed": 230,
+              "chargeMs": 650,
+              "cooldownMs": 1500
+            }
+          }
+        },
+        {
+          "hpBelow": 0.35,
+          "ai": {
+            "type": "charger",
+            "params": {
+              "turnRate": 3.5,
+              "chargeRange": 210,
+              "windupMs": 550,
+              "chargeSpeed": 260,
+              "chargeMs": 650,
+              "cooldownMs": 1000
+            }
+          },
+          "summon": {
+            "enemy": "mutant_wolf",
+            "count": 6
+          }
+        }
+      ]
+    }
+  },
+  "stats": {
+    "hp": 7500,
+    "speed": 62,
+    "damage": 30,
+    "xp": 70
+  },
+  "drops": [
+    {
+      "item": "pickup",
+      "id": "chest",
+      "chance": 1
+    },
+    {
+      "item": "caps",
+      "chance": 1,
+      "amount": [
+        12,
+        24
+      ]
+    }
+  ],
+  "tags": [
+    "animal",
+    "elite"
+  ]
+}

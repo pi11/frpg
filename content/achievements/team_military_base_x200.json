@@ -1,0 +1,22 @@
+{
+  "id": "team_military_base_x200",
+  "name": "Сборная на форсаже: Военная база",
+  "description": "Победить Стального генерала на скорости ×2 каждым героем",
+  "hidden": true,
+  "emeralds": 35,
+  "condition": {
+    "type": "victory",
+    "speed": 200,
+    "locations": [
+      "military_base"
+    ],
+    "heroes": [
+      "wanderer",
+      "spark",
+      "bruiser",
+      "marksman",
+      "chemist"
+    ],
+    "every": true
+  }
+}

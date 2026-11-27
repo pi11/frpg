@@ -1,0 +1,91 @@
+{
+  "id": "scorpion_king",
+  "name": "Скорпион-царь",
+  "sprite": "enemies/scorpion_king",
+  "role": "elite",
+  "ai": {
+    "type": "boss_phases",
+    "params": {
+      "phases": [
+        {
+          "hpBelow": 1,
+          "ai": {
+            "type": "charger",
+            "params": {
+              "turnRate": 4,
+              "chargeRange": 160,
+              "windupMs": 650,
+              "chargeSpeed": 230,
+              "chargeMs": 500,
+              "cooldownMs": 1700
+            }
+          }
+        },
+        {
+          "hpBelow": 0.6,
+          "ai": {
+            "type": "ranged",
+            "params": {
+              "turnRate": 3,
+              "preferredRange": 110,
+              "fireCooldownMs": 1400,
+              "projectileSpeed": 130,
+              "projectileDamage": 15,
+              "projectileSprite": "projectiles/sand",
+              "lifetimeMs": 2800,
+              "shots": 10,
+              "spreadDegrees": 300
+            }
+          },
+          "summon": {
+            "enemy": "scorpion",
+            "count": 6
+          }
+        },
+        {
+          "hpBelow": 0.3,
+          "ai": {
+            "type": "charger",
+            "params": {
+              "turnRate": 4,
+              "chargeRange": 200,
+              "windupMs": 550,
+              "chargeSpeed": 270,
+              "chargeMs": 550,
+              "cooldownMs": 900
+            }
+          },
+          "summon": {
+            "enemy": "vulture",
+            "count": 8
+          }
+        }
+      ]
+    }
+  },
+  "stats": {
+    "hp": 11500,
+    "speed": 58,
+    "damage": 34,
+    "xp": 85
+  },
+  "drops": [
+    {
+      "item": "pickup",
+      "id": "chest",
+      "chance": 1
+    },
+    {
+      "item": "caps",
+      "chance": 1,
+      "amount": [
+        12,
+        24
+      ]
+    }
+  ],
+  "tags": [
+    "insect",
+    "elite"
+  ]
+}

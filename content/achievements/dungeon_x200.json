@@ -1,0 +1,16 @@
+{
+  "id": "dungeon_x200",
+  "name": "Гроза катакомб",
+  "description": "Победить Крысиного короля на скорости ×2",
+  "hidden": false,
+  "emeralds": 18,
+  "condition": {
+    "type": "victory",
+    "speed": 200,
+    "locations": [
+      "dungeon"
+    ],
+    "heroes": [],
+    "every": false
+  }
+}

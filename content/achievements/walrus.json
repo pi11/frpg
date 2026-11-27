@@ -1,0 +1,14 @@
+{
+  "id": "walrus",
+  "name": "Морж",
+  "description": "Провести на льду и в морозных трещинах 30 секунд за забег",
+  "hidden": true,
+  "emeralds": 3,
+  "condition": {
+    "type": "reported",
+    "event": "hazardTime",
+    "value": 30,
+    "minSeconds": 30,
+    "location": "frozen_pass"
+  }
+}

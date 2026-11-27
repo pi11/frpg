@@ -1,0 +1,34 @@
+{
+  "id": "vulture",
+  "name": "Стервятник",
+  "sprite": "enemies/vulture",
+  "role": "normal",
+  "ai": {
+    "type": "weaver",
+    "params": {
+      "turnRate": 6,
+      "amplitude": 0.8,
+      "frequencyHz": 1.2
+    }
+  },
+  "stats": {
+    "hp": 18,
+    "speed": 86,
+    "damage": 8,
+    "xp": 1
+  },
+  "drops": [
+    {
+      "item": "caps",
+      "chance": 0.015,
+      "amount": [
+        1,
+        2
+      ]
+    }
+  ],
+  "tags": [
+    "animal",
+    "flying"
+  ]
+}

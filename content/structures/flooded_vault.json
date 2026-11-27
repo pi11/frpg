@@ -1,0 +1,46 @@
+{
+  "id": "flooded_vault",
+  "items": [
+    {
+      "kind": "patch",
+      "sprite": "decor/dark_water",
+      "x": 0,
+      "y": 10
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/pillar",
+      "x": -46,
+      "y": -12
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/pillar",
+      "x": 46,
+      "y": -12
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/cave_rock",
+      "x": -20,
+      "y": 36
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/torch",
+      "x": 22,
+      "y": -30
+    },
+    {
+      "kind": "crate",
+      "x": 58,
+      "y": 26
+    },
+    {
+      "kind": "landmark",
+      "landmark": "generator",
+      "x": -8,
+      "y": -26
+    }
+  ]
+}

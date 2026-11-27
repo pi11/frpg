@@ -1,0 +1,14 @@
+{
+  "id": "deserter",
+  "name": "Дезертир",
+  "description": "Сбежать с военной базы в первые 20 секунд",
+  "hidden": true,
+  "emeralds": 1,
+  "condition": {
+    "type": "reported",
+    "event": "earlyQuit",
+    "value": 20,
+    "minSeconds": 0,
+    "location": "military_base"
+  }
+}

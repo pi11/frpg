@@ -1,0 +1,46 @@
+{
+  "id": "helipad_ruins",
+  "items": [
+    {
+      "kind": "patch",
+      "sprite": "decor/helipad",
+      "x": 0,
+      "y": 0
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/radio_mast",
+      "x": -62,
+      "y": -20
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/ammo_crates",
+      "x": 52,
+      "y": -26
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/hedgehog",
+      "x": 50,
+      "y": 30
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/hedgehog",
+      "x": -46,
+      "y": 34
+    },
+    {
+      "kind": "crate",
+      "x": 0,
+      "y": -40
+    },
+    {
+      "kind": "landmark",
+      "landmark": "workbench",
+      "x": 30,
+      "y": 6
+    }
+  ]
+}

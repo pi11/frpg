@@ -1,0 +1,52 @@
+{
+  "id": "crypt_hall",
+  "items": [
+    {
+      "kind": "patch",
+      "sprite": "decor/flagstones",
+      "x": 0,
+      "y": 4
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/pillar",
+      "x": -40,
+      "y": -20
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/pillar",
+      "x": 40,
+      "y": -20
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/pillar",
+      "x": -40,
+      "y": 28
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/pillar",
+      "x": 40,
+      "y": 28
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/torch",
+      "x": 0,
+      "y": -34
+    },
+    {
+      "kind": "crate",
+      "x": -20,
+      "y": 38
+    },
+    {
+      "kind": "landmark",
+      "landmark": "hatch",
+      "x": 0,
+      "y": 6
+    }
+  ]
+}

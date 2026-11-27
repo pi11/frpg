@@ -1,0 +1,14 @@
+{
+  "id": "loshok",
+  "name": "Лошок",
+  "description": "Купить усиление за изумруды и погибнуть в первую минуту",
+  "hidden": true,
+  "emeralds": 3,
+  "condition": {
+    "type": "reported",
+    "event": "earlyDeath",
+    "value": 60,
+    "minSeconds": 0,
+    "minBoosts": 1
+  }
+}

@@ -51,6 +51,8 @@ class RunStartResponse(BaseModel):
     run_id: uuid.UUID
     seed: int
     content_hash: str
+    #: Bought boosts this run takes; they are gone from the profile now.
+    boosts: list[str] = Field(default_factory=list)
 
 
 class RunSummary(BaseModel):
@@ -103,14 +105,27 @@ async def start_run(
         previous.finished_at = now
         age = now - as_utc(previous.started_at)
         previous.flags = ["abandoned"] if age < timedelta(hours=1) else ["expired"]
+    # Boosts are used up by the start itself: an abandoned run loses them too.
+    locked = await session.scalar(
+        select(Profile).where(Profile.user_id == user.id).with_for_update()
+        .execution_options(populate_existing=True)
+    )
+    known_boosts = content.category("boosts")
+    boosts: list[str] = []
+    if locked is not None and (locked.data or {}).get("boosts"):
+        boosts = [item for item in locked.data["boosts"] if item in known_boosts]
+        locked.data = {**locked.data, "boosts": []}
+        locked.version += 1
     run = Run(
         user_id=user.id, location_id=body.location_id, hero_id=body.hero_id, speed=body.speed,
         seed=secrets.randbits(32), content_hash=content.hash, status="started",
-        started_at=now, flags=[],
+        started_at=now, flags=[], boosts=boosts,
     )
     session.add(run)
     await session.commit()
-    return RunStartResponse(run_id=run.id, seed=run.seed, content_hash=run.content_hash)
+    return RunStartResponse(
+        run_id=run.id, seed=run.seed, content_hash=run.content_hash, boosts=boosts,
+    )
 
 
 @router.post("/{run_id}/finish", response_model=RunFinishResponse)
@@ -182,9 +197,11 @@ async def finish_run(
     if body.boss_killed and not boss_killed:
         flags.append("boss_clamped")
 
+    boosts = content.category("boosts")
+    bonus = sum(float(boosts[item].get("rewardBonus", 0)) for item in run.boosts if item in boosts)
     reward = run_reward(
         rules, duration, kills, wave, boss_killed, picked_caps,
-        float(location["rewardMultiplier"]),
+        float(location["rewardMultiplier"]) * (1 + bonus),
     )
     data = profile.data or {}
     bosses = list(data.get("bosses_killed", []))
@@ -215,7 +232,7 @@ async def finish_run(
         RunFacts(
             location=run.location_id, duration=duration, kills=kills, picked_caps=picked_caps,
             boss_killed=boss_killed, autopilot=body.autopilot, reported=body.achievements,
-            speed=run.speed,
+            speed=run.speed, boosts=len(run.boosts),
         ),
     )
     elites = accepted_elites(location, known_enemies, body.kills_by_type, duration)
@@ -236,6 +253,7 @@ async def finish_run(
             "duration_seconds": duration, "kills": kills, "wave_reached": wave,
             "boss_killed": boss_killed, "picked_caps": picked_caps,
             "emeralds": emeralds, "achievements": achievements, "speed": run.speed,
+            "boosts": list(run.boosts),
         },
     }
     profile.caps += reward

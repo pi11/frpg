@@ -1,0 +1,14 @@
+{
+  "id": "claustrophobia",
+  "name": "Клаустрофобия",
+  "description": "Сбежать из подземелья в первые 20 секунд",
+  "hidden": true,
+  "emeralds": 1,
+  "condition": {
+    "type": "reported",
+    "event": "earlyQuit",
+    "value": 20,
+    "minSeconds": 0,
+    "location": "dungeon"
+  }
+}

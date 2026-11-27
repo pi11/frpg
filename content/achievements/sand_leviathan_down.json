@@ -1,0 +1,13 @@
+{
+  "id": "sand_leviathan_down",
+  "name": "Повелитель дюн",
+  "description": "Победить Песчаного левиафана",
+  "hidden": false,
+  "emeralds": 14,
+  "condition": {
+    "type": "metric",
+    "metric": "boss",
+    "value": 1,
+    "location": "great_desert"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "id": "rat_king_down",
+  "name": "Свержение с трона",
+  "description": "Победить Крысиного короля",
+  "hidden": false,
+  "emeralds": 11,
+  "condition": {
+    "type": "metric",
+    "metric": "boss",
+    "value": 1,
+    "location": "dungeon"
+  }
+}

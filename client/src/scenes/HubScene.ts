@@ -1,12 +1,12 @@
 import * as Phaser from 'phaser';
 import { accountKey, ApiRequestError, authMethods, deleteAccount, loginByKey, saveSession, session } from '../api/auth';
 import { identityLines } from '../api/identities';
-import { buyUnlock, buyUpgrade, claimAchievement, claimDaily, getProfile, startRun, type Profile } from '../api/game';
+import { buyBoost, buyUnlock, buyUpgrade, claimAchievement, claimDaily, getProfile, startRun, type Profile } from '../api/game';
 import { getCatalog } from '../content/catalog';
 import { orderedLocations } from '../content/locations';
 import { bundledContentHash } from '../content/hash';
 import type {
-  AchievementDefinition, HeroDefinition, PassiveDefinition, ProgressUnlock, UpgradeDefinition, WeaponDefinition,
+  AchievementDefinition, BoostDefinition, HeroDefinition, PassiveDefinition, ProgressUnlock, UpgradeDefinition, WeaponDefinition,
 } from '../content/schemas';
 import { heroTraits, statBonus } from '../content/statText';
 import { ATLAS, HUB_MUSIC, TUNES } from '../assets';
@@ -31,7 +31,8 @@ const CATEGORIES: readonly [UpgradeDefinition['category'], string][] = [
 
 /** Sections of the emerald tab; slots and special are upgrade categories. */
 const SHOP_TABS = [
-  ['weapons', 'Оружие'], ['passives', 'Перки'], ['slots', 'Слоты'], ['special', 'Особое'], ['info', 'Где добыть'],
+  ['weapons', 'Оружие'], ['passives', 'Перки'], ['boosts', 'На забег'], ['slots', 'Слоты'], ['special', 'Особое'],
+  ['info', 'Где добыть'],
 ] as const;
 type ShopTab = (typeof SHOP_TABS)[number][0];
 
@@ -129,6 +130,7 @@ export class HubScene extends Phaser.Scene {
   private speed = Number(loadChoice(SPEED_KEY)) || 100;
   private category: UpgradeDefinition['category'] = 'survival';
   private shopTab: ShopTab = 'weapons';
+  private gemSrc: string | undefined;
   /** Tabs, items and heroes this browser has shown the player, for the "new" marks. */
   private seen: (Opened & { visited: string[] }) | null = null;
 
@@ -168,6 +170,7 @@ export class HubScene extends Phaser.Scene {
             <p id="hub-autopilot-note" class="hub-note"></p>
             <button id="hub-start" class="auth-primary" type="button">Отправиться на вылазку</button>
             <p id="hub-location" class="hub-note"></p>
+            <p id="hub-boosts-ready" class="hub-note hub-boosts-ready" hidden></p>
           </section>
           <section id="hub-panel-daily" role="tabpanel" aria-labelledby="hub-tab-daily">
             ${panelHead('daily')}
@@ -188,6 +191,7 @@ export class HubScene extends Phaser.Scene {
             <div id="hub-shop-tabs" class="hub-subtabs" role="group" aria-label="Покупки за изумруды"></div>
             <ul id="hub-weapons" class="hub-upgrades hub-items"></ul>
             <ul id="hub-passives" class="hub-upgrades hub-items"></ul>
+            <ul id="hub-boosts" class="hub-upgrades hub-items"></ul>
             <ul id="hub-shop-upgrades" class="hub-upgrades"></ul>
             <div id="hub-emerald-info"></div>
           </section>
@@ -386,6 +390,10 @@ export class HubScene extends Phaser.Scene {
         if (button?.dataset.unlock) void this.act(() => this.unlock(button.dataset.unlock!));
       };
     }
+    this.el('hub-boosts').onclick = (event) => {
+      const button = (event.target as HTMLElement).closest<HTMLButtonElement>('button[data-boost]');
+      if (button?.dataset.boost) void this.act(() => this.buyBoost(button.dataset.boost!));
+    };
     const tabs = this.overlay.querySelector<HTMLElement>('.hub-tabs')!;
     tabs.onclick = (event) => {
       const button = (event.target as HTMLElement).closest<HTMLButtonElement>('button[data-tab]');
@@ -634,7 +642,11 @@ export class HubScene extends Phaser.Scene {
     if (!profile.unlocked_locations.includes(this.selected)) {
       this.selected = locations.find((item) => profile.unlocked_locations.includes(item.id))?.id ?? '';
     }
-    this.el('hub-locations').innerHTML = locations.map((location) => {
+    // Open places and only the next closed one: the rest stay a surprise.
+    const nextLocked = locations.find((item) => !profile.unlocked_locations.includes(item.id));
+    const shown = locations.filter((item) => profile.unlocked_locations.includes(item.id) || item === nextLocked);
+    const hiddenCount = locations.length - shown.length;
+    this.el('hub-locations').innerHTML = shown.map((location) => {
       const open = profile.unlocked_locations.includes(location.id);
       const chosen = location.id === this.selected;
       const beaten = profile.bosses_killed.includes(location.id) ? ' · босс повержен' : '';
@@ -644,7 +656,8 @@ export class HubScene extends Phaser.Scene {
         class="${chosen ? 'hub-location-chosen' : ''}" ${open ? '' : 'disabled'} aria-pressed="${chosen}">
         <strong>${escapeHtml(location.name)}</strong> <span class="hub-level">награда ×${location.rewardMultiplier}${beaten}</span>
         <small>${escapeHtml(open ? location.description : lock)}</small></button></li>`;
-    }).join('');
+    }).join('') + (hiddenCount
+      ? `<li class="hub-more"><small>Дальше по карте ещё ${hiddenCount} ${hiddenCount === 1 ? 'место' : hiddenCount < 5 ? 'места' : 'мест'}…</small></li>` : '');
     const location = catalog.locations[this.selected];
     this.renderSpeeds(profile);
     this.renderHeroes(profile);
@@ -654,6 +667,7 @@ export class HubScene extends Phaser.Scene {
     this.renderItems(profile);
     this.renderPurchaseBadges(profile);
     this.renderEmeralds(profile);
+    this.renderBoosts(profile);
     this.renderAchievements(profile);
     this.renderDaily(profile);
     const pilot = catalog.upgrades.autopilot;
@@ -665,9 +679,9 @@ export class HubScene extends Phaser.Scene {
     this.el<HTMLElement>('hub-autopilot').closest('label')!.hidden = !bought;
     this.el('hub-autopilot-note').hidden = !bought && !this.isTabOpen('shop');
     this.el<HTMLInputElement>('hub-autopilot').disabled = !bought;
-    this.el('hub-autopilot-note').textContent = bought
+    this.el('hub-autopilot-note').innerHTML = bought
       ? 'Не закрывайте вкладку игры. В забеге переключается клавишей I.'
-      : pilot ? `Купите за ${upgradeCost(pilot, 0)} изумр.: вкладка «За изумруды», раздел «Особое».` : '';
+      : pilot ? `Купите за ${upgradeCost(pilot, 0)}${this.gem()}: вкладка «За изумруды», раздел «Особое».` : '';
     this.el('hub-categories').innerHTML = CATEGORIES.map(([category, title]) =>
       `<button type="button" data-category="${category}" aria-pressed="${category === this.category}">${title}</button>`).join('');
     const row = (upgrade: UpgradeDefinition): string => {
@@ -677,7 +691,7 @@ export class HubScene extends Phaser.Scene {
       const cost = maxed ? 0 : upgradeCost(upgrade, level);
       const emeralds = upgrade.currency === 'emeralds';
       const funds = emeralds ? profile.emeralds : profile.caps;
-      const label = maxed ? 'Максимум' : `Купить · ${cost}${emeralds ? ' изумр.' : ''}`;
+      const label = maxed ? 'Максимум' : `Купить · ${cost}${emeralds ? this.gem() : ''}`;
       return `<li>
         <div><strong>${escapeHtml(upgrade.name)}</strong> <span class="hub-level">${level}/${upgrade.maxLevel}</span>
         <small>${escapeHtml(effectText(upgrade, level))}</small></div>
@@ -702,6 +716,7 @@ export class HubScene extends Phaser.Scene {
     }).join('');
     this.el('hub-weapons').hidden = this.shopTab !== 'weapons';
     this.el('hub-passives').hidden = this.shopTab !== 'passives';
+    this.el('hub-boosts').hidden = this.shopTab !== 'boosts';
     this.el('hub-shop-upgrades').hidden = this.shopTab !== 'slots' && this.shopTab !== 'special';
     this.el('hub-emerald-info').hidden = this.shopTab !== 'info';
   }
@@ -727,11 +742,11 @@ export class HubScene extends Phaser.Scene {
     const beaten = Object.values(profile.wins[this.selected] ?? {}).some((value) => value >= current);
     const parts: string[] = [];
     if (current > 100) parts.push('Всё в забеге идёт быстрее, время на таймере — игровое.');
-    if (bonus && !beaten) parts.push(`Первая победа над боссом на ${speedLabel(current)}: +${bonus} изумр.`);
+    if (bonus && !beaten) parts.push(`Первая победа над боссом на ${speedLabel(current)}: +${bonus}${this.gem()}`);
     if (next && previous) {
       parts.push(`${speedLabel(next.percent)} откроется после победы над боссом на ${speedLabel(previous.percent)}.`);
     }
-    this.el('hub-speed-note').textContent = parts.join(' ');
+    this.el('hub-speed-note').innerHTML = parts.join(' ');
   }
 
   private heroCondition(hero: HeroDefinition, profile: Profile): string {
@@ -786,7 +801,7 @@ export class HubScene extends Phaser.Scene {
       if (open || unlock.type === 'default') {
         // Shown as open.
       } else if (unlock.type === 'emeralds') {
-        action = `<button type="button" data-unlock="${escapeHtml(item.id)}" ${unlock.emeralds > profile.emeralds ? 'disabled' : ''}>Открыть · ${unlock.emeralds}</button>`;
+        action = `<button type="button" data-unlock="${escapeHtml(item.id)}" ${unlock.emeralds > profile.emeralds ? 'disabled' : ''}>Открыть · ${unlock.emeralds}${this.gem()}</button>`;
       } else {
         action = `<span class="hub-open hub-pending">${pixelIcon(LOCK)}</span>`;
         note = [`Откроется: ${this.progressText(unlock, profile)}`, note].filter(Boolean).join('\n');
@@ -822,9 +837,43 @@ export class HubScene extends Phaser.Scene {
         perks.filter((perk) => perk.unlock.type === 'default').map((perk) => row(perk, note(perk))));
   }
 
+  /** One-run boosts: bought ones wait in the backpack and are shown on the start screen. */
+  private renderBoosts(profile: Profile): void {
+    const boosts = Object.values(getCatalog().boosts).sort((a, b) => a.emeralds - b.emeralds);
+    const packed = new Set(profile.boosts);
+    const effects = (boost: BoostDefinition): string => [
+      ...boost.effects.map((effect) => statBonus(effect.stat, effect.value, effect.mod)),
+      ...(boost.rewardBonus ? [`+${Math.round(boost.rewardBonus * 100)}% к награде крышками`] : []),
+    ].join(', ');
+    this.el('hub-boosts').innerHTML = `<li class="hub-category">Действуют один забег</li>
+      <li class="hub-help-row"><small>Купленное ждёт в рюкзаке и тратится, как только начнётся следующий забег, даже если выйти из него раньше.</small></li>`
+      + boosts.map((boost) => {
+        const ready = packed.has(boost.id);
+        const action = ready
+          ? '<span class="hub-open">В рюкзаке</span>'
+          : `<button type="button" data-boost="${escapeHtml(boost.id)}" ${boost.emeralds > profile.emeralds ? 'disabled' : ''}>Купить · ${boost.emeralds}${this.gem()}</button>`;
+        return `<li class="${ready ? 'hub-packed' : ''}">
+          <img class="hub-icon" alt="" src="${this.textures.getBase64(ATLAS, boost.sprite)}">
+          <div><strong>${escapeHtml(boost.name)}</strong>
+          <small>${escapeHtml(boost.description)}<br>${escapeHtml(effects(boost))}</small></div>${action}</li>`;
+      }).join('');
+    const ready = boosts.filter((boost) => packed.has(boost.id));
+    const note = this.el('hub-boosts-ready');
+    note.hidden = ready.length === 0;
+    note.innerHTML = ready.length ? `С собой на один забег: ${ready.map((boost) =>
+      `<img class="hub-gem" alt="" src="${this.textures.getBase64(ATLAS, boost.sprite)}">${escapeHtml(boost.name)}`).join(', ')}` : '';
+  }
+
+  /** A small emerald after a price or a reward, so it is clear what is paid or earned. */
+  private gem(): string {
+    this.gemSrc ??= this.textures.getBase64(ATLAS, 'ui/emerald');
+    return `<img class="hub-gem" alt=" изумр." src="${this.gemSrc}">`;
+  }
+
   /** What the emeralds on hand can buy right now, per section of the emerald tab. */
   private purchasable(profile: Profile): Record<Exclude<ShopTab, 'info'>, number> {
     const { upgrades, weapons, passives } = getCatalog();
+    // Boosts are bought for one run and never run out, so they get no badge.
     const upgradesReady = (category: string): number => Object.values(upgrades).filter((upgrade) => {
       const level = profile.upgrades[upgrade.id] ?? 0;
       return upgrade.currency === 'emeralds' && upgrade.category === category
@@ -835,7 +884,7 @@ export class HubScene extends Phaser.Scene {
       && item.unlock.emeralds <= profile.emeralds).length;
     return {
       weapons: unlockable(Object.values(weapons)), passives: unlockable(Object.values(passives)),
-      slots: upgradesReady('slots'), special: upgradesReady('special'),
+      slots: upgradesReady('slots'), special: upgradesReady('special'), boosts: 0,
     };
   }
 
@@ -859,10 +908,11 @@ export class HubScene extends Phaser.Scene {
     const catalog = getCatalog();
     const marks = catalog.balance.reward.emeraldMilestones;
     const row = (title: string, amount: number, done = false): string =>
-      `<li class="${done ? 'hub-done' : ''}"><span>${escapeHtml(title)}</span><span>${done ? 'получено' : `+${amount}`}</span></li>`;
+      `<li class="${done ? 'hub-done' : ''}"><span>${escapeHtml(title)}</span><span>${done ? 'получено' : `+${amount}${this.gem()}`}</span></li>`;
     this.el('hub-emerald-info').innerHTML = `
       <p class="hub-help">За изумруды открывают тяжёлое оружие и редкие перки (они появляются среди карточек забега), докупают слоты и автопилот. Изумруды начисляются в конце забега, даже если герой погиб.</p>
-      ${orderedLocations(catalog).map((location) => {
+      ${orderedLocations(catalog).filter((location, index, all) => profile.unlocked_locations.includes(location.id)
+        || all.findIndex((item) => !profile.unlocked_locations.includes(item.id)) === index).map((location) => {
         const { elite, boss, firstBoss } = location.emeralds;
         const reached = profile.milestones[location.id] ?? [];
         return `<h2>${escapeHtml(location.name)}</h2><ul class="hub-goals">
@@ -884,21 +934,31 @@ export class HubScene extends Phaser.Scene {
     const row = (item: AchievementDefinition): string => {
       const done = owned.has(item.id);
       const reward = waiting.has(item.id)
-        ? `<button type="button" data-claim="${escapeHtml(item.id)}">Забрать +${item.emeralds}</button>`
-        : done ? 'получено' : `+${item.emeralds}`;
+        ? `<button type="button" data-claim="${escapeHtml(item.id)}">Забрать +${item.emeralds}${this.gem()}</button>`
+        : done ? 'получено' : `+${item.emeralds}${this.gem()}`;
       return `<li class="${done && !waiting.has(item.id) ? 'hub-done' : ''}"><span><strong>${escapeHtml(item.name)}</strong><br>${escapeHtml(item.description)}</span><span>${reward}</span></li>`;
     };
     const ready = all.filter((item) => waiting.has(item.id));
-    const open = all.filter((item) => !item.hidden && !waiting.has(item.id));
+    // Achievements of places not reached yet would give away their bosses: they wait with the place.
+    const places = (item: AchievementDefinition): string[] => {
+      const { condition } = item;
+      if (condition.type === 'victory') return condition.locations;
+      return condition.location ? [condition.location] : [];
+    };
+    const ahead = (item: AchievementDefinition): boolean => !owned.has(item.id)
+      && places(item).some((place) => !profile.unlocked_locations.includes(place));
+    const later = all.filter((item) => !item.hidden && ahead(item)).length;
+    const open = all.filter((item) => !item.hidden && !waiting.has(item.id) && !ahead(item));
     const hidden = all.filter((item) => item.hidden);
     const found = hidden.filter((item) => owned.has(item.id));
     const shown = found.filter((item) => !waiting.has(item.id));
     const left = hidden.length - found.length;
     this.el('hub-achievements').innerHTML = `
       <p class="hub-help">Получено ${all.filter((item) => owned.has(item.id)).length} из ${all.length}. Нажмите «Забрать», чтобы получить изумруды.</p>
-      ${ready.length ? `<h2>Заберите награду</h2>${ready.length > 1 ? `<button type="button" class="auth-primary hub-claim-all" data-claim-all>Забрать всё · +${ready.reduce((sum, item) => sum + item.emeralds, 0)}</button>` : ''}
+      ${ready.length ? `<h2>Заберите награду</h2>${ready.length > 1 ? `<button type="button" class="auth-primary hub-claim-all" data-claim-all>Забрать всё · +${ready.reduce((sum, item) => sum + item.emeralds, 0)}${this.gem()}</button>` : ''}
         <ul class="hub-goals hub-ready">${ready.map(row).join('')}</ul><h2>Список</h2>` : ''}
-      <ul class="hub-goals">${open.map(row).join('')}</ul>
+      <ul class="hub-goals">${open.map(row).join('')}${later
+        ? `<li><span>Ещё ${later} откроются вместе с новыми местами</span><span></span></li>` : ''}</ul>
       <h2>Скрытые: ${found.length} из ${hidden.length}</h2>
       <ul class="hub-goals">${shown.map(row).join('')}${left
         ? `<li><span>??? Ещё не найдено: ${left}</span><span></span></li>` : ''}</ul>`;
@@ -915,8 +975,8 @@ export class HubScene extends Phaser.Scene {
       const shown = quest.metric === 'survive'
         ? `${formatTime(quest.progress)} / ${formatTime(quest.goal)}` : `${quest.progress} / ${quest.goal}`;
       const reward = quest.claimed ? 'получено' : done
-        ? `<button type="button" data-daily="${escapeHtml(quest.id)}">Забрать +${quest.emeralds}</button>`
-        : `+${quest.emeralds}`;
+        ? `<button type="button" data-daily="${escapeHtml(quest.id)}">Забрать +${quest.emeralds}${this.gem()}</button>`
+        : `+${quest.emeralds}${this.gem()}`;
       return `<li class="${quest.claimed ? 'hub-done' : ''}"><span><strong>${escapeHtml(quest.text)}</strong>
         <span class="hub-bar"><span style="width:${Math.round(100 * Math.min(1, quest.progress / quest.goal))}%"></span></span>
         <small>${shown}</small></span><span>${reward}</span></li>`;
@@ -990,6 +1050,20 @@ export class HubScene extends Phaser.Scene {
     this.scene.restart();
   }
 
+  private async buyBoost(id: string): Promise<void> {
+    if (!this.profile) return;
+    try {
+      this.render(await buyBoost(id, this.profile.version));
+      playSfx('sfx/ui_buy');
+      this.status(`«${getCatalog().boosts[id]?.name ?? id}» уложено в рюкзак на следующий забег.`);
+    } catch (error) {
+      if (error instanceof ApiRequestError && error.status === 409) {
+        this.render(await getProfile());
+      }
+      throw error;
+    }
+  }
+
   private async unlock(id: string): Promise<void> {
     if (!this.profile) return;
     try {
@@ -1040,7 +1114,7 @@ export class HubScene extends Phaser.Scene {
       seed, wave, locationId: location.id, heroId: this.hero,
       runId: run.run_id, contentHash, upgrades: { ...this.profile.upgrades },
       openItems: [...this.profile.open_items], achievements: [...this.profile.achievements],
-      speed: this.runSpeed(this.profile),
+      speed: this.runSpeed(this.profile), boosts: [...(run.boosts ?? [])],
     };
     this.scene.start('Run', data);
   }

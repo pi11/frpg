@@ -48,3 +48,7 @@ class Run(Base):
     flags: Mapped[list[str]] = mapped_column(
         JSON().with_variant(ARRAY(String), "postgresql"), default=list
     )
+    #: One-run boosts bought for emeralds and used up when this run started.
+    boosts: Mapped[list[str]] = mapped_column(
+        JSON().with_variant(ARRAY(String), "postgresql"), default=list, server_default="{}",
+    )

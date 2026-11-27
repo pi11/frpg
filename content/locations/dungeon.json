@@ -1,0 +1,550 @@
+{
+  "id": "dungeon",
+  "name": "Подземелье",
+  "description": "Затопленные катакомбы: крысиные стаи, пещерные пауки, слепые копатели и Крысиный король.",
+  "unlock": {
+    "type": "bossKilled",
+    "location": "dark_forest"
+  },
+  "rewardMultiplier": 3.5,
+  "emeralds": {
+    "elite": 4,
+    "boss": 10,
+    "firstBoss": 18
+  },
+  "groundSprite": "ground/dungeon",
+  "music": "music/dungeon",
+  "bossMusic": "music/boss",
+  "durationSeconds": 690,
+  "startingHero": "wanderer",
+  "waves": [
+    {
+      "atSecond": 0,
+      "spawnIntervalMs": 240,
+      "hpMultiplier": 2.83,
+      "speedMultiplier": 1,
+      "enemies": [
+        {
+          "id": "cave_rat",
+          "weight": 2
+        },
+        {
+          "id": "cave_spider",
+          "weight": 1
+        }
+      ]
+    },
+    {
+      "atSecond": 45,
+      "spawnIntervalMs": 190,
+      "hpMultiplier": 3.2,
+      "speedMultiplier": 1,
+      "enemies": [
+        {
+          "id": "cave_rat",
+          "weight": 3
+        },
+        {
+          "id": "cave_spider",
+          "weight": 2
+        },
+        {
+          "id": "blind_digger",
+          "weight": 1
+        }
+      ]
+    },
+    {
+      "atSecond": 90,
+      "spawnIntervalMs": 160,
+      "hpMultiplier": 3.73,
+      "speedMultiplier": 1.05,
+      "enemies": [
+        {
+          "id": "cave_rat",
+          "weight": 3
+        },
+        {
+          "id": "cave_spider",
+          "weight": 2
+        },
+        {
+          "id": "blind_digger",
+          "weight": 1
+        },
+        {
+          "id": "ghoul",
+          "weight": 1
+        }
+      ]
+    },
+    {
+      "atSecond": 185,
+      "spawnIntervalMs": 130,
+      "hpMultiplier": 4.63,
+      "speedMultiplier": 1.1,
+      "enemies": [
+        {
+          "id": "cave_rat",
+          "weight": 3
+        },
+        {
+          "id": "cave_spider",
+          "weight": 2
+        },
+        {
+          "id": "blind_digger",
+          "weight": 2
+        },
+        {
+          "id": "ghoul",
+          "weight": 1
+        },
+        {
+          "id": "cave_rat",
+          "weight": 2,
+          "group": 3
+        }
+      ]
+    },
+    {
+      "atSecond": 275,
+      "spawnIntervalMs": 110,
+      "hpMultiplier": 5.9,
+      "speedMultiplier": 1.15,
+      "enemies": [
+        {
+          "id": "cave_rat",
+          "weight": 3
+        },
+        {
+          "id": "cave_spider",
+          "weight": 2
+        },
+        {
+          "id": "blind_digger",
+          "weight": 2
+        },
+        {
+          "id": "ghoul",
+          "weight": 2
+        },
+        {
+          "id": "cave_rat",
+          "weight": 2,
+          "group": 3
+        }
+      ]
+    },
+    {
+      "atSecond": 370,
+      "spawnIntervalMs": 68,
+      "hpMultiplier": 7.7,
+      "speedMultiplier": 1.15,
+      "enemies": [
+        {
+          "id": "cave_rat",
+          "weight": 3
+        },
+        {
+          "id": "cave_spider",
+          "weight": 3
+        },
+        {
+          "id": "blind_digger",
+          "weight": 2
+        },
+        {
+          "id": "ghoul",
+          "weight": 2
+        },
+        {
+          "id": "cave_rat",
+          "weight": 2,
+          "group": 5
+        }
+      ]
+    },
+    {
+      "atSecond": 460,
+      "spawnIntervalMs": 52,
+      "hpMultiplier": 10.94,
+      "speedMultiplier": 1.18,
+      "enemies": [
+        {
+          "id": "cave_rat",
+          "weight": 3
+        },
+        {
+          "id": "cave_spider",
+          "weight": 3
+        },
+        {
+          "id": "blind_digger",
+          "weight": 2
+        },
+        {
+          "id": "ghoul",
+          "weight": 2
+        },
+        {
+          "id": "cave_rat",
+          "weight": 2,
+          "group": 5
+        }
+      ]
+    },
+    {
+      "atSecond": 555,
+      "spawnIntervalMs": 45,
+      "hpMultiplier": 13.25,
+      "speedMultiplier": 1.2,
+      "enemies": [
+        {
+          "id": "cave_rat",
+          "weight": 4
+        },
+        {
+          "id": "cave_spider",
+          "weight": 3
+        },
+        {
+          "id": "blind_digger",
+          "weight": 3
+        },
+        {
+          "id": "ghoul",
+          "weight": 2
+        },
+        {
+          "id": "cave_rat",
+          "weight": 2,
+          "group": 6
+        }
+      ]
+    },
+    {
+      "atSecond": 600,
+      "spawnIntervalMs": 950,
+      "hpMultiplier": 13.25,
+      "speedMultiplier": 1.2,
+      "enemies": [
+        {
+          "id": "cave_rat",
+          "weight": 2
+        },
+        {
+          "id": "cave_spider",
+          "weight": 1
+        },
+        {
+          "id": "blind_digger",
+          "weight": 1
+        }
+      ]
+    }
+  ],
+  "events": [
+    {
+      "atSecond": 210,
+      "enemy": "spider_queen",
+      "count": 1
+    },
+    {
+      "atSecond": 390,
+      "enemy": "great_worm",
+      "count": 1
+    },
+    {
+      "atSecond": 530,
+      "enemy": "spider_queen",
+      "count": 2
+    },
+    {
+      "atSecond": 540,
+      "enemy": "great_worm",
+      "count": 1
+    }
+  ],
+  "boss": {
+    "atSecond": 600,
+    "enemy": "rat_king"
+  },
+  "decor": {
+    "chunkSize": 256,
+    "biomeChunks": 3,
+    "biomes": [
+      {
+        "id": "halls",
+        "weight": 3,
+        "patches": {
+          "perChunk": [
+            2,
+            4
+          ],
+          "items": [
+            {
+              "sprite": "decor/flagstones",
+              "weight": 3
+            },
+            {
+              "sprite": "decor/rubble",
+              "weight": 2
+            }
+          ]
+        },
+        "objects": {
+          "perChunk": [
+            3,
+            6
+          ],
+          "items": [
+            {
+              "sprite": "decor/pillar",
+              "weight": 4
+            },
+            {
+              "sprite": "decor/torch",
+              "weight": 2
+            },
+            {
+              "sprite": "decor/barrel",
+              "weight": 1
+            },
+            {
+              "sprite": "decor/cobweb",
+              "weight": 2
+            }
+          ]
+        }
+      },
+      {
+        "id": "caves",
+        "weight": 3,
+        "patches": {
+          "perChunk": [
+            2,
+            4
+          ],
+          "items": [
+            {
+              "sprite": "decor/dark_water",
+              "weight": 2
+            },
+            {
+              "sprite": "decor/rubble",
+              "weight": 2
+            }
+          ]
+        },
+        "objects": {
+          "perChunk": [
+            4,
+            7
+          ],
+          "items": [
+            {
+              "sprite": "decor/cave_rock",
+              "weight": 5
+            },
+            {
+              "sprite": "decor/rocks",
+              "weight": 2
+            },
+            {
+              "sprite": "decor/crystal",
+              "weight": 1
+            },
+            {
+              "sprite": "decor/mushrooms",
+              "weight": 2
+            }
+          ]
+        }
+      },
+      {
+        "id": "ossuary",
+        "weight": 2,
+        "patches": {
+          "perChunk": [
+            2,
+            4
+          ],
+          "items": [
+            {
+              "sprite": "decor/ember_pit",
+              "weight": 1
+            },
+            {
+              "sprite": "decor/flagstones",
+              "weight": 2
+            }
+          ]
+        },
+        "objects": {
+          "perChunk": [
+            3,
+            6
+          ],
+          "items": [
+            {
+              "sprite": "decor/skull_pile",
+              "weight": 3
+            },
+            {
+              "sprite": "decor/bones",
+              "weight": 4
+            },
+            {
+              "sprite": "decor/cobweb",
+              "weight": 2
+            },
+            {
+              "sprite": "decor/grave",
+              "weight": 2
+            }
+          ]
+        }
+      },
+      {
+        "id": "forge",
+        "weight": 1,
+        "patches": {
+          "perChunk": [
+            2,
+            4
+          ],
+          "items": [
+            {
+              "sprite": "decor/lava_crack",
+              "weight": 3
+            },
+            {
+              "sprite": "decor/ember_pit",
+              "weight": 2
+            }
+          ]
+        },
+        "objects": {
+          "perChunk": [
+            2,
+            5
+          ],
+          "items": [
+            {
+              "sprite": "decor/pillar",
+              "weight": 2
+            },
+            {
+              "sprite": "decor/spikes",
+              "weight": 2
+            },
+            {
+              "sprite": "decor/barrel",
+              "weight": 2
+            },
+            {
+              "sprite": "decor/torch",
+              "weight": 2
+            }
+          ]
+        }
+      }
+    ],
+    "crates": {
+      "sprite": "decor/crate",
+      "hp": 10,
+      "perChunk": [
+        0,
+        1
+      ],
+      "drops": [
+        {
+          "pickup": "medkit",
+          "weight": 8
+        },
+        {
+          "pickup": "caps_stash",
+          "weight": 4
+        },
+        {
+          "pickup": "magnet",
+          "weight": 2
+        },
+        {
+          "pickup": "pulse_bomb",
+          "weight": 2
+        },
+        {
+          "pickup": "rage_shot",
+          "weight": 1
+        },
+        {
+          "pickup": "adrenaline",
+          "weight": 1
+        },
+        {
+          "pickup": "shield_cell",
+          "weight": 1
+        },
+        {
+          "pickup": "ammo_belt",
+          "weight": 1
+        },
+        {
+          "pickup": "cryo_bomb",
+          "weight": 1
+        },
+        {
+          "pickup": "data_disk",
+          "weight": 1
+        },
+        {
+          "pickup": "bullet_shield",
+          "weight": 2
+        }
+      ]
+    },
+    "structures": {
+      "chance": 0.2,
+      "items": [
+        {
+          "structure": "crypt_hall",
+          "weight": 3
+        },
+        {
+          "structure": "rat_nest",
+          "weight": 3
+        },
+        {
+          "structure": "flooded_vault",
+          "weight": 2
+        },
+        {
+          "structure": "guard_room",
+          "weight": 2
+        }
+      ]
+    },
+    "hazards": [
+      {
+        "sprite": "decor/dark_water",
+        "radius": 22,
+        "damagePerSecond": 0,
+        "slow": 0.35
+      },
+      {
+        "sprite": "decor/ember_pit",
+        "radius": 15,
+        "damagePerSecond": 8,
+        "slow": 0
+      },
+      {
+        "sprite": "decor/lava_crack",
+        "radius": 18,
+        "damagePerSecond": 10,
+        "slow": 0
+      }
+    ]
+  }
+}

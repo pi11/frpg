@@ -1,0 +1,14 @@
+{
+  "id": "spare_heart",
+  "name": "Запасное сердце",
+  "description": "Ещё одна жизнь: герой встанет после гибели",
+  "sprite": "boosts/spare_heart",
+  "emeralds": 5,
+  "effects": [
+    {
+      "stat": "revives",
+      "mod": "flat",
+      "value": 1
+    }
+  ]
+}

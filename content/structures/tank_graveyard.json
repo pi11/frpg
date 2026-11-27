@@ -1,0 +1,51 @@
+{
+  "id": "tank_graveyard",
+  "items": [
+    {
+      "kind": "patch",
+      "sprite": "decor/tracks",
+      "x": -20,
+      "y": 20
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/tank_wreck",
+      "x": -26,
+      "y": -14
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/tank_wreck",
+      "x": 36,
+      "y": 26
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/hedgehog",
+      "x": 40,
+      "y": -30
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/hedgehog",
+      "x": -56,
+      "y": 30
+    },
+    {
+      "kind": "crate",
+      "x": 0,
+      "y": 40
+    },
+    {
+      "kind": "crate",
+      "x": 62,
+      "y": -6
+    },
+    {
+      "kind": "landmark",
+      "landmark": "hatch",
+      "x": 6,
+      "y": 4
+    }
+  ]
+}

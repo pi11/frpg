@@ -1,0 +1,33 @@
+{
+  "id": "cave_spider",
+  "name": "Пещерный паук",
+  "sprite": "enemies/cave_spider",
+  "role": "normal",
+  "ai": {
+    "type": "weaver",
+    "params": {
+      "turnRate": 6,
+      "amplitude": 0.9,
+      "frequencyHz": 1.6
+    }
+  },
+  "stats": {
+    "hp": 16,
+    "speed": 84,
+    "damage": 8,
+    "xp": 1
+  },
+  "drops": [
+    {
+      "item": "caps",
+      "chance": 0.015,
+      "amount": [
+        1,
+        2
+      ]
+    }
+  ],
+  "tags": [
+    "insect"
+  ]
+}

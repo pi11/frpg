@@ -1,0 +1,46 @@
+{
+  "id": "buried_convoy",
+  "items": [
+    {
+      "kind": "patch",
+      "sprite": "decor/snow_patch",
+      "x": 0,
+      "y": 12
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/frozen_car",
+      "x": -32,
+      "y": -12
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/frozen_car",
+      "x": 34,
+      "y": 18
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/snowdrift",
+      "x": 0,
+      "y": 36
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/fence",
+      "x": -50,
+      "y": 30
+    },
+    {
+      "kind": "crate",
+      "x": 56,
+      "y": -20
+    },
+    {
+      "kind": "landmark",
+      "landmark": "vending",
+      "x": 4,
+      "y": -30
+    }
+  ]
+}

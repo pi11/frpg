@@ -1,0 +1,46 @@
+{
+  "id": "oasis",
+  "items": [
+    {
+      "kind": "patch",
+      "sprite": "decor/pond",
+      "x": 0,
+      "y": 8
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/palm",
+      "x": -40,
+      "y": -24
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/palm",
+      "x": 38,
+      "y": -28
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/palm",
+      "x": 44,
+      "y": 30
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/bush",
+      "x": -36,
+      "y": 32
+    },
+    {
+      "kind": "crate",
+      "x": 0,
+      "y": -40
+    },
+    {
+      "kind": "landmark",
+      "landmark": "med_station",
+      "x": -60,
+      "y": 4
+    }
+  ]
+}

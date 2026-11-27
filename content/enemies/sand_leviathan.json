@@ -1,0 +1,120 @@
+{
+  "id": "sand_leviathan",
+  "name": "Песчаный левиафан",
+  "sprite": "enemies/sand_leviathan",
+  "role": "boss",
+  "scale": 1.5,
+  "ai": {
+    "type": "boss_phases",
+    "params": {
+      "phases": [
+        {
+          "hpBelow": 1,
+          "ai": {
+            "type": "burrower",
+            "params": {
+              "turnRate": 3.5,
+              "surfaceMs": 4000,
+              "undergroundSpeed": 230,
+              "maxBurrowMs": 2600,
+              "emergeRange": 24,
+              "windupMs": 650,
+              "emergeRadius": 84,
+              "emergeDamage": 44
+            }
+          }
+        },
+        {
+          "hpBelow": 0.8,
+          "ai": {
+            "type": "ranged",
+            "params": {
+              "turnRate": 3.5,
+              "preferredRange": 100,
+              "fireCooldownMs": 1000,
+              "projectileSpeed": 160,
+              "projectileDamage": 23,
+              "projectileSprite": "projectiles/sand",
+              "lifetimeMs": 3000,
+              "shots": 12,
+              "spreadDegrees": 120
+            }
+          },
+          "summon": {
+            "enemy": "scorpion",
+            "count": 12
+          }
+        },
+        {
+          "hpBelow": 0.55,
+          "ai": {
+            "type": "burrower",
+            "params": {
+              "turnRate": 3.5,
+              "surfaceMs": 3400,
+              "undergroundSpeed": 260,
+              "maxBurrowMs": 2400,
+              "emergeRange": 24,
+              "windupMs": 600,
+              "emergeRadius": 92,
+              "emergeDamage": 48
+            }
+          },
+          "summon": {
+            "enemy": "sand_worm",
+            "count": 10
+          }
+        },
+        {
+          "hpBelow": 0.35,
+          "ai": {
+            "type": "ranged",
+            "params": {
+              "turnRate": 3.5,
+              "preferredRange": 90,
+              "fireCooldownMs": 950,
+              "projectileSpeed": 150,
+              "projectileDamage": 24,
+              "projectileSprite": "projectiles/sand",
+              "lifetimeMs": 3000,
+              "shots": 28,
+              "spreadDegrees": 345
+            }
+          },
+          "summon": {
+            "enemy": "vulture",
+            "count": 16
+          }
+        },
+        {
+          "hpBelow": 0.15,
+          "ai": {
+            "type": "charger",
+            "params": {
+              "turnRate": 4.5,
+              "chargeRange": 240,
+              "windupMs": 420,
+              "chargeSpeed": 330,
+              "chargeMs": 750,
+              "cooldownMs": 650
+            }
+          },
+          "summon": {
+            "enemy": "nomad",
+            "count": 10
+          }
+        }
+      ]
+    }
+  },
+  "stats": {
+    "hp": 55000,
+    "speed": 90,
+    "damage": 46,
+    "xp": 0
+  },
+  "drops": [],
+  "tags": [
+    "boss"
+  ]
+}

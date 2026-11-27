@@ -1,0 +1,52 @@
+{
+  "id": "mushroom_ring",
+  "items": [
+    {
+      "kind": "patch",
+      "sprite": "decor/forest_moss",
+      "x": 0,
+      "y": 0
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/mushrooms",
+      "x": -26,
+      "y": -18
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/mushrooms",
+      "x": 26,
+      "y": -18
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/mushrooms",
+      "x": -30,
+      "y": 18
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/mushrooms",
+      "x": 30,
+      "y": 20
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/stump",
+      "x": 0,
+      "y": -34
+    },
+    {
+      "kind": "crate",
+      "x": 0,
+      "y": 36
+    },
+    {
+      "kind": "landmark",
+      "landmark": "hatch",
+      "x": 0,
+      "y": 2
+    }
+  ]
+}

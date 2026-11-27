@@ -36,6 +36,8 @@ export interface Profile {
   speeds: Record<string, number[]>;
   /** Best boss win speed (percent) per location and hero. */
   wins: Record<string, Record<string, number>>;
+  /** One-run boosts bought for emeralds; the next run takes them all. */
+  boosts: string[];
   identities: { provider: string; subject: string }[];
 }
 
@@ -43,6 +45,8 @@ export interface RunStart {
   run_id: string;
   seed: number;
   content_hash: string;
+  /** Bought boosts this run takes (they are gone from the profile now). */
+  boosts: string[];
 }
 
 export interface RunSummary {
@@ -79,6 +83,12 @@ export function buyUpgrade(id: string, expectedVersion: number): Promise<Profile
 
 export function buyUnlock(id: string, expectedVersion: number): Promise<Profile> {
   return request<Profile>(`/unlocks/${encodeURIComponent(id)}/buy`, {
+    method: 'POST', body: JSON.stringify({ expected_version: expectedVersion }),
+  }, true);
+}
+
+export function buyBoost(id: string, expectedVersion: number): Promise<Profile> {
+  return request<Profile>(`/boosts/${encodeURIComponent(id)}/buy`, {
     method: 'POST', body: JSON.stringify({ expected_version: expectedVersion }),
   }, true);
 }

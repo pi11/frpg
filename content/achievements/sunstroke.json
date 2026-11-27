@@ -1,0 +1,14 @@
+{
+  "id": "sunstroke",
+  "name": "Солнечный удар",
+  "description": "Погибнуть в пустыне в первые 30 секунд",
+  "hidden": true,
+  "emeralds": 1,
+  "condition": {
+    "type": "reported",
+    "event": "earlyDeath",
+    "value": 30,
+    "minSeconds": 0,
+    "location": "great_desert"
+  }
+}

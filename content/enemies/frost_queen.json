@@ -1,0 +1,119 @@
+{
+  "id": "frost_queen",
+  "name": "Королева стужи",
+  "sprite": "enemies/frost_queen",
+  "role": "boss",
+  "scale": 1.5,
+  "ai": {
+    "type": "boss_phases",
+    "params": {
+      "phases": [
+        {
+          "hpBelow": 1,
+          "ai": {
+            "type": "ranged",
+            "params": {
+              "turnRate": 3.5,
+              "preferredRange": 120,
+              "fireCooldownMs": 1000,
+              "projectileSpeed": 170,
+              "projectileDamage": 21,
+              "projectileSprite": "projectiles/ice_shard",
+              "lifetimeMs": 3000,
+              "shots": 11,
+              "spreadDegrees": 90
+            }
+          }
+        },
+        {
+          "hpBelow": 0.8,
+          "ai": {
+            "type": "charger",
+            "params": {
+              "turnRate": 4.5,
+              "chargeRange": 230,
+              "windupMs": 550,
+              "chargeSpeed": 280,
+              "chargeMs": 750,
+              "cooldownMs": 1000
+            }
+          },
+          "summon": {
+            "enemy": "polar_wolf",
+            "count": 14
+          }
+        },
+        {
+          "hpBelow": 0.55,
+          "ai": {
+            "type": "ranged",
+            "params": {
+              "turnRate": 3.5,
+              "preferredRange": 90,
+              "fireCooldownMs": 1000,
+              "projectileSpeed": 150,
+              "projectileDamage": 22,
+              "projectileSprite": "projectiles/ice_shard",
+              "lifetimeMs": 3000,
+              "shots": 28,
+              "spreadDegrees": 345
+            }
+          },
+          "summon": {
+            "enemy": "ice_beetle",
+            "count": 12
+          }
+        },
+        {
+          "hpBelow": 0.35,
+          "ai": {
+            "type": "charger",
+            "params": {
+              "turnRate": 4.5,
+              "chargeRange": 230,
+              "windupMs": 450,
+              "chargeSpeed": 320,
+              "chargeMs": 750,
+              "cooldownMs": 700
+            }
+          },
+          "summon": {
+            "enemy": "snow_beast",
+            "count": 8
+          }
+        },
+        {
+          "hpBelow": 0.15,
+          "ai": {
+            "type": "ranged",
+            "params": {
+              "turnRate": 3.5,
+              "preferredRange": 80,
+              "fireCooldownMs": 650,
+              "projectileSpeed": 190,
+              "projectileDamage": 22,
+              "projectileSprite": "projectiles/ice_shard",
+              "lifetimeMs": 3000,
+              "shots": 16,
+              "spreadDegrees": 170
+            }
+          },
+          "summon": {
+            "enemy": "frost_shooter",
+            "count": 8
+          }
+        }
+      ]
+    }
+  },
+  "stats": {
+    "hp": 47000,
+    "speed": 88,
+    "damage": 42,
+    "xp": 0
+  },
+  "drops": [],
+  "tags": [
+    "boss"
+  ]
+}

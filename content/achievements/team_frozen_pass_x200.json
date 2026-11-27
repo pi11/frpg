@@ -1,0 +1,22 @@
+{
+  "id": "team_frozen_pass_x200",
+  "name": "Сборная на форсаже: Ледяной перевал",
+  "description": "Победить Королеву стужи на скорости ×2 каждым героем",
+  "hidden": true,
+  "emeralds": 38,
+  "condition": {
+    "type": "victory",
+    "speed": 200,
+    "locations": [
+      "frozen_pass"
+    ],
+    "heroes": [
+      "wanderer",
+      "spark",
+      "bruiser",
+      "marksman",
+      "chemist"
+    ],
+    "every": true
+  }
+}

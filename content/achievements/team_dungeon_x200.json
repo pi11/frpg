@@ -1,0 +1,22 @@
+{
+  "id": "team_dungeon_x200",
+  "name": "Сборная на форсаже: Подземелье",
+  "description": "Победить Крысиного короля на скорости ×2 каждым героем",
+  "hidden": true,
+  "emeralds": 37,
+  "condition": {
+    "type": "victory",
+    "speed": 200,
+    "locations": [
+      "dungeon"
+    ],
+    "heroes": [
+      "wanderer",
+      "spark",
+      "bruiser",
+      "marksman",
+      "chemist"
+    ],
+    "every": true
+  }
+}

@@ -1,0 +1,57 @@
+{
+  "id": "army_depot",
+  "items": [
+    {
+      "kind": "patch",
+      "sprite": "decor/concrete_pad",
+      "x": 0,
+      "y": 8
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/container",
+      "x": -30,
+      "y": -30
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/ammo_crates",
+      "x": 30,
+      "y": -24
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/sandbags",
+      "x": -48,
+      "y": 30
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/sandbags",
+      "x": 44,
+      "y": 34
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/barbed_wire",
+      "x": 0,
+      "y": 48
+    },
+    {
+      "kind": "crate",
+      "x": -60,
+      "y": 0
+    },
+    {
+      "kind": "crate",
+      "x": 60,
+      "y": 6
+    },
+    {
+      "kind": "landmark",
+      "landmark": "vending",
+      "x": 4,
+      "y": 10
+    }
+  ]
+}

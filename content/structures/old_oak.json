@@ -1,0 +1,46 @@
+{
+  "id": "old_oak",
+  "items": [
+    {
+      "kind": "patch",
+      "sprite": "decor/leaf_litter",
+      "x": 0,
+      "y": 16
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/oak",
+      "x": 0,
+      "y": -14
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/bush",
+      "x": -38,
+      "y": 20
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/bush",
+      "x": 40,
+      "y": 18
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/fern",
+      "x": -20,
+      "y": 34
+    },
+    {
+      "kind": "crate",
+      "x": 50,
+      "y": -10
+    },
+    {
+      "kind": "landmark",
+      "landmark": "vending",
+      "x": -46,
+      "y": -12
+    }
+  ]
+}

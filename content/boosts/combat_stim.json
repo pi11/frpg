@@ -1,0 +1,19 @@
+{
+  "id": "combat_stim",
+  "name": "Боевой стимулятор",
+  "description": "Урон и скорострельность выше с первой секунды",
+  "sprite": "boosts/combat_stim",
+  "emeralds": 4,
+  "effects": [
+    {
+      "stat": "damage",
+      "mod": "flat",
+      "value": 5
+    },
+    {
+      "stat": "attackSpeed",
+      "mod": "flat",
+      "value": 0.1
+    }
+  ]
+}

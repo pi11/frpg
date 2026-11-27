@@ -1,0 +1,22 @@
+{
+  "id": "team_great_desert_x200",
+  "name": "Сборная на форсаже: Великая пустыня",
+  "description": "Победить Песчаного левиафана на скорости ×2 каждым героем",
+  "hidden": true,
+  "emeralds": 40,
+  "condition": {
+    "type": "victory",
+    "speed": 200,
+    "locations": [
+      "great_desert"
+    ],
+    "heroes": [
+      "wanderer",
+      "spark",
+      "bruiser",
+      "marksman",
+      "chemist"
+    ],
+    "every": true
+  }
+}

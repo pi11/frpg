@@ -1,0 +1,43 @@
+{
+  "id": "blind_digger",
+  "name": "Слепой копатель",
+  "sprite": "enemies/blind_digger",
+  "role": "normal",
+  "ai": {
+    "type": "burrower",
+    "params": {
+      "turnRate": 4,
+      "surfaceMs": 2600,
+      "undergroundSpeed": 150,
+      "maxBurrowMs": 3200,
+      "emergeRange": 24,
+      "windupMs": 600,
+      "emergeRadius": 34,
+      "emergeDamage": 16
+    }
+  },
+  "stats": {
+    "hp": 36,
+    "speed": 54,
+    "damage": 9,
+    "xp": 3
+  },
+  "drops": [
+    {
+      "item": "caps",
+      "chance": 0.04,
+      "amount": [
+        1,
+        4
+      ]
+    },
+    {
+      "item": "pickup",
+      "id": "medkit",
+      "chance": 0.006
+    }
+  ],
+  "tags": [
+    "animal"
+  ]
+}

@@ -1,0 +1,52 @@
+{
+  "id": "caravan_rest",
+  "items": [
+    {
+      "kind": "patch",
+      "sprite": "decor/scorched_sand",
+      "x": 0,
+      "y": 6
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/campfire",
+      "x": 0,
+      "y": 0
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/tent",
+      "x": -42,
+      "y": -22
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/tent",
+      "x": 40,
+      "y": -26
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/barrel",
+      "x": -50,
+      "y": 26
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/cow_skull",
+      "x": 30,
+      "y": 30
+    },
+    {
+      "kind": "crate",
+      "x": 60,
+      "y": 4
+    },
+    {
+      "kind": "landmark",
+      "landmark": "vending",
+      "x": -8,
+      "y": 32
+    }
+  ]
+}

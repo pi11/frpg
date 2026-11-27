@@ -1,0 +1,52 @@
+{
+  "id": "sand_temple",
+  "items": [
+    {
+      "kind": "patch",
+      "sprite": "decor/sand_ripples",
+      "x": 0,
+      "y": 10
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/sandstone",
+      "x": -36,
+      "y": -14
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/sandstone",
+      "x": 36,
+      "y": -18
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/pillar",
+      "x": -16,
+      "y": -34
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/pillar",
+      "x": 16,
+      "y": -34
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/cow_skull",
+      "x": 0,
+      "y": 34
+    },
+    {
+      "kind": "crate",
+      "x": 56,
+      "y": 24
+    },
+    {
+      "kind": "landmark",
+      "landmark": "hatch",
+      "x": 0,
+      "y": -2
+    }
+  ]
+}

@@ -1,0 +1,51 @@
+{
+  "id": "crashed_airliner",
+  "items": [
+    {
+      "kind": "patch",
+      "sprite": "decor/scorched_sand",
+      "x": 0,
+      "y": 10
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/plane_tail",
+      "x": -26,
+      "y": -16
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/tires",
+      "x": 40,
+      "y": 22
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/sandstone",
+      "x": 46,
+      "y": -26
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/bones",
+      "x": -40,
+      "y": 32
+    },
+    {
+      "kind": "crate",
+      "x": 10,
+      "y": 36
+    },
+    {
+      "kind": "crate",
+      "x": -60,
+      "y": -6
+    },
+    {
+      "kind": "landmark",
+      "landmark": "workbench",
+      "x": 26,
+      "y": -6
+    }
+  ]
+}

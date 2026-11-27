@@ -1,0 +1,538 @@
+{
+  "id": "great_desert",
+  "name": "Великая пустыня",
+  "description": "Бескрайние барханы: скорпионы, стервятники, песчаные черви, кочевники и Песчаный левиафан.",
+  "unlock": {
+    "type": "bossKilled",
+    "location": "frozen_pass"
+  },
+  "rewardMultiplier": 5,
+  "emeralds": {
+    "elite": 6,
+    "boss": 12,
+    "firstBoss": 24
+  },
+  "groundSprite": "ground/desert",
+  "music": "music/desert",
+  "bossMusic": "music/boss",
+  "durationSeconds": 690,
+  "startingHero": "wanderer",
+  "waves": [
+    {
+      "atSecond": 0,
+      "spawnIntervalMs": 240,
+      "hpMultiplier": 3.85,
+      "speedMultiplier": 1,
+      "enemies": [
+        {
+          "id": "scorpion",
+          "weight": 2
+        },
+        {
+          "id": "vulture",
+          "weight": 1
+        }
+      ]
+    },
+    {
+      "atSecond": 45,
+      "spawnIntervalMs": 190,
+      "hpMultiplier": 4.36,
+      "speedMultiplier": 1,
+      "enemies": [
+        {
+          "id": "scorpion",
+          "weight": 3
+        },
+        {
+          "id": "vulture",
+          "weight": 2
+        },
+        {
+          "id": "sand_worm",
+          "weight": 1
+        }
+      ]
+    },
+    {
+      "atSecond": 90,
+      "spawnIntervalMs": 160,
+      "hpMultiplier": 5.07,
+      "speedMultiplier": 1.05,
+      "enemies": [
+        {
+          "id": "scorpion",
+          "weight": 3
+        },
+        {
+          "id": "vulture",
+          "weight": 2
+        },
+        {
+          "id": "sand_worm",
+          "weight": 1
+        },
+        {
+          "id": "nomad",
+          "weight": 1
+        }
+      ]
+    },
+    {
+      "atSecond": 185,
+      "spawnIntervalMs": 130,
+      "hpMultiplier": 6.3,
+      "speedMultiplier": 1.1,
+      "enemies": [
+        {
+          "id": "scorpion",
+          "weight": 3
+        },
+        {
+          "id": "vulture",
+          "weight": 2
+        },
+        {
+          "id": "sand_worm",
+          "weight": 2
+        },
+        {
+          "id": "nomad",
+          "weight": 1
+        },
+        {
+          "id": "vulture",
+          "weight": 2,
+          "group": 3
+        }
+      ]
+    },
+    {
+      "atSecond": 275,
+      "spawnIntervalMs": 110,
+      "hpMultiplier": 8.04,
+      "speedMultiplier": 1.15,
+      "enemies": [
+        {
+          "id": "scorpion",
+          "weight": 3
+        },
+        {
+          "id": "vulture",
+          "weight": 2
+        },
+        {
+          "id": "sand_worm",
+          "weight": 2
+        },
+        {
+          "id": "nomad",
+          "weight": 2
+        },
+        {
+          "id": "vulture",
+          "weight": 2,
+          "group": 3
+        }
+      ]
+    },
+    {
+      "atSecond": 370,
+      "spawnIntervalMs": 68,
+      "hpMultiplier": 10.49,
+      "speedMultiplier": 1.15,
+      "enemies": [
+        {
+          "id": "scorpion",
+          "weight": 3
+        },
+        {
+          "id": "vulture",
+          "weight": 3
+        },
+        {
+          "id": "sand_worm",
+          "weight": 2
+        },
+        {
+          "id": "nomad",
+          "weight": 2
+        },
+        {
+          "id": "vulture",
+          "weight": 2,
+          "group": 4
+        }
+      ]
+    },
+    {
+      "atSecond": 460,
+      "spawnIntervalMs": 52,
+      "hpMultiplier": 14.9,
+      "speedMultiplier": 1.18,
+      "enemies": [
+        {
+          "id": "scorpion",
+          "weight": 3
+        },
+        {
+          "id": "vulture",
+          "weight": 3
+        },
+        {
+          "id": "sand_worm",
+          "weight": 2
+        },
+        {
+          "id": "nomad",
+          "weight": 2
+        },
+        {
+          "id": "vulture",
+          "weight": 2,
+          "group": 4
+        }
+      ]
+    },
+    {
+      "atSecond": 555,
+      "spawnIntervalMs": 45,
+      "hpMultiplier": 18.03,
+      "speedMultiplier": 1.2,
+      "enemies": [
+        {
+          "id": "scorpion",
+          "weight": 4
+        },
+        {
+          "id": "vulture",
+          "weight": 3
+        },
+        {
+          "id": "sand_worm",
+          "weight": 3
+        },
+        {
+          "id": "nomad",
+          "weight": 2
+        },
+        {
+          "id": "vulture",
+          "weight": 2,
+          "group": 5
+        }
+      ]
+    },
+    {
+      "atSecond": 600,
+      "spawnIntervalMs": 950,
+      "hpMultiplier": 18.03,
+      "speedMultiplier": 1.2,
+      "enemies": [
+        {
+          "id": "scorpion",
+          "weight": 2
+        },
+        {
+          "id": "vulture",
+          "weight": 1
+        },
+        {
+          "id": "sand_worm",
+          "weight": 1
+        }
+      ]
+    }
+  ],
+  "events": [
+    {
+      "atSecond": 210,
+      "enemy": "scorpion_king",
+      "count": 1
+    },
+    {
+      "atSecond": 390,
+      "enemy": "scorpion_king",
+      "count": 1
+    },
+    {
+      "atSecond": 530,
+      "enemy": "scorpion_king",
+      "count": 2
+    },
+    {
+      "atSecond": 540,
+      "enemy": "great_worm",
+      "count": 1
+    }
+  ],
+  "boss": {
+    "atSecond": 600,
+    "enemy": "sand_leviathan"
+  },
+  "decor": {
+    "chunkSize": 256,
+    "biomeChunks": 3,
+    "biomes": [
+      {
+        "id": "dunes",
+        "weight": 4,
+        "patches": {
+          "perChunk": [
+            2,
+            4
+          ],
+          "items": [
+            {
+              "sprite": "decor/sand_ripples",
+              "weight": 4
+            },
+            {
+              "sprite": "decor/dune",
+              "weight": 2
+            }
+          ]
+        },
+        "objects": {
+          "perChunk": [
+            2,
+            5
+          ],
+          "items": [
+            {
+              "sprite": "decor/cactus",
+              "weight": 3
+            },
+            {
+              "sprite": "decor/cow_skull",
+              "weight": 2
+            },
+            {
+              "sprite": "decor/sandstone",
+              "weight": 2
+            }
+          ]
+        }
+      },
+      {
+        "id": "badlands",
+        "weight": 2,
+        "patches": {
+          "perChunk": [
+            2,
+            4
+          ],
+          "items": [
+            {
+              "sprite": "decor/scorched_sand",
+              "weight": 2
+            },
+            {
+              "sprite": "decor/salt_flat",
+              "weight": 2
+            }
+          ]
+        },
+        "objects": {
+          "perChunk": [
+            3,
+            6
+          ],
+          "items": [
+            {
+              "sprite": "decor/sandstone",
+              "weight": 4
+            },
+            {
+              "sprite": "decor/rocks",
+              "weight": 2
+            },
+            {
+              "sprite": "decor/bones",
+              "weight": 2
+            },
+            {
+              "sprite": "decor/dead_tree",
+              "weight": 1
+            }
+          ]
+        }
+      },
+      {
+        "id": "quicksand_flats",
+        "weight": 1,
+        "patches": {
+          "perChunk": [
+            2,
+            4
+          ],
+          "items": [
+            {
+              "sprite": "decor/quicksand",
+              "weight": 4
+            },
+            {
+              "sprite": "decor/sand_ripples",
+              "weight": 1
+            }
+          ]
+        },
+        "objects": {
+          "perChunk": [
+            2,
+            4
+          ],
+          "items": [
+            {
+              "sprite": "decor/cow_skull",
+              "weight": 2
+            },
+            {
+              "sprite": "decor/bones",
+              "weight": 2
+            },
+            {
+              "sprite": "decor/cactus",
+              "weight": 1
+            }
+          ]
+        }
+      },
+      {
+        "id": "oasis_edge",
+        "weight": 1,
+        "patches": {
+          "perChunk": [
+            2,
+            4
+          ],
+          "items": [
+            {
+              "sprite": "decor/pond",
+              "weight": 1
+            },
+            {
+              "sprite": "decor/dry_grass",
+              "weight": 2
+            }
+          ]
+        },
+        "objects": {
+          "perChunk": [
+            3,
+            6
+          ],
+          "items": [
+            {
+              "sprite": "decor/palm",
+              "weight": 4
+            },
+            {
+              "sprite": "decor/bush",
+              "weight": 2
+            },
+            {
+              "sprite": "decor/cactus",
+              "weight": 2
+            }
+          ]
+        }
+      }
+    ],
+    "crates": {
+      "sprite": "decor/crate",
+      "hp": 10,
+      "perChunk": [
+        0,
+        1
+      ],
+      "drops": [
+        {
+          "pickup": "medkit",
+          "weight": 8
+        },
+        {
+          "pickup": "caps_stash",
+          "weight": 4
+        },
+        {
+          "pickup": "magnet",
+          "weight": 2
+        },
+        {
+          "pickup": "pulse_bomb",
+          "weight": 2
+        },
+        {
+          "pickup": "rage_shot",
+          "weight": 1
+        },
+        {
+          "pickup": "adrenaline",
+          "weight": 1
+        },
+        {
+          "pickup": "shield_cell",
+          "weight": 1
+        },
+        {
+          "pickup": "ammo_belt",
+          "weight": 1
+        },
+        {
+          "pickup": "cryo_bomb",
+          "weight": 1
+        },
+        {
+          "pickup": "data_disk",
+          "weight": 1
+        },
+        {
+          "pickup": "bullet_shield",
+          "weight": 2
+        }
+      ]
+    },
+    "structures": {
+      "chance": 0.2,
+      "items": [
+        {
+          "structure": "oasis",
+          "weight": 2
+        },
+        {
+          "structure": "caravan_rest",
+          "weight": 3
+        },
+        {
+          "structure": "sand_temple",
+          "weight": 2
+        },
+        {
+          "structure": "crashed_airliner",
+          "weight": 2
+        }
+      ]
+    },
+    "hazards": [
+      {
+        "sprite": "decor/quicksand",
+        "radius": 22,
+        "damagePerSecond": 0,
+        "slow": 0.4
+      },
+      {
+        "sprite": "decor/scorched_sand",
+        "radius": 16,
+        "damagePerSecond": 5,
+        "slow": 0
+      },
+      {
+        "sprite": "decor/pond",
+        "radius": 24,
+        "damagePerSecond": 0,
+        "slow": 0.3
+      }
+    ]
+  }
+}

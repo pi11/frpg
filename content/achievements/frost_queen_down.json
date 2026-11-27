@@ -1,0 +1,13 @@
+{
+  "id": "frost_queen_down",
+  "name": "Оттепель",
+  "description": "Победить Королеву стужи",
+  "hidden": false,
+  "emeralds": 12,
+  "condition": {
+    "type": "metric",
+    "metric": "boss",
+    "value": 1,
+    "location": "frozen_pass"
+  }
+}

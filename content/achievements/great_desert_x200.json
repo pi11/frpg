@@ -1,0 +1,16 @@
+{
+  "id": "great_desert_x200",
+  "name": "Песчаная буря",
+  "description": "Победить Песчаного левиафана на скорости ×2",
+  "hidden": false,
+  "emeralds": 21,
+  "condition": {
+    "type": "victory",
+    "speed": 200,
+    "locations": [
+      "great_desert"
+    ],
+    "heroes": [],
+    "every": false
+  }
+}

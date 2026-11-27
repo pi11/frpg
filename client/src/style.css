@@ -164,7 +164,8 @@ body.crt::after {
 .hub-open { flex: none; min-width: 112px; color: var(--term-dim); text-align: center; }
 .hub-goals { margin: 0; padding: 0; list-style: none; }
 .hub-goals li { display: flex; justify-content: space-between; gap: 12px; padding: 7px 0; border-top: 1px dashed var(--term-line); }
-.hub-goals li span:last-child { color: var(--term-warn); }
+.hub-goals li span:last-child { color: var(--term-warn); white-space: nowrap; }
+.hub-goals li button { white-space: nowrap; }
 .hub-daily li > span:first-child { flex: 1; }
 .hub-bar { display: block; height: 6px; margin: 8px 0 4px; background: var(--term-line); }
 .hub-bar span { display: block; height: 100%; background: var(--term-border); }
@@ -176,6 +177,13 @@ body.crt::after {
 .hub-stats dt { color: var(--term-dim); font-size: 8px; }
 .hub-stats dd { display: flex; align-items: center; gap: 6px; margin: 6px 0 0; color: var(--term-bright); font-size: 16px; }
 .hub-cap { width: 16px; height: 16px; image-rendering: pixelated; }
+/* An emerald (or boost) after a number: shows what is paid or earned. */
+.hub-gem { display: inline-block; width: 12px; height: 12px; margin: 0 0 0 3px; vertical-align: -2px; image-rendering: pixelated; }
+.hub-boosts-ready { color: var(--term-warn); }
+.hub-boosts-ready .hub-gem { margin: 0 3px 0 6px; }
+.hub-upgrades .hub-help-row { border-top: 0; padding-top: 0; }
+.hub-packed .hub-open { color: var(--term-warn); }
+.hub-locations .hub-more { color: var(--term-dim); text-align: center; }
 .hub-note { color: var(--term-dim); font-size: 8px; text-align: center; }
 .hub-locations { display: grid; gap: 6px; margin: 0 0 12px; padding: 0; list-style: none; }
 .hub-locations button { display: block; width: 100%; padding: 8px 10px; border: 1px solid var(--term-line); background: var(--term-bg); color: var(--term-text); font: inherit; font-size: 8px; text-align: left; cursor: pointer; }

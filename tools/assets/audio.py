@@ -420,11 +420,112 @@ def rain_theme() -> list[float]:
     ], cutoff=3600)
 
 
+def military_theme() -> list[float]:
+    """Marching run music for the military base in C minor, 112 BPM, 16 bars, snare rolls."""
+    step = 60 / 112 / 4
+    total = int(step * 16 * 16 * RATE)
+    bass = " ".join(["C2:4 G1:4 C2:4 G1:4 ", "G#1:4 D#2:4 G#1:4 D#2:4 ",
+                     "F1:4 C2:4 F1:4 C2:4 ", "G1:4 D2:4 G1:4 B1:4 "] * 4)
+    lead = (
+        "C5:6 C5:2 D#5:4 G5:4 F5:6 D#5:2 D5:8 "
+        "D#5:6 D5:2 C5:4 G#4:4 G4:16 "
+        "C5:6 C5:2 D#5:4 G5:4 G#5:6 G5:2 F5:8 "
+        "D#5:4 D5:4 B4:4 D5:4 C5:16 "
+        "-:32 -:32 "
+        "G4:2 G4:2 C5:4 G4:2 G4:2 D#5:4 D5:4 C5:4 B4:8 "
+        "G#4:2 G#4:2 C5:4 F5:4 D#5:4 D5:4 B4:4 C5:8"
+    )
+    return master([
+        sequence(bass, step, triangle, 0.26, total, curve=1.0, gate=0.6),
+        sequence(lead, step, pulse(0.25), 0.09, total, curve=0.7),
+        drums("k.s.s.sskss.s.ss", step, total, 81),
+    ], cutoff=5000)
+
+
+def forest_theme() -> list[float]:
+    """Folk tune for the forest in E dorian with a flute-like lead, 92 BPM, 16 bars."""
+    step = 60 / 92 / 4
+    total = int(step * 16 * 16 * RATE)
+    arps = " ".join(" ".join(f"{note}:2" for note in (*chord, *chord[::-1])) for chord in (
+        ("E3", "B3", "E4", "G4"), ("D3", "A3", "D4", "F#4"), ("A2", "E3", "A3", "C#4"),
+        ("B2", "F#3", "B3", "D4")))
+    bass = "E2:12 B1:4 D2:12 A1:4 A1:12 E2:4 B1:12 F#1:4"
+    lead = ("-:64 B4:4 E5:4 F#5:4 G5:4 F#5:6 E5:2 D5:8 E5:4 C#5:4 A4:8 B4:16 "
+            "G5:4 F#5:4 E5:4 D5:4 C#5:6 D5:2 E5:8 F#5:4 D5:4 B4:8 E5:16")
+    return master([
+        sequence(arps, step, pulse(0.125), 0.07, total, curve=1.6),
+        sequence(bass, step, triangle, 0.28, total, curve=0.6),
+        sequence(lead, step, triangle, 0.22, total, curve=0.5),
+        drums("k.....h.k...h.h.", step, total, 83),
+    ], cutoff=4200)
+
+
+def dungeon_theme() -> list[float]:
+    """Slow, low dungeon crawl in C# minor with dripping bells, 78 BPM, 16 bars."""
+    step = 60 / 78 / 4
+    total = int(step * 16 * 16 * RATE)
+    bass = " ".join(["C#2:8 C#2:4 G#1:4 ", "A1:8 A1:4 E2:4 ", "F#1:8 F#1:4 C#2:4 ",
+                     "G#1:8 G#1:4 B1:4 "] * 4)
+    bells = ("G#5:2 -:6 E5:2 -:6 C#6:2 -:14 B5:2 -:6 G#5:2 -:6 F#5:2 -:14 "
+             "E5:2 -:6 C#5:2 -:6 A5:2 -:14 G#5:2 -:6 B5:2 -:6 D#5:2 -:14")
+    lead = ("-:64 C#4:8 E4:8 G#4:12 F#4:4 E4:8 D#4:8 C#4:16 "
+            "A4:8 G#4:8 E4:12 F#4:4 G#4:16 D#4:16")
+    return master([
+        sequence(bass, step, triangle, 0.32, total, curve=0.8, gate=0.95),
+        sequence(bells, step, sine, 0.12, total, curve=2.6),
+        sequence(lead, step, pulse(0.25), 0.07, total, curve=0.4),
+        drums("k.......k...h...", step, total, 87),
+    ], cutoff=3400)
+
+
+def winter_theme() -> list[float]:
+    """Icy run music for the frozen pass in F# minor with bell arpeggios, 96 BPM, 16 bars."""
+    step = 60 / 96 / 4
+    total = int(step * 16 * 16 * RATE)
+    arps = " ".join(" ".join(f"{note}:1" for note in (*chord, *chord) * 2) for chord in (
+        ("F#4", "A4", "C#5", "F#5"), ("D4", "F#4", "A4", "D5"), ("E4", "G#4", "B4", "E5"),
+        ("C#4", "F4", "G#4", "C#5")))
+    bass = " ".join(["F#2:8 C#2:8 ", "D2:8 A1:8 ", "E2:8 B1:8 ", "C#2:8 G#1:8 "] * 4)
+    lead = ("-:64 C#5:8 A4:4 F#4:4 G#4:8 A4:8 B4:6 A4:2 G#4:8 F4:16 "
+            "F#5:8 E5:4 C#5:4 D5:8 A4:8 B4:6 C#5:2 G#4:8 F#4:16")
+    return master([
+        sequence(arps, step, sine, 0.10, total, curve=2.2),
+        sequence(bass, step, triangle, 0.28, total, curve=0.8),
+        sequence(lead, step, pulse(0.125), 0.08, total, curve=0.5),
+        drums("k...h.s.k.k.h.s.", step, total, 89),
+    ], cutoff=4800)
+
+
+def desert_theme() -> list[float]:
+    """Hot desert run in D phrygian with a snaking lead, 104 BPM, 16 bars."""
+    step = 60 / 104 / 4
+    total = int(step * 16 * 16 * RATE)
+    bass = " ".join(["D2:2 D2:2 -:2 D2:2 D#2:2 D2:2 -:2 A1:2 "] * 16)
+    lead = (
+        "D5:4 D#5:4 F#5:6 G5:2 A5:4 G5:4 F#5:4 D#5:4 "
+        "D5:8 C5:4 A#4:4 A4:16 "
+        "A4:4 A#4:4 C5:4 D5:4 D#5:6 D5:2 C5:4 A#4:4 "
+        "A4:4 A#4:4 A4:4 G4:4 F#4:4 D#4:4 D4:8 "
+        "-:32 -:32 "
+        "A5:2 G5:2 F#5:2 D#5:2 D5:4 D#5:4 F#5:8 D5:8 "
+        "C5:2 A#4:2 A4:2 G4:2 A4:4 A#4:4 A4:16"
+    )
+    pads = " ".join(["D4:16 ", "D4:16 ", "D#4:16 ", "D4:16 "] * 4)
+    return master([
+        sequence(bass, step, pulse(0.5), 0.13, total, curve=1.4, gate=0.8),
+        sequence(lead, step, pulse(0.25), 0.09, total, curve=0.6),
+        sequence(pads, step, triangle, 0.09, total, curve=0.3),
+        drums("k.hhs.h.k.hks.hh", step, total, 91),
+    ], cutoff=5200)
+
+
 def music_tracks() -> dict[str, list[float]]:
     return {
         "shelter": shelter_theme(), "wasteland": wasteland_theme(), "boss": boss_theme(),
         "city": city_theme(), "marsh": marsh_theme(), "sunset": sunset_theme(),
-        "road": road_theme(), "rain": rain_theme(),
+        "road": road_theme(), "rain": rain_theme(), "military": military_theme(),
+        "forest": forest_theme(), "dungeon": dungeon_theme(), "winter": winter_theme(),
+        "desert": desert_theme(),
     }
 
 

@@ -1,0 +1,35 @@
+{
+  "id": "mine_crawler",
+  "name": "Ползучая мина",
+  "sprite": "enemies/mine_crawler",
+  "role": "normal",
+  "ai": {
+    "type": "exploder",
+    "params": {
+      "turnRate": 6,
+      "triggerRange": 24,
+      "fuseMs": 650,
+      "radius": 36,
+      "damage": 24
+    }
+  },
+  "stats": {
+    "hp": 16,
+    "speed": 76,
+    "damage": 4,
+    "xp": 2
+  },
+  "drops": [
+    {
+      "item": "caps",
+      "chance": 0.03,
+      "amount": [
+        1,
+        3
+      ]
+    }
+  ],
+  "tags": [
+    "robot"
+  ]
+}

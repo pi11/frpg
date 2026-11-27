@@ -1,0 +1,31 @@
+{
+  "id": "cave_rat",
+  "name": "Туннельная крыса",
+  "sprite": "enemies/cave_rat",
+  "role": "normal",
+  "ai": {
+    "type": "chaser",
+    "params": {
+      "turnRate": 7
+    }
+  },
+  "stats": {
+    "hp": 10,
+    "speed": 88,
+    "damage": 5,
+    "xp": 1
+  },
+  "drops": [
+    {
+      "item": "caps",
+      "chance": 0.01,
+      "amount": [
+        1,
+        2
+      ]
+    }
+  ],
+  "tags": [
+    "animal"
+  ]
+}

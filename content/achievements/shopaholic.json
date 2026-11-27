@@ -1,0 +1,14 @@
+{
+  "id": "shopaholic",
+  "name": "Шопоголик",
+  "description": "Взять в один забег четыре усиления",
+  "hidden": true,
+  "emeralds": 4,
+  "condition": {
+    "type": "reported",
+    "event": "boosts",
+    "value": 4,
+    "minSeconds": 0,
+    "minBoosts": 4
+  }
+}

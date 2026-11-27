@@ -49,6 +49,15 @@ def test_reported_conditions_have_limits() -> None:
     assert earned(facts(reported=["meat_grinder", "unknown"])) == []
 
 
+def test_reported_conditions_check_location_and_boosts() -> None:
+    assert earned(facts(duration=10, reported=["deserter"])) == []
+    assert earned(facts(duration=10, reported=["deserter"], location="military_base")) == [
+        "deserter"]
+    assert earned(facts(duration=10, reported=["shopaholic"], boosts=3)) == []
+    assert earned(facts(duration=10, reported=["shopaholic"], boosts=4)) == ["shopaholic"]
+    assert earned(facts(boss_killed=True, location="great_desert")) == ["sand_leviathan_down"]
+
+
 def test_achievement_is_added_once_and_waits() -> None:
     items = get_content().category("achievements")
     data, new = grant_achievements(items, {"emeralds": 2}, facts(reported=["tickle"]))

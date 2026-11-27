@@ -1,0 +1,34 @@
+{
+  "id": "sentry_drone",
+  "name": "Дрон-часовой",
+  "sprite": "enemies/sentry_drone",
+  "role": "normal",
+  "ai": {
+    "type": "weaver",
+    "params": {
+      "turnRate": 6,
+      "amplitude": 0.8,
+      "frequencyHz": 1.4
+    }
+  },
+  "stats": {
+    "hp": 14,
+    "speed": 82,
+    "damage": 7,
+    "xp": 1
+  },
+  "drops": [
+    {
+      "item": "caps",
+      "chance": 0.015,
+      "amount": [
+        1,
+        2
+      ]
+    }
+  ],
+  "tags": [
+    "robot",
+    "flying"
+  ]
+}

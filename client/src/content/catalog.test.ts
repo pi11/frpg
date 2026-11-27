@@ -203,6 +203,12 @@ describe('assets referenced by content', () => {
         if (item.kind === 'patch' || item.kind === 'object') needFrame(item.sprite);
       }
     }
+    for (const boost of Object.values(content.boosts)) needFrame(boost.sprite);
+    // Enemy shots, also inside boss phases.
+    const shots = (ai: { type: string; params: unknown }): string[] => ai.type === 'boss_phases'
+      ? (ai.params as { phases: { ai: { type: string; params: unknown } }[] }).phases.flatMap((phase) => shots(phase.ai))
+      : [(ai.params as { projectileSprite?: string }).projectileSprite ?? ''].filter(Boolean);
+    for (const enemy of Object.values(content.enemies)) for (const sprite of shots(enemy.ai)) needFrame(sprite);
     for (const frame of ['xp/green', 'xp/green/idle_0', 'ui/cap', 'ui/emerald', 'fx/ray/idle_0', 'fx/hit/burst_0',
       'fx/explosion/burst_0']) needFrame(frame);
     for (const sound of UI_SOUNDS) needFile(`${sound}.wav`);
@@ -269,7 +275,8 @@ describe('locations', () => {
   it('are listed in unlock order and each later one needs the previous boss', () => {
     const ordered = orderedLocations(getCatalog());
     expect(ordered.map((location) => location.id))
-      .toEqual(['shelter_outskirts', 'dead_city', 'toxic_marsh']);
+      .toEqual(['shelter_outskirts', 'dead_city', 'toxic_marsh', 'military_base', 'dark_forest', 'dungeon',
+        'frozen_pass', 'great_desert']);
     ordered.slice(1).forEach((location, index) => {
       expect(location.unlock).toEqual({ type: 'bossKilled', location: ordered[index]!.id });
       expect(location.rewardMultiplier).toBeGreaterThan(ordered[index]!.rewardMultiplier);

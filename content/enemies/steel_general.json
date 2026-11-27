@@ -1,0 +1,119 @@
+{
+  "id": "steel_general",
+  "name": "Стальной генерал",
+  "sprite": "enemies/steel_general",
+  "role": "boss",
+  "scale": 1.5,
+  "ai": {
+    "type": "boss_phases",
+    "params": {
+      "phases": [
+        {
+          "hpBelow": 1,
+          "ai": {
+            "type": "ranged",
+            "params": {
+              "turnRate": 3.5,
+              "preferredRange": 110,
+              "fireCooldownMs": 1100,
+              "projectileSpeed": 165,
+              "projectileDamage": 18,
+              "projectileSprite": "projectiles/slug",
+              "lifetimeMs": 3000,
+              "shots": 9,
+              "spreadDegrees": 80
+            }
+          }
+        },
+        {
+          "hpBelow": 0.8,
+          "ai": {
+            "type": "charger",
+            "params": {
+              "turnRate": 4.5,
+              "chargeRange": 230,
+              "windupMs": 520,
+              "chargeSpeed": 280,
+              "chargeMs": 750,
+              "cooldownMs": 1000
+            }
+          },
+          "summon": {
+            "enemy": "soldier",
+            "count": 10
+          }
+        },
+        {
+          "hpBelow": 0.55,
+          "ai": {
+            "type": "ranged",
+            "params": {
+              "turnRate": 3.5,
+              "preferredRange": 90,
+              "fireCooldownMs": 1100,
+              "projectileSpeed": 150,
+              "projectileDamage": 19,
+              "projectileSprite": "projectiles/slug",
+              "lifetimeMs": 3000,
+              "shots": 24,
+              "spreadDegrees": 344
+            }
+          },
+          "summon": {
+            "enemy": "sentry_drone",
+            "count": 14
+          }
+        },
+        {
+          "hpBelow": 0.3,
+          "ai": {
+            "type": "charger",
+            "params": {
+              "turnRate": 4.5,
+              "chargeRange": 230,
+              "windupMs": 450,
+              "chargeSpeed": 310,
+              "chargeMs": 750,
+              "cooldownMs": 700
+            }
+          },
+          "summon": {
+            "enemy": "mine_crawler",
+            "count": 12
+          }
+        },
+        {
+          "hpBelow": 0.15,
+          "ai": {
+            "type": "ranged",
+            "params": {
+              "turnRate": 3.5,
+              "preferredRange": 90,
+              "fireCooldownMs": 700,
+              "projectileSpeed": 180,
+              "projectileDamage": 19,
+              "projectileSprite": "projectiles/slug",
+              "lifetimeMs": 3000,
+              "shots": 14,
+              "spreadDegrees": 150
+            }
+          },
+          "summon": {
+            "enemy": "soldier",
+            "count": 12
+          }
+        }
+      ]
+    }
+  },
+  "stats": {
+    "hp": 28000,
+    "speed": 84,
+    "damage": 36,
+    "xp": 0
+  },
+  "drops": [],
+  "tags": [
+    "boss"
+  ]
+}

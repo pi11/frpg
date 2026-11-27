@@ -1,0 +1,16 @@
+{
+  "id": "dungeon_x150",
+  "name": "Крысолов",
+  "description": "Победить Крысиного короля на скорости ×1,5",
+  "hidden": false,
+  "emeralds": 14,
+  "condition": {
+    "type": "victory",
+    "speed": 150,
+    "locations": [
+      "dungeon"
+    ],
+    "heroes": [],
+    "every": false
+  }
+}

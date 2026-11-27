@@ -1,0 +1,13 @@
+{
+  "id": "forest_lord_down",
+  "name": "Лесоруб",
+  "description": "Победить Хозяина леса",
+  "hidden": false,
+  "emeralds": 10,
+  "condition": {
+    "type": "metric",
+    "metric": "boss",
+    "value": 1,
+    "location": "dark_forest"
+  }
+}

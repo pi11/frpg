@@ -1,0 +1,14 @@
+{
+  "id": "camel",
+  "name": "Верблюд",
+  "description": "Не останавливаться в пустыне 4 минуты",
+  "hidden": true,
+  "emeralds": 5,
+  "condition": {
+    "type": "reported",
+    "event": "alwaysMoving",
+    "value": 240,
+    "minSeconds": 240,
+    "location": "great_desert"
+  }
+}

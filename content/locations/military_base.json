@@ -1,0 +1,566 @@
+{
+  "id": "military_base",
+  "name": "Военная база",
+  "description": "Брошенный гарнизон: одичавшие рядовые, дроны-часовые, ползучие мины и Стальной генерал.",
+  "unlock": {
+    "type": "bossKilled",
+    "location": "toxic_marsh"
+  },
+  "rewardMultiplier": 2.5,
+  "emeralds": {
+    "elite": 3,
+    "boss": 8,
+    "firstBoss": 14
+  },
+  "groundSprite": "ground/military",
+  "music": "music/military",
+  "bossMusic": "music/boss",
+  "durationSeconds": 690,
+  "startingHero": "wanderer",
+  "waves": [
+    {
+      "atSecond": 0,
+      "spawnIntervalMs": 240,
+      "hpMultiplier": 1.96,
+      "speedMultiplier": 1,
+      "enemies": [
+        {
+          "id": "soldier",
+          "weight": 2
+        },
+        {
+          "id": "sentry_drone",
+          "weight": 1
+        }
+      ]
+    },
+    {
+      "atSecond": 45,
+      "spawnIntervalMs": 190,
+      "hpMultiplier": 2.23,
+      "speedMultiplier": 1,
+      "enemies": [
+        {
+          "id": "soldier",
+          "weight": 3
+        },
+        {
+          "id": "sentry_drone",
+          "weight": 2
+        },
+        {
+          "id": "mine_crawler",
+          "weight": 1
+        }
+      ]
+    },
+    {
+      "atSecond": 90,
+      "spawnIntervalMs": 160,
+      "hpMultiplier": 2.59,
+      "speedMultiplier": 1.05,
+      "enemies": [
+        {
+          "id": "soldier",
+          "weight": 3
+        },
+        {
+          "id": "sentry_drone",
+          "weight": 2
+        },
+        {
+          "id": "mine_crawler",
+          "weight": 1
+        },
+        {
+          "id": "cleaner_bot",
+          "weight": 1
+        }
+      ]
+    },
+    {
+      "atSecond": 185,
+      "spawnIntervalMs": 130,
+      "hpMultiplier": 3.21,
+      "speedMultiplier": 1.1,
+      "enemies": [
+        {
+          "id": "soldier",
+          "weight": 3
+        },
+        {
+          "id": "sentry_drone",
+          "weight": 2
+        },
+        {
+          "id": "mine_crawler",
+          "weight": 2
+        },
+        {
+          "id": "cleaner_bot",
+          "weight": 1
+        },
+        {
+          "id": "wild_dog",
+          "weight": 2,
+          "group": 3
+        }
+      ]
+    },
+    {
+      "atSecond": 275,
+      "spawnIntervalMs": 110,
+      "hpMultiplier": 4.1,
+      "speedMultiplier": 1.15,
+      "enemies": [
+        {
+          "id": "soldier",
+          "weight": 3
+        },
+        {
+          "id": "sentry_drone",
+          "weight": 2
+        },
+        {
+          "id": "mine_crawler",
+          "weight": 2
+        },
+        {
+          "id": "cleaner_bot",
+          "weight": 2
+        },
+        {
+          "id": "wild_dog",
+          "weight": 2,
+          "group": 3
+        }
+      ]
+    },
+    {
+      "atSecond": 370,
+      "spawnIntervalMs": 68,
+      "hpMultiplier": 5.35,
+      "speedMultiplier": 1.15,
+      "enemies": [
+        {
+          "id": "soldier",
+          "weight": 3
+        },
+        {
+          "id": "sentry_drone",
+          "weight": 3
+        },
+        {
+          "id": "mine_crawler",
+          "weight": 2
+        },
+        {
+          "id": "cleaner_bot",
+          "weight": 2
+        },
+        {
+          "id": "wild_dog",
+          "weight": 2,
+          "group": 4
+        }
+      ]
+    },
+    {
+      "atSecond": 460,
+      "spawnIntervalMs": 52,
+      "hpMultiplier": 7.6,
+      "speedMultiplier": 1.18,
+      "enemies": [
+        {
+          "id": "soldier",
+          "weight": 3
+        },
+        {
+          "id": "sentry_drone",
+          "weight": 3
+        },
+        {
+          "id": "mine_crawler",
+          "weight": 2
+        },
+        {
+          "id": "cleaner_bot",
+          "weight": 2
+        },
+        {
+          "id": "wild_dog",
+          "weight": 2,
+          "group": 4
+        }
+      ]
+    },
+    {
+      "atSecond": 555,
+      "spawnIntervalMs": 45,
+      "hpMultiplier": 9.2,
+      "speedMultiplier": 1.2,
+      "enemies": [
+        {
+          "id": "soldier",
+          "weight": 4
+        },
+        {
+          "id": "sentry_drone",
+          "weight": 3
+        },
+        {
+          "id": "mine_crawler",
+          "weight": 3
+        },
+        {
+          "id": "cleaner_bot",
+          "weight": 2
+        },
+        {
+          "id": "wild_dog",
+          "weight": 2,
+          "group": 5
+        }
+      ]
+    },
+    {
+      "atSecond": 600,
+      "spawnIntervalMs": 950,
+      "hpMultiplier": 9.2,
+      "speedMultiplier": 1.2,
+      "enemies": [
+        {
+          "id": "soldier",
+          "weight": 2
+        },
+        {
+          "id": "sentry_drone",
+          "weight": 1
+        },
+        {
+          "id": "mine_crawler",
+          "weight": 1
+        }
+      ]
+    }
+  ],
+  "events": [
+    {
+      "atSecond": 210,
+      "enemy": "riot_mech",
+      "count": 2
+    },
+    {
+      "atSecond": 390,
+      "enemy": "war_bot",
+      "count": 3
+    },
+    {
+      "atSecond": 530,
+      "enemy": "riot_mech",
+      "count": 3
+    },
+    {
+      "atSecond": 540,
+      "enemy": "war_bot",
+      "count": 2
+    }
+  ],
+  "boss": {
+    "atSecond": 600,
+    "enemy": "steel_general"
+  },
+  "decor": {
+    "chunkSize": 256,
+    "biomeChunks": 3,
+    "biomes": [
+      {
+        "id": "parade_ground",
+        "weight": 3,
+        "patches": {
+          "perChunk": [
+            2,
+            4
+          ],
+          "items": [
+            {
+              "sprite": "decor/concrete_pad",
+              "weight": 3
+            },
+            {
+              "sprite": "decor/tracks",
+              "weight": 2
+            },
+            {
+              "sprite": "decor/scorch",
+              "weight": 1
+            }
+          ]
+        },
+        "objects": {
+          "perChunk": [
+            4,
+            8
+          ],
+          "items": [
+            {
+              "sprite": "decor/sandbags",
+              "weight": 3
+            },
+            {
+              "sprite": "decor/hedgehog",
+              "weight": 3
+            },
+            {
+              "sprite": "decor/concrete_block",
+              "weight": 2
+            },
+            {
+              "sprite": "decor/ammo_crates",
+              "weight": 2
+            },
+            {
+              "sprite": "decor/barbed_wire",
+              "weight": 3
+            }
+          ]
+        }
+      },
+      {
+        "id": "motor_pool",
+        "weight": 2,
+        "patches": {
+          "perChunk": [
+            2,
+            4
+          ],
+          "items": [
+            {
+              "sprite": "decor/tracks",
+              "weight": 3
+            },
+            {
+              "sprite": "decor/oil_puddle",
+              "weight": 2
+            },
+            {
+              "sprite": "decor/asphalt",
+              "weight": 2
+            }
+          ]
+        },
+        "objects": {
+          "perChunk": [
+            3,
+            6
+          ],
+          "items": [
+            {
+              "sprite": "decor/tank_wreck",
+              "weight": 2
+            },
+            {
+              "sprite": "decor/tires",
+              "weight": 3
+            },
+            {
+              "sprite": "decor/container",
+              "weight": 1
+            },
+            {
+              "sprite": "decor/barrel",
+              "weight": 3
+            }
+          ]
+        }
+      },
+      {
+        "id": "perimeter",
+        "weight": 3,
+        "patches": {
+          "perChunk": [
+            2,
+            4
+          ],
+          "items": [
+            {
+              "sprite": "decor/dry_grass",
+              "weight": 3
+            },
+            {
+              "sprite": "decor/crater",
+              "weight": 2
+            },
+            {
+              "sprite": "decor/scorch",
+              "weight": 2
+            }
+          ]
+        },
+        "objects": {
+          "perChunk": [
+            4,
+            8
+          ],
+          "items": [
+            {
+              "sprite": "decor/barbed_wire",
+              "weight": 4
+            },
+            {
+              "sprite": "decor/watchtower",
+              "weight": 1
+            },
+            {
+              "sprite": "decor/rocks",
+              "weight": 2
+            },
+            {
+              "sprite": "decor/dead_tree",
+              "weight": 2
+            },
+            {
+              "sprite": "decor/hedgehog",
+              "weight": 2
+            }
+          ]
+        }
+      },
+      {
+        "id": "minefield",
+        "weight": 1,
+        "patches": {
+          "perChunk": [
+            2,
+            4
+          ],
+          "items": [
+            {
+              "sprite": "decor/crater",
+              "weight": 4
+            },
+            {
+              "sprite": "decor/scorch",
+              "weight": 3
+            }
+          ]
+        },
+        "objects": {
+          "perChunk": [
+            2,
+            4
+          ],
+          "items": [
+            {
+              "sprite": "decor/hedgehog",
+              "weight": 2
+            },
+            {
+              "sprite": "decor/barbed_wire",
+              "weight": 2
+            },
+            {
+              "sprite": "decor/bones",
+              "weight": 2
+            }
+          ]
+        }
+      }
+    ],
+    "crates": {
+      "sprite": "decor/crate",
+      "hp": 10,
+      "perChunk": [
+        0,
+        1
+      ],
+      "drops": [
+        {
+          "pickup": "medkit",
+          "weight": 8
+        },
+        {
+          "pickup": "caps_stash",
+          "weight": 4
+        },
+        {
+          "pickup": "magnet",
+          "weight": 2
+        },
+        {
+          "pickup": "pulse_bomb",
+          "weight": 2
+        },
+        {
+          "pickup": "rage_shot",
+          "weight": 1
+        },
+        {
+          "pickup": "adrenaline",
+          "weight": 1
+        },
+        {
+          "pickup": "shield_cell",
+          "weight": 1
+        },
+        {
+          "pickup": "ammo_belt",
+          "weight": 1
+        },
+        {
+          "pickup": "cryo_bomb",
+          "weight": 1
+        },
+        {
+          "pickup": "data_disk",
+          "weight": 1
+        },
+        {
+          "pickup": "bullet_shield",
+          "weight": 2
+        }
+      ]
+    },
+    "structures": {
+      "chance": 0.2,
+      "items": [
+        {
+          "structure": "army_depot",
+          "weight": 3
+        },
+        {
+          "structure": "bunker_post",
+          "weight": 3
+        },
+        {
+          "structure": "helipad_ruins",
+          "weight": 2
+        },
+        {
+          "structure": "tank_graveyard",
+          "weight": 2
+        }
+      ]
+    },
+    "hazards": [
+      {
+        "sprite": "decor/scorch",
+        "radius": 14,
+        "damagePerSecond": 5,
+        "slow": 0
+      },
+      {
+        "sprite": "decor/oil_puddle",
+        "radius": 16,
+        "damagePerSecond": 0,
+        "slow": 0.3
+      },
+      {
+        "sprite": "decor/crater",
+        "radius": 16,
+        "damagePerSecond": 0,
+        "slow": 0.2
+      }
+    ]
+  }
+}

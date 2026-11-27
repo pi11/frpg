@@ -1,0 +1,118 @@
+{
+  "id": "rat_king",
+  "name": "Крысиный король",
+  "sprite": "enemies/rat_king",
+  "role": "boss",
+  "scale": 1.5,
+  "ai": {
+    "type": "boss_phases",
+    "params": {
+      "phases": [
+        {
+          "hpBelow": 1,
+          "ai": {
+            "type": "charger",
+            "params": {
+              "turnRate": 4.5,
+              "chargeRange": 230,
+              "windupMs": 600,
+              "chargeSpeed": 250,
+              "chargeMs": 750,
+              "cooldownMs": 1400
+            }
+          }
+        },
+        {
+          "hpBelow": 0.8,
+          "ai": {
+            "type": "ranged",
+            "params": {
+              "turnRate": 3.5,
+              "preferredRange": 110,
+              "fireCooldownMs": 1100,
+              "projectileSpeed": 150,
+              "projectileDamage": 20,
+              "projectileSprite": "projectiles/spit",
+              "lifetimeMs": 3000,
+              "shots": 12,
+              "spreadDegrees": 120
+            }
+          },
+          "summon": {
+            "enemy": "cave_rat",
+            "count": 20
+          }
+        },
+        {
+          "hpBelow": 0.55,
+          "ai": {
+            "type": "burrower",
+            "params": {
+              "turnRate": 3.5,
+              "surfaceMs": 3600,
+              "undergroundSpeed": 240,
+              "maxBurrowMs": 2600,
+              "emergeRange": 24,
+              "windupMs": 650,
+              "emergeRadius": 84,
+              "emergeDamage": 42
+            }
+          },
+          "summon": {
+            "enemy": "blind_digger",
+            "count": 8
+          }
+        },
+        {
+          "hpBelow": 0.35,
+          "ai": {
+            "type": "ranged",
+            "params": {
+              "turnRate": 3.5,
+              "preferredRange": 90,
+              "fireCooldownMs": 1000,
+              "projectileSpeed": 140,
+              "projectileDamage": 21,
+              "projectileSprite": "projectiles/spit",
+              "lifetimeMs": 3000,
+              "shots": 26,
+              "spreadDegrees": 345
+            }
+          },
+          "summon": {
+            "enemy": "cave_spider",
+            "count": 14
+          }
+        },
+        {
+          "hpBelow": 0.15,
+          "ai": {
+            "type": "charger",
+            "params": {
+              "turnRate": 4.5,
+              "chargeRange": 230,
+              "windupMs": 420,
+              "chargeSpeed": 320,
+              "chargeMs": 750,
+              "cooldownMs": 600
+            }
+          },
+          "summon": {
+            "enemy": "cave_rat",
+            "count": 30
+          }
+        }
+      ]
+    }
+  },
+  "stats": {
+    "hp": 40000,
+    "speed": 86,
+    "damage": 40,
+    "xp": 0
+  },
+  "drops": [],
+  "tags": [
+    "boss"
+  ]
+}

@@ -26,6 +26,19 @@ describe('achievements noticed by the client', () => {
     expect(reached('forgot_iron', { seconds: 9, end: 'death' })).toBe(false);
   });
 
+  it('location and emerald boosts', () => {
+    expect(reached('loshok', { seconds: 40, end: 'death' })).toBe(false);
+    expect(reached('loshok', { seconds: 40, end: 'death', boosts: 1 })).toBe(true);
+    expect(reached('loshok', { seconds: 61, end: 'death', boosts: 1 })).toBe(false);
+    expect(reached('shopaholic', { boosts: 3 })).toBe(false);
+    expect(reached('shopaholic', { boosts: 4 })).toBe(true);
+    expect(reached('deserter', { seconds: 10, end: 'quit' })).toBe(false);
+    expect(reached('deserter', { seconds: 10, end: 'quit', location: 'military_base' })).toBe(true);
+    expect(reached('snowman', { seconds: 60, location: 'frozen_pass' })).toBe(true);
+    expect(reached('snowman', { seconds: 60, location: 'frozen_pass', moved: true })).toBe(false);
+    expect(reached('camel', { seconds: 240, location: 'great_desert' })).toBe(true);
+  });
+
   it('boss, clicks, pauses, hazards, night and evolutions', () => {
     expect(reached('boss_blitz', { seconds: 830 })).toBe(false);
     expect(reached('boss_blitz', { seconds: 830, bossSeconds: 54 })).toBe(true);

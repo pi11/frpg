@@ -1,0 +1,13 @@
+{
+  "id": "steel_general_down",
+  "name": "Разжалован",
+  "description": "Победить Стального генерала",
+  "hidden": false,
+  "emeralds": 9,
+  "condition": {
+    "type": "metric",
+    "metric": "boss",
+    "value": 1,
+    "location": "military_base"
+  }
+}

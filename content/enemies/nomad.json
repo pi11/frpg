@@ -1,0 +1,44 @@
+{
+  "id": "nomad",
+  "name": "Кочевник",
+  "sprite": "enemies/nomad",
+  "role": "normal",
+  "ai": {
+    "type": "ranged",
+    "params": {
+      "turnRate": 4,
+      "preferredRange": 130,
+      "fireCooldownMs": 3000,
+      "projectileSpeed": 130,
+      "projectileDamage": 9,
+      "projectileSprite": "projectiles/sand",
+      "lifetimeMs": 2600,
+      "shots": 2,
+      "spreadDegrees": 14
+    }
+  },
+  "stats": {
+    "hp": 30,
+    "speed": 56,
+    "damage": 7,
+    "xp": 2
+  },
+  "drops": [
+    {
+      "item": "caps",
+      "chance": 0.06,
+      "amount": [
+        2,
+        5
+      ]
+    },
+    {
+      "item": "pickup",
+      "id": "magnet",
+      "chance": 0.003
+    }
+  ],
+  "tags": [
+    "human"
+  ]
+}

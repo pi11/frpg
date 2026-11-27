@@ -1,0 +1,52 @@
+{
+  "id": "guard_room",
+  "items": [
+    {
+      "kind": "patch",
+      "sprite": "decor/flagstones",
+      "x": 0,
+      "y": 0
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/spikes",
+      "x": -34,
+      "y": 20
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/spikes",
+      "x": 34,
+      "y": 20
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/torch",
+      "x": -20,
+      "y": -30
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/torch",
+      "x": 20,
+      "y": -30
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/barrel",
+      "x": 52,
+      "y": -14
+    },
+    {
+      "kind": "crate",
+      "x": -52,
+      "y": -10
+    },
+    {
+      "kind": "landmark",
+      "landmark": "workbench",
+      "x": 0,
+      "y": -6
+    }
+  ]
+}

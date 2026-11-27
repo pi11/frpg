@@ -1,0 +1,16 @@
+{
+  "id": "frozen_pass_x200",
+  "name": "Глобальное потепление",
+  "description": "Победить Королеву стужи на скорости ×2",
+  "hidden": false,
+  "emeralds": 19,
+  "condition": {
+    "type": "victory",
+    "speed": 200,
+    "locations": [
+      "frozen_pass"
+    ],
+    "heroes": [],
+    "every": false
+  }
+}

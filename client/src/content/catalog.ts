@@ -1,10 +1,10 @@
 import { enemyBehaviors, pickupEffects, weaponBehaviors } from '../behaviors/registry';
 import {
-  AchievementSchema, BalanceSchema, DailyTemplateSchema, EnemySchema, HeroSchema, LandmarkSchema, LocationSchema, PassiveSchema, PickupSchema,
+  AchievementSchema, BalanceSchema, BoostSchema, DailyTemplateSchema, EnemySchema, HeroSchema, LandmarkSchema, LocationSchema, PassiveSchema, PickupSchema,
   StructureSchema, UpgradeSchema, WeaponSchema,
 } from './schemas';
 import type {
-  AchievementDefinition, BalanceDefinition, DailyTemplateDefinition, EnemyDefinition, HeroDefinition, ItemUnlock, LandmarkDefinition, LocationDefinition,
+  AchievementDefinition, BalanceDefinition, BoostDefinition, DailyTemplateDefinition, EnemyDefinition, HeroDefinition, ItemUnlock, LandmarkDefinition, LocationDefinition,
   PassiveDefinition, PickupDefinition, StructureDefinition, UpgradeDefinition, WeaponDefinition,
 } from './schemas';
 
@@ -21,6 +21,7 @@ export interface Catalog {
   structures: Record<string, StructureDefinition>;
   achievements: Record<string, AchievementDefinition>;
   daily: Record<string, DailyTemplateDefinition>;
+  boosts: Record<string, BoostDefinition>;
 }
 
 const bundledFiles = import.meta.glob<unknown>('../../../content/**/*.json', {
@@ -41,6 +42,7 @@ export function validateContent(files: Record<string, unknown>): Catalog {
   const structures: Catalog['structures'] = {};
   const achievements: Catalog['achievements'] = {};
   const daily: Catalog['daily'] = {};
+  const boosts: Catalog['boosts'] = {};
   let balance: BalanceDefinition | undefined;
 
   function add<T extends { id: string }>(target: Record<string, T>, value: T, path: string): void {
@@ -68,6 +70,7 @@ export function validateContent(files: Record<string, unknown>): Catalog {
       case 'structures': add(structures, StructureSchema.parse(raw), path); break;
       case 'daily': add(daily, DailyTemplateSchema.parse(raw), path); break;
       case 'achievements': add(achievements, AchievementSchema.parse(raw), path); break;
+      case 'boosts': add(boosts, BoostSchema.parse(raw), path); break;
       default: throw new Error(`${path}: unknown content category`);
     }
   }
@@ -190,6 +193,10 @@ export function validateContent(files: Record<string, unknown>): Catalog {
   }
   for (const achievement of Object.values(achievements)) {
     const { condition } = achievement;
+    if (((condition.type === 'metric' && condition.metric === 'boss') || condition.type === 'reported')
+      && condition.location !== undefined && !locations[condition.location]) {
+      throw new Error(`achievement ${achievement.id}: unknown location ${condition.location}`);
+    }
     if (condition.type === 'metric' && condition.metric === 'boss'
       && !locations[condition.location ?? '']) {
       throw new Error(`achievement ${achievement.id}: unknown location ${condition.location}`);
@@ -272,7 +279,7 @@ export function validateContent(files: Record<string, unknown>): Catalog {
     }
   }
 
-  return { balance, heroes, weapons, passives, enemies, locations, upgrades, pickups, landmarks, structures, achievements, daily };
+  return { balance, heroes, weapons, passives, enemies, locations, upgrades, pickups, landmarks, structures, achievements, daily, boosts };
 }
 
 let cached: Catalog | undefined;

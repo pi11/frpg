@@ -1,0 +1,9 @@
+{
+  "id": "caps_bag",
+  "name": "Мешок для крышек",
+  "description": "Награда крышками за забег больше на половину (подобранные крышки не считаются)",
+  "sprite": "boosts/caps_bag",
+  "emeralds": 4,
+  "effects": [],
+  "rewardBonus": 0.5
+}

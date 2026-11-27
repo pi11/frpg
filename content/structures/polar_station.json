@@ -1,0 +1,46 @@
+{
+  "id": "polar_station",
+  "items": [
+    {
+      "kind": "patch",
+      "sprite": "decor/snow_patch",
+      "x": 0,
+      "y": 10
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/radio_mast",
+      "x": -44,
+      "y": -24
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/container",
+      "x": 24,
+      "y": -22
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/snowdrift",
+      "x": -30,
+      "y": 30
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/frozen_car",
+      "x": 40,
+      "y": 28
+    },
+    {
+      "kind": "crate",
+      "x": -60,
+      "y": 8
+    },
+    {
+      "kind": "landmark",
+      "landmark": "generator",
+      "x": 0,
+      "y": 12
+    }
+  ]
+}

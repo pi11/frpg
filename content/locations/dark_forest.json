@@ -1,0 +1,544 @@
+{
+  "id": "dark_forest",
+  "name": "Чёрный лес",
+  "description": "Глухая чаща: стаи волков-мутантов, клещи, грибы-споровики, медведи и Хозяин леса.",
+  "unlock": {
+    "type": "bossKilled",
+    "location": "military_base"
+  },
+  "rewardMultiplier": 3,
+  "emeralds": {
+    "elite": 4,
+    "boss": 9,
+    "firstBoss": 16
+  },
+  "groundSprite": "ground/forest",
+  "music": "music/forest",
+  "bossMusic": "music/boss",
+  "durationSeconds": 690,
+  "startingHero": "wanderer",
+  "waves": [
+    {
+      "atSecond": 0,
+      "spawnIntervalMs": 240,
+      "hpMultiplier": 2.35,
+      "speedMultiplier": 1,
+      "enemies": [
+        {
+          "id": "mutant_wolf",
+          "weight": 2
+        },
+        {
+          "id": "tick",
+          "weight": 1
+        }
+      ]
+    },
+    {
+      "atSecond": 45,
+      "spawnIntervalMs": 190,
+      "hpMultiplier": 2.67,
+      "speedMultiplier": 1,
+      "enemies": [
+        {
+          "id": "mutant_wolf",
+          "weight": 3
+        },
+        {
+          "id": "tick",
+          "weight": 2
+        },
+        {
+          "id": "spore_shroom",
+          "weight": 1
+        }
+      ]
+    },
+    {
+      "atSecond": 90,
+      "spawnIntervalMs": 160,
+      "hpMultiplier": 3.1,
+      "speedMultiplier": 1.05,
+      "enemies": [
+        {
+          "id": "mutant_wolf",
+          "weight": 3
+        },
+        {
+          "id": "tick",
+          "weight": 2
+        },
+        {
+          "id": "spore_shroom",
+          "weight": 1
+        },
+        {
+          "id": "rad_bat",
+          "weight": 1
+        }
+      ]
+    },
+    {
+      "atSecond": 185,
+      "spawnIntervalMs": 130,
+      "hpMultiplier": 3.85,
+      "speedMultiplier": 1.1,
+      "enemies": [
+        {
+          "id": "mutant_wolf",
+          "weight": 3
+        },
+        {
+          "id": "tick",
+          "weight": 2
+        },
+        {
+          "id": "spore_shroom",
+          "weight": 2
+        },
+        {
+          "id": "rad_bat",
+          "weight": 1
+        },
+        {
+          "id": "mutant_wolf",
+          "weight": 2,
+          "group": 3
+        }
+      ]
+    },
+    {
+      "atSecond": 275,
+      "spawnIntervalMs": 110,
+      "hpMultiplier": 4.92,
+      "speedMultiplier": 1.15,
+      "enemies": [
+        {
+          "id": "mutant_wolf",
+          "weight": 3
+        },
+        {
+          "id": "tick",
+          "weight": 2
+        },
+        {
+          "id": "spore_shroom",
+          "weight": 2
+        },
+        {
+          "id": "rad_bat",
+          "weight": 2
+        },
+        {
+          "id": "mutant_wolf",
+          "weight": 2,
+          "group": 3
+        }
+      ]
+    },
+    {
+      "atSecond": 370,
+      "spawnIntervalMs": 68,
+      "hpMultiplier": 6.42,
+      "speedMultiplier": 1.15,
+      "enemies": [
+        {
+          "id": "mutant_wolf",
+          "weight": 3
+        },
+        {
+          "id": "tick",
+          "weight": 3
+        },
+        {
+          "id": "spore_shroom",
+          "weight": 2
+        },
+        {
+          "id": "rad_bat",
+          "weight": 2
+        },
+        {
+          "id": "mutant_wolf",
+          "weight": 2,
+          "group": 4
+        }
+      ]
+    },
+    {
+      "atSecond": 460,
+      "spawnIntervalMs": 52,
+      "hpMultiplier": 9.12,
+      "speedMultiplier": 1.18,
+      "enemies": [
+        {
+          "id": "mutant_wolf",
+          "weight": 3
+        },
+        {
+          "id": "tick",
+          "weight": 3
+        },
+        {
+          "id": "spore_shroom",
+          "weight": 2
+        },
+        {
+          "id": "rad_bat",
+          "weight": 2
+        },
+        {
+          "id": "mutant_wolf",
+          "weight": 2,
+          "group": 4
+        }
+      ]
+    },
+    {
+      "atSecond": 555,
+      "spawnIntervalMs": 45,
+      "hpMultiplier": 11.04,
+      "speedMultiplier": 1.2,
+      "enemies": [
+        {
+          "id": "mutant_wolf",
+          "weight": 4
+        },
+        {
+          "id": "tick",
+          "weight": 3
+        },
+        {
+          "id": "spore_shroom",
+          "weight": 3
+        },
+        {
+          "id": "rad_bat",
+          "weight": 2
+        },
+        {
+          "id": "mutant_wolf",
+          "weight": 2,
+          "group": 5
+        }
+      ]
+    },
+    {
+      "atSecond": 600,
+      "spawnIntervalMs": 950,
+      "hpMultiplier": 11.04,
+      "speedMultiplier": 1.2,
+      "enemies": [
+        {
+          "id": "mutant_wolf",
+          "weight": 2
+        },
+        {
+          "id": "tick",
+          "weight": 1
+        },
+        {
+          "id": "spore_shroom",
+          "weight": 1
+        }
+      ]
+    }
+  ],
+  "events": [
+    {
+      "atSecond": 210,
+      "enemy": "bear",
+      "count": 1
+    },
+    {
+      "atSecond": 390,
+      "enemy": "brute",
+      "count": 2
+    },
+    {
+      "atSecond": 530,
+      "enemy": "bear",
+      "count": 2
+    },
+    {
+      "atSecond": 540,
+      "enemy": "brute",
+      "count": 1
+    }
+  ],
+  "boss": {
+    "atSecond": 600,
+    "enemy": "forest_lord"
+  },
+  "decor": {
+    "chunkSize": 256,
+    "biomeChunks": 3,
+    "biomes": [
+      {
+        "id": "pinewood",
+        "weight": 4,
+        "patches": {
+          "perChunk": [
+            2,
+            4
+          ],
+          "items": [
+            {
+              "sprite": "decor/forest_moss",
+              "weight": 3
+            },
+            {
+              "sprite": "decor/leaf_litter",
+              "weight": 2
+            }
+          ]
+        },
+        "objects": {
+          "perChunk": [
+            6,
+            10
+          ],
+          "items": [
+            {
+              "sprite": "decor/pine",
+              "weight": 6
+            },
+            {
+              "sprite": "decor/fern",
+              "weight": 3
+            },
+            {
+              "sprite": "decor/bush",
+              "weight": 2
+            },
+            {
+              "sprite": "decor/stump",
+              "weight": 1
+            }
+          ]
+        }
+      },
+      {
+        "id": "oak_glade",
+        "weight": 2,
+        "patches": {
+          "perChunk": [
+            2,
+            4
+          ],
+          "items": [
+            {
+              "sprite": "decor/leaf_litter",
+              "weight": 4
+            },
+            {
+              "sprite": "decor/forest_moss",
+              "weight": 1
+            }
+          ]
+        },
+        "objects": {
+          "perChunk": [
+            4,
+            7
+          ],
+          "items": [
+            {
+              "sprite": "decor/oak",
+              "weight": 3
+            },
+            {
+              "sprite": "decor/bush",
+              "weight": 3
+            },
+            {
+              "sprite": "decor/fallen_log",
+              "weight": 2
+            },
+            {
+              "sprite": "decor/mushrooms",
+              "weight": 2
+            }
+          ]
+        }
+      },
+      {
+        "id": "bog",
+        "weight": 2,
+        "patches": {
+          "perChunk": [
+            2,
+            4
+          ],
+          "items": [
+            {
+              "sprite": "decor/pond",
+              "weight": 3
+            },
+            {
+              "sprite": "decor/moss",
+              "weight": 2
+            },
+            {
+              "sprite": "decor/forest_moss",
+              "weight": 1
+            }
+          ]
+        },
+        "objects": {
+          "perChunk": [
+            3,
+            6
+          ],
+          "items": [
+            {
+              "sprite": "decor/reeds",
+              "weight": 4
+            },
+            {
+              "sprite": "decor/dead_tree",
+              "weight": 2
+            },
+            {
+              "sprite": "decor/mushrooms",
+              "weight": 2
+            },
+            {
+              "sprite": "decor/stump",
+              "weight": 1
+            }
+          ]
+        }
+      },
+      {
+        "id": "windfall",
+        "weight": 1,
+        "patches": {
+          "perChunk": [
+            2,
+            4
+          ],
+          "items": [
+            {
+              "sprite": "decor/leaf_litter",
+              "weight": 3
+            }
+          ]
+        },
+        "objects": {
+          "perChunk": [
+            3,
+            6
+          ],
+          "items": [
+            {
+              "sprite": "decor/fallen_log",
+              "weight": 4
+            },
+            {
+              "sprite": "decor/stump",
+              "weight": 3
+            },
+            {
+              "sprite": "decor/dead_tree",
+              "weight": 2
+            },
+            {
+              "sprite": "decor/rocks",
+              "weight": 1
+            }
+          ]
+        }
+      }
+    ],
+    "crates": {
+      "sprite": "decor/crate",
+      "hp": 10,
+      "perChunk": [
+        0,
+        1
+      ],
+      "drops": [
+        {
+          "pickup": "medkit",
+          "weight": 8
+        },
+        {
+          "pickup": "caps_stash",
+          "weight": 4
+        },
+        {
+          "pickup": "magnet",
+          "weight": 2
+        },
+        {
+          "pickup": "pulse_bomb",
+          "weight": 2
+        },
+        {
+          "pickup": "rage_shot",
+          "weight": 1
+        },
+        {
+          "pickup": "adrenaline",
+          "weight": 1
+        },
+        {
+          "pickup": "shield_cell",
+          "weight": 1
+        },
+        {
+          "pickup": "ammo_belt",
+          "weight": 1
+        },
+        {
+          "pickup": "cryo_bomb",
+          "weight": 1
+        },
+        {
+          "pickup": "data_disk",
+          "weight": 1
+        },
+        {
+          "pickup": "bullet_shield",
+          "weight": 2
+        }
+      ]
+    },
+    "structures": {
+      "chance": 0.2,
+      "items": [
+        {
+          "structure": "forest_camp",
+          "weight": 3
+        },
+        {
+          "structure": "hunter_lodge",
+          "weight": 2
+        },
+        {
+          "structure": "mushroom_ring",
+          "weight": 2
+        },
+        {
+          "structure": "old_oak",
+          "weight": 3
+        }
+      ]
+    },
+    "hazards": [
+      {
+        "sprite": "decor/pond",
+        "radius": 24,
+        "damagePerSecond": 0,
+        "slow": 0.3
+      },
+      {
+        "sprite": "decor/moss",
+        "radius": 14,
+        "damagePerSecond": 0,
+        "slow": 0.15
+      }
+    ]
+  }
+}

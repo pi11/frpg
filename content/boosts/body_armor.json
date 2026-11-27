@@ -1,0 +1,19 @@
+{
+  "id": "body_armor",
+  "name": "Армейский бронежилет",
+  "description": "Больше здоровья и брони",
+  "sprite": "boosts/body_armor",
+  "emeralds": 3,
+  "effects": [
+    {
+      "stat": "maxHp",
+      "mod": "flat",
+      "value": 50
+    },
+    {
+      "stat": "armor",
+      "mod": "flat",
+      "value": 2
+    }
+  ]
+}

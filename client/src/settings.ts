@@ -11,7 +11,7 @@ export interface Settings {
 }
 
 const STORAGE_KEY = 'wasteland.settings.v1';
-const defaults: Settings = { music: 1, sfx: 1, crt: true, autopilot: false, hubTune: 'music/shelter', runTune: 'auto' };
+const defaults: Settings = { music: 1, sfx: 1, crt: false, autopilot: false, hubTune: 'music/shelter', runTune: 'auto' };
 let current: Settings | null = null;
 const listeners = new Set<(settings: Settings) => void>();
 

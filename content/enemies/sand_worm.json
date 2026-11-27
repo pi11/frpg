@@ -1,0 +1,43 @@
+{
+  "id": "sand_worm",
+  "name": "Песчаный червь",
+  "sprite": "enemies/sand_worm",
+  "role": "normal",
+  "ai": {
+    "type": "burrower",
+    "params": {
+      "turnRate": 4,
+      "surfaceMs": 2400,
+      "undergroundSpeed": 160,
+      "maxBurrowMs": 3000,
+      "emergeRange": 24,
+      "windupMs": 600,
+      "emergeRadius": 36,
+      "emergeDamage": 17
+    }
+  },
+  "stats": {
+    "hp": 40,
+    "speed": 54,
+    "damage": 9,
+    "xp": 3
+  },
+  "drops": [
+    {
+      "item": "caps",
+      "chance": 0.04,
+      "amount": [
+        1,
+        4
+      ]
+    },
+    {
+      "item": "pickup",
+      "id": "medkit",
+      "chance": 0.006
+    }
+  ],
+  "tags": [
+    "mutant"
+  ]
+}

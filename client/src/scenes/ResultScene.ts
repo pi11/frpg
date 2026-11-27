@@ -16,6 +16,8 @@ export interface ResultData {
   runId: string;
   bossKilled: boolean;
   locationId: string;
+  /** Extra share of earned caps from one-run boosts (the server applies the same). */
+  rewardBonus?: number;
   summary: RunSummary;
 }
 
@@ -83,7 +85,7 @@ export class ResultScene extends Phaser.Scene {
       duration: summary.duration_seconds,
       kills: Object.values(summary.kills_by_type).reduce((sum, value) => sum + value, 0),
       wave: summary.wave_reached, bossKilled: summary.boss_killed, pickedCaps: summary.picked_caps,
-      multiplier: catalog.locations[this.result.locationId]?.rewardMultiplier ?? 1,
+      multiplier: (catalog.locations[this.result.locationId]?.rewardMultiplier ?? 1) * (1 + (this.result.rewardBonus ?? 0)),
     });
     this.rewardLabel.setText(`Сервер считает награду… (≈ ${estimate} крышек)`);
     this.actionLabel.setText('ПОДОЖДИТЕ…');
@@ -135,11 +137,12 @@ export class ResultScene extends Phaser.Scene {
       const head = this.add.text(-cardWidth / 2 + 38, -12, 'ДОСТИЖЕНИЕ!', textStyle(8, COLORS.warn));
       const name = this.add.text(-cardWidth / 2 + 38, 0, item?.name ?? id, textStyle(8, COLORS.bright, {
         wordWrap: { width: cardWidth - 92 } }));
-      const prize = this.add.text(cardWidth / 2 - 8, 0, item ? `+${item.emeralds}` : '', textStyle(8, COLORS.bright))
+      const prize = this.add.text(cardWidth / 2 - 22, 0, item ? `+${item.emeralds}` : '', textStyle(8, COLORS.bright))
         .setOrigin(1, 0.5);
+      const gem = this.add.image(cardWidth / 2 - 13, 0, ATLAS, 'ui/emerald').setVisible(Boolean(item));
       const shine = this.add.rectangle(-cardWidth / 2, 0, 10, 32, 0xffffff, 0.35).setAngle(18)
         .setBlendMode(Phaser.BlendModes.ADD);
-      card.add([ray, box, icon, head, name, prize, shine]);
+      card.add([ray, box, icon, head, name, prize, gem, shine]);
       this.tweens.chain({ targets: card, tweens: [
         { y, delay, duration: 380, ease: 'Back.easeOut', onStart: () => playSfx('sfx/emerald') },
         { scale: 1.06, duration: 120, yoyo: true, onComplete: () => this.burst(cx - cardWidth / 2 + 20, y, 8) },

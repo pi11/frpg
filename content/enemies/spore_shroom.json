@@ -1,0 +1,44 @@
+{
+  "id": "spore_shroom",
+  "name": "Гриб-споровик",
+  "sprite": "enemies/spore_shroom",
+  "role": "normal",
+  "ai": {
+    "type": "ranged",
+    "params": {
+      "turnRate": 4,
+      "preferredRange": 110,
+      "fireCooldownMs": 3200,
+      "projectileSpeed": 105,
+      "projectileDamage": 8,
+      "projectileSprite": "projectiles/spore",
+      "lifetimeMs": 2600,
+      "shots": 3,
+      "spreadDegrees": 30
+    }
+  },
+  "stats": {
+    "hp": 30,
+    "speed": 42,
+    "damage": 7,
+    "xp": 2
+  },
+  "drops": [
+    {
+      "item": "caps",
+      "chance": 0.04,
+      "amount": [
+        1,
+        4
+      ]
+    },
+    {
+      "item": "pickup",
+      "id": "medkit",
+      "chance": 0.006
+    }
+  ],
+  "tags": [
+    "mutant"
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "id": "team_dark_forest_x200",
+  "name": "Сборная на форсаже: Чёрный лес",
+  "description": "Победить Хозяина леса на скорости ×2 каждым героем",
+  "hidden": true,
+  "emeralds": 36,
+  "condition": {
+    "type": "victory",
+    "speed": 200,
+    "locations": [
+      "dark_forest"
+    ],
+    "heroes": [
+      "wanderer",
+      "spark",
+      "bruiser",
+      "marksman",
+      "chemist"
+    ],
+    "every": true
+  }
+}

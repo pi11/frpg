@@ -1,0 +1,44 @@
+{
+  "id": "soldier",
+  "name": "Одичавший рядовой",
+  "sprite": "enemies/soldier",
+  "role": "normal",
+  "ai": {
+    "type": "ranged",
+    "params": {
+      "turnRate": 4,
+      "preferredRange": 120,
+      "fireCooldownMs": 3000,
+      "projectileSpeed": 120,
+      "projectileDamage": 7,
+      "projectileSprite": "projectiles/slug",
+      "lifetimeMs": 2600,
+      "shots": 1,
+      "spreadDegrees": 0
+    }
+  },
+  "stats": {
+    "hp": 26,
+    "speed": 56,
+    "damage": 7,
+    "xp": 2
+  },
+  "drops": [
+    {
+      "item": "caps",
+      "chance": 0.05,
+      "amount": [
+        1,
+        4
+      ]
+    },
+    {
+      "item": "pickup",
+      "id": "bullet_shield",
+      "chance": 0.004
+    }
+  ],
+  "tags": [
+    "human"
+  ]
+}

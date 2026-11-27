@@ -1,0 +1,19 @@
+{
+  "id": "rabbit_foot",
+  "name": "Кроличья лапка",
+  "description": "Больше добычи и критических попаданий",
+  "sprite": "boosts/rabbit_foot",
+  "emeralds": 3,
+  "effects": [
+    {
+      "stat": "luck",
+      "mod": "flat",
+      "value": 0.3
+    },
+    {
+      "stat": "critChance",
+      "mod": "flat",
+      "value": 0.1
+    }
+  ]
+}

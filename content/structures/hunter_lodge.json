@@ -1,0 +1,46 @@
+{
+  "id": "hunter_lodge",
+  "items": [
+    {
+      "kind": "patch",
+      "sprite": "decor/leaf_litter",
+      "x": 0,
+      "y": 10
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/hut",
+      "x": -16,
+      "y": -20
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/fence",
+      "x": 36,
+      "y": 10
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/stump",
+      "x": 50,
+      "y": -24
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/bones",
+      "x": -46,
+      "y": 26
+    },
+    {
+      "kind": "crate",
+      "x": -54,
+      "y": -6
+    },
+    {
+      "kind": "landmark",
+      "landmark": "workbench",
+      "x": 22,
+      "y": 28
+    }
+  ]
+}

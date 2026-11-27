@@ -1,0 +1,90 @@
+{
+  "id": "ice_golem",
+  "name": "Ледяной голем",
+  "sprite": "enemies/ice_golem",
+  "role": "elite",
+  "ai": {
+    "type": "boss_phases",
+    "params": {
+      "phases": [
+        {
+          "hpBelow": 1,
+          "ai": {
+            "type": "charger",
+            "params": {
+              "turnRate": 3.5,
+              "chargeRange": 180,
+              "windupMs": 700,
+              "chargeSpeed": 210,
+              "chargeMs": 650,
+              "cooldownMs": 1900
+            }
+          }
+        },
+        {
+          "hpBelow": 0.6,
+          "ai": {
+            "type": "ranged",
+            "params": {
+              "turnRate": 3,
+              "preferredRange": 120,
+              "fireCooldownMs": 1500,
+              "projectileSpeed": 130,
+              "projectileDamage": 14,
+              "projectileSprite": "projectiles/ice_shard",
+              "lifetimeMs": 2800,
+              "shots": 12,
+              "spreadDegrees": 330
+            }
+          },
+          "summon": {
+            "enemy": "ice_beetle",
+            "count": 6
+          }
+        },
+        {
+          "hpBelow": 0.3,
+          "ai": {
+            "type": "charger",
+            "params": {
+              "turnRate": 3.5,
+              "chargeRange": 220,
+              "windupMs": 600,
+              "chargeSpeed": 260,
+              "chargeMs": 650,
+              "cooldownMs": 900
+            }
+          },
+          "summon": {
+            "enemy": "polar_wolf",
+            "count": 6
+          }
+        }
+      ]
+    }
+  },
+  "stats": {
+    "hp": 10000,
+    "speed": 54,
+    "damage": 32,
+    "xp": 80
+  },
+  "drops": [
+    {
+      "item": "pickup",
+      "id": "chest",
+      "chance": 1
+    },
+    {
+      "item": "caps",
+      "chance": 1,
+      "amount": [
+        12,
+        24
+      ]
+    }
+  ],
+  "tags": [
+    "elite"
+  ]
+}

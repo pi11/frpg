@@ -1,0 +1,14 @@
+{
+  "id": "snowman",
+  "name": "Снеговик",
+  "description": "Простоять на ледяном перевале минуту, не сдвинувшись с места",
+  "hidden": true,
+  "emeralds": 3,
+  "condition": {
+    "type": "reported",
+    "event": "noMove",
+    "value": 60,
+    "minSeconds": 60,
+    "location": "frozen_pass"
+  }
+}

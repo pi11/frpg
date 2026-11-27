@@ -1,0 +1,31 @@
+{
+  "id": "tick",
+  "name": "Лесной клещ",
+  "sprite": "enemies/tick",
+  "role": "normal",
+  "ai": {
+    "type": "chaser",
+    "params": {
+      "turnRate": 8
+    }
+  },
+  "stats": {
+    "hp": 8,
+    "speed": 90,
+    "damage": 5,
+    "xp": 1
+  },
+  "drops": [
+    {
+      "item": "caps",
+      "chance": 0.008,
+      "amount": [
+        1,
+        1
+      ]
+    }
+  ],
+  "tags": [
+    "insect"
+  ]
+}

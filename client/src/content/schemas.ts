@@ -350,12 +350,17 @@ export const AchievementSchema = z.object({
       event: z.enum(['noMove', 'finishNoMove', 'noDamage', 'singleWeapon', 'evolved', 'bossFast',
         'knocks', 'lowHp', 'exactKills', 'crates', 'frozen', 'flips', 'autoPicks', 'noKills',
         'alwaysMoving', 'landmarks', 'broke', 'bossIgnored', 'flawless', 'bossOneGun', 'noPerks',
-        'noUpgrades', 'bossLowHp', 'evolutions', 'heroClicks', 'earlyDeath', 'earlyQuit', 'autopilotTime', 'pauses', 'hazardTime', 'nightHour']),
+        'noUpgrades', 'bossLowHp', 'evolutions', 'heroClicks', 'earlyDeath', 'earlyQuit', 'autopilotTime', 'pauses', 'hazardTime', 'nightHour',
+        'boosts']),
       value: z.number().int().positive(),
       minSeconds: z.number().int().nonnegative().default(0),
       boss: z.boolean().default(false),
       autopilot: z.boolean().default(false),
       minSpeed: z.number().int().min(100).default(100),
+      /** Only in a run at this location. */
+      location: IdSchema.optional(),
+      /** Only in a run that took at least this many emerald boosts (checked by the server too). */
+      minBoosts: z.number().int().positive().optional(),
     }).strict(),
     z.object({
       type: z.literal('victory'),
@@ -370,6 +375,28 @@ export const AchievementSchema = z.object({
   ]),
 }).strict();
 export type AchievementDefinition = z.infer<typeof AchievementSchema>;
+
+/**
+ * A one-run boost bought for emeralds in the shelter. It waits in the profile and is used up
+ * when the next run starts (server/app/api/runs.py), whatever happens in that run.
+ */
+export const BoostSchema = z.object({
+  id: IdSchema,
+  name: z.string().min(1),
+  description: z.string().min(1),
+  sprite: spriteKey('boosts'),
+  emeralds: z.number().int().positive(),
+  /** Added to the hero's stats for the run, like shelter upgrades. */
+  effects: z.array(z.object({
+    stat: StatKeySchema,
+    mod: z.enum(['flat', 'percent']),
+    value: z.number(),
+  }).strict()),
+  /** Extra share of the earned caps (not the picked-up ones); the server applies it. */
+  rewardBonus: z.number().positive().max(2).optional(),
+}).strict().refine((item) => item.effects.length > 0 || item.rewardBonus !== undefined,
+  'a boost needs effects or rewardBonus');
+export type BoostDefinition = z.infer<typeof BoostSchema>;
 
 /** A daily quest template; the server picks 3-4 per day (server/app/services/daily.py). */
 export const DailyTemplateSchema = z.object({

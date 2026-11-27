@@ -1,0 +1,524 @@
+{
+  "id": "frozen_pass",
+  "name": "Ледяной перевал",
+  "description": "Заснеженное ущелье: снежные мутанты, ледяные жуки, морозные стрелки и Королева стужи.",
+  "unlock": {
+    "type": "bossKilled",
+    "location": "dungeon"
+  },
+  "rewardMultiplier": 4,
+  "emeralds": {
+    "elite": 5,
+    "boss": 11,
+    "firstBoss": 20
+  },
+  "groundSprite": "ground/snow",
+  "music": "music/winter",
+  "bossMusic": "music/boss",
+  "durationSeconds": 690,
+  "startingHero": "wanderer",
+  "waves": [
+    {
+      "atSecond": 0,
+      "spawnIntervalMs": 240,
+      "hpMultiplier": 3.3,
+      "speedMultiplier": 1,
+      "enemies": [
+        {
+          "id": "polar_wolf",
+          "weight": 2
+        },
+        {
+          "id": "ice_beetle",
+          "weight": 1
+        }
+      ]
+    },
+    {
+      "atSecond": 45,
+      "spawnIntervalMs": 190,
+      "hpMultiplier": 3.74,
+      "speedMultiplier": 1,
+      "enemies": [
+        {
+          "id": "polar_wolf",
+          "weight": 3
+        },
+        {
+          "id": "ice_beetle",
+          "weight": 2
+        },
+        {
+          "id": "frost_shooter",
+          "weight": 1
+        }
+      ]
+    },
+    {
+      "atSecond": 90,
+      "spawnIntervalMs": 160,
+      "hpMultiplier": 4.35,
+      "speedMultiplier": 1.05,
+      "enemies": [
+        {
+          "id": "polar_wolf",
+          "weight": 3
+        },
+        {
+          "id": "ice_beetle",
+          "weight": 2
+        },
+        {
+          "id": "frost_shooter",
+          "weight": 1
+        },
+        {
+          "id": "snow_beast",
+          "weight": 1
+        }
+      ]
+    },
+    {
+      "atSecond": 185,
+      "spawnIntervalMs": 130,
+      "hpMultiplier": 5.4,
+      "speedMultiplier": 1.1,
+      "enemies": [
+        {
+          "id": "polar_wolf",
+          "weight": 3
+        },
+        {
+          "id": "ice_beetle",
+          "weight": 2
+        },
+        {
+          "id": "frost_shooter",
+          "weight": 2
+        },
+        {
+          "id": "snow_beast",
+          "weight": 1
+        },
+        {
+          "id": "polar_wolf",
+          "weight": 2,
+          "group": 3
+        }
+      ]
+    },
+    {
+      "atSecond": 275,
+      "spawnIntervalMs": 110,
+      "hpMultiplier": 6.89,
+      "speedMultiplier": 1.15,
+      "enemies": [
+        {
+          "id": "polar_wolf",
+          "weight": 3
+        },
+        {
+          "id": "ice_beetle",
+          "weight": 2
+        },
+        {
+          "id": "frost_shooter",
+          "weight": 2
+        },
+        {
+          "id": "snow_beast",
+          "weight": 2
+        },
+        {
+          "id": "polar_wolf",
+          "weight": 2,
+          "group": 3
+        }
+      ]
+    },
+    {
+      "atSecond": 370,
+      "spawnIntervalMs": 68,
+      "hpMultiplier": 8.99,
+      "speedMultiplier": 1.15,
+      "enemies": [
+        {
+          "id": "polar_wolf",
+          "weight": 3
+        },
+        {
+          "id": "ice_beetle",
+          "weight": 3
+        },
+        {
+          "id": "frost_shooter",
+          "weight": 2
+        },
+        {
+          "id": "snow_beast",
+          "weight": 2
+        },
+        {
+          "id": "polar_wolf",
+          "weight": 2,
+          "group": 4
+        }
+      ]
+    },
+    {
+      "atSecond": 460,
+      "spawnIntervalMs": 52,
+      "hpMultiplier": 12.77,
+      "speedMultiplier": 1.18,
+      "enemies": [
+        {
+          "id": "polar_wolf",
+          "weight": 3
+        },
+        {
+          "id": "ice_beetle",
+          "weight": 3
+        },
+        {
+          "id": "frost_shooter",
+          "weight": 2
+        },
+        {
+          "id": "snow_beast",
+          "weight": 2
+        },
+        {
+          "id": "polar_wolf",
+          "weight": 2,
+          "group": 4
+        }
+      ]
+    },
+    {
+      "atSecond": 555,
+      "spawnIntervalMs": 45,
+      "hpMultiplier": 15.46,
+      "speedMultiplier": 1.2,
+      "enemies": [
+        {
+          "id": "polar_wolf",
+          "weight": 4
+        },
+        {
+          "id": "ice_beetle",
+          "weight": 3
+        },
+        {
+          "id": "frost_shooter",
+          "weight": 3
+        },
+        {
+          "id": "snow_beast",
+          "weight": 2
+        },
+        {
+          "id": "polar_wolf",
+          "weight": 2,
+          "group": 5
+        }
+      ]
+    },
+    {
+      "atSecond": 600,
+      "spawnIntervalMs": 950,
+      "hpMultiplier": 15.46,
+      "speedMultiplier": 1.2,
+      "enemies": [
+        {
+          "id": "polar_wolf",
+          "weight": 2
+        },
+        {
+          "id": "ice_beetle",
+          "weight": 1
+        },
+        {
+          "id": "frost_shooter",
+          "weight": 1
+        }
+      ]
+    }
+  ],
+  "events": [
+    {
+      "atSecond": 210,
+      "enemy": "ice_golem",
+      "count": 1
+    },
+    {
+      "atSecond": 390,
+      "enemy": "ice_golem",
+      "count": 1
+    },
+    {
+      "atSecond": 530,
+      "enemy": "ice_golem",
+      "count": 2
+    },
+    {
+      "atSecond": 540,
+      "enemy": "bear",
+      "count": 1
+    }
+  ],
+  "boss": {
+    "atSecond": 600,
+    "enemy": "frost_queen"
+  },
+  "decor": {
+    "chunkSize": 256,
+    "biomeChunks": 3,
+    "biomes": [
+      {
+        "id": "snowfield",
+        "weight": 3,
+        "patches": {
+          "perChunk": [
+            2,
+            4
+          ],
+          "items": [
+            {
+              "sprite": "decor/snow_patch",
+              "weight": 3
+            },
+            {
+              "sprite": "decor/ice_sheet",
+              "weight": 1
+            }
+          ]
+        },
+        "objects": {
+          "perChunk": [
+            4,
+            7
+          ],
+          "items": [
+            {
+              "sprite": "decor/snow_pine",
+              "weight": 4
+            },
+            {
+              "sprite": "decor/snowdrift",
+              "weight": 3
+            },
+            {
+              "sprite": "decor/rocks",
+              "weight": 1
+            }
+          ]
+        }
+      },
+      {
+        "id": "glacier",
+        "weight": 2,
+        "patches": {
+          "perChunk": [
+            2,
+            4
+          ],
+          "items": [
+            {
+              "sprite": "decor/ice_sheet",
+              "weight": 4
+            },
+            {
+              "sprite": "decor/frost_vent",
+              "weight": 1
+            }
+          ]
+        },
+        "objects": {
+          "perChunk": [
+            3,
+            6
+          ],
+          "items": [
+            {
+              "sprite": "decor/ice_crystal",
+              "weight": 4
+            },
+            {
+              "sprite": "decor/snowdrift",
+              "weight": 2
+            }
+          ]
+        }
+      },
+      {
+        "id": "frozen_road",
+        "weight": 2,
+        "patches": {
+          "perChunk": [
+            2,
+            4
+          ],
+          "items": [
+            {
+              "sprite": "decor/snow_patch",
+              "weight": 2
+            },
+            {
+              "sprite": "decor/road",
+              "weight": 1
+            }
+          ]
+        },
+        "objects": {
+          "perChunk": [
+            3,
+            5
+          ],
+          "items": [
+            {
+              "sprite": "decor/frozen_car",
+              "weight": 2
+            },
+            {
+              "sprite": "decor/fence",
+              "weight": 2
+            },
+            {
+              "sprite": "decor/snowdrift",
+              "weight": 2
+            },
+            {
+              "sprite": "decor/signpost",
+              "weight": 1
+            }
+          ]
+        }
+      },
+      {
+        "id": "taiga",
+        "weight": 2,
+        "patches": {
+          "perChunk": [
+            2,
+            4
+          ],
+          "items": [
+            {
+              "sprite": "decor/snow_patch",
+              "weight": 2
+            }
+          ]
+        },
+        "objects": {
+          "perChunk": [
+            6,
+            9
+          ],
+          "items": [
+            {
+              "sprite": "decor/snow_pine",
+              "weight": 6
+            },
+            {
+              "sprite": "decor/snowman",
+              "weight": 1
+            },
+            {
+              "sprite": "decor/dead_tree",
+              "weight": 1
+            }
+          ]
+        }
+      }
+    ],
+    "crates": {
+      "sprite": "decor/crate",
+      "hp": 10,
+      "perChunk": [
+        0,
+        1
+      ],
+      "drops": [
+        {
+          "pickup": "medkit",
+          "weight": 8
+        },
+        {
+          "pickup": "caps_stash",
+          "weight": 4
+        },
+        {
+          "pickup": "magnet",
+          "weight": 2
+        },
+        {
+          "pickup": "pulse_bomb",
+          "weight": 2
+        },
+        {
+          "pickup": "rage_shot",
+          "weight": 1
+        },
+        {
+          "pickup": "adrenaline",
+          "weight": 1
+        },
+        {
+          "pickup": "shield_cell",
+          "weight": 1
+        },
+        {
+          "pickup": "ammo_belt",
+          "weight": 1
+        },
+        {
+          "pickup": "cryo_bomb",
+          "weight": 1
+        },
+        {
+          "pickup": "data_disk",
+          "weight": 1
+        },
+        {
+          "pickup": "bullet_shield",
+          "weight": 2
+        }
+      ]
+    },
+    "structures": {
+      "chance": 0.2,
+      "items": [
+        {
+          "structure": "polar_station",
+          "weight": 3
+        },
+        {
+          "structure": "frozen_camp",
+          "weight": 3
+        },
+        {
+          "structure": "ice_garden",
+          "weight": 2
+        },
+        {
+          "structure": "buried_convoy",
+          "weight": 2
+        }
+      ]
+    },
+    "hazards": [
+      {
+        "sprite": "decor/ice_sheet",
+        "radius": 24,
+        "damagePerSecond": 0,
+        "slow": 0.35
+      },
+      {
+        "sprite": "decor/frost_vent",
+        "radius": 14,
+        "damagePerSecond": 7,
+        "slow": 0.2
+      }
+    ]
+  }
+}

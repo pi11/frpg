@@ -1,0 +1,14 @@
+{
+  "id": "spelunker",
+  "name": "Спелеолог",
+  "description": "Разбить 15 ящиков в подземелье за один забег",
+  "hidden": true,
+  "emeralds": 4,
+  "condition": {
+    "type": "reported",
+    "event": "crates",
+    "value": 15,
+    "minSeconds": 0,
+    "location": "dungeon"
+  }
+}

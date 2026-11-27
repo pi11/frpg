@@ -37,12 +37,18 @@ export interface RunRecord {
   bossHp: number | null;
   /** Game speed in percent. */
   speed: number;
+  /** Location of the run and how many emerald boosts it took. */
+  location: string;
+  boosts: number;
   /** Set when the run is over. */
   end: 'death' | 'survived' | 'quit' | null;
 }
 
-export function newRecord(startHour: number, knocks = 0, speed = 100): RunRecord {
+export function newRecord(
+  startHour: number, knocks = 0, speed = 100, run: { location: string; boosts: number } = { location: '', boosts: 0 },
+): RunRecord {
   return {
+    location: run.location, boosts: run.boosts,
     seconds: 0, moved: false, damaged: false, weapons: 1, evolved: false, bossSeconds: null,
     heroClicks: 0, pauses: 0, hazardMs: 0, startHour, autopilotMs: 0, end: null,
     knocks, lowestHp: Infinity, kills: 0, crates: 0, frozen: 0, flips: 0, autoPicks: 0, idleMs: 0,
@@ -61,6 +67,8 @@ export function isReached(achievement: AchievementDefinition, record: RunRecord)
   // With the autopilot only its own achievements count.
   if (condition.autopilot !== record.autopilotMs > 0) return false;
   if (condition.boss && record.bossSeconds === null) return false;
+  if (condition.location !== undefined && condition.location !== record.location) return false;
+  if (record.boosts < (condition.minBoosts ?? 0)) return false;
   const { value } = condition;
   switch (condition.event) {
     case 'noMove': return !record.moved && record.seconds >= value;
@@ -95,5 +103,6 @@ export function isReached(achievement: AchievementDefinition, record: RunRecord)
     case 'pauses': return record.pauses >= value;
     case 'hazardTime': return record.hazardMs >= value * 1000;
     case 'nightHour': return record.startHour === value;
+    case 'boosts': return record.boosts >= value;
   }
 }

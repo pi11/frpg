@@ -1,0 +1,14 @@
+{
+  "id": "partisan",
+  "name": "Партизан",
+  "description": "Продержаться в Чёрном лесу 3 минуты без единой царапины",
+  "hidden": true,
+  "emeralds": 5,
+  "condition": {
+    "type": "reported",
+    "event": "noDamage",
+    "value": 180,
+    "minSeconds": 180,
+    "location": "dark_forest"
+  }
+}

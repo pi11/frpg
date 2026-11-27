@@ -1,0 +1,52 @@
+{
+  "id": "bunker_post",
+  "items": [
+    {
+      "kind": "patch",
+      "sprite": "decor/scorch",
+      "x": 0,
+      "y": 10
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/bunker",
+      "x": 0,
+      "y": -18
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/watchtower",
+      "x": -54,
+      "y": -10
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/barbed_wire",
+      "x": -30,
+      "y": 34
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/barbed_wire",
+      "x": 30,
+      "y": 36
+    },
+    {
+      "kind": "object",
+      "sprite": "decor/hedgehog",
+      "x": 58,
+      "y": 4
+    },
+    {
+      "kind": "crate",
+      "x": 46,
+      "y": -32
+    },
+    {
+      "kind": "landmark",
+      "landmark": "generator",
+      "x": 0,
+      "y": 24
+    }
+  ]
+}

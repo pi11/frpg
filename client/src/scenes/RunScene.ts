@@ -8,7 +8,7 @@ import type {
 import { getCatalog } from '../content/catalog';
 import type { Catalog } from '../content/catalog';
 import type {
-  EnemyDefinition, HeroDefinition, LocationDefinition, PassiveDefinition, StatKey, WeaponDefinition,
+  BoostDefinition, EnemyDefinition, HeroDefinition, LocationDefinition, PassiveDefinition, StatKey, WeaponDefinition,
 } from '../content/schemas';
 import { inputState, shelterState } from '../inputState';
 import { playMusic, playSfx, playTune } from '../sound';
@@ -94,6 +94,8 @@ export interface RunData {
   achievements: string[];
   /** Game speed in percent (100, 150, 200); the server checked that it is open. */
   speed?: number;
+  /** One-run emerald boosts the server handed to this run. */
+  boosts?: string[];
 }
 
 /** Presentation constants (not balance). */
@@ -230,6 +232,8 @@ export class RunScene extends Phaser.Scene {
   private facing = 0;
   /** Free level-ups left to show at the start. */
   private headStart = 0;
+  /** Bought one-run boosts; their effects count like shelter upgrades. */
+  private boosts: BoostDefinition[] = [];
   private orbiters = new Map<string, Phaser.GameObjects.Sprite[]>();
   private auras = new Map<string, number>();
   private mobs: SpriteMob[] = [];
@@ -282,6 +286,7 @@ export class RunScene extends Phaser.Scene {
     this.weapons = new Map([[hero.startingWeapon, this.newWeaponState()]]);
     this.ownedPassives = new Map();
     this.shelterUpgrades = { ...data.upgrades };
+    this.boosts = (data.boosts ?? []).flatMap((id) => this.catalog.boosts[id] ?? []);
     this.killsByType = {};
     this.runId = data.runId;
     this.contentHash = data.contentHash;
@@ -299,7 +304,9 @@ export class RunScene extends Phaser.Scene {
     this.blasts = [];
     this.beams = [];
     this.openItems = new Set(data.openItems);
-    this.record = newRecord(new Date().getHours(), shelterState.knocks, data.speed ?? 100);
+    this.record = newRecord(new Date().getHours(), shelterState.knocks, data.speed ?? 100, {
+      location: location.id, boosts: this.boosts.length,
+    });
     shelterState.knocks = 0;
     this.record.upgrades = Object.values(data.upgrades).reduce((sum, level) => sum + level, 0);
     this.flipAt = -Infinity;
@@ -680,6 +687,13 @@ export class RunScene extends Phaser.Scene {
       if (!upgrade || upgrade.stat !== key) continue;
       if (upgrade.mod === 'flat') flat += upgrade.perLevel * level;
       else percent += upgrade.perLevel * level;
+    }
+    for (const boost of this.boosts) {
+      for (const effect of boost.effects) {
+        if (effect.stat !== key) continue;
+        if (effect.mod === 'flat') flat += effect.value;
+        else percent += effect.value;
+      }
     }
     for (const buff of this.buffs.values()) {
       if (buff.stat === key && buff.until > this.elapsedMs) flat += buff.amount;
@@ -1907,6 +1921,7 @@ export class RunScene extends Phaser.Scene {
       reason, seconds: this.view.seconds, kills: this.view.kills,
       level: this.view.level, seed: this.view.seed, runId: this.runId,
       bossKilled: this.bossKilled, locationId: this.location.id,
+      rewardBonus: this.boosts.reduce((sum, boost) => sum + (boost.rewardBonus ?? 0), 0),
       summary: {
         content_hash: this.contentHash,
         duration_seconds: this.view.seconds,
