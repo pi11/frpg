@@ -108,6 +108,8 @@ const SUMMON_RING = 36;
 const PACK_RING = 18;
 const SPLIT_RING = 10;
 const HIT_FLASH_MS = 50;
+/** Longest frame physics simulates in one go, so a hitch does not push bodies through each other. */
+const MAX_PHYSICS_DELTA_MS = 50;
 const LABEL_POOL_SIZE = 8;
 const HIT_FLASH_GAP_MS = 120;
 const REWARD_RING = 20;
@@ -344,7 +346,23 @@ export class RunScene extends Phaser.Scene {
     // A faster game: physics, timers, tweens and animations all run `speed` times quicker,
     // and update() scales its delta, so the game clock and cooldowns follow.
     const speed = this.timeScale();
-    this.physics.world.timeScale = 1 / speed;
+    // Physics steps once per rendered frame with the frame's (scaled) time: a fixed 60 Hz step
+    // with timeScale 1/speed skipped frames (every fifth at pace 0.8, more on 120-144 Hz screens)
+    // and the hero stuttered.
+    const world = this.physics.world;
+    this.physics.disableUpdate();
+    world.fixedStep = false;
+    const stepPhysics = (time: number, frameDelta: number): void => {
+      world.update(time, Math.min(frameDelta, MAX_PHYSICS_DELTA_MS) * this.timeScale());
+    };
+    this.events.on(Phaser.Scenes.Events.UPDATE, stepPhysics);
+    // The camera follows the hero after physics has moved it, on whole pixels: rounding the
+    // hero and the scroll separately made it shake by a pixel, worst on diagonals.
+    this.events.on(Phaser.Scenes.Events.POST_UPDATE, this.followHero, this);
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+      this.events.off(Phaser.Scenes.Events.UPDATE, stepPhysics);
+      this.events.off(Phaser.Scenes.Events.POST_UPDATE, this.followHero, this);
+    });
     this.time.timeScale = speed;
     this.tweens.timeScale = speed;
     this.anims.globalTimeScale = speed;
@@ -355,8 +373,8 @@ export class RunScene extends Phaser.Scene {
     this.hero = this.physics.add.sprite(0, 0, ATLAS, this.heroDefinition.sprite).setDepth(10);
     // The body stays small and sits on the feet of the taller sprite.
     (this.hero.body as Phaser.Physics.Arcade.Body).setSize(12, 14).setOffset(6, 9);
-    this.cameras.main.startFollow(this.hero, true);
     this.cameras.main.setRoundPixels(true);
+    this.followHero();
 
     const firstEnemy = Object.values(this.catalog.enemies)[0]!;
     this.enemies = this.createPool(firstEnemy.sprite, limits.enemyLimit);
@@ -593,10 +611,7 @@ export class RunScene extends Phaser.Scene {
     this.updateHazards(delta);
     if (this.finished) return;
     this.moveHero(delta);
-    const camera = this.cameras.main;
-    this.ground.tilePositionX = camera.scrollX;
-    this.ground.tilePositionY = camera.scrollY;
-    this.decor.update(camera.worldView);
+    this.decor.update(this.cameras.main.worldView);
 
     const interval = this.currentWave().spawnIntervalMs;
     this.spawnClock += delta;
@@ -671,6 +686,15 @@ export class RunScene extends Phaser.Scene {
     if (this.view.warning !== text) playSfx('sfx/warning');
     this.view.warning = text;
     this.warningUntil = this.elapsedMs + 500;
+  }
+
+  /** Centres the camera on the hero with a whole-pixel scroll; the ground tiles move with it. */
+  private followHero(): void {
+    const camera = this.cameras.main;
+    camera.setScroll(Math.round(this.hero.x) - Math.floor(camera.width / 2),
+      Math.round(this.hero.y) - Math.floor(camera.height / 2));
+    this.ground.tilePositionX = camera.scrollX;
+    this.ground.tilePositionY = camera.scrollY;
   }
 
   stat(key: StatKey): number {
