@@ -12,7 +12,7 @@ from pydantic import BaseModel
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.auth import AUTH_ERRORS, resolve_identity
+from app.api.auth import AUTH_ERRORS, note_sign_in, resolve_identity
 from app.api.errors import ApiError, ErrorCode
 from app.config import get_settings
 from app.db import get_session
@@ -105,6 +105,7 @@ async def telegram_poll(
     user = await resolve_identity(
         session, "telegram", str(challenge.telegram_user_id), challenge.user_id
     )
+    await note_sign_in(session, user.id, "telegram")
     pair = await issue_pair(session, user, request.headers.get("user-agent"))
     challenge.status = "consumed"
     await session.commit()

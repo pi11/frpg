@@ -1,0 +1,11 @@
+{
+  "id": "key_master",
+  "name": "Ключ от всех дверей",
+  "description": "Войти в аккаунт по ключу",
+  "hidden": true,
+  "emeralds": 2,
+  "condition": {
+    "type": "account",
+    "event": "key"
+  }
+}

@@ -17,6 +17,8 @@ from app.api.errors import ApiError, ErrorCode, ErrorResponse
 from app.config import get_settings
 from app.db import get_session
 from app.models.auth import AuthIdentity, LoginToken, Profile, RecoveryKey, User
+from app.services.achievements import record_account_event
+from app.services.content import get_content
 from app.services.mail import send_login_email
 from app.services.recovery import derive_key, format_key, key_digest, normalize_key
 from app.services.tokens import (
@@ -96,6 +98,21 @@ async def create_user(session: AsyncSession) -> User:
     await session.flush()
     session.add(Profile(user_id=user.id, data={}))
     return user
+
+
+async def note_sign_in(session: AsyncSession, user_id: uuid.UUID, event: str) -> None:
+    """Remembers how the player signed in, for the hidden account achievements."""
+    profile = await session.scalar(
+        select(Profile).where(Profile.user_id == user_id).with_for_update()
+        .execution_options(populate_existing=True)
+    )
+    if profile is None or event in (profile.data or {}).get("account_events", []):
+        return
+    data, _ = record_account_event(
+        get_content().category("achievements"), profile.data or {}, event,
+    )
+    profile.data = data
+    profile.version += 1
 
 
 async def resolve_identity(
@@ -212,6 +229,7 @@ async def email_verify(
             raise ApiError(401, ErrorCode.invalid_code, "Неверный код")
     challenge.used_at = utcnow()
     user = await resolve_identity(session, "email", challenge.email, challenge.user_id)
+    await note_sign_in(session, user.id, "email")
     pair = await issue_pair(session, user, request.headers.get("user-agent"))
     await session.commit()
     return pair
@@ -227,6 +245,7 @@ async def key_login(body: KeyLoginRequest, request: Request, session: SessionDep
     if user is None:
         raise ApiError(401, ErrorCode.invalid_code, "Ключ не подходит. Проверьте, нет ли опечатки")
     user.last_seen_at = utcnow()
+    await note_sign_in(session, user.id, "key")
     pair = await issue_pair(session, user, request.headers.get("user-agent"))
     await session.commit()
     return pair

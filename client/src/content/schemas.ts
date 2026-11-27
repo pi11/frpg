@@ -363,6 +363,11 @@ export const AchievementSchema = z.object({
       minBoosts: z.number().int().positive().optional(),
     }).strict(),
     z.object({
+      /** Granted by the server at sign-in: by mail, through Telegram or with the account key. */
+      type: z.literal('account'),
+      event: z.enum(['email', 'telegram', 'key']),
+    }).strict(),
+    z.object({
       type: z.literal('victory'),
       /** Boss beaten at this game speed (percent) or faster. */
       speed: z.number().int().min(100),

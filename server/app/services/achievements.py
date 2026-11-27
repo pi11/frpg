@@ -7,6 +7,8 @@ clicking the hero) cannot be seen by the server: the client names them and the s
 the limits written in content (minimum duration, boss kill, autopilot, game speed, location and
 boosts taken).
 `victory` ones read the boss wins per location, hero and speed kept in `data["wins"]`.
+`account` ones are granted by the auth endpoints: signing in by mail, Telegram or account key
+adds the event to `data["account_events"]` (see `record_account_event`).
 """
 
 from collections.abc import Collection, Mapping
@@ -72,6 +74,8 @@ def is_earned(
     condition = achievement["condition"]
     if condition["type"] == "victory":
         return has_victory(condition, data)
+    if condition["type"] == "account":
+        return condition["event"] in data.get("account_events", [])
     min_speed = int(condition.get("minSpeed", 100))
     if min_speed > 100 and (run is None or run.speed < min_speed):
         return False
@@ -109,3 +113,13 @@ def grant_achievements(
         "achievements": [*data.get("achievements", []), *earned],
         "achievements_unclaimed": [*data.get("achievements_unclaimed", []), *earned],
     }, earned
+
+
+def record_account_event(
+    achievements: Mapping[str, Mapping[str, Any]], data: Mapping[str, Any], event: str,
+) -> tuple[dict[str, Any], list[str]]:
+    """Profile data after a sign-in by mail, Telegram or account key, and new achievements."""
+    events = list(data.get("account_events", []))
+    if event not in events:
+        events.append(event)
+    return grant_achievements(achievements, {**data, "account_events": events}, None)

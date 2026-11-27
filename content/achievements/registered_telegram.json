@@ -1,0 +1,11 @@
+{
+  "id": "registered_telegram",
+  "name": "Голубиная почта",
+  "description": "Привязать к аккаунту Telegram",
+  "hidden": true,
+  "emeralds": 3,
+  "condition": {
+    "type": "account",
+    "event": "telegram"
+  }
+}

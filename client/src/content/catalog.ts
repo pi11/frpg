@@ -201,7 +201,8 @@ export function validateContent(files: Record<string, unknown>): Catalog {
       && !locations[condition.location ?? '']) {
       throw new Error(`achievement ${achievement.id}: unknown location ${condition.location}`);
     }
-    const speed = condition.type === 'victory' ? condition.speed : condition.minSpeed ?? 100;
+    const speed = condition.type === 'victory' ? condition.speed
+      : condition.type === 'account' ? 100 : condition.minSpeed ?? 100;
     if (!balance.speeds.some((item) => item.percent === speed)) {
       throw new Error(`achievement ${achievement.id}: no game speed ${speed}`);
     }

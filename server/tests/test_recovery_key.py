@@ -5,7 +5,7 @@ from uuid import UUID, uuid4
 
 import httpx
 import pytest
-from app.models.auth import RecoveryKey, User
+from app.models.auth import Profile, RecoveryKey, User
 from app.services.cleanup import cleanup
 from app.services.recovery import derive_key, format_key, normalize_key
 from app.services.tokens import utcnow
@@ -47,6 +47,15 @@ async def test_key_opens_the_same_account(api: dict[str, object]) -> None:
     login = await client.post("/api/v1/auth/key", json={"key": shown.lower()})
     assert login.status_code == 200
     assert login.json()["user_id"] == guest["user_id"] and not login.json()["is_guest"]
+    async with factory() as session:
+        profile = await session.get(Profile, UUID(guest["user_id"]))
+        assert profile is not None
+        assert (profile.data or {}).get("achievements_unclaimed") == ["key_master"]
+    # A second sign-in does not grant it again.
+    assert (await client.post("/api/v1/auth/key", json={"key": shown})).status_code == 200
+    async with factory() as session:
+        profile = await session.get(Profile, UUID(guest["user_id"]))
+        assert profile is not None and (profile.data or {}).get("achievements") == ["key_master"]
     for wrong in ("", "AAAAA-AAAAA-AAAAA-AAAAA", "hello"):
         response = await client.post("/api/v1/auth/key", json={"key": wrong})
         assert response.status_code == 401 and response.json()["code"] == "invalid_code"

@@ -1,0 +1,11 @@
+{
+  "id": "registered_email",
+  "name": "Прописка",
+  "description": "Привязать к аккаунту почту",
+  "hidden": true,
+  "emeralds": 3,
+  "condition": {
+    "type": "account",
+    "event": "email"
+  }
+}

@@ -79,6 +79,7 @@ async def test_guest_email_link_preserves_profile(api: dict[str, object]) -> Non
     async with factory() as session:
         profile = await session.get(Profile, UUID(guest["user_id"]))
         assert profile is not None and profile.caps == 123
+        assert (profile.data or {}).get("achievements_unclaimed") == ["registered_email"]
         identity = await session.scalar(select(AuthIdentity))
         assert identity is not None and identity.subject == "player@example.com"
         challenge = await session.scalar(select(LoginToken))

@@ -953,7 +953,7 @@ export class HubScene extends Phaser.Scene {
     const places = (item: AchievementDefinition): string[] => {
       const { condition } = item;
       if (condition.type === 'victory') return condition.locations;
-      return condition.location ? [condition.location] : [];
+      return 'location' in condition && condition.location ? [condition.location] : [];
     };
     const ahead = (item: AchievementDefinition): boolean => !owned.has(item.id)
       && places(item).some((place) => !profile.unlocked_locations.includes(place));

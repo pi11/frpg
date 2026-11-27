@@ -100,16 +100,19 @@ export class HudScene extends Phaser.Scene {
       leave: () => this.run.abandon(),
     });
 
-    const pauseButton = this.add.text(width - 28, 6, 'II', textStyle(8, COLORS.bright, {
+    // On a phone held upright the top line (HP and level) reaches the right edge, so pause and
+    // full screen move down to the free corner right of the weapon slots.
+    const buttonsY = portrait ? height - 33 : 4;
+    const pauseButton = this.add.text(width - 28, buttonsY + 2, 'II', textStyle(8, COLORS.bright, {
       backgroundColor: '#1d3322', padding: { x: 5, y: 4 },
     })).setInteractive({ useHandCursor: true });
     pauseButton.on('pointerdown', () => this.togglePause());
     if (fullscreenAvailable()) {
       const full = this.add.graphics().setInteractive(
-        new Phaser.Geom.Rectangle(width - 52, 4, 20, 18), Phaser.Geom.Rectangle.Contains);
+        new Phaser.Geom.Rectangle(width - 52, buttonsY, 20, 18), Phaser.Geom.Rectangle.Contains);
       const draw = (): void => {
-        full.clear().fillStyle(0x1d3322).fillRect(width - 52, 4, 20, 18).lineStyle(1, 0xe4ffd8);
-        const [l, t, r, b] = [width - 47, 8, width - 37, 18];
+        full.clear().fillStyle(0x1d3322).fillRect(width - 52, buttonsY, 20, 18).lineStyle(1, 0xe4ffd8);
+        const [l, t, r, b] = [width - 47, buttonsY + 4, width - 37, buttonsY + 14];
         const out = isFullscreen() ? -1 : 1;
         for (const [x, y, dx, dy] of [[l, t, 1, 1], [r, t, -1, 1], [l, b, 1, -1], [r, b, -1, -1]] as const) {
           const cx = out > 0 ? x : x + dx * 3;

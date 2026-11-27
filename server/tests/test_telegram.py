@@ -64,6 +64,7 @@ async def test_telegram_login_and_guest_link(
         profile = await session.get(Profile, UUID(guest["user_id"]))
         identity = await session.scalar(select(AuthIdentity))
         assert profile is not None and profile.caps == 55
+        assert (profile.data or {}).get("achievements_unclaimed") == ["registered_telegram"]
         assert identity is not None and identity.subject == "987654321"
 
 
