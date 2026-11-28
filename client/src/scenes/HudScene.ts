@@ -45,6 +45,8 @@ export class HudScene extends Phaser.Scene {
   private passiveSlots: Slot[] = [];
   private tooltip!: Tooltip;
   private toast!: Phaser.GameObjects.Text;
+  /** Contract objective and time left, under the timer. */
+  private objective!: Phaser.GameObjects.Text;
   private autopilot: Phaser.GameObjects.Text | null = null;
   private emeraldIcon!: Phaser.GameObjects.Image;
   private emeralds!: Phaser.GameObjects.Text;
@@ -74,6 +76,9 @@ export class HudScene extends Phaser.Scene {
     this.xpBar = this.add.graphics();
     this.level = this.add.text(right, 4, '', textStyle(8, COLORS.bright));
     this.timer = this.add.text(cx, top + 5, '', textStyle(16, COLORS.bright)).setOrigin(0.5, 0);
+    this.objective = this.add.text(cx, top + 24, '', textStyle(8, COLORS.warn, {
+      backgroundColor: '#08120bcc', padding: { x: 4, y: 2 }, align: 'center', wordWrap: { width: width - 24 },
+    })).setOrigin(0.5, 0).setVisible(false);
     this.stats = this.add.text(portrait ? 6 : right, portrait ? 27 : 15, '', textStyle(8, COLORS.text));
     this.fps = this.add.text(6, height - (portrait ? 92 : 48), '', textStyle(8, COLORS.dim));
     const money = portrait ? { x: right + 4, y: 19 } : { x: 350, y: 13 };
@@ -184,6 +189,8 @@ export class HudScene extends Phaser.Scene {
     this.emeraldIcon.setVisible(view.emeralds > 0);
     this.emeralds.setVisible(view.emeralds > 0);
     this.toast.setText(view.toast).setVisible(Boolean(view.toast));
+    if (this.objective.text !== view.objective) this.objective.setText(view.objective);
+    this.objective.setVisible(Boolean(view.objective));
     this.buffBars.clear();
     while (this.buffIcons.length < view.buffs.length) {
       this.buffIcons.push(this.add.image(16 + this.buffIcons.length * 22, this.buffY, ATLAS, 'ui/cap'));

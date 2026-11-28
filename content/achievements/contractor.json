@@ -1,0 +1,12 @@
+{
+  "id": "contractor",
+  "name": "Подрядчик",
+  "description": "Выполнить контракт: убить цель до конца времени",
+  "hidden": false,
+  "emeralds": 2,
+  "condition": {
+    "type": "reported",
+    "event": "contracts",
+    "value": 1
+  }
+}

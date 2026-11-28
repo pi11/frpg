@@ -378,6 +378,27 @@ export const LocationSchema = z.object({
 }).strict();
 export type LocationDefinition = z.infer<typeof LocationSchema>;
 
+/**
+ * A short contract: its own waves and mini-boss events on one location, and one objective.
+ * It never spawns the location boss and never counts as a boss win; the server checks it by
+ * the mode stored with the run.
+ */
+export const ContractSchema = z.object({
+  id: IdSchema,
+  name: z.string().min(1),
+  description: z.string().min(1),
+  location: IdSchema,
+  durationSeconds: z.number().int().positive(),
+  /** Multiplies the location's reward multiplier, so a short run does not pay more per minute. */
+  rewardMultiplier: z.number().positive().max(1),
+  /** Caps added once when the objective is done; never emeralds. */
+  completionCaps: z.number().int().nonnegative(),
+  waves: LocationSchema.shape.waves,
+  events: LocationSchema.shape.events,
+  objective: z.object({ type: z.literal('killElite'), enemy: IdSchema, atSecond: z.number().positive() }).strict(),
+}).strict();
+export type ContractDefinition = z.infer<typeof ContractSchema>;
+
 export const UpgradeSchema = z.object({
   id: IdSchema,
   name: z.string().min(1),
@@ -419,7 +440,7 @@ export const AchievementSchema = z.object({
         'knocks', 'lowHp', 'exactKills', 'crates', 'frozen', 'flips', 'autoPicks', 'noKills',
         'alwaysMoving', 'landmarks', 'broke', 'bossIgnored', 'flawless', 'bossOneGun', 'noPerks',
         'noUpgrades', 'bossLowHp', 'evolutions', 'heroClicks', 'earlyDeath', 'earlyQuit', 'autopilotTime', 'pauses', 'hazardTime', 'nightHour',
-        'boosts', 'risks', 'declines', 'fogsClean', 'turrets']),
+        'boosts', 'risks', 'declines', 'fogsClean', 'turrets', 'contracts']),
       value: z.number().int().positive(),
       minSeconds: z.number().int().nonnegative().default(0),
       boss: z.boolean().default(false),

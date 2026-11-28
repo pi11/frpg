@@ -22,6 +22,8 @@ export interface ResultData {
   /** HP taken from enemies per weapon id ('' = everything else); shown only, never sent. */
   damage?: [string, number][];
   build?: RunBuild;
+  /** A contract run: its name and whether the objective fell here (the server checks it again). */
+  contract?: { id: string; name: string; done: boolean };
   summary: RunSummary;
 }
 
@@ -57,9 +59,11 @@ export class ResultScene extends Phaser.Scene {
     // Landscape: the run and the reward on the left, the build on the right. Portrait: one column.
     const left = portrait ? cx : 124;
     const column = portrait ? width - 36 : 204;
-    const title = this.result.bossKilled ? 'ПОБЕДА!' : { death: 'ЗАБЕГ ОКОНЧЕН', survived: 'ВЫЖИЛ!', quit: 'ВОЗВРАЩЕНИЕ' }[this.result.reason];
-    this.add.text(left, portrait ? 30 : 32, title,
-      textStyle(16, this.result.reason === 'death' ? COLORS.danger : COLORS.bright)).setOrigin(0.5);
+    const contract = this.result.contract;
+    const title = contract ? (contract.done ? 'ЦЕЛЬ ВЗЯТА!' : 'ЦЕЛЬ УПУЩЕНА')
+      : this.result.bossKilled ? 'ПОБЕДА!' : { death: 'ЗАБЕГ ОКОНЧЕН', survived: 'ВЫЖИЛ!', quit: 'ВОЗВРАЩЕНИЕ' }[this.result.reason];
+    const failed = contract ? !contract.done : this.result.reason === 'death';
+    this.add.text(left, portrait ? 30 : 32, title, textStyle(16, failed ? COLORS.danger : COLORS.bright)).setOrigin(0.5);
     const minutes = Math.floor(this.result.seconds / 60).toString().padStart(2, '0');
     const seconds = (this.result.seconds % 60).toString().padStart(2, '0');
     const stats = this.add.text(left, portrait ? 48 : 52,
@@ -196,7 +200,10 @@ export class ResultScene extends Phaser.Scene {
         }\nВсего: ${response.profile.caps} крышек, ${response.profile.emeralds} изумрудов${note}${
           earned.length ? `\nДостижений: ${earned.length}, награда в убежище` : ''}`,
       );
-      this.recordLabel.setText(recordLines(response.record).join('\n'));
+      this.recordLabel.setText(response.contract
+        ? `${this.result.contract?.name ?? 'Контракт'}: ${response.contract.done
+          ? `цель выполнена, +${response.contract.bonus_caps} крышек` : 'цель не выполнена, бонуса нет'}`
+        : recordLines(response.record).join('\n'));
       const goal = nextGoal(response.profile, catalog);
       this.goalLabel.setText(goal ? `ДАЛЬШЕ: ${goal}` : '');
       this.actionLabel.setText('В УБЕЖИЩЕ');

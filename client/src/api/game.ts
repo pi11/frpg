@@ -47,6 +47,8 @@ export interface RunStart {
   content_hash: string;
   /** Bought boosts this run takes (they are gone from the profile now). */
   boosts: string[];
+  mode?: 'standard' | 'contract';
+  contract_id?: string | null;
 }
 
 export interface RunSummary {
@@ -70,6 +72,8 @@ export interface RunFinish {
   flags: string[];
   /** Accepted time and kills and the location bests before this run; null with the autopilot. */
   record?: RunRecord | null;
+  /** Contract runs only: the objective as the server checked it and the bonus it paid. */
+  contract?: { id: string; done: boolean; bonus_caps: number } | null;
   profile: Profile;
 }
 
@@ -115,9 +119,12 @@ export function claimAchievement(id: string, expectedVersion: number): Promise<P
   }, true);
 }
 
-export function startRun(locationId: string, heroId: string, speed = 100): Promise<RunStart> {
+export function startRun(locationId: string, heroId: string, speed = 100, contractId: string | null = null): Promise<RunStart> {
   return request<RunStart>('/runs/start', {
-    method: 'POST', body: JSON.stringify({ location_id: locationId, hero_id: heroId, speed }),
+    method: 'POST', body: JSON.stringify({
+      location_id: locationId, hero_id: heroId, speed,
+      ...(contractId ? { mode: 'contract', contract_id: contractId } : {}),
+    }),
   }, true);
 }
 

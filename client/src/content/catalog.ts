@@ -1,10 +1,10 @@
 import { enemyBehaviors, pickupEffects, weaponBehaviors } from '../behaviors/registry';
 import {
-  AchievementSchema, BalanceSchema, BoostSchema, DailyTemplateSchema, EnemySchema, HeroSchema, LandmarkSchema, LocationSchema, PassiveSchema, PickupSchema,
+  AchievementSchema, BalanceSchema, BoostSchema, ContractSchema, DailyTemplateSchema, EnemySchema, HeroSchema, LandmarkSchema, LocationSchema, PassiveSchema, PickupSchema,
   StructureSchema, UpgradeSchema, WeaponSchema,
 } from './schemas';
 import type {
-  AchievementDefinition, BalanceDefinition, BoostDefinition, DailyTemplateDefinition, EnemyDefinition, HeroDefinition, ItemUnlock, LandmarkDefinition, LocationDefinition,
+  AchievementDefinition, BalanceDefinition, BoostDefinition, ContractDefinition, DailyTemplateDefinition, EnemyDefinition, HeroDefinition, ItemUnlock, LandmarkDefinition, LocationDefinition,
   PassiveDefinition, PickupDefinition, StructureDefinition, UpgradeDefinition, WeaponDefinition,
 } from './schemas';
 
@@ -22,6 +22,7 @@ export interface Catalog {
   achievements: Record<string, AchievementDefinition>;
   daily: Record<string, DailyTemplateDefinition>;
   boosts: Record<string, BoostDefinition>;
+  contracts: Record<string, ContractDefinition>;
 }
 
 const bundledFiles = import.meta.glob<unknown>('../../../content/**/*.json', {
@@ -64,6 +65,7 @@ export function validateContent(files: Record<string, unknown>): Catalog {
   const achievements: Catalog['achievements'] = {};
   const daily: Catalog['daily'] = {};
   const boosts: Catalog['boosts'] = {};
+  const contracts: Catalog['contracts'] = {};
   let balance: BalanceDefinition | undefined;
 
   function add<T extends { id: string }>(target: Record<string, T>, value: T, path: string): void {
@@ -88,6 +90,7 @@ export function validateContent(files: Record<string, unknown>): Catalog {
       case 'upgrades': add(upgrades, UpgradeSchema.parse(raw), path); break;
       case 'pickups': add(pickups, PickupSchema.parse(raw), path); break;
       case 'landmarks': add(landmarks, LandmarkSchema.parse(raw), path); break;
+      case 'contracts': add(contracts, ContractSchema.parse(raw), path); break;
       case 'structures': add(structures, StructureSchema.parse(raw), path); break;
       case 'daily': add(daily, DailyTemplateSchema.parse(raw), path); break;
       case 'achievements': add(achievements, AchievementSchema.parse(raw), path); break;
@@ -312,7 +315,33 @@ export function validateContent(files: Record<string, unknown>): Catalog {
     }
   }
 
-  return { balance, heroes, weapons, passives, enemies, locations, upgrades, pickups, landmarks, structures, achievements, daily, boosts };
+  for (const contract of Object.values(contracts)) {
+    const owner = `contract ${contract.id}`;
+    if (!locations[contract.location]) throw new Error(`${owner}: unknown location ${contract.location}`);
+    if (contract.waves[0]?.atSecond !== 0) throw new Error(`${owner}: first wave must start at second 0`);
+    let previous = -1;
+    for (const wave of contract.waves) {
+      if (wave.atSecond <= previous || wave.atSecond >= contract.durationSeconds) {
+        throw new Error(`${owner}: invalid wave time ${wave.atSecond}`);
+      }
+      previous = wave.atSecond;
+      for (const entry of wave.enemies) needEnemy(`${owner} wave`, entry.id, 'normal');
+    }
+    for (const event of contract.events) {
+      needEnemy(`${owner} event`, event.enemy, 'elite');
+      if (event.atSecond >= contract.durationSeconds) throw new Error(`${owner}: event after the end`);
+    }
+    // The objective is a mini-boss, never the location boss, and it must come in time to be beaten.
+    needEnemy(`${owner} objective`, contract.objective.enemy, 'elite');
+    if (contract.objective.atSecond >= contract.durationSeconds - 10) {
+      throw new Error(`${owner}: the objective comes too late to be done`);
+    }
+  }
+
+  return {
+    balance, heroes, weapons, passives, enemies, locations, upgrades, pickups, landmarks, structures, achievements, daily, boosts,
+    contracts,
+  };
 }
 
 let cached: Catalog | undefined;

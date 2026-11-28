@@ -8,7 +8,8 @@ import { getCatalog } from '../content/catalog';
 import { orderedLocations } from '../content/locations';
 import { bundledContentHash } from '../content/hash';
 import type {
-  AchievementDefinition, BoostDefinition, HeroDefinition, PassiveDefinition, ProgressUnlock, UpgradeDefinition, WeaponDefinition,
+  AchievementDefinition, BoostDefinition, ContractDefinition, HeroDefinition, PassiveDefinition, ProgressUnlock, UpgradeDefinition,
+  WeaponDefinition,
 } from '../content/schemas';
 import { heroTraits, statBonus } from '../content/statText';
 import { ATLAS, HUB_MUSIC, TUNES } from '../assets';
@@ -97,6 +98,8 @@ function formatTime(totalSeconds: number): string {
 
 const LOCATION_KEY = 'wasteland.location.v1';
 const HERO_KEY = 'wasteland.hero.v1';
+/** '' is a full run; otherwise the id of the chosen contract. */
+const CONTRACT_KEY = 'wasteland.contract.v1';
 const SPEED_KEY = 'wasteland.speed.v1';
 
 function speedLabel(percent: number): string {
@@ -128,6 +131,7 @@ export class HubScene extends Phaser.Scene {
   /** Location chosen in the list; remembered per browser. */
   private selected = loadChoice(LOCATION_KEY);
   private hero = loadChoice(HERO_KEY);
+  private contract = loadChoice(CONTRACT_KEY);
   /** Wanted game speed in percent; lowered to what the chosen location has open. */
   private speed = Number(loadChoice(SPEED_KEY)) || 100;
   private category: UpgradeDefinition['category'] = 'survival';
@@ -166,6 +170,8 @@ export class HubScene extends Phaser.Scene {
             <div class="shelter-view" role="img" aria-label="Закат над пустошью и вход в убежище"></div>
             <button id="hub-hero" class="hub-hero" type="button"></button>
             <ul id="hub-locations" class="hub-locations"></ul>
+            <div id="hub-modes" class="hub-subtabs hub-modes" role="group" aria-label="Режим вылазки"></div>
+            <p id="hub-mode-note" class="hub-note"></p>
             <div id="hub-speeds" class="hub-subtabs hub-speeds" role="group" aria-label="Скорость игры"></div>
             <p id="hub-speed-note" class="hub-note"></p>
             <label class="hub-autopilot"><input id="hub-autopilot" type="checkbox"> <span>Автопилот: героем управляет ИИ</span></label>
@@ -354,6 +360,14 @@ export class HubScene extends Phaser.Scene {
       this.render(this.profile);
     };
     this.el('hub-hero').onclick = () => this.openTab('heroes', true);
+    this.el('hub-modes').onclick = (event) => {
+      const button = (event.target as HTMLElement).closest<HTMLButtonElement>('button[data-contract]');
+      if (!button || button.dataset.contract === undefined || !this.profile) return;
+      this.contract = button.dataset.contract;
+      saveChoice(CONTRACT_KEY, this.contract);
+      playSfx('sfx/ui_click');
+      this.render(this.profile);
+    };
     this.el('hub-speeds').onclick = (event) => {
       const button = (event.target as HTMLElement).closest<HTMLButtonElement>('button[data-speed]');
       if (!button?.dataset.speed || !this.profile) return;
@@ -670,6 +684,7 @@ export class HubScene extends Phaser.Scene {
     }).join('') + (hiddenCount
       ? `<li class="hub-more"><small>Дальше по карте ещё ${hiddenCount} ${hiddenCount === 1 ? 'место' : hiddenCount < 5 ? 'места' : 'мест'}…</small></li>` : '');
     const location = catalog.locations[this.selected];
+    this.renderModes();
     this.renderSpeeds(profile);
     this.renderHeroes(profile);
     const hero = catalog.heroes[this.hero];
@@ -1103,6 +1118,35 @@ export class HubScene extends Phaser.Scene {
     }
   }
 
+  /** Contracts of the chosen location, or none; a contract of another place falls back to a full run. */
+  private chosenContract(): ContractDefinition | null {
+    const contract = getCatalog().contracts[this.contract];
+    return contract && contract.location === this.selected ? contract : null;
+  }
+
+  /** «Полный забег / Контракт» for the chosen location, with the contract's terms under it. */
+  private renderModes(): void {
+    const catalog = getCatalog();
+    const contracts = Object.values(catalog.contracts).filter((item) => item.location === this.selected);
+    const chosen = this.chosenContract();
+    this.el('hub-modes').hidden = !contracts.length;
+    this.el('hub-mode-note').hidden = !chosen;
+    this.el('hub-modes').innerHTML = contracts.length ? [
+      `<button type="button" data-contract="" aria-pressed="${!chosen}">Полный забег</button>`,
+      ...contracts.map((item) => `<button type="button" data-contract="${escapeHtml(item.id)}"
+        aria-pressed="${chosen?.id === item.id}">Контракт: ${escapeHtml(item.name)}</button>`),
+    ].join('') : '';
+    if (chosen) {
+      const enemy = catalog.enemies[chosen.objective.enemy]?.name ?? chosen.objective.enemy;
+      const minutes = `${Math.floor(chosen.durationSeconds / 60)}:${String(chosen.durationSeconds % 60).padStart(2, '0')}`;
+      this.el('hub-mode-note').textContent = `${chosen.description} Цель: убить «${enemy}» (появится около ${
+        Math.floor(chosen.objective.atSecond / 60)}:${String(chosen.objective.atSecond % 60).padStart(2, '0')}) за ${minutes}. `
+        + `За цель +${chosen.completionCaps} крышек. Изумрудов, босса и открытия локаций в контракте нет; `
+        + 'купленные усиления расходуются при старте.';
+    }
+    this.el('hub-start').textContent = chosen ? 'Взять контракт' : 'Отправиться на вылазку';
+  }
+
   private async beginRun(): Promise<void> {
     if (!this.profile) return;
     const catalog = getCatalog();
@@ -1111,7 +1155,7 @@ export class HubScene extends Phaser.Scene {
     playSfx('sfx/ui_click');
     this.status('Открываем шлюз…');
     const [run, contentHash] = await Promise.all([
-      startRun(location.id, this.hero, this.runSpeed(this.profile)), bundledContentHash(),
+      startRun(location.id, this.hero, this.runSpeed(this.profile), this.chosenContract()?.id ?? null), bundledContentHash(),
     ]);
     if (!this.active) return;
     const params = new URLSearchParams(window.location.search);
@@ -1126,6 +1170,7 @@ export class HubScene extends Phaser.Scene {
       runId: run.run_id, contentHash, upgrades: { ...this.profile.upgrades },
       openItems: [...this.profile.open_items], achievements: [...this.profile.achievements],
       speed: this.runSpeed(this.profile), boosts: [...(run.boosts ?? [])],
+      contractId: run.mode === 'contract' ? run.contract_id ?? undefined : undefined,
     };
     this.scene.start('Run', data);
   }

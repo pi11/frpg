@@ -170,6 +170,21 @@ describe('shared content catalog', () => {
     expect(edit((choices) => { choices[2]!.id = 'risky'; })).toThrow('duplicate choice');
   });
 
+  it('checks contracts: a known location, a mini-boss objective in time, normal wave enemies', () => {
+    const path = Object.keys(rawFiles).find((item) => item.endsWith('contracts/outskirts_cleanup.json'))!;
+    type Contract = { location: string; objective: { enemy: string; atSecond: number }; waves: { enemies: { id: string }[] }[] };
+    const edit = (change: (contract: Contract) => void): (() => unknown) => {
+      const contract = structuredClone(rawFiles[path] as Contract);
+      change(contract);
+      return () => validateContent({ ...rawFiles, [path]: contract });
+    };
+    expect(edit(() => undefined)).not.toThrow();
+    expect(edit((contract) => { contract.location = 'nowhere'; })).toThrow('unknown location');
+    expect(edit((contract) => { contract.objective.enemy = 'junk_king'; })).toThrow();
+    expect(edit((contract) => { contract.objective.atSecond = 239; })).toThrow('too late');
+    expect(edit((contract) => { contract.waves[0]!.enemies[0]!.id = 'brute'; })).toThrow();
+  });
+
   it('rejects duplicate content ids', () => {
     const enemyPath = Object.keys(rawFiles).find((path) => path.endsWith('ghoul.json'));
     expect(enemyPath).toBeDefined();

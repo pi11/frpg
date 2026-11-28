@@ -48,6 +48,9 @@ class Run(Base):
     flags: Mapped[list[str]] = mapped_column(
         JSON().with_variant(ARRAY(String), "postgresql"), default=list
     )
+    #: "standard" (full run) or "contract"; finish checks the run by this, not by the client.
+    mode: Mapped[str] = mapped_column(String(16), default="standard", server_default="standard")
+    contract_id: Mapped[str | None] = mapped_column(String(80), nullable=True)
     #: One-run boosts bought for emeralds and used up when this run started.
     boosts: Mapped[list[str]] = mapped_column(
         JSON().with_variant(ARRAY(String), "postgresql"), default=list, server_default="{}",

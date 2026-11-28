@@ -8,7 +8,7 @@ import type {
 import { getCatalog } from '../content/catalog';
 import type { Catalog } from '../content/catalog';
 import type {
-  BoostDefinition, EnemyDefinition, HeroDefinition, LandmarkChoice, LocationDefinition, PassiveDefinition, StatKey,
+  BoostDefinition, ContractDefinition, EnemyDefinition, HeroDefinition, LandmarkChoice, LocationDefinition, PassiveDefinition, StatKey,
   WeaponDefinition,
 } from '../content/schemas';
 import { inputState, shelterState } from '../inputState';
@@ -58,6 +58,8 @@ export interface RunView {
   emeralds: number;
   /** Achievement banner. */
   toast: string;
+  /** Contract objective and time left for the HUD; '' in a full run. */
+  objective: string;
 }
 
 export interface UpgradeChoice {
@@ -102,6 +104,8 @@ export interface RunData {
   speed?: number;
   /** One-run emerald boosts the server handed to this run. */
   boosts?: string[];
+  /** A short contract on this location instead of the full run (the server stored the mode). */
+  contractId?: string;
 }
 
 /** Presentation constants (not balance). */
@@ -222,7 +226,7 @@ export class RunScene extends Phaser.Scene {
   readonly view: RunView = {
     speed: 1, hp: 0, maxHp: 0, xp: 0, nextXp: 0, level: 1, kills: 0, caps: 0, seconds: 0,
     wave: 1, enemyCount: 0, projectileCount: 0, seed: 0, boss: null, warning: '',
-    rerolls: 0, revives: 0, buffs: [], emeralds: 0, toast: '',
+    rerolls: 0, revives: 0, buffs: [], emeralds: 0, toast: '', objective: '',
   };
   choices: UpgradeChoice[] = [];
   chest: ChestData = { granted: [], caps: 0 };
@@ -278,6 +282,9 @@ export class RunScene extends Phaser.Scene {
   private turretField: TurretField | null = null;
   private turretSprites = new Map<string, Phaser.GameObjects.Sprite>();
   private rulePrompt!: Phaser.GameObjects.Text;
+  private contract: ContractDefinition | null = null;
+  private objectiveSpawned = false;
+  private objectiveDone = false;
   /** The place whose choice window is open (or about to be answered). */
   private landmarkOffer: ActiveLandmark | null = null;
   /** Places the player walked away from; asked again only after leaving the circle. */
@@ -327,10 +334,18 @@ export class RunScene extends Phaser.Scene {
 
   init(data: RunData): void {
     this.catalog = getCatalog();
-    const location = this.catalog.locations[data.locationId];
+    const base = this.catalog.locations[data.locationId];
     const hero = this.catalog.heroes[data.heroId];
-    if (!location || !hero) throw new Error('Unknown location or hero');
+    if (!base || !hero) throw new Error('Unknown location or hero');
+    const contract = data.contractId ? this.catalog.contracts[data.contractId] : undefined;
+    this.contract = contract && contract.location === base.id ? contract : null;
+    // A contract plays on the same map with its own, shorter schedule and no boss.
+    const location: LocationDefinition = this.contract ? {
+      ...base, durationSeconds: this.contract.durationSeconds, waves: this.contract.waves, events: this.contract.events,
+    } : base;
     this.location = location;
+    this.objectiveSpawned = false;
+    this.objectiveDone = false;
     this.heroDefinition = hero;
     this.rng = new Rng(data.seed);
     this.weapons = new Map([[hero.startingWeapon, this.newWeaponState()]]);
@@ -387,7 +402,7 @@ export class RunScene extends Phaser.Scene {
       nextXp: this.catalog.balance.xp.base, level: 1, kills: 0, caps: 0,
       seconds: Math.floor(this.elapsedMs / 1000), wave: this.waveIndex + 1,
       enemyCount: 0, projectileCount: 0, seed: data.seed, boss: null, warning: '',
-      rerolls: Math.floor(this.stat('rerolls')), revives: Math.floor(this.stat('revives')), buffs: [], emeralds: 0, toast: '',
+      rerolls: Math.floor(this.stat('rerolls')), revives: Math.floor(this.stat('revives')), buffs: [], emeralds: 0, toast: '', objective: '',
     });
     inputState.x = 0;
     inputState.y = 0;
@@ -724,6 +739,10 @@ export class RunScene extends Phaser.Scene {
         this.announceElite();
       }
     }
+    if (this.contract) {
+      this.runObjective(this.contract, seconds, warning);
+      return;
+    }
     const boss = this.location.boss;
     if (!this.bossSpawned) {
       const definition = this.catalog.enemies[boss.enemy]!;
@@ -738,6 +757,41 @@ export class RunScene extends Phaser.Scene {
         playMusic(this.location.bossMusic);
       }
     }
+  }
+
+  /** The contract's mini-boss: a warning, then it comes; the HUD line shows what is left. */
+  private runObjective(contract: ContractDefinition, seconds: number, warning: number): void {
+    const { objective } = contract;
+    const definition = this.catalog.enemies[objective.enemy]!;
+    const left = Math.max(0, Math.ceil(contract.durationSeconds - seconds));
+    const clock = `${Math.floor(left / 60)}:${String(left % 60).padStart(2, '0')}`;
+    if (!this.objectiveSpawned) {
+      const until = Math.max(0, Math.ceil(objective.atSecond - seconds));
+      this.view.objective = `ЦЕЛЬ: ${definition.name.toUpperCase()}\nПОЯВИТСЯ ЧЕРЕЗ ${until} С · ЕЩЁ ${clock}`;
+      if (seconds >= objective.atSecond - warning) this.warn('!! ЦЕЛЬ ИДЁТ !!');
+      if (seconds >= objective.atSecond) {
+        this.objectiveSpawned = true;
+        this.spawnEnemy(definition);
+        this.announceElite();
+      }
+      return;
+    }
+    this.view.objective = `ЦЕЛЬ: ${definition.name.toUpperCase()}\nУБЕЙТЕ! ЕЩЁ ${clock}`;
+  }
+
+  /** The objective fell: the contract ends at once, like a boss win. */
+  private completeContract(): void {
+    this.objectiveDone = true;
+    this.record.contracts += 1;
+    this.checkAchievements();
+    this.finished = true;
+    this.physics.pause();
+    this.hero.setVelocity(0, 0);
+    this.view.objective = '';
+    this.view.warning = 'КОНТРАКТ ВЫПОЛНЕН!';
+    this.warningUntil = Infinity;
+    playSfx('sfx/reward');
+    this.time.delayedCall(VICTORY_DELAY_MS, () => this.finish('survived'));
   }
 
   private announceElite(): void {
@@ -1071,7 +1125,7 @@ export class RunScene extends Phaser.Scene {
     this.view.kills += 1;
     const healed = this.stat('killHeal');
     if (healed > 0) this.view.hp = Math.min(this.view.maxHp, this.view.hp + healed);
-    if (definition.role !== 'normal') {
+    if (definition.role !== 'normal' && !this.contract) {
       const { elite, boss } = this.location.emeralds;
       const emeralds = definition.role === 'boss' ? boss : elite;
       this.view.emeralds += emeralds;
@@ -1085,6 +1139,9 @@ export class RunScene extends Phaser.Scene {
     this.rollDrops(definition, x, y);
     if (definition.split) this.summon(definition.split.enemy, definition.split.count, { x, y }, SPLIT_RING);
     if (definition.role === 'boss') this.winByBoss();
+    if (this.contract && this.objectiveSpawned && !this.objectiveDone && definition.id === this.contract.objective.enemy) {
+      this.completeContract();
+    }
   }
 
   private rollDrops(definition: EnemyDefinition, x: number, y: number): void {
@@ -2276,6 +2333,7 @@ export class RunScene extends Phaser.Scene {
       level: this.view.level, seed: this.view.seed, runId: this.runId,
       bossKilled: this.bossKilled, locationId: this.location.id,
       rewardBonus: this.boosts.reduce((sum, boost) => sum + (boost.rewardBonus ?? 0), 0),
+      contract: this.contract ? { id: this.contract.id, name: this.contract.name, done: this.objectiveDone } : undefined,
       damage: [...this.damageDealt],
       build: {
         weapons: [...this.weapons].map(([id, state]) => [id, state.level]),

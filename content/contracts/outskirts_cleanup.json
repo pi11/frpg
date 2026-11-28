@@ -1,0 +1,117 @@
+{
+  "id": "outskirts_cleanup",
+  "name": "Зачистка подступов",
+  "location": "shelter_outskirts",
+  "description": "Короткая вылазка: продержитесь против усиленных волн и убейте громилу, пока не вышло время.",
+  "durationSeconds": 240,
+  "rewardMultiplier": 0.7,
+  "completionCaps": 20,
+  "waves": [
+    {
+      "atSecond": 0,
+      "spawnIntervalMs": 170,
+      "hpMultiplier": 1.0,
+      "speedMultiplier": 1.0,
+      "enemies": [
+        {
+          "id": "ghoul",
+          "weight": 3
+        },
+        {
+          "id": "roach",
+          "weight": 1
+        }
+      ]
+    },
+    {
+      "atSecond": 40,
+      "spawnIntervalMs": 130,
+      "hpMultiplier": 1.2,
+      "speedMultiplier": 1.05,
+      "enemies": [
+        {
+          "id": "ghoul",
+          "weight": 3
+        },
+        {
+          "id": "roach",
+          "weight": 2
+        }
+      ]
+    },
+    {
+      "atSecond": 85,
+      "spawnIntervalMs": 105,
+      "hpMultiplier": 1.4,
+      "speedMultiplier": 1.1,
+      "enemies": [
+        {
+          "id": "ghoul",
+          "weight": 3
+        },
+        {
+          "id": "roach",
+          "weight": 2
+        },
+        {
+          "id": "scorpion",
+          "weight": 1
+        }
+      ]
+    },
+    {
+      "atSecond": 130,
+      "spawnIntervalMs": 85,
+      "hpMultiplier": 1.7,
+      "speedMultiplier": 1.12,
+      "enemies": [
+        {
+          "id": "ghoul",
+          "weight": 2
+        },
+        {
+          "id": "roach",
+          "weight": 2
+        },
+        {
+          "id": "scorpion",
+          "weight": 1
+        },
+        {
+          "id": "raider",
+          "weight": 1
+        }
+      ]
+    },
+    {
+      "atSecond": 175,
+      "spawnIntervalMs": 70,
+      "hpMultiplier": 2.0,
+      "speedMultiplier": 1.15,
+      "enemies": [
+        {
+          "id": "ghoul",
+          "weight": 2
+        },
+        {
+          "id": "roach",
+          "weight": 2
+        },
+        {
+          "id": "scorpion",
+          "weight": 1
+        },
+        {
+          "id": "raider",
+          "weight": 1
+        }
+      ]
+    }
+  ],
+  "events": [],
+  "objective": {
+    "type": "killElite",
+    "enemy": "brute",
+    "atSecond": 205
+  }
+}

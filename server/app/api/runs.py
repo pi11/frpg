@@ -46,6 +46,9 @@ class RunStartRequest(BaseModel):
     hero_id: str
     #: Game speed in percent, one of `balance.speeds`.
     speed: int = 100
+    #: A full run, or a short contract on this location (`contract_id` from content/contracts).
+    mode: Literal["standard", "contract"] = "standard"
+    contract_id: str | None = Field(default=None, max_length=80)
 
 
 class RunStartResponse(BaseModel):
@@ -54,6 +57,8 @@ class RunStartResponse(BaseModel):
     content_hash: str
     #: Bought boosts this run takes; they are gone from the profile now.
     boosts: list[str] = Field(default_factory=list)
+    mode: Literal["standard", "contract"] = "standard"
+    contract_id: str | None = None
 
 
 class RunSummary(BaseModel):
@@ -78,14 +83,24 @@ class RunRecord(BaseModel):
     previous_kills: int | None
 
 
+class ContractResult(BaseModel):
+    """How a contract ended: the objective checked by the server and the bonus caps paid."""
+
+    id: str
+    done: bool
+    bonus_caps: int
+
+
 class RunFinishResponse(BaseModel):
     status: Literal["finished"] = "finished"
     reward_caps: int
     reward_emeralds: int
     achievements: list[str]
     flags: list[str]
-    #: Personal record view; None for autopilot runs, which do not set records.
+    #: Personal record view; None for autopilot runs and contracts, which do not set records.
     record: RunRecord | None = None
+    #: Set for a contract run only.
+    contract: ContractResult | None = None
     profile: ProfileResponse
 
 
@@ -107,6 +122,16 @@ async def start_run(
         raise ApiError(403, ErrorCode.locked, "Персонаж ещё не открыт")
     if body.speed not in unlocked_speeds(content.balance["speeds"], data, body.location_id):
         raise ApiError(403, ErrorCode.locked, "Эта скорость ещё не открыта")
+    contract_id: str | None = None
+    if body.mode == "contract":
+        contract = content.category("contracts").get(body.contract_id or "")
+        if contract is None:
+            raise ApiError(404, ErrorCode.not_found, "Контракт не найден")
+        if contract["location"] != body.location_id:
+            raise ApiError(409, ErrorCode.conflict, "Этот контракт на другой локации")
+        contract_id = contract["id"]
+    elif body.contract_id is not None:
+        raise ApiError(409, ErrorCode.conflict, "Контракт выбирается только в режиме контракта")
     await session.scalar(select(User).where(User.id == user.id).with_for_update())
     now = utcnow()
     active = (await session.scalars(
@@ -131,12 +156,13 @@ async def start_run(
     run = Run(
         user_id=user.id, location_id=body.location_id, hero_id=body.hero_id, speed=body.speed,
         seed=secrets.randbits(32), content_hash=content.hash, status="started",
-        started_at=now, flags=[], boosts=boosts,
+        started_at=now, flags=[], boosts=boosts, mode=body.mode, contract_id=contract_id,
     )
     session.add(run)
     await session.commit()
     return RunStartResponse(
         run_id=run.id, seed=run.seed, content_hash=run.content_hash, boosts=boosts,
+        mode=body.mode, contract_id=contract_id,
     )
 
 
@@ -158,28 +184,38 @@ async def finish_run(
     if profile is None:
         raise ApiError(404, ErrorCode.not_found, "Профиль не найден")
     if run.status == "finished":
-        saved = ((run.summary or {}).get("accepted") or {}).get("record")
+        accepted = (run.summary or {}).get("accepted") or {}
+        saved = accepted.get("record")
+        saved_contract = accepted.get("contract")
         return RunFinishResponse(
             reward_caps=run.reward_caps or 0,
             reward_emeralds=((run.summary or {}).get("accepted") or {}).get("emeralds", 0),
             achievements=((run.summary or {}).get("accepted") or {}).get("achievements", []),
             flags=run.flags,
             record=RunRecord(**saved) if saved else None,
+            contract=ContractResult(**saved_contract) if saved_contract else None,
             profile=await profile_response(session, user, profile),
         )
 
     content = get_content()
     location = content.category("locations")[run.location_id]
+    # A contract is checked by the mode stored at start, never by what the client says now.
+    contract = (
+        content.category("contracts").get(run.contract_id or "") if run.mode == "contract" else None
+    )
+    schedule = contract or location
     known_enemies = content.category("enemies")
     rules = content.balance["reward"]
     now = utcnow()
     flags: list[str] = []
     if body.content_hash != run.content_hash or content.hash != run.content_hash:
         flags.append("content_hash_mismatch")
+    if run.mode == "contract" and contract is None:
+        flags.append("contract_missing")
     # Durations are in game seconds: they pass at the chosen speed times the base pace.
     wall_seconds = max(0.0, (now - as_utc(run.started_at)).total_seconds())
     max_duration = min(
-        location["durationSeconds"],
+        schedule["durationSeconds"],
         int(wall_seconds * run.speed / 100 * content.balance["run"]["timeScale"])
         + rules["durationGraceSeconds"],
     )
@@ -199,13 +235,14 @@ async def finish_run(
     picked_caps = min(body.picked_caps, math.floor(duration * rules["maxCapsPerSecond"]))
     if picked_caps != body.picked_caps:
         flags.append("caps_clamped")
-    maximum_wave = sum(1 for wave in location["waves"] if wave["atSecond"] <= duration)
+    maximum_wave = sum(1 for wave in schedule["waves"] if wave["atSecond"] <= duration)
     wave = min(body.wave_reached, max(1, maximum_wave))
     if wave != body.wave_reached:
         flags.append("wave_clamped")
     boss = location.get("boss")
     boss_killed = (
-        body.boss_killed and boss is not None and duration >= boss["atSecond"]
+        run.mode == "standard" and body.boss_killed and boss is not None
+        and duration >= boss["atSecond"]
         and body.kills_by_type.get(boss["enemy"], 0) >= 1
     )
     if body.boss_killed and not boss_killed:
@@ -213,21 +250,34 @@ async def finish_run(
 
     boosts = content.category("boosts")
     bonus = sum(float(boosts[item].get("rewardBonus", 0)) for item in run.boosts if item in boosts)
+    objective = contract["objective"] if contract else None
+    objective_done = bool(
+        objective and objective["enemy"] in known_enemies and duration >= objective["atSecond"]
+        and body.kills_by_type.get(objective["enemy"], 0) >= 1
+    )
+    contract_bonus = int(contract["completionCaps"]) if contract and objective_done else 0
     reward = run_reward(
         rules, duration, kills, wave, boss_killed, picked_caps,
-        float(location["rewardMultiplier"]) * (1 + bonus),
+        float(location["rewardMultiplier"]) * float(contract["rewardMultiplier"] if contract else 1)
+        * (1 + bonus),
+    ) + contract_bonus
+    # The objective counts as one more mini-boss of the schedule (for daily quests).
+    events = list(schedule["events"]) + (
+        [{"atSecond": objective["atSecond"], "enemy": objective["enemy"], "count": 1}]
+        if objective else []
     )
     data = profile.data or {}
     bosses = list(data.get("bosses_killed", []))
     marks: dict[str, list[int]] = dict(data.get("milestones", {}))
     reached = marks.get(run.location_id, [])
     rules_marks = rules["emeraldMilestones"]
-    passed = new_milestones(rules_marks, duration, reached)
+    # Contracts give no emeralds and never reach survival marks, wins or bosses.
+    passed = new_milestones(rules_marks, duration, reached) if run.mode == "standard" else []
     emeralds = emerald_reward(
         location["emeralds"], rules_marks,
         accepted_elites(location, known_enemies, body.kills_by_type, duration),
         boss_killed, run.location_id not in bosses, passed,
-    )
+    ) if run.mode == "standard" else 0
     if boss_killed and not body.autopilot:
         emeralds += speed_win_emeralds(
             content.balance["speeds"], data, run.location_id, run.speed,
@@ -249,7 +299,7 @@ async def finish_run(
             speed=run.speed, boosts=len(run.boosts),
         ),
     )
-    elites = accepted_elites(location, known_enemies, body.kills_by_type, duration)
+    elites = accepted_elites({"events": events}, known_enemies, body.kills_by_type, duration)
     if not body.autopilot:
         daily_rules = content.balance["daily"]
         day = game_day(now, daily_rules)
@@ -258,8 +308,12 @@ async def finish_run(
             "elites": elites, "picked_caps": picked_caps, "boss_killed": boss_killed,
         }, daily_rules)
     record: dict[str, int | None] | None = None
-    if not body.autopilot:
+    if not body.autopilot and run.mode == "standard":
         data, record = update_record(data, run.location_id, duration, kills)
+    contract_result = (
+        {"id": run.contract_id, "done": objective_done, "bonus_caps": contract_bonus}
+        if run.mode == "contract" and run.contract_id else None
+    )
     run.status = "finished"
     run.finished_at = now
     run.reward_caps = reward
@@ -270,7 +324,8 @@ async def finish_run(
             "duration_seconds": duration, "kills": kills, "wave_reached": wave,
             "boss_killed": boss_killed, "picked_caps": picked_caps,
             "emeralds": emeralds, "achievements": achievements, "speed": run.speed,
-            "boosts": list(run.boosts), "record": record,
+            "boosts": list(run.boosts), "record": record, "mode": run.mode,
+            "contract": contract_result,
         },
     }
     profile.caps += reward
@@ -281,5 +336,6 @@ async def finish_run(
     return RunFinishResponse(
         reward_caps=reward, reward_emeralds=emeralds, achievements=achievements, flags=flags,
         record=RunRecord(**record) if record else None,
+        contract=ContractResult(**contract_result) if contract_result else None,
         profile=await profile_response(session, user, profile),
     )

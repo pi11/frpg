@@ -66,6 +66,11 @@ describe('achievements noticed by the client', () => {
     expect(reached('fortified', { turrets: 3, location: 'military_base' })).toBe(true);
   });
 
+  it('a done contract', () => {
+    expect(reached('contractor', { contracts: 0 })).toBe(false);
+    expect(reached('contractor', { contracts: 1 })).toBe(true);
+  });
+
   it('oddities', () => {
     expect(reached('knock_knock', { knocks: 7 })).toBe(true);
     expect(reached('by_a_thread', {})).toBe(false);

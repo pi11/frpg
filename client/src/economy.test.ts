@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import vectors from '../../testdata/economy_vectors.json';
 import { bundledContentHash, contentDigest } from './content/hash';
+import { getCatalog } from './content/catalog';
 import { emeraldReward, runReward, upgradeCost } from './economy';
 
 // The same file is checked by server/tests/test_economy.py.
@@ -36,6 +37,29 @@ describe('economy formulas match the server', () => {
         Object.entries(item.files).filter((entry): entry is [string, string] => typeof entry[1] === 'string'),
       );
       expect(await contentDigest(files)).toBe(item.expected);
+    }
+  });
+});
+
+describe('contracts', () => {
+  // Same inputs as test_contract_pays_no_more_per_minute_than_the_same_minutes_of_a_full_run.
+  it('pay no more per minute than the same minutes of a full run, bonus included', () => {
+    const { balance, contracts, locations } = getCatalog();
+    for (const contract of Object.values(contracts)) {
+      const location = locations[contract.location]!;
+      const seconds = contract.durationSeconds;
+      const fullWaves = location.waves.filter((wave) => wave.atSecond <= seconds).length;
+      for (const perSecond of [0.5, 1, 2, 3, 5]) {
+        const kills = Math.floor(seconds * perSecond);
+        const short = runReward(balance.reward, {
+          duration: seconds, kills, wave: contract.waves.length, bossKilled: false, pickedCaps: 0,
+          multiplier: location.rewardMultiplier * contract.rewardMultiplier,
+        }) + contract.completionCaps;
+        const full = runReward(balance.reward, {
+          duration: seconds, kills, wave: fullWaves, bossKilled: false, pickedCaps: 0, multiplier: location.rewardMultiplier,
+        });
+        expect(short, `${contract.id} at ${perSecond}/s`).toBeLessThanOrEqual(full);
+      }
     }
   });
 });
