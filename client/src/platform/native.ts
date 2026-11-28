@@ -35,7 +35,7 @@ export function pauseRun(game: Phaser.Game): void {
 
 function handleBack(game: Phaser.Game): void {
   const manager = game.scene;
-  if (manager.isActive('LevelUp') || manager.isActive('Chest') || manager.isActive('Result')) return;
+  if (['LevelUp', 'Chest', 'Evolution', 'Landmark', 'Result'].some((key) => manager.isActive(key))) return;
   const runHud = hud(game);
   if (runHud) {
     runHud.togglePause();

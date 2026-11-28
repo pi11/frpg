@@ -208,6 +208,23 @@ export type PickupDefinition = z.infer<typeof PickupSchema>;
  * A place on the map with a one-time reward. The hero stands inside `radius` for `holdMs`
  * (and pays `caps` collected in this run); an ambush comes from the current wave.
  */
+/**
+ * One card of a landmark's choice. `caps` is paid once when it is chosen; `holdMs` 0 gives the
+ * reward at once. The rewards roll from the landmark's own list; `guaranteed` pickups come on top.
+ */
+export const LandmarkChoiceSchema = z.object({
+  id: z.enum(['careful', 'risky', 'buy']),
+  title: z.string().min(1),
+  description: z.string().min(1),
+  caps: z.number().int().nonnegative(),
+  holdMs: z.number().nonnegative(),
+  rolls: RangeSchema,
+  guaranteed: z.array(IdSchema).default([]),
+  /** Enemies from the current wave: right after the choice, or when the reward is given. */
+  ambush: z.object({ count: z.number().int().positive(), when: z.enum(['choose', 'complete']) }).strict().optional(),
+}).strict();
+export type LandmarkChoice = z.infer<typeof LandmarkChoiceSchema>;
+
 export const LandmarkSchema = z.object({
   id: IdSchema,
   name: z.string().min(1),
@@ -222,6 +239,11 @@ export const LandmarkSchema = z.object({
   rolls: RangeSchema,
   rewards: z.array(z.object({ pickup: IdSchema, weight: z.number().positive() }).strict()).min(1),
   ambush: z.object({ count: z.number().int().positive() }).strict().optional(),
+  /**
+   * Optional cards shown when the hero first steps in; they replace trigger.holdMs/caps, rolls
+   * and ambush for this place. Without them the landmark works as before.
+   */
+  choices: z.array(LandmarkChoiceSchema).min(2).max(3).optional(),
 }).strict();
 export type LandmarkDefinition = z.infer<typeof LandmarkSchema>;
 
@@ -355,7 +377,7 @@ export const AchievementSchema = z.object({
         'knocks', 'lowHp', 'exactKills', 'crates', 'frozen', 'flips', 'autoPicks', 'noKills',
         'alwaysMoving', 'landmarks', 'broke', 'bossIgnored', 'flawless', 'bossOneGun', 'noPerks',
         'noUpgrades', 'bossLowHp', 'evolutions', 'heroClicks', 'earlyDeath', 'earlyQuit', 'autopilotTime', 'pauses', 'hazardTime', 'nightHour',
-        'boosts']),
+        'boosts', 'risks', 'declines']),
       value: z.number().int().positive(),
       minSeconds: z.number().int().nonnegative().default(0),
       boss: z.boolean().default(false),

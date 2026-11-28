@@ -29,6 +29,27 @@ const bundledFiles = import.meta.glob<unknown>('../../../content/**/*.json', {
   import: 'default',
 });
 
+/**
+ * Choice cards: unique kinds, a free careful card for the autopilot, a risky card that fights
+ * before the reward, a buy card that costs caps, and known guaranteed pickups.
+ */
+function checkLandmarkChoices(landmark: LandmarkDefinition, pickups: Catalog['pickups']): void {
+  const choices = landmark.choices;
+  if (!choices) return;
+  const fail = (message: string): never => { throw new Error(`landmark ${landmark.id}: ${message}`); };
+  if (new Set(choices.map((choice) => choice.id)).size !== choices.length) fail('duplicate choice');
+  const careful = choices.find((choice) => choice.id === 'careful');
+  if (!careful || careful.caps > 0 || careful.ambush) fail('needs a free careful choice without an ambush');
+  const risky = choices.find((choice) => choice.id === 'risky');
+  if (risky && risky.ambush?.when !== 'choose') fail('the risky choice needs an ambush right after the choice');
+  const buy = choices.find((choice) => choice.id === 'buy');
+  if (buy && (buy.caps <= 0 || buy.holdMs > 0)) fail('the buy choice costs caps and pays at once');
+  for (const choice of choices) {
+    if (choice.rolls[0] > choice.rolls[1]) fail(`${choice.id}: bad rolls`);
+    for (const pickup of choice.guaranteed) if (!pickups[pickup]) fail(`${choice.id}: unknown pickup ${pickup}`);
+  }
+}
+
 export function validateContent(files: Record<string, unknown>): Catalog {
   const seen = new Set<string>();
   const heroes: Catalog['heroes'] = {};
@@ -148,6 +169,7 @@ export function validateContent(files: Record<string, unknown>): Catalog {
         throw new Error(`landmark ${landmark.id}: unknown reward ${reward.pickup}`);
       }
     }
+    checkLandmarkChoices(landmark, pickups);
   }
   for (const structure of Object.values(structures)) {
     for (const item of structure.items) {

@@ -27,6 +27,9 @@ export interface RunRecord {
   autoPicks: number;
   idleMs: number;
   landmarks: number;
+  /** Risky cards taken at landmarks, and choice windows closed without a card. */
+  risks: number;
+  declines: number;
   broke: boolean;
   bossSpawned: boolean;
   /** Most perks owned at once, evolutions taken, shelter upgrade levels at the start. */
@@ -52,7 +55,7 @@ export function newRecord(
     seconds: 0, moved: false, damaged: false, weapons: 1, evolved: false, bossSeconds: null,
     heroClicks: 0, pauses: 0, hazardMs: 0, startHour, autopilotMs: 0, end: null,
     knocks, lowestHp: Infinity, kills: 0, crates: 0, frozen: 0, flips: 0, autoPicks: 0, idleMs: 0,
-    landmarks: 0, broke: false, bossSpawned: false,
+    landmarks: 0, risks: 0, declines: 0, broke: false, bossSpawned: false,
     passives: 0, evolutions: 0, upgrades: 0, bossHp: null, speed,
   };
 }
@@ -104,5 +107,7 @@ export function isReached(achievement: AchievementDefinition, record: RunRecord)
     case 'hazardTime': return record.hazardMs >= value * 1000;
     case 'nightHour': return record.startHour === value;
     case 'boosts': return record.boosts >= value;
+    case 'risks': return record.risks >= value;
+    case 'declines': return record.declines >= value;
   }
 }

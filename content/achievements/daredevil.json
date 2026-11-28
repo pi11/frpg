@@ -1,0 +1,12 @@
+{
+  "id": "daredevil",
+  "name": "Сорвиголова",
+  "description": "Рискнуть у мест на карте 3 раза за один забег",
+  "hidden": false,
+  "emeralds": 3,
+  "condition": {
+    "type": "reported",
+    "event": "risks",
+    "value": 3
+  }
+}

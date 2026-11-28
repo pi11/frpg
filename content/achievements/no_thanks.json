@@ -1,0 +1,12 @@
+{
+  "id": "no_thanks",
+  "name": "Спасибо, не надо",
+  "description": "Уйти от выбора у мест 5 раз за один забег",
+  "hidden": true,
+  "emeralds": 2,
+  "condition": {
+    "type": "reported",
+    "event": "declines",
+    "value": 5
+  }
+}

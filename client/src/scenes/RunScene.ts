@@ -8,7 +8,8 @@ import type {
 import { getCatalog } from '../content/catalog';
 import type { Catalog } from '../content/catalog';
 import type {
-  BoostDefinition, EnemyDefinition, HeroDefinition, LocationDefinition, PassiveDefinition, StatKey, WeaponDefinition,
+  BoostDefinition, EnemyDefinition, HeroDefinition, LandmarkChoice, LocationDefinition, PassiveDefinition, StatKey,
+  WeaponDefinition,
 } from '../content/schemas';
 import { inputState, shelterState } from '../inputState';
 import { playMusic, playSfx, playTune } from '../sound';
@@ -23,6 +24,7 @@ import { COLORS, textStyle } from '../ui/theme';
 import { onLayoutChange } from '../ui/layout';
 import { evolutionChanges, levelChanges, levelStats, statBonus } from '../content/statText';
 import { WorldDecor, type ActiveLandmark } from '../systems/WorldDecor';
+import { choiceCard, type ChoiceCard } from '../systems/landmarkChoices';
 import type { ResultData } from './ResultScene';
 
 export interface RunView {
@@ -253,6 +255,10 @@ export class RunScene extends Phaser.Scene {
   private damageDealt = new Map<string, number>();
   /** Weapon whose behavior runs right now; projectiles, zones and blasts remember it. */
   private firing = '';
+  /** The place whose choice window is open (or about to be answered). */
+  private landmarkOffer: ActiveLandmark | null = null;
+  /** Places the player walked away from; asked again only after leaving the circle. */
+  private declined = new Set<string>();
   /** Evolutions waiting for their screen; shown when the level-up or chest screen closes. */
   private evolutionQueue: EvolutionOption[] = [];
   /** The evolution the Evolution scene is showing. */
@@ -340,6 +346,8 @@ export class RunScene extends Phaser.Scene {
     this.orbiters = new Map();
     this.auras = new Map();
     this.evolutionQueue = [];
+    this.landmarkOffer = null;
+    this.declined = new Set();
     this.damageDealt = new Map();
     this.firing = '';
     this.evolution = null;
@@ -1505,46 +1513,133 @@ export class RunScene extends Phaser.Scene {
       }
     }
     const nearby: ActiveLandmark[] = [];
+    let offer: ActiveLandmark | null = null;
     this.decor.eachLandmark((landmark) => {
       if (landmark.used) return;
       const distance = Math.hypot(landmark.x - this.hero.x, landmark.y - this.hero.y);
       const { trigger } = landmark.definition;
+      const hold = this.holdOf(landmark);
       if (distance <= trigger.radius) {
         nearby.push(landmark);
-        if (this.view.caps >= trigger.caps) landmark.progress += delta * (1 + this.stat('landmarkSpeed')) / trigger.holdMs;
+        // A place with cards waits for a choice; only one window opens even if two are close.
+        if (landmark.definition.choices && !landmark.choice) {
+          if (!offer && !this.declined.has(landmark.key)) offer = landmark;
+          return;
+        }
+        if (this.view.caps >= this.priceOf(landmark)) landmark.progress += delta * (1 + this.stat('landmarkSpeed')) / hold;
       } else {
-        landmark.progress = Math.max(0, landmark.progress - landmarkDecayRate * delta / trigger.holdMs);
+        this.declined.delete(landmark.key);
+        landmark.progress = Math.max(0, landmark.progress - landmarkDecayRate * delta / hold);
         if (distance <= landmarkHintRange && !view.contains(landmark.x, landmark.y)) {
           this.drawHint(hints, landmark);
         }
       }
     });
+    if (offer) {
+      this.offerLandmark(offer);
+      return;
+    }
     const closest = nearby[0];
     this.prompt.setVisible(Boolean(closest));
     if (!closest) return;
     const { definition } = closest;
-    const { caps } = definition.trigger;
+    const caps = this.priceOf(closest);
     const price = caps ? `\n${caps} крышек${this.view.caps < caps ? ' — не хватает' : ''}` : '';
-    const text = `${definition.name.toUpperCase()}\n${definition.hint}${price}`;
+    const chosen = definition.choices?.find((choice) => choice.id === closest.choice);
+    const text = `${definition.name.toUpperCase()}\n${chosen ? `${chosen.title}: удержите круг` : definition.hint}${price}`;
     if (this.prompt.text !== text) this.prompt.setText(text);
     this.prompt.setPosition(closest.x, closest.y - definition.trigger.radius - 4);
     for (const landmark of nearby) {
       // Two landmarks may finish together: the price is checked again for each.
-      if (landmark.progress >= 1 && this.view.caps >= landmark.definition.trigger.caps) {
+      if (landmark.progress >= 1 && this.view.caps >= this.priceOf(landmark)
+        && (!landmark.definition.choices || landmark.choice)) {
         this.completeLandmark(landmark);
       }
     }
   }
 
+  /** The chosen card of a place with choices; undefined for the old kind. */
+  private choiceOf(landmark: ActiveLandmark): LandmarkChoice | undefined {
+    return landmark.definition.choices?.find((choice) => choice.id === landmark.choice);
+  }
+
+  private holdOf(landmark: ActiveLandmark): number {
+    return Math.max(1, this.choiceOf(landmark)?.holdMs ?? landmark.definition.trigger.holdMs);
+  }
+
+  /** Caps paid on completion: a chosen card was paid when taken. */
+  private priceOf(landmark: ActiveLandmark): number {
+    return landmark.definition.choices ? 0 : landmark.definition.trigger.caps;
+  }
+
+  /** Stops the run and shows the cards of this place (the autopilot takes the careful one at once). */
+  private offerLandmark(landmark: ActiveLandmark): void {
+    if (this.autopilotOn) {
+      this.landmarkOffer = landmark;
+      this.answerLandmark('careful');
+      return;
+    }
+    this.landmarkOffer = landmark;
+    this.prompt.setVisible(false);
+    this.hero.setVelocity(0, 0);
+    this.scene.launch('Landmark');
+    this.scene.bringToTop('Landmark');
+    this.scene.pause();
+  }
+
+  /** Cards of the place waiting for a choice, for the Landmark scene. */
+  landmarkCards(): { name: string; cards: ChoiceCard[] } | null {
+    const landmark = this.landmarkOffer;
+    if (!landmark?.definition.choices) return null;
+    return {
+      name: landmark.definition.name,
+      cards: landmark.definition.choices.map((choice) => choiceCard(choice, this.view.caps, this.catalog.pickups)),
+    };
+  }
+
+  /**
+   * The player's answer: a card id, or null to walk away (the place stays unused until the hero
+   * leaves its circle). The price is paid and a risky ambush starts once, here; false when the
+   * card cannot be taken.
+   */
+  answerLandmark(id: LandmarkChoice['id'] | null): boolean {
+    const landmark = this.landmarkOffer;
+    if (!landmark) return false;
+    if (id === null) {
+      this.declined.add(landmark.key);
+      this.record.declines += 1;
+      this.landmarkOffer = null;
+      return true;
+    }
+    const choice = landmark.definition.choices?.find((item) => item.id === id);
+    if (!choice || choice.caps > this.view.caps || !this.decor.chooseLandmark(landmark, id)) return false;
+    this.landmarkOffer = null;
+    this.view.caps -= choice.caps;
+    if (choice.caps > 0 && this.view.caps === 0) this.record.broke = true;
+    if (id === 'risky') this.record.risks += 1;
+    if (choice.ambush?.when === 'choose') this.ambush(choice.ambush.count);
+    landmark.progress = 0;
+    if (choice.holdMs <= 0) this.completeLandmark(landmark);
+    return true;
+  }
+
+  private ambush(count: number): void {
+    this.warn('!! ЗАСАДА !!');
+    this.warningUntil = this.elapsedMs + 1200;
+    for (let index = 0; index < count; index += 1) this.spawnWaveEntry();
+  }
+
   private completeLandmark(landmark: ActiveLandmark): void {
     const { definition } = landmark;
+    const choice = this.choiceOf(landmark);
     this.decor.useLandmark(landmark);
     this.prompt.setVisible(false);
-    this.view.caps -= definition.trigger.caps;
+    const price = this.priceOf(landmark);
+    this.view.caps -= price;
     this.record.landmarks += 1;
-    if (definition.trigger.caps > 0 && this.view.caps === 0) this.record.broke = true;
+    if (price > 0 && this.view.caps === 0) this.record.broke = true;
     playSfx('sfx/landmark');
-    const [min, max] = definition.rolls;
+    const [min, max] = choice?.rolls ?? definition.rolls;
     const count = min + Math.floor(this.rng.next() * (max - min + 1));
     const total = definition.rewards.reduce((sum, reward) => sum + reward.weight, 0);
     for (let index = 0; index < count; index += 1) {
@@ -1555,11 +1650,11 @@ export class RunScene extends Phaser.Scene {
       this.spawnPickup(reward.pickup, landmark.x + Math.cos(angle) * REWARD_RING,
         landmark.y + Math.sin(angle) * REWARD_RING);
     }
-    if (definition.ambush) {
-      this.warn('!! ЗАСАДА !!');
-      this.warningUntil = this.elapsedMs + 1200;
-      for (let index = 0; index < definition.ambush.count; index += 1) this.spawnWaveEntry();
-    }
+    (choice?.guaranteed ?? []).forEach((pickup, index) => {
+      this.spawnPickup(pickup, landmark.x + (index - (choice!.guaranteed.length - 1) / 2) * 18, landmark.y - REWARD_RING);
+    });
+    const ambush = choice ? (choice.ambush?.when === 'complete' ? choice.ambush.count : 0) : definition.ambush?.count ?? 0;
+    if (ambush) this.ambush(ambush);
   }
 
   /** Arrow at the screen edge towards an off-screen landmark. */

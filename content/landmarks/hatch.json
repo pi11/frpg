@@ -1,7 +1,7 @@
 {
   "id": "hatch",
   "name": "Тайник",
-  "hint": "Открыть — будет засада",
+  "hint": "Войдите в круг и выберите, как открыть",
   "sprite": "landmarks/hatch",
   "trigger": {
     "radius": 24,
@@ -36,5 +36,47 @@
   ],
   "ambush": {
     "count": 10
-  }
+  },
+  "choices": [
+    {
+      "id": "careful",
+      "title": "Осторожно",
+      "description": "Медленно вскрыть замок без шума.",
+      "caps": 0,
+      "holdMs": 4500,
+      "rolls": [
+        2,
+        3
+      ]
+    },
+    {
+      "id": "risky",
+      "title": "Рискнуть",
+      "description": "Сорвать люк ломом — охрана прибежит.",
+      "caps": 0,
+      "holdMs": 1200,
+      "rolls": [
+        3,
+        4
+      ],
+      "guaranteed": [
+        "chest"
+      ],
+      "ambush": {
+        "count": 20,
+        "when": "choose"
+      }
+    },
+    {
+      "id": "buy",
+      "title": "Выкупить",
+      "description": "Купить код замка у торговца.",
+      "caps": 25,
+      "holdMs": 0,
+      "rolls": [
+        1,
+        2
+      ]
+    }
+  ]
 }

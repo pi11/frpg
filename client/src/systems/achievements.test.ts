@@ -52,6 +52,13 @@ describe('achievements noticed by the client', () => {
     expect(reached('evolver', { seconds: 200, evolved: true })).toBe(true);
   });
 
+  it('risky choices and walking away at landmarks', () => {
+    expect(reached('daredevil', { risks: 2 })).toBe(false);
+    expect(reached('daredevil', { risks: 3 })).toBe(true);
+    expect(reached('no_thanks', { declines: 4 })).toBe(false);
+    expect(reached('no_thanks', { declines: 5 })).toBe(true);
+  });
+
   it('oddities', () => {
     expect(reached('knock_knock', { knocks: 7 })).toBe(true);
     expect(reached('by_a_thread', {})).toBe(false);

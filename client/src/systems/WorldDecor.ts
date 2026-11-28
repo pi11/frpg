@@ -1,6 +1,6 @@
 import type * as Phaser from 'phaser';
 import { ATLAS } from '../assets';
-import type { LandmarkDefinition, LocationDefinition, StructureDefinition } from '../content/schemas';
+import type { LandmarkChoice, LandmarkDefinition, LocationDefinition, StructureDefinition } from '../content/schemas';
 import type { Catalog } from '../content/catalog';
 import { rollRange } from '../behaviors/types';
 import { Rng } from './rng';
@@ -97,6 +97,8 @@ export interface ActiveLandmark {
   readonly image: Phaser.GameObjects.Image;
   used: boolean;
   progress: number;
+  /** The card taken at a landmark with choices; kept for the whole run, also when its chunk reloads. */
+  choice: LandmarkChoice['id'] | null;
 }
 
 export interface ActiveHazard {
@@ -117,6 +119,7 @@ export class WorldDecor {
   private readonly broken = new Set<string>();
   private readonly images: Phaser.GameObjects.Image[] = [];
   private readonly used = new Set<string>();
+  private readonly chosen = new Map<string, LandmarkChoice['id']>();
   private readonly hazardsBySprite: Map<string, Decor['hazards'][number]>;
   private readonly activeLandmarks = new Map<string, ActiveLandmark[]>();
   private readonly activeHazards = new Map<string, ActiveHazard[]>();
@@ -150,6 +153,14 @@ export class WorldDecor {
       }
     }
     return { damagePerSecond, slow };
+  }
+
+  /** Fixes the card for this landmark; false when one was taken before. */
+  chooseLandmark(landmark: ActiveLandmark, choice: LandmarkChoice['id']): boolean {
+    if (this.chosen.has(landmark.key) || this.used.has(landmark.key)) return false;
+    this.chosen.set(landmark.key, choice);
+    landmark.choice = choice;
+    return true;
   }
 
   useLandmark(landmark: ActiveLandmark): void {
@@ -213,7 +224,8 @@ export class WorldDecor {
         .setDepth(item.kind === 'patch' ? -90 : -20 + item.y / 100000);
       objects.push(image);
       if (landmark) {
-        landmarks.push({ key: item.key, definition: landmark, x: item.x, y: item.y, image, used, progress: 0 });
+        landmarks.push({ key: item.key, definition: landmark, x: item.x, y: item.y, image, used, progress: 0,
+          choice: this.chosen.get(item.key) ?? null });
       }
       const hazard = item.kind === 'patch' ? this.hazardsBySprite.get(item.sprite) : undefined;
       if (hazard) hazards.push({ ...hazard, x: item.x, y: item.y });

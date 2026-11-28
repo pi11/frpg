@@ -6,6 +6,7 @@ import { AuthScene } from './scenes/AuthScene';
 import { BootScene } from './scenes/BootScene';
 import { ChestScene } from './scenes/ChestScene';
 import { EvolutionScene } from './scenes/EvolutionScene';
+import { LandmarkScene } from './scenes/LandmarkScene';
 import { HubScene } from './scenes/HubScene';
 import { HudScene } from './scenes/HudScene';
 import { LevelUpScene } from './scenes/LevelUpScene';
@@ -40,7 +41,7 @@ export const game = new Phaser.Game({
   physics: {
     default: 'arcade',
   },
-  scene: [AuthScene, BootScene, HubScene, AdminScene, RunScene, HudScene, LevelUpScene, ChestScene, EvolutionScene, ResultScene],
+  scene: [AuthScene, BootScene, HubScene, AdminScene, RunScene, HudScene, LevelUpScene, ChestScene, EvolutionScene, LandmarkScene, ResultScene],
 });
 
 setupPlatform(game);

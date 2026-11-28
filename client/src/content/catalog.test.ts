@@ -154,6 +154,22 @@ describe('shared content catalog', () => {
     expect(() => validateContent({ ...rawFiles, [enemyPath!]: enemy })).toThrow('unknown drop pickup');
   });
 
+  it('checks landmark choices: a free careful card, a risky fight first, a paid instant buy', () => {
+    const path = Object.keys(rawFiles).find((item) => item.endsWith('landmarks/generator.json'))!;
+    type Choice = { id: string; caps: number; holdMs: number; guaranteed?: string[]; ambush?: { when: string } };
+    const edit = (change: (choices: Choice[]) => void): (() => unknown) => {
+      const landmark = structuredClone(rawFiles[path] as { choices: Choice[] });
+      change(landmark.choices);
+      return () => validateContent({ ...rawFiles, [path]: landmark });
+    };
+    expect(edit(() => undefined)).not.toThrow();
+    expect(edit((choices) => { choices[0]!.caps = 5; })).toThrow('free careful choice');
+    expect(edit((choices) => { choices[1]!.ambush!.when = 'complete'; })).toThrow('ambush right after');
+    expect(edit((choices) => { choices[2]!.holdMs = 1000; })).toThrow('pays at once');
+    expect(edit((choices) => { choices[1]!.guaranteed = ['golden_gun']; })).toThrow('unknown pickup');
+    expect(edit((choices) => { choices[2]!.id = 'risky'; })).toThrow('duplicate choice');
+  });
+
   it('rejects duplicate content ids', () => {
     const enemyPath = Object.keys(rawFiles).find((path) => path.endsWith('ghoul.json'));
     expect(enemyPath).toBeDefined();

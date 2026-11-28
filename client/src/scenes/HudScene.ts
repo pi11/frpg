@@ -23,6 +23,8 @@ interface Slot {
 
 const SLOT_SIZE = 20;
 
+
+const OVERLAYS = ['LevelUp', 'Chest', 'Evolution', 'Landmark'] as const;
 export class HudScene extends Phaser.Scene {
   private run!: RunScene;
   private hpBar!: Phaser.GameObjects.Graphics;
@@ -156,7 +158,7 @@ export class HudScene extends Phaser.Scene {
     });
     // Turning the phone rebuilds the HUD; a paused run stays paused.
     onLayoutChange(this, () => this.scene.restart());
-    if (this.scene.isPaused('Run') && !this.scene.isActive('LevelUp') && !this.scene.isActive('Chest')) {
+    if (this.scene.isPaused('Run') && !this.overlayOpen()) {
       this.pausePanel.show();
     }
     new VirtualJoystick(this, () => this.scene.isActive('Run'));
@@ -250,7 +252,7 @@ export class HudScene extends Phaser.Scene {
   /** Mouse only: slots are not interactive, so a press on them still steers the hero. */
   private updateTooltip(): void {
     const pointer = this.input.activePointer;
-    if (pointer.wasTouch || this.scene.isActive('LevelUp') || this.scene.isActive('Chest')) {
+    if (pointer.wasTouch || this.overlayOpen()) {
       this.tooltip.hide();
       return;
     }
@@ -291,8 +293,13 @@ export class HudScene extends Phaser.Scene {
     this.autopilot?.setText(`[I] ИИ ${on ? 'ВКЛ' : 'ВЫКЛ'}`).setColor(on ? '#9bff6e' : COLORS.dim);
   }
 
+  /** A screen that already paused the run (level-up, chest, evolution, landmark choice). */
+  private overlayOpen(): boolean {
+    return OVERLAYS.some((key) => this.scene.isActive(key));
+  }
+
   togglePause(): void {
-    if (this.scene.isActive('LevelUp') || this.scene.isActive('Chest')) return;
+    if (this.overlayOpen()) return;
     playSfx('sfx/ui_click');
     if (this.scene.isPaused('Run')) {
       this.scene.resume('Run');
@@ -304,7 +311,7 @@ export class HudScene extends Phaser.Scene {
 
   /** Pauses the run with the panel shown (back button, app sent to background). */
   pause(): void {
-    if (this.scene.isActive('LevelUp') || this.scene.isActive('Chest')) return;
+    if (this.overlayOpen()) return;
     if (!this.scene.isActive('Run')) return;
     this.run.notePause();
     this.scene.pause('Run');

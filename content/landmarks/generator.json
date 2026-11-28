@@ -1,7 +1,7 @@
 {
   "id": "generator",
   "name": "Генератор",
-  "hint": "Запустите: удержите позицию",
+  "hint": "Войдите в круг и выберите, как запустить",
   "sprite": "landmarks/generator",
   "trigger": {
     "radius": 52,
@@ -36,5 +36,47 @@
   ],
   "ambush": {
     "count": 14
-  }
+  },
+  "choices": [
+    {
+      "id": "careful",
+      "title": "Осторожно",
+      "description": "Тихо запустить и стоять рядом.",
+      "caps": 0,
+      "holdMs": 9000,
+      "rolls": [
+        2,
+        3
+      ]
+    },
+    {
+      "id": "risky",
+      "title": "Рискнуть",
+      "description": "Шум на всю округу — толпа придёт сразу.",
+      "caps": 0,
+      "holdMs": 9000,
+      "rolls": [
+        3,
+        4
+      ],
+      "guaranteed": [
+        "chest"
+      ],
+      "ambush": {
+        "count": 26,
+        "when": "choose"
+      }
+    },
+    {
+      "id": "buy",
+      "title": "Выкупить",
+      "description": "Заплатить, чтобы запустили за вас.",
+      "caps": 40,
+      "holdMs": 0,
+      "rolls": [
+        2,
+        3
+      ]
+    }
+  ]
 }
