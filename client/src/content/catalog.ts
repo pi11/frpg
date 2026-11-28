@@ -246,6 +246,16 @@ export function validateContent(files: Record<string, unknown>): Catalog {
     throw new Error('At least one location must be open from the start');
   }
   for (const location of Object.values(locations)) {
+    const rule = location.specialRule;
+    if (rule) {
+      const placed = new Set(location.decor.structures.items.map((item) => item.structure));
+      for (const id of rule.type === 'toxicFog' ? rule.safeStructures : rule.structures.map((item) => item.structure)) {
+        if (!placed.has(id)) throw new Error(`location ${location.id}: rule structure ${id} is never placed here`);
+      }
+      if (rule.type === 'toxicFog' && rule.warningSeconds >= rule.everySeconds - rule.durationSeconds) {
+        throw new Error(`location ${location.id}: fog warning overlaps the previous fog`);
+      }
+    }
     if (heroes[location.startingHero]?.unlock.type !== 'default') {
       throw new Error(`location ${location.id}: hero ${location.startingHero} must be open`);
     }

@@ -99,6 +99,7 @@ function render(atlas: Atlas | null): void {
       location.description,
       `Награда ×${location.rewardMultiplier} · босс в ${clock(location.boss.atSecond)}: ${boss?.name ?? ''}`,
       `Как открыть: ${location.unlock.type === 'default' ? 'доступна сразу' : unlockText(location.unlock)}`,
+      ...(location.specialRule ? [`Особое правило — ${location.specialRule.name}: ${location.specialRule.description}`] : []),
     ]);
   }).join(''));
 }

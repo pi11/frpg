@@ -22,6 +22,7 @@
     "reviveBlastRadius": 140,
     "reviveBlastDamage": 80,
     "hazardTickMs": 500,
+    "maxHazardDamagePerTick": 6,
     "landmarkDecayRate": 0.5,
     "landmarkHintRange": 420,
     "maxHeavyWeapons": 2,

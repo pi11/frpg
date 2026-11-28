@@ -1,0 +1,13 @@
+{
+  "id": "fortified",
+  "name": "Глухая оборона",
+  "description": "Включить 3 турели за один забег на Военной базе",
+  "hidden": false,
+  "emeralds": 3,
+  "condition": {
+    "type": "reported",
+    "event": "turrets",
+    "value": 3,
+    "location": "military_base"
+  }
+}

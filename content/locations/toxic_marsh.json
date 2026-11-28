@@ -266,6 +266,22 @@
       "count": 1
     }
   ],
+  "specialRule": {
+    "type": "toxicFog",
+    "name": "Токсичный туман",
+    "description": "Туман жжёт вне светлых кругов у хижин, причалов и клиник.",
+    "firstAtSecond": 45,
+    "everySeconds": 70,
+    "warningSeconds": 6,
+    "durationSeconds": 12,
+    "damagePerSecond": 6,
+    "safeStructures": [
+      "fisher_hut",
+      "sunken_jetty",
+      "swamp_clinic"
+    ],
+    "safeRadius": 64
+  },
   "boss": {
     "atSecond": 600,
     "enemy": "marsh_mother"

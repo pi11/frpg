@@ -59,6 +59,13 @@ describe('achievements noticed by the client', () => {
     expect(reached('no_thanks', { declines: 5 })).toBe(true);
   });
 
+  it('fog and turrets count only at their own location', () => {
+    expect(reached('fog_dodger', { fogsClean: 3, location: 'toxic_marsh' })).toBe(true);
+    expect(reached('fog_dodger', { fogsClean: 3, location: 'dead_city' })).toBe(false);
+    expect(reached('fortified', { turrets: 2, location: 'military_base' })).toBe(false);
+    expect(reached('fortified', { turrets: 3, location: 'military_base' })).toBe(true);
+  });
+
   it('oddities', () => {
     expect(reached('knock_knock', { knocks: 7 })).toBe(true);
     expect(reached('by_a_thread', {})).toBe(false);

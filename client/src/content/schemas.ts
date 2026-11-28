@@ -260,6 +260,47 @@ export const StructureSchema = z.object({
 }).strict();
 export type StructureDefinition = z.infer<typeof StructureSchema>;
 
+/**
+ * One distinctive rule of a location (optional). Times are game seconds, so pause and the
+ * chosen speed act on them like on waves. `name` and `description` are shown in the shelter
+ * and when the run starts.
+ */
+export const SpecialRuleSchema = z.discriminatedUnion('type', [
+  z.object({
+    type: z.literal('toxicFog'),
+    name: z.string().min(1),
+    description: z.string().min(1),
+    firstAtSecond: z.number().positive(),
+    everySeconds: z.number().positive(),
+    warningSeconds: z.number().positive(),
+    durationSeconds: z.number().positive(),
+    /** Outside safe zones; reduced by radResist and capped per tick with the ground hazards. */
+    damagePerSecond: z.number().positive(),
+    /** Safe zones are circles around these structures. */
+    safeStructures: z.array(IdSchema).min(1),
+    safeRadius: z.number().positive(),
+  }).strict(),
+  z.object({
+    type: z.literal('turrets'),
+    name: z.string().min(1),
+    description: z.string().min(1),
+    /** An idle turret stands in each of these structures, this far from its centre (clear of its landmark). */
+    structures: z.array(z.object({ structure: IdSchema, x: z.number().int(), y: z.number().int() }).strict()).min(1),
+    /** Stand this long inside `radius` with `caps` run caps to switch it on (paid on switch-on). */
+    radius: z.number().positive(),
+    holdMs: z.number().positive(),
+    caps: z.number().int().nonnegative(),
+    durationSeconds: z.number().positive(),
+    range: z.number().positive(),
+    damage: z.number().positive(),
+    shotIntervalMs: z.number().positive(),
+    shotSpeed: z.number().positive(),
+    /** At most this many turrets fire at once. */
+    maxActive: z.number().int().positive(),
+  }).strict(),
+]);
+export type SpecialRule = z.infer<typeof SpecialRuleSchema>;
+
 export const LocationSchema = z.object({
   id: IdSchema,
   name: z.string().min(1),
@@ -301,6 +342,7 @@ export const LocationSchema = z.object({
     enemy: IdSchema,
     count: z.number().int().positive(),
   }).strict()),
+  specialRule: SpecialRuleSchema.optional(),
   /** Killing the boss wins the run; the server checks the time and grants the boss bonus. */
   boss: z.object({ atSecond: z.number().positive(), enemy: IdSchema }).strict(),
   bossMusic: soundKey('music'),
@@ -377,7 +419,7 @@ export const AchievementSchema = z.object({
         'knocks', 'lowHp', 'exactKills', 'crates', 'frozen', 'flips', 'autoPicks', 'noKills',
         'alwaysMoving', 'landmarks', 'broke', 'bossIgnored', 'flawless', 'bossOneGun', 'noPerks',
         'noUpgrades', 'bossLowHp', 'evolutions', 'heroClicks', 'earlyDeath', 'earlyQuit', 'autopilotTime', 'pauses', 'hazardTime', 'nightHour',
-        'boosts', 'risks', 'declines']),
+        'boosts', 'risks', 'declines', 'fogsClean', 'turrets']),
       value: z.number().int().positive(),
       minSeconds: z.number().int().nonnegative().default(0),
       boss: z.boolean().default(false),
@@ -487,6 +529,8 @@ export const BalanceSchema = z.object({
     reviveBlastRadius: z.number().positive(),
     reviveBlastDamage: z.number().positive(),
     hazardTickMs: z.number().positive(),
+    /** Upper limit of ground hazard and toxic fog damage together in one hazard tick. */
+    maxHazardDamagePerTick: z.number().positive(),
     /** How fast landmark progress is lost outside its circle (1 = as fast as it grows). */
     landmarkDecayRate: z.number().nonnegative(),
     /** Off-screen landmarks closer than this get an arrow at the screen edge. */

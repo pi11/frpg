@@ -665,7 +665,8 @@ export class HubScene extends Phaser.Scene {
       return `<li><button type="button" data-location="${escapeHtml(location.id)}"
         class="${chosen ? 'hub-location-chosen' : ''}" ${open ? '' : 'disabled'} aria-pressed="${chosen}">
         <strong>${escapeHtml(location.name)}</strong> <span class="hub-level">награда ×${location.rewardMultiplier}${beaten}</span>
-        <small>${escapeHtml(open ? location.description : lock)}</small></button></li>`;
+        <small>${escapeHtml(open ? location.description : lock)}</small>${open && location.specialRule
+          ? `<small class="hub-rule">! ${escapeHtml(location.specialRule.name)}: ${escapeHtml(location.specialRule.description)}</small>` : ''}</button></li>`;
     }).join('') + (hiddenCount
       ? `<li class="hub-more"><small>Дальше по карте ещё ${hiddenCount} ${hiddenCount === 1 ? 'место' : hiddenCount < 5 ? 'места' : 'мест'}…</small></li>` : '');
     const location = catalog.locations[this.selected];

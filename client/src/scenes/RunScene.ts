@@ -25,6 +25,10 @@ import { onLayoutChange } from '../ui/layout';
 import { evolutionChanges, levelChanges, levelStats, statBonus } from '../content/statText';
 import { WorldDecor, type ActiveLandmark } from '../systems/WorldDecor';
 import { choiceCard, type ChoiceCard } from '../systems/landmarkChoices';
+import {
+  fogPhase, hazardTickDamage, insideAny, nearest, StructureFinder, TurretField,
+  type FogPhase, type FogRule, type TurretPost, type TurretRule,
+} from '../systems/locationRules';
 import type { ResultData } from './ResultScene';
 
 export interface RunView {
@@ -102,6 +106,13 @@ export interface RunData {
 
 /** Presentation constants (not balance). */
 const AURA_COLOR = 0x9bff6e;
+/** Toxic fog tint over the screen and the light safe circles. */
+const FOG_COLOR = 0xc8d23a;
+const SAFE_COLOR = 0xe4ffd8;
+/** The rule of the location is announced this long after the start (game ms). */
+const RULE_BANNER_MS = 4500;
+const TURRET_SPRITE = 'projectiles/turret';
+const TURRET_SHOT = 'projectiles/tracer';
 const BOLT_COLOR = 0x649388;
 
 /** `#rrggbb` from content to a Phaser colour. */
@@ -255,6 +266,18 @@ export class RunScene extends Phaser.Scene {
   private damageDealt = new Map<string, number>();
   /** Weapon whose behavior runs right now; projectiles, zones and blasts remember it. */
   private firing = '';
+  private fogRule: FogRule | null = null;
+  private fogFinder: StructureFinder | null = null;
+  /** Fog damage per second at the hero this frame (0 in a safe circle or without fog). */
+  private fogDps = 0;
+  /** The current fog already hurt the hero; a fog that ends without it counts for achievements. */
+  private fogHurt = false;
+  private fogWas: FogPhase['state'] = 'clear';
+  private safeZones: Point[] = [];
+  private fogOverlay!: Phaser.GameObjects.Rectangle;
+  private turretField: TurretField | null = null;
+  private turretSprites = new Map<string, Phaser.GameObjects.Sprite>();
+  private rulePrompt!: Phaser.GameObjects.Text;
   /** The place whose choice window is open (or about to be answered). */
   private landmarkOffer: ActiveLandmark | null = null;
   /** Places the player walked away from; asked again only after leaving the circle. */
@@ -426,6 +449,7 @@ export class RunScene extends Phaser.Scene {
       (item as Phaser.Physics.Arcade.Sprite).setDepth(-10).setImmovable(true);
     });
     this.decor = new WorldDecor(this, this.view.seed, this.location.decor, this.crates, this.catalog);
+    this.createRule();
 
     this.effects = this.add.group({ maxSize: EFFECT_POOL_SIZE });
     for (let index = 0; index < EFFECT_POOL_SIZE; index += 1) {
@@ -643,6 +667,7 @@ export class RunScene extends Phaser.Scene {
     const regen = this.stat('regen');
     if (regen > 0) this.view.hp = Math.min(this.view.maxHp, this.view.hp + regen * delta / 1000);
     this.updateBuffs();
+    this.updateRule(delta);
     this.updateHazards(delta);
     if (this.finished) return;
     this.moveHero(delta);
@@ -661,7 +686,10 @@ export class RunScene extends Phaser.Scene {
     this.updateZones(delta);
     this.updateBlasts();
     this.updateLoot();
-    if (!this.finished && this.scene.isActive()) this.updateLandmarks(delta);
+    if (!this.finished && this.scene.isActive()) {
+      this.updateLandmarks(delta);
+      this.drawRuleHints();
+    }
     this.auras.clear();
     this.beams.length = 0;
     this.updateWeapons(delta);
@@ -1406,6 +1434,7 @@ export class RunScene extends Phaser.Scene {
   private drawAreas(): void {
     const graphics = this.areaGraphics.clear();
     const pulse = 0.5 + 0.5 * Math.sin(this.elapsedMs / 180);
+    this.drawRule(graphics, pulse);
     for (const { radius, color } of this.auras.values()) {
       graphics.fillStyle(color, 0.08 + 0.05 * pulse).fillCircle(this.hero.x, this.hero.y, radius);
       graphics.lineStyle(1, color, 0.35 + 0.2 * pulse).strokeCircle(this.hero.x, this.hero.y, radius);
@@ -1483,8 +1512,8 @@ export class RunScene extends Phaser.Scene {
     const resist = Math.min(1, Math.max(0, this.stat('radResist')));
     this.hazardSlow = slow * (1 - resist);
     if (slow > 0 || damagePerSecond > 0) this.record.hazardMs += delta;
-    const tick = this.catalog.balance.run.hazardTickMs;
-    const damage = damagePerSecond * (1 - resist) * tick / 1000;
+    const { hazardTickMs: tick, maxHazardDamagePerTick: cap } = this.catalog.balance.run;
+    const damage = hazardTickDamage(damagePerSecond, this.fogDps, resist, tick, cap);
     if (damage <= 0) {
       this.hazardClock = 0;
       return;
@@ -1493,7 +1522,157 @@ export class RunScene extends Phaser.Scene {
     while (this.hazardClock >= tick && !this.finished) {
       this.hazardClock -= tick;
       this.hurt(damage);
+      if (this.fogDps > 0) this.fogHurt = true;
     }
+  }
+
+  // --- location rules: toxic fog, defence turrets ---------------------------------------
+
+  /** Builds the rule of this location (if any) and announces it for a few seconds. */
+  private createRule(): void {
+    const rule = this.location.specialRule;
+    this.fogRule = rule?.type === 'toxicFog' ? rule : null;
+    this.fogFinder = this.fogRule ? new StructureFinder(this.view.seed, this.location.decor, this.fogRule.safeStructures) : null;
+    this.turretField = rule?.type === 'turrets' ? new TurretField(rule, this.view.seed, this.location.decor) : null;
+    this.fogDps = 0;
+    this.fogHurt = false;
+    this.fogWas = 'clear';
+    this.safeZones = [];
+    this.turretSprites = new Map();
+    const { width, height } = this.scale;
+    this.fogOverlay = this.add.rectangle(0, 0, width * 2, height * 2, FOG_COLOR, 0).setOrigin(0)
+      .setScrollFactor(0).setDepth(24);
+    this.rulePrompt = this.add.text(0, 0, '', textStyle(8, COLORS.bright, { align: 'center' }))
+      .setOrigin(0.5, 1).setDepth(31).setVisible(false);
+    if (rule && this.elapsedMs < RULE_BANNER_MS) {
+      this.view.warning = `${rule.name.toUpperCase()}\n${rule.description}`;
+      this.warningUntil = RULE_BANNER_MS;
+    }
+  }
+
+  private updateRule(delta: number): void {
+    this.fogDps = 0;
+    if (this.fogRule && this.fogFinder) this.updateFog(this.fogRule, this.fogFinder);
+    if (this.turretField) this.updateTurrets(this.turretField, delta);
+  }
+
+  private updateFog(rule: FogRule, finder: StructureFinder): void {
+    const phase = fogPhase(rule, this.elapsedMs / 1000);
+    this.safeZones = finder.around(this.hero);
+    const safe = insideAny(this.safeZones, this.hero, rule.safeRadius);
+    if (phase.state === 'fog' && this.fogWas !== 'fog') this.fogHurt = false;
+    if (phase.state !== 'fog' && this.fogWas === 'fog' && !this.fogHurt) this.record.fogsClean += 1;
+    this.fogWas = phase.state;
+    const pulse = 0.5 + 0.5 * Math.sin(this.elapsedMs / 300);
+    if (phase.state === 'warning') {
+      this.warn(`ТОКСИЧНЫЙ ТУМАН ЧЕРЕЗ ${Math.ceil(phase.secondsLeft)}\nБЕГИТЕ В СВЕТЛЫЙ КРУГ`);
+      this.fogOverlay.setFillStyle(FOG_COLOR, 0.06 + 0.06 * pulse);
+    } else if (phase.state === 'fog') {
+      this.fogDps = safe ? 0 : rule.damagePerSecond;
+      if (!safe) this.warn('ТУМАН ЖЖЁТ! В СВЕТЛЫЙ КРУГ');
+      this.fogOverlay.setFillStyle(FOG_COLOR, 0.26 + 0.08 * pulse);
+    } else {
+      this.fogOverlay.setFillStyle(FOG_COLOR, 0);
+    }
+  }
+
+  private updateTurrets(field: TurretField, delta: number): void {
+    field.sync(this.hero);
+    const rule = this.location.specialRule as TurretRule;
+    const paid = field.update(this.elapsedMs, delta, this.hero, this.view.caps, {
+      target: (from, range) => this.nearestOrdinary(from, range),
+      shoot: (from, target) => {
+        const angle = Math.atan2(target.y - from.y, target.x - from.x);
+        // Credited to «Другое» on the result screen: no weapon is firing now.
+        this.spawnProjectile({
+          at: { x: from.x, y: from.y }, vx: Math.cos(angle) * rule.shotSpeed, vy: Math.sin(angle) * rule.shotSpeed,
+          damage: rule.damage, lifetimeMs: rule.range / rule.shotSpeed * 1000 + 100, sprite: TURRET_SHOT, pierce: 0,
+        });
+        playSfx('sfx/shot_pistol', 0.25);
+      },
+    });
+    if (paid > 0) {
+      this.view.caps -= paid;
+      if (this.view.caps === 0) this.record.broke = true;
+      this.record.turrets += 1;
+      playSfx('sfx/powerup');
+      this.label('ТУРЕЛЬ ВКЛЮЧЕНА', COLORS.warn);
+    }
+    let near: TurretPost | null = null;
+    for (const post of field.posts.values()) {
+      let sprite = this.turretSprites.get(post.key);
+      if (!sprite) {
+        sprite = this.add.sprite(post.x, post.y, ATLAS, TURRET_SPRITE).setDepth(1);
+        this.turretSprites.set(post.key, sprite);
+      }
+      if (post.state === 'active') {
+        if (!sprite.anims.isPlaying) sprite.play(animationKey(TURRET_SPRITE, 'spin')).clearTint().setAlpha(1);
+      } else {
+        sprite.stop().setTint(post.state === 'spent' ? 0x3a3a3a : 0x8a8a8a).setAlpha(post.state === 'spent' ? 0.6 : 1);
+      }
+      if (post.state === 'idle' && Math.hypot(post.x - this.hero.x, post.y - this.hero.y) <= rule.radius) near = post;
+    }
+    this.rulePrompt.setVisible(Boolean(near));
+    if (near) {
+      const blocker = field.blocker(this.view.caps);
+      this.rulePrompt.setText(`ТУРЕЛЬ\n${blocker ? `Не включить: ${blocker}` : `Стойте рядом: ${rule.caps} крышек`}`)
+        .setPosition(near.x, near.y - rule.radius - 4);
+    }
+  }
+
+  /** Nearest ordinary enemy in range: turrets leave mini-bosses and the boss to the player. */
+  private nearestOrdinary(center: Point, range: number): Point | null {
+    let found: Point | null = null;
+    let best = range * range;
+    for (const mob of this.mobs) {
+      if (!mob.targetable || mob.definition.role !== 'normal') continue;
+      const distance = (mob.x - center.x) ** 2 + (mob.y - center.y) ** 2;
+      if (distance > best) continue;
+      found = mob.sprite;
+      best = distance;
+    }
+    return found;
+  }
+
+  /** Safe circles of the fog and turret ranges and timers, in world space. */
+  private drawRule(graphics: Phaser.GameObjects.Graphics, pulse: number): void {
+    const view = this.cameras.main.worldView;
+    if (this.fogRule) {
+      const phase = fogPhase(this.fogRule, this.elapsedMs / 1000);
+      const urgent = phase.state !== 'clear';
+      for (const zone of this.safeZones) {
+        if (!Phaser.Geom.Rectangle.Overlaps(view, new Phaser.Geom.Rectangle(zone.x - 80, zone.y - 80, 160, 160))) continue;
+        graphics.fillStyle(SAFE_COLOR, urgent ? 0.12 + 0.08 * pulse : 0.05)
+          .fillCircle(zone.x, zone.y, this.fogRule.safeRadius);
+        graphics.lineStyle(urgent ? 2 : 1, SAFE_COLOR, urgent ? 0.6 + 0.3 * pulse : 0.3)
+          .strokeCircle(zone.x, zone.y, this.fogRule.safeRadius);
+      }
+    }
+    if (this.turretField) {
+      const rule = this.location.specialRule as TurretRule;
+      for (const post of this.turretField.posts.values()) {
+        if (post.state === 'spent') continue;
+        if (post.state === 'idle') {
+          graphics.lineStyle(1, 0xf2c46b, 0.3 + 0.25 * pulse).strokeCircle(post.x, post.y, rule.radius);
+          if (post.progress > 0) {
+            graphics.lineStyle(3, 0xf2c46b, 0.9).beginPath()
+              .arc(post.x, post.y, rule.radius, -Math.PI / 2, -Math.PI / 2 + post.progress * Math.PI * 2).strokePath();
+          }
+          continue;
+        }
+        const left = Math.max(0, (post.until - this.elapsedMs) / (rule.durationSeconds * 1000));
+        graphics.lineStyle(1, 0xf2c46b, 0.18).strokeCircle(post.x, post.y, rule.range);
+        graphics.lineStyle(3, 0xf2c46b, 0.85).beginPath()
+          .arc(post.x, post.y, 14, -Math.PI / 2, -Math.PI / 2 + left * Math.PI * 2).strokePath();
+      }
+    }
+  }
+
+  /** Arrow to the nearest safe circle while fog threatens and it is off screen. */
+  private drawRuleHints(): void {
+    if (!this.fogRule || fogPhase(this.fogRule, this.elapsedMs / 1000).state === 'clear') return;
+    const zone = nearest(this.safeZones, this.hero);
+    if (zone && !this.cameras.main.worldView.contains(zone.x, zone.y)) this.drawHint(this.hintGraphics, zone, SAFE_COLOR);
   }
 
   private updateLandmarks(delta: number): void {

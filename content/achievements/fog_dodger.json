@@ -1,0 +1,13 @@
+{
+  "id": "fog_dodger",
+  "name": "Сухим из тумана",
+  "description": "Пережить 3 токсичных тумана в Ядовитых топях, не получив от них урона",
+  "hidden": false,
+  "emeralds": 3,
+  "condition": {
+    "type": "reported",
+    "event": "fogsClean",
+    "value": 3,
+    "location": "toxic_marsh"
+  }
+}

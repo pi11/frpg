@@ -266,6 +266,32 @@
       "count": 2
     }
   ],
+  "specialRule": {
+    "type": "turrets",
+    "name": "Турели обороны",
+    "description": "Включите турель у склада или поста: постойте рядом и заплатите крышками.",
+    "structures": [
+      {
+        "structure": "army_depot",
+        "x": -60,
+        "y": 44
+      },
+      {
+        "structure": "bunker_post",
+        "x": 70,
+        "y": -44
+      }
+    ],
+    "radius": 28,
+    "holdMs": 2000,
+    "caps": 10,
+    "durationSeconds": 30,
+    "range": 170,
+    "damage": 16,
+    "shotIntervalMs": 220,
+    "shotSpeed": 360,
+    "maxActive": 2
+  },
   "boss": {
     "atSecond": 600,
     "enemy": "steel_general"

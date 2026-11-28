@@ -45,6 +45,19 @@ export function biomeAt(seed: number, cx: number, cy: number, decor: Decor): Dec
   return weighted(decor.biomes, new Rng(hash).next());
 }
 
+/**
+ * The hand-made structure of a chunk and its centre, or null; the same rolls generateChunk
+ * makes first, so it agrees with the map without building the chunk.
+ */
+export function structureAt(seed: number, cx: number, cy: number, decor: Decor): { id: string; x: number; y: number } | null {
+  const rng = new Rng(chunkSeed(seed, cx, cy));
+  const size = decor.chunkSize;
+  const x = (cx + 0.5) * size;
+  const y = (cy + 0.5) * size;
+  if (rng.next() >= decor.structures.chance || Math.hypot(x, y) <= size) return null;
+  return { id: weighted(decor.structures.items, rng.next()).structure, x, y };
+}
+
 /** Pure, deterministic contents of one chunk (unit-tested). */
 export function generateChunk(
   seed: number, cx: number, cy: number, decor: Decor,
