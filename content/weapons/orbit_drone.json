@@ -14,67 +14,67 @@
   },
   "levels": [
     {
-      "damage": 6,
+      "damage": 8,
       "cooldownMs": 3200,
       "shots": 1,
       "spreadDegrees": 0,
-      "radius": 34,
+      "radius": 38,
       "durationMs": 3200
     },
     {
-      "damage": 7,
+      "damage": 10,
       "cooldownMs": 3100,
       "shots": 2,
       "spreadDegrees": 0,
-      "radius": 34,
+      "radius": 44,
       "durationMs": 3400
     },
     {
-      "damage": 8,
+      "damage": 13,
       "cooldownMs": 3000,
       "shots": 2,
       "spreadDegrees": 0,
-      "radius": 38,
+      "radius": 50,
       "durationMs": 3600
     },
     {
-      "damage": 9,
+      "damage": 16,
       "cooldownMs": 2900,
       "shots": 3,
       "spreadDegrees": 0,
-      "radius": 38,
+      "radius": 56,
       "durationMs": 3800
     },
     {
-      "damage": 11,
+      "damage": 19,
       "cooldownMs": 2800,
       "shots": 3,
       "spreadDegrees": 0,
-      "radius": 42,
+      "radius": 62,
       "durationMs": 4000
     },
     {
-      "damage": 13,
+      "damage": 23,
       "cooldownMs": 2700,
       "shots": 4,
       "spreadDegrees": 0,
-      "radius": 42,
+      "radius": 68,
       "durationMs": 4300
     },
     {
-      "damage": 15,
+      "damage": 27,
       "cooldownMs": 2500,
       "shots": 4,
       "spreadDegrees": 0,
-      "radius": 46,
+      "radius": 74,
       "durationMs": 4600
     },
     {
-      "damage": 18,
+      "damage": 32,
       "cooldownMs": 2300,
       "shots": 5,
       "spreadDegrees": 0,
-      "radius": 48,
+      "radius": 82,
       "durationMs": 5000
     }
   ],

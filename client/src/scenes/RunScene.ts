@@ -285,6 +285,8 @@ export class RunScene extends Phaser.Scene {
   private contract: ContractDefinition | null = null;
   private objectiveSpawned = false;
   private objectiveDone = false;
+  /** Levels bought at vending machines this run; each one makes the next dearer. */
+  private levelsBought = 0;
   /** The place whose choice window is open (or about to be answered). */
   private landmarkOffer: ActiveLandmark | null = null;
   /** Places the player walked away from; asked again only after leaving the circle. */
@@ -386,6 +388,7 @@ export class RunScene extends Phaser.Scene {
     this.evolutionQueue = [];
     this.landmarkOffer = null;
     this.declined = new Set();
+    this.levelsBought = 0;
     this.damageDealt = new Map();
     this.firing = '';
     this.evolution = null;
@@ -1256,7 +1259,7 @@ export class RunScene extends Phaser.Scene {
   private drawBolt(path: readonly Point[], sprite: string, tint?: string): void {
     const bolt = this.add.graphics().setDepth(13);
     const glow = hexColor(tint, BOLT_COLOR);
-    for (const [width, color, alpha] of [[tint ? 4 : 3, glow, tint ? 0.7 : 0.5], [1, 0xf0e8cf, 1]] as const) {
+    for (const [width, color, alpha] of [[tint ? 2 : 3, glow, tint ? 0.8 : 0.5], [1, 0xf0e8cf, 1]] as const) {
       bolt.lineStyle(width, color, alpha).beginPath().moveTo(path[0]!.x, path[0]!.y);
       for (let index = 1; index < path.length; index += 1) {
         const from = path[index - 1]!;
@@ -1805,7 +1808,9 @@ export class RunScene extends Phaser.Scene {
 
   /** Caps paid on completion: a chosen card was paid when taken. */
   private priceOf(landmark: ActiveLandmark): number {
-    return landmark.definition.choices ? 0 : landmark.definition.trigger.caps;
+    const { choices, trigger, levelUp } = landmark.definition;
+    if (choices) return 0;
+    return trigger.caps + (levelUp ? levelUp.priceStep * this.levelsBought : 0);
   }
 
   /** Stops the run and shows the cards of this place (the autopilot takes the careful one at once). */
@@ -1870,6 +1875,7 @@ export class RunScene extends Phaser.Scene {
     const choice = this.choiceOf(landmark);
     this.decor.useLandmark(landmark);
     this.prompt.setVisible(false);
+    // Paid before the level is counted, so the next purchase costs more.
     const price = this.priceOf(landmark);
     this.view.caps -= price;
     this.record.landmarks += 1;
@@ -1891,6 +1897,11 @@ export class RunScene extends Phaser.Scene {
     });
     const ambush = choice ? (choice.ambush?.when === 'complete' ? choice.ambush.count : 0) : definition.ambush?.count ?? 0;
     if (ambush) this.ambush(ambush);
+    if (definition.levelUp) {
+      this.levelsBought += 1;
+      this.label('НОВЫЙ УРОВЕНЬ', COLORS.warn);
+      this.gainXp(this.view.nextXp - this.view.xp);
+    }
   }
 
   /** Arrow at the screen edge towards an off-screen landmark. */

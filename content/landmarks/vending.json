@@ -1,16 +1,16 @@
 {
   "id": "vending",
   "name": "Торговый автомат",
-  "hint": "Стойте рядом, чтобы купить",
+  "hint": "Новый уровень за крышки: стойте рядом",
   "sprite": "landmarks/vending",
   "trigger": {
     "radius": 26,
     "holdMs": 1500,
-    "caps": 12
+    "caps": 15
   },
   "rolls": [
-    2,
-    2
+    1,
+    1
   ],
   "rewards": [
     {
@@ -37,5 +37,8 @@
       "pickup": "bullet_shield",
       "weight": 2
     }
-  ]
+  ],
+  "levelUp": {
+    "priceStep": 10
+  }
 }

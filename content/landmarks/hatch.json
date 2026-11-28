@@ -63,7 +63,7 @@
         "chest"
       ],
       "ambush": {
-        "count": 20,
+        "count": 30,
         "when": "choose"
       }
     },

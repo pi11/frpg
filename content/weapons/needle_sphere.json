@@ -18,35 +18,40 @@
       "cooldownMs": 1500,
       "shots": 14,
       "spreadDegrees": 334,
-      "pierce": 1
+      "pierce": 1,
+      "durationMs": 800
     },
     {
       "damage": 20,
       "cooldownMs": 1390,
       "shots": 16,
       "spreadDegrees": 337,
-      "pierce": 2
+      "pierce": 2,
+      "durationMs": 900
     },
     {
       "damage": 23,
       "cooldownMs": 1280,
       "shots": 19,
       "spreadDegrees": 340,
-      "pierce": 2
+      "pierce": 2,
+      "durationMs": 1000
     },
     {
       "damage": 26,
       "cooldownMs": 1160,
       "shots": 22,
       "spreadDegrees": 342,
-      "pierce": 2
+      "pierce": 2,
+      "durationMs": 1100
     },
     {
       "damage": 30,
       "cooldownMs": 1050,
       "shots": 24,
       "spreadDegrees": 345,
-      "pierce": 3
+      "pierce": 3,
+      "durationMs": 1200
     }
   ],
   "tags": [

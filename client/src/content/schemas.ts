@@ -244,6 +244,11 @@ export const LandmarkSchema = z.object({
    * and ambush for this place. Without them the landmark works as before.
    */
   choices: z.array(LandmarkChoiceSchema).min(2).max(3).optional(),
+  /**
+   * Sells a level: on completion the hero levels up at once (three cards). Every purchase in the
+   * run, at any such landmark, raises the price by `priceStep` run caps.
+   */
+  levelUp: z.object({ priceStep: z.number().int().nonnegative() }).strict().optional(),
 }).strict();
 export type LandmarkDefinition = z.infer<typeof LandmarkSchema>;
 

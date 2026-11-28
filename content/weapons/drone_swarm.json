@@ -14,11 +14,11 @@
   },
   "levels": [
     {
-      "damage": 26,
+      "damage": 36,
       "cooldownMs": 1000,
       "shots": 7,
       "spreadDegrees": 0,
-      "radius": 60,
+      "radius": 90,
       "durationMs": 1200
     }
   ],

@@ -13,7 +13,6 @@ Image = list[list[Pixel]]
 # Evolved weapon id -> (base sprite, colour, size factor). Green stays the colour of XP and
 # pink the colour of enemy spit, so neither is used here.
 LOOKS: dict[str, tuple[str, str, int]] = {
-    "nail_gun": ("projectiles/bullet", "#9fe4ff", 2),
     "twin_pistols": ("projectiles/bullet", "#ffd84a", 2),
     "scrap_cannon": ("projectiles/pellet", "#ff9a3c", 2),
     "buckshot_ram": ("projectiles/pellet", "#fff2a6", 2),
@@ -112,8 +111,24 @@ def copy_set(
     return result
 
 
+def nail() -> Image:
+    """A steel nail pointing right (projectiles turn along their flight): flat head, shaft, tip."""
+    rows = [
+        "H...........",
+        "HSSSSSSSSSs.",
+        "HDDDDDDDDDdT",
+        "H...........",
+    ]
+    colors: dict[str, Pixel] = {
+        "H": (150, 160, 172, 255), "S": (226, 234, 242, 255), "s": (190, 200, 210, 255),
+        "L": (176, 188, 200, 255), "T": (240, 246, 252, 255), "D": (96, 106, 118, 255),
+        "d": (120, 130, 142, 255), ".": (0, 0, 0, 0),
+    }
+    return [[colors[char] for char in row] for row in rows]
+
+
 def frames(existing: dict[str, Image]) -> dict[str, Image]:
-    result: dict[str, Image] = {}
+    result: dict[str, Image] = {"projectiles/nail_gun": nail()}
     for weapon, (base, color, factor) in LOOKS.items():
         result.update(copy_set(existing, base, f"projectiles/{weapon}", color, factor))
     for key, color in FIRES.items():

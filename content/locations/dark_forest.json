@@ -37,7 +37,7 @@
     {
       "atSecond": 45,
       "spawnIntervalMs": 190,
-      "hpMultiplier": 2.67,
+      "hpMultiplier": 2.68,
       "speedMultiplier": 1,
       "enemies": [
         {
@@ -56,8 +56,8 @@
     },
     {
       "atSecond": 90,
-      "spawnIntervalMs": 160,
-      "hpMultiplier": 3.1,
+      "spawnIntervalMs": 159,
+      "hpMultiplier": 3.13,
       "speedMultiplier": 1.05,
       "enemies": [
         {
@@ -80,8 +80,8 @@
     },
     {
       "atSecond": 185,
-      "spawnIntervalMs": 130,
-      "hpMultiplier": 3.85,
+      "spawnIntervalMs": 128,
+      "hpMultiplier": 4.0,
       "speedMultiplier": 1.1,
       "enemies": [
         {
@@ -109,8 +109,8 @@
     },
     {
       "atSecond": 275,
-      "spawnIntervalMs": 110,
-      "hpMultiplier": 4.92,
+      "spawnIntervalMs": 107,
+      "hpMultiplier": 5.33,
       "speedMultiplier": 1.15,
       "enemies": [
         {
@@ -138,8 +138,8 @@
     },
     {
       "atSecond": 370,
-      "spawnIntervalMs": 68,
-      "hpMultiplier": 6.42,
+      "spawnIntervalMs": 64,
+      "hpMultiplier": 7.4,
       "speedMultiplier": 1.15,
       "enemies": [
         {
@@ -167,8 +167,8 @@
     },
     {
       "atSecond": 460,
-      "spawnIntervalMs": 52,
-      "hpMultiplier": 9.12,
+      "spawnIntervalMs": 48,
+      "hpMultiplier": 11.26,
       "speedMultiplier": 1.18,
       "enemies": [
         {
@@ -196,8 +196,8 @@
     },
     {
       "atSecond": 555,
-      "spawnIntervalMs": 45,
-      "hpMultiplier": 11.04,
+      "spawnIntervalMs": 40,
+      "hpMultiplier": 14.82,
       "speedMultiplier": 1.2,
       "enemies": [
         {
@@ -226,7 +226,7 @@
     {
       "atSecond": 600,
       "spawnIntervalMs": 950,
-      "hpMultiplier": 11.04,
+      "hpMultiplier": 15.46,
       "speedMultiplier": 1.2,
       "enemies": [
         {

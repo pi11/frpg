@@ -81,6 +81,17 @@ describe('shared content catalog', () => {
     }
   });
 
+  it('grows the reach of every circle weapon with each level', () => {
+    for (const weapon of Object.values(getCatalog().weapons)) {
+      if (weapon.levels.length < 2) continue;
+      const ring = weapon.behavior.type === 'orbit' || weapon.behavior.type === 'aura';
+      const spray = weapon.behavior.type === 'projectile' && weapon.levels[0]!.spreadDegrees >= 300;
+      if (!ring && !spray) continue;
+      const reach = weapon.levels.map((level) => (ring ? level.radius : level.durationMs) ?? 0);
+      reach.slice(1).forEach((value, index) => expect(value, `${weapon.id} level ${index + 2}`).toBeGreaterThan(reach[index]!));
+    }
+  });
+
   it('opens heavy weapon slots only for emeralds', () => {
     const { heroes, upgrades, balance } = getCatalog();
     for (const hero of Object.values(heroes)) expect(hero.baseStats.heavySlots, hero.id).toBe(0);

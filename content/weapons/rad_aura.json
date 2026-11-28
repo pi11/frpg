@@ -15,56 +15,56 @@
       "cooldownMs": 650,
       "shots": 1,
       "spreadDegrees": 0,
-      "radius": 34
+      "radius": 36
     },
     {
       "damage": 4,
       "cooldownMs": 640,
       "shots": 1,
       "spreadDegrees": 0,
-      "radius": 38
+      "radius": 42
     },
     {
       "damage": 4,
       "cooldownMs": 600,
       "shots": 1,
       "spreadDegrees": 0,
-      "radius": 42
+      "radius": 48
     },
     {
       "damage": 5,
       "cooldownMs": 580,
       "shots": 1,
       "spreadDegrees": 0,
-      "radius": 46
+      "radius": 54
     },
     {
       "damage": 6,
       "cooldownMs": 550,
       "shots": 1,
       "spreadDegrees": 0,
-      "radius": 50
+      "radius": 60
     },
     {
       "damage": 7,
       "cooldownMs": 520,
       "shots": 1,
       "spreadDegrees": 0,
-      "radius": 54
+      "radius": 66
     },
     {
       "damage": 8,
       "cooldownMs": 480,
       "shots": 1,
       "spreadDegrees": 0,
-      "radius": 58
+      "radius": 72
     },
     {
       "damage": 10,
       "cooldownMs": 440,
       "shots": 1,
       "spreadDegrees": 0,
-      "radius": 64
+      "radius": 80
     }
   ],
   "tags": [
