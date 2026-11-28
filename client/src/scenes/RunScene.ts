@@ -192,6 +192,8 @@ class SpriteMob implements Mob {
 
 interface Zone extends ZoneSpec {
   active: boolean;
+  /** Weapon id credited with the damage; '' is everything else. */
+  source: string;
   nextTick: number;
   until: number;
   flames: Phaser.GameObjects.Sprite[];
@@ -199,6 +201,7 @@ interface Zone extends ZoneSpec {
 
 interface PendingBlast extends BlastSpec {
   at: number;
+  source: string;
   shell: Phaser.GameObjects.Image;
 }
 
@@ -246,6 +249,10 @@ export class RunScene extends Phaser.Scene {
   private boosts: BoostDefinition[] = [];
   private orbiters = new Map<string, Phaser.GameObjects.Sprite[]>();
   private auras = new Map<string, { radius: number; color: number }>();
+  /** HP taken from enemies per weapon id ('' = thorns, bonuses, revive blast), for the result screen. */
+  private damageDealt = new Map<string, number>();
+  /** Weapon whose behavior runs right now; projectiles, zones and blasts remember it. */
+  private firing = '';
   /** Evolutions waiting for their screen; shown when the level-up or chest screen closes. */
   private evolutionQueue: EvolutionOption[] = [];
   /** The evolution the Evolution scene is showing. */
@@ -333,6 +340,8 @@ export class RunScene extends Phaser.Scene {
     this.orbiters = new Map();
     this.auras = new Map();
     this.evolutionQueue = [];
+    this.damageDealt = new Map();
+    this.firing = '';
     this.evolution = null;
     this.mobs = [];
     this.buffs = new Map();
@@ -425,7 +434,7 @@ export class RunScene extends Phaser.Scene {
       const flames = Array.from({ length: FLAMES_PER_ZONE }, () =>
         this.add.sprite(0, 0, ATLAS, 'fx/fire').setDepth(-4).setVisible(false));
       this.zones.push({
-        active: false, x: 0, y: 0, radius: 0, damage: 0, tickMs: 1, durationMs: 0,
+        active: false, source: '', x: 0, y: 0, radius: 0, damage: 0, tickMs: 1, durationMs: 0,
         sprite: 'fx/fire', pull: 0, nextTick: 0, until: 0, flames,
       });
     }
@@ -445,7 +454,7 @@ export class RunScene extends Phaser.Scene {
       if (this.blast(bullet)) return;
       const chill = bullet.getData('chillMs') as number;
       if (chill) mob.chilledUntil = this.elapsedMs + chill;
-      this.damageMob(mob, bullet.getData('damage') as number, bullet.x, bullet.y);
+      this.damageMob(mob, bullet.getData('damage') as number, bullet.x, bullet.y, bullet.getData('source') as string);
     });
     this.physics.add.overlap(this.projectiles, this.crates, (first, second) => {
       const bullet = first as Phaser.Physics.Arcade.Sprite;
@@ -501,9 +510,10 @@ export class RunScene extends Phaser.Scene {
       nearestEnemy: () => this.nearestEnemy(),
       randomEnemyWithin: (range) => this.randomEnemyWithin(range),
       nearestTo: (center, range, skip) => this.nearestTo(center, range, skip),
-      strike: (target, damage) => this.strike(target, damage),
+      strike: (target, damage) => this.strike(target, damage, this.firing),
       drawBolt: (path, sprite, color) => this.drawBolt(path, sprite, color),
-      damageInRadius: (center, radius, damage, limit) => this.damageInRadius(center, radius, damage, limit),
+      damageInRadius: (center, radius, damage, limit) =>
+        this.damageInRadius(center, radius, damage, limit, this.firing),
       spawnProjectile: (spec) => this.spawnProjectile(spec),
       spawnZone: (spec) => this.spawnZone(spec),
       scheduleBlast: (spec) => this.scheduleBlast(spec),
@@ -972,7 +982,8 @@ export class RunScene extends Phaser.Scene {
     return definition.role === 'boss' ? bossMaxLossPerSecond : eliteMaxLossPerSecond;
   }
 
-  private damageMob(mob: SpriteMob, amount: number, x: number, y: number): void {
+  /** `source` is the weapon id credited on the result screen; '' counts as «Другое». */
+  private damageMob(mob: SpriteMob, amount: number, x: number, y: number, source = ''): void {
     const chance = this.stat('critChance');
     if (chance > 0 && this.rng.next() < chance) {
       amount *= this.catalog.balance.run.critMultiplier + this.stat('critDamage');
@@ -982,6 +993,9 @@ export class RunScene extends Phaser.Scene {
       amount = Math.min(mob.lossBudget, amount * (1 + this.stat('eliteDamage')));
       mob.lossBudget -= amount;
     }
+    // Only HP really lost counts: no overkill, and the elite/boss limit is already applied.
+    const lost = Math.max(0, Math.min(amount, mob.hp));
+    this.damageDealt.set(source, (this.damageDealt.get(source) ?? 0) + lost);
     mob.hp -= amount;
     if (mob.hp <= 0) {
       this.killMob(mob);
@@ -1139,10 +1153,10 @@ export class RunScene extends Phaser.Scene {
     return nearest;
   }
 
-  private strike(target: Point, damage: number): void {
+  private strike(target: Point, damage: number, source: string): void {
     // Targets are the enemy sprites handed out by the searches above.
     const mob = (target as Phaser.Physics.Arcade.Sprite).getData('mob') as SpriteMob;
-    if (mob.targetable) this.damageMob(mob, damage, target.x, target.y);
+    if (mob.targetable) this.damageMob(mob, damage, target.x, target.y, source);
   }
 
   /** Jagged lightning that fades out; the jitter is visual only and does not use the run RNG. */
@@ -1177,7 +1191,7 @@ export class RunScene extends Phaser.Scene {
     return dx * dx + dy * dy;
   }
 
-  private damageInRadius(center: Point, radius: number, damage: number, limit?: HitLimit): number {
+  private damageInRadius(center: Point, radius: number, damage: number, limit?: HitLimit, source = ''): number {
     let hits = 0;
     for (const mob of this.mobs) {
       const sprite = mob.sprite;
@@ -1191,7 +1205,7 @@ export class RunScene extends Phaser.Scene {
         mob.hitAt[limit.owner] = this.elapsedMs;
       }
       hits += 1;
-      this.damageMob(mob, damage, sprite.x, sprite.y);
+      this.damageMob(mob, damage, sprite.x, sprite.y, source);
     }
     for (const item of this.crates.getChildren()) {
       const crate = item as Phaser.Physics.Arcade.Sprite;
@@ -1209,6 +1223,7 @@ export class RunScene extends Phaser.Scene {
       const definition = this.catalog.weapons[id]!;
       const level = definition.levels[state.level - 1]!;
       const behavior = weaponBehaviors[definition.behavior.type]!;
+      this.firing = id;
       behavior.update?.(this.combat, definition, level, definition.behavior.params, state, delta);
       const cooldown = level.cooldownMs / attackSpeed;
       state.clock += delta;
@@ -1221,6 +1236,7 @@ export class RunScene extends Phaser.Scene {
       state.clock -= cooldown;
       if (result === 'fired') playSfx(definition.fireSound, 0.8);
     }
+    this.firing = '';
   }
 
   private spawnProjectile(spec: ProjectileSpec): void {
@@ -1230,7 +1246,7 @@ export class RunScene extends Phaser.Scene {
     bullet.enableBody(true, spec.at?.x ?? this.hero.x, spec.at?.y ?? this.hero.y, true, true);
     (bullet.body as Phaser.Physics.Arcade.Body).setSize(bullet.width, bullet.height);
     (bullet.getData('hits') as Set<number>).clear();
-    bullet.setData('damage', spec.damage).setData('pierce', spec.pierce)
+    bullet.setData('damage', spec.damage).setData('pierce', spec.pierce).setData('source', this.firing)
       .setData('expiresAt', this.elapsedMs + spec.lifetimeMs)
       .setData('blastRadius', spec.blastRadius ?? 0).setData('turnRate', spec.turnRate ?? 0)
       .setData('returnAt', spec.returnAfterMs === undefined ? 0 : this.elapsedMs + spec.returnAfterMs)
@@ -1256,7 +1272,8 @@ export class RunScene extends Phaser.Scene {
     if (!radius) return false;
     this.playEffect('fx/explosion', 'burst', bullet.x, bullet.y, false);
     playSfx('sfx/explosion', 0.5);
-    this.damageInRadius({ x: bullet.x, y: bullet.y }, radius, bullet.getData('damage') as number);
+    this.damageInRadius({ x: bullet.x, y: bullet.y }, radius, bullet.getData('damage') as number,
+      undefined, bullet.getData('source') as string);
     return true;
   }
 
@@ -1296,7 +1313,7 @@ export class RunScene extends Phaser.Scene {
   private spawnZone(spec: ZoneSpec): void {
     const zone = this.zones.find((candidate) => !candidate.active);
     if (!zone) return;
-    Object.assign(zone, { pull: 0 }, spec, {
+    Object.assign(zone, { pull: 0 }, spec, { source: this.firing,
       active: true, nextTick: this.elapsedMs, until: this.elapsedMs + spec.durationMs,
     });
     zone.flames.forEach((flame, index) => {
@@ -1310,7 +1327,7 @@ export class RunScene extends Phaser.Scene {
   private scheduleBlast(spec: BlastSpec): void {
     const shell = this.add.image(spec.x, spec.y - SHELL_HEIGHT, ATLAS, spec.sprite)
       .setDepth(13).setFlipY(true).setVisible(false);
-    this.blasts.push({ ...spec, at: this.elapsedMs + spec.delayMs, shell });
+    this.blasts.push({ ...spec, at: this.elapsedMs + spec.delayMs, shell, source: this.firing });
   }
 
   private updateBlasts(): void {
@@ -1329,7 +1346,7 @@ export class RunScene extends Phaser.Scene {
       blast.shell.destroy();
       this.playEffect('fx/explosion', 'burst', blast.x, blast.y, false, blast.radius / 24);
       playSfx('sfx/explosion', 0.5);
-      this.damageInRadius(blast, blast.radius, blast.damage);
+      this.damageInRadius(blast, blast.radius, blast.damage, undefined, blast.source);
     }
   }
 
@@ -1356,7 +1373,7 @@ export class RunScene extends Phaser.Scene {
       if (zone.pull) this.pullEnemies(zone, zone.pull, delta);
       if (this.elapsedMs >= zone.nextTick) {
         zone.nextTick += zone.tickMs;
-        this.damageInRadius(zone, zone.radius, zone.damage);
+        this.damageInRadius(zone, zone.radius, zone.damage, undefined, zone.source);
       }
     }
   }
@@ -1985,6 +2002,11 @@ export class RunScene extends Phaser.Scene {
       level: this.view.level, seed: this.view.seed, runId: this.runId,
       bossKilled: this.bossKilled, locationId: this.location.id,
       rewardBonus: this.boosts.reduce((sum, boost) => sum + (boost.rewardBonus ?? 0), 0),
+      damage: [...this.damageDealt],
+      build: {
+        weapons: [...this.weapons].map(([id, state]) => [id, state.level]),
+        passives: [...this.ownedPassives],
+      },
       summary: {
         content_hash: this.contentHash,
         duration_seconds: this.view.seconds,

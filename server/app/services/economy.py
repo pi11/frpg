@@ -177,3 +177,24 @@ def record_win(data: Mapping[str, Any], location: str, hero: str, speed: int) ->
     heroes = wins.setdefault(location, {})
     heroes[hero] = max(int(heroes.get(hero, 0)), speed)
     return {**data, "wins": wins}
+
+
+def update_record(
+    data: Mapping[str, Any], location: str, seconds: int, kills: int,
+) -> tuple[dict[str, Any], dict[str, int | None]]:
+    """Best accepted time and kills per location; returns the new data and the result-screen view.
+
+    The view holds this run's numbers and the previous bests (None on the first run there).
+    """
+    records = {key: dict(value) for key, value in data.get("records", {}).items()}
+    before = records.get(location)
+    records[location] = {
+        "seconds": max(seconds, int(before["seconds"])) if before else seconds,
+        "kills": max(kills, int(before["kills"])) if before else kills,
+    }
+    view: dict[str, int | None] = {
+        "seconds": seconds, "kills": kills,
+        "previous_seconds": int(before["seconds"]) if before else None,
+        "previous_kills": int(before["kills"]) if before else None,
+    }
+    return {**data, "records": records}, view

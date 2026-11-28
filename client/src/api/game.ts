@@ -68,7 +68,17 @@ export interface RunFinish {
   /** Newly earned; their emeralds are claimed in the shelter. */
   achievements: string[];
   flags: string[];
+  /** Accepted time and kills and the location bests before this run; null with the autopilot. */
+  record?: RunRecord | null;
   profile: Profile;
+}
+
+export interface RunRecord {
+  seconds: number;
+  kills: number;
+  /** null: the first run on this location. */
+  previous_seconds: number | null;
+  previous_kills: number | null;
 }
 
 export function getProfile(): Promise<Profile> {

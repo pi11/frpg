@@ -29,6 +29,7 @@ from app.services.economy import (
     unlocked_heroes,
     unlocked_locations,
     unlocked_speeds,
+    update_record,
 )
 from app.services.tokens import as_utc, current_user, utcnow
 
@@ -68,12 +69,23 @@ class RunSummary(BaseModel):
     )
 
 
+class RunRecord(BaseModel):
+    """Accepted time and kills of this run and the location bests before it (None: first run)."""
+
+    seconds: int
+    kills: int
+    previous_seconds: int | None
+    previous_kills: int | None
+
+
 class RunFinishResponse(BaseModel):
     status: Literal["finished"] = "finished"
     reward_caps: int
     reward_emeralds: int
     achievements: list[str]
     flags: list[str]
+    #: Personal record view; None for autopilot runs, which do not set records.
+    record: RunRecord | None = None
     profile: ProfileResponse
 
 
@@ -146,11 +158,13 @@ async def finish_run(
     if profile is None:
         raise ApiError(404, ErrorCode.not_found, "Профиль не найден")
     if run.status == "finished":
+        saved = ((run.summary or {}).get("accepted") or {}).get("record")
         return RunFinishResponse(
             reward_caps=run.reward_caps or 0,
             reward_emeralds=((run.summary or {}).get("accepted") or {}).get("emeralds", 0),
             achievements=((run.summary or {}).get("accepted") or {}).get("achievements", []),
             flags=run.flags,
+            record=RunRecord(**saved) if saved else None,
             profile=await profile_response(session, user, profile),
         )
 
@@ -243,6 +257,9 @@ async def finish_run(
             "kills": kills, "kills_by_type": body.kills_by_type, "duration": duration,
             "elites": elites, "picked_caps": picked_caps, "boss_killed": boss_killed,
         }, daily_rules)
+    record: dict[str, int | None] | None = None
+    if not body.autopilot:
+        data, record = update_record(data, run.location_id, duration, kills)
     run.status = "finished"
     run.finished_at = now
     run.reward_caps = reward
@@ -253,7 +270,7 @@ async def finish_run(
             "duration_seconds": duration, "kills": kills, "wave_reached": wave,
             "boss_killed": boss_killed, "picked_caps": picked_caps,
             "emeralds": emeralds, "achievements": achievements, "speed": run.speed,
-            "boosts": list(run.boosts),
+            "boosts": list(run.boosts), "record": record,
         },
     }
     profile.caps += reward
@@ -263,5 +280,6 @@ async def finish_run(
     await session.commit()
     return RunFinishResponse(
         reward_caps=reward, reward_emeralds=emeralds, achievements=achievements, flags=flags,
+        record=RunRecord(**record) if record else None,
         profile=await profile_response(session, user, profile),
     )

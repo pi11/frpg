@@ -4,6 +4,7 @@ import { ATLAS } from '../assets';
 import { getCatalog } from '../content/catalog';
 import { runReward } from '../economy';
 import { playSfx, stopMusic } from '../sound';
+import { damageRows, evolutionHint, nextGoal, recordLines, type RunBuild } from '../systems/runReport';
 import { layoutOf, onLayoutChange } from '../ui/layout';
 import { COLORS, textStyle } from '../ui/theme';
 
@@ -18,14 +19,23 @@ export interface ResultData {
   locationId: string;
   /** Extra share of earned caps from one-run boosts (the server applies the same). */
   rewardBonus?: number;
+  /** HP taken from enemies per weapon id ('' = everything else); shown only, never sent. */
+  damage?: [string, number][];
+  build?: RunBuild;
   summary: RunSummary;
 }
+
+const ROW_HEIGHT = 18;
+const ICON_STEP = 23;
+const REWARD_LINES = 5;
 
 export class ResultScene extends Phaser.Scene {
   private result!: ResultData;
   private rewardLabel!: Phaser.GameObjects.Text;
   private actionLabel!: Phaser.GameObjects.Text;
   private leaveLabel!: Phaser.GameObjects.Text;
+  private recordLabel!: Phaser.GameObjects.Text;
+  private goalLabel!: Phaser.GameObjects.Text;
   private settled = false;
   private sending = false;
 
@@ -42,31 +52,114 @@ export class ResultScene extends Phaser.Scene {
   create(): void {
     stopMusic();
     this.cameras.main.setBackgroundColor('#08120b');
-    const { cx, cy, width, portrait } = layoutOf(this);
-    this.add.rectangle(cx, cy, width - 24, portrait ? 400 : 246, COLORS.panel, 1).setStrokeStyle(1, COLORS.panelBorder);
+    const { cx, cy, width, height, portrait } = layoutOf(this);
+    this.add.rectangle(cx, cy, width - 16, height - 16, COLORS.panel, 1).setStrokeStyle(1, COLORS.panelBorder);
+    // Landscape: the run and the reward on the left, the build on the right. Portrait: one column.
+    const left = portrait ? cx : 124;
+    const column = portrait ? width - 36 : 204;
     const title = this.result.bossKilled ? 'ПОБЕДА!' : { death: 'ЗАБЕГ ОКОНЧЕН', survived: 'ВЫЖИЛ!', quit: 'ВОЗВРАЩЕНИЕ' }[this.result.reason];
-    this.add.text(cx, cy - (portrait ? 165 : 95), title,
-      textStyle(portrait ? 16 : 24, this.result.reason === 'death' ? COLORS.danger : COLORS.bright)).setOrigin(0.5);
+    this.add.text(left, portrait ? 30 : 32, title,
+      textStyle(16, this.result.reason === 'death' ? COLORS.danger : COLORS.bright)).setOrigin(0.5);
     const minutes = Math.floor(this.result.seconds / 60).toString().padStart(2, '0');
     const seconds = (this.result.seconds % 60).toString().padStart(2, '0');
-    this.add.text(cx, cy - (portrait ? 120 : 49),
-      `ВРЕМЯ ${minutes}:${seconds}   УБИТО ${this.result.kills}   УР.${this.result.level}   КРЫШЕК ${this.result.summary.picked_caps}`,
-      textStyle(8, COLORS.text, { align: 'center', wordWrap: { width: width - 48 } })).setOrigin(0.5);
-    this.add.text(cx, cy - (portrait ? 90 : 31), `SEED ${this.result.seed}`, textStyle(8, COLORS.dim)).setOrigin(0.5);
-    this.add.image(cx, cy - (portrait ? 62 : 12), ATLAS, 'ui/cap').setScale(2);
-    this.rewardLabel = this.add.text(cx, cy + (portrait ? 34 : 38), '', textStyle(8, COLORS.bright, {
-      align: 'center', wordWrap: { width: width - 60 },
-    })).setOrigin(0.5);
-    this.actionLabel = this.add.text(cx, cy + (portrait ? 142 : 86), '', textStyle(8, COLORS.bright, {
+    const stats = this.add.text(left, portrait ? 48 : 52,
+      `ВРЕМЯ ${minutes}:${seconds}   УР.${this.result.level}\nУБИТО ${this.result.kills}   КРЫШЕК ${this.result.summary.picked_caps}`,
+      textStyle(8, COLORS.text, { align: 'center' })).setOrigin(0.5, 0);
+    const seed = this.add.text(left, stats.y + stats.height + 4, `SEED ${this.result.seed}`, textStyle(8, COLORS.dim))
+      .setOrigin(0.5, 0);
+    this.recordLabel = this.add.text(left, seed.y + 16, '',
+      textStyle(8, COLORS.warn, { align: 'center', wordWrap: { width: column } })).setOrigin(0.5, 0);
+
+    let y = portrait ? this.recordLabel.y + 30 : 24;
+    const x0 = portrait ? 18 : 254;
+    const span = portrait ? width - 36 : 210;
+    if (!portrait) this.add.rectangle(246, cy, 1, height - 40, COLORS.panelBorder, 0.5);
+    y = this.drawDamage(x0, y, span);
+    y = this.drawBuild(x0, y, span);
+    this.goalLabel = this.add.text(x0, y + 4, '', textStyle(8, COLORS.bright, { wordWrap: { width: span } }));
+
+    const rewardY = portrait ? height - 150 : 124;
+    this.add.image(left, rewardY, ATLAS, 'ui/cap').setScale(2);
+    this.rewardLabel = this.add.text(left, rewardY + 16, '', textStyle(8, COLORS.bright, {
+      align: 'center', wordWrap: { width: column }, maxLines: REWARD_LINES,
+    })).setOrigin(0.5, 0);
+    this.actionLabel = this.add.text(left, height - (portrait ? 56 : 44), '', textStyle(8, COLORS.bright, {
       backgroundColor: '#1d3322', padding: { x: 12, y: 7 },
     })).setOrigin(0.5).setInteractive({ useHandCursor: true });
     this.actionLabel.on('pointerdown', () => this.onAction());
     this.input.keyboard?.on('keydown-SPACE', () => this.onAction());
-    this.leaveLabel = this.add.text(cx, cy + (portrait ? 178 : 109), 'ВЕРНУТЬСЯ БЕЗ НАГРАДЫ', textStyle(8, COLORS.dim))
+    this.leaveLabel = this.add.text(left, height - (portrait ? 28 : 20), 'ВЕРНУТЬСЯ БЕЗ НАГРАДЫ', textStyle(8, COLORS.dim))
       .setOrigin(0.5).setInteractive({ useHandCursor: true })
       .on('pointerdown', () => { if (!this.sending) this.scene.start('Hub'); });
     onLayoutChange(this, () => this.scene.restart(this.result));
     void this.settle();
+  }
+
+  /** Top three weapons by damage really dealt, with bars; nothing when no enemy was hit. */
+  private drawDamage(x: number, y: number, span: number): number {
+    const rows = damageRows(this.result.damage ?? [], getCatalog());
+    if (!rows.length) return y;
+    this.add.text(x, y, 'УРОН', textStyle(8, COLORS.dim));
+    y += 14;
+    for (const row of rows) {
+      if (row.sprite) this.add.image(x + 8, y + 4, ATLAS, row.sprite);
+      const percent = `${Math.round(row.share * 100)}%`;
+      this.add.text(x + span, y - 2, percent, textStyle(8, COLORS.bright)).setOrigin(1, 0);
+      this.add.text(x + 20, y - 2, this.fit(row.name, span - 20 - percent.length * 8 - 8),
+        textStyle(8, row.id ? COLORS.text : COLORS.dim));
+      this.add.rectangle(x + 20, y + 10, span - 20, 3, COLORS.barBack).setOrigin(0, 0.5);
+      this.add.rectangle(x + 20, y + 10, Math.max(1, (span - 20) * row.share), 3, row.id ? COLORS.xp : 0x5f9a63)
+        .setOrigin(0, 0.5);
+      y += ROW_HEIGHT;
+    }
+    return y + 2;
+  }
+
+  /** Icons of the weapons and perks held at the end with levels, the evolution by name, and a near miss. */
+  private drawBuild(x: number, y: number, span: number): number {
+    const build = this.result.build;
+    if (!build || (!build.weapons.length && !build.passives.length)) return y;
+    const { weapons, passives } = getCatalog();
+    this.add.text(x, y, 'СБОРКА', textStyle(8, COLORS.dim));
+    y += 18;
+    // Weapons, a gap, then perks, in one flow that wraps.
+    const perRow = Math.max(1, Math.floor(span / ICON_STEP));
+    const items = [
+      ...build.weapons.map(([id, level]) => ({ sprite: weapons[id]?.sprite, level,
+        max: weapons[id]?.levels.length ?? 1, gold: Boolean(weapons[id]?.evolved) })),
+      ...(build.weapons.length && build.passives.length ? [null] : []),
+      ...build.passives.map(([id, level]) => ({ sprite: passives[id]?.sprite, level,
+        max: passives[id]?.maxLevel ?? 1, gold: false })),
+    ];
+    items.forEach((item, index) => {
+      if (!item) return;
+      const ix = x + 8 + (index % perRow) * ICON_STEP;
+      const iy = y + Math.floor(index / perRow) * ICON_STEP;
+      if (item.sprite) this.add.image(ix, iy, ATLAS, item.sprite);
+      const maxed = item.level >= item.max;
+      this.add.text(ix + 10, iy + 9, maxed ? '*' : String(item.level),
+        textStyle(8, item.gold || maxed ? COLORS.warn : COLORS.dim, { stroke: '#08120b', strokeThickness: 3 }))
+        .setOrigin(1, 1);
+    });
+    y += Math.ceil(items.length / perRow) * ICON_STEP;
+    const evolved = build.weapons.map(([id]) => weapons[id]).filter((weapon) => weapon?.evolved);
+    const lines = [
+      ...(evolved.length ? [{ text: `Эволюция: ${evolved.map((weapon) => weapon!.name).join(', ')}`, color: COLORS.warn }] : []),
+      ...[evolutionHint(build, getCatalog())].filter((text): text is string => Boolean(text))
+        .map((text) => ({ text, color: COLORS.dim })),
+    ];
+    y -= 6;
+    for (const line of lines) {
+      const label = this.add.text(x, y, line.text, textStyle(8, line.color, { wordWrap: { width: span } }));
+      y += label.height + 4;
+    }
+    return y + 2;
+  }
+
+  /** Cuts a name with … so it never runs into the percent. */
+  private fit(text: string, pixels: number): string {
+    const chars = Math.max(3, Math.floor(pixels / 8));
+    return text.length <= chars ? text : `${text.slice(0, chars - 1)}…`;
   }
 
   private onAction(): void {
@@ -80,7 +173,7 @@ export class ResultScene extends Phaser.Scene {
     this.sending = true;
     const summary = this.result.summary;
     const catalog = getCatalog();
-    const { cx } = layoutOf(this);
+    const { cx, portrait } = layoutOf(this);
     const estimate = runReward(catalog.balance.reward, {
       duration: summary.duration_seconds,
       kills: Object.values(summary.kills_by_type).reduce((sum, value) => sum + value, 0),
@@ -94,20 +187,21 @@ export class ResultScene extends Phaser.Scene {
       if (!this.scene.isActive()) return;
       this.settled = true;
       this.leaveLabel.setVisible(false);
-      const earned = response.achievements.map((id) => {
-        const item = catalog.achievements[id];
-        return item ? item.name : id;
-      });
+      const earned = response.achievements;
       const note = response.flags.length
         ? '\nСервер скорректировал сводку забега, награда урезана.' : '';
       this.rewardLabel.setText(
         `Награда: +${response.reward_caps} крышек${
           response.reward_emeralds ? `, +${response.reward_emeralds} изумрудов` : ''
-        }\nВсего: ${response.profile.caps} крышек, ${response.profile.emeralds} изумрудов${note}${earned.length ? `\nДостижения: ${earned.join(', ')}. Награда ждёт в убежище` : ''}`,
+        }\nВсего: ${response.profile.caps} крышек, ${response.profile.emeralds} изумрудов${note}${
+          earned.length ? `\nДостижений: ${earned.length}, награда в убежище` : ''}`,
       );
+      this.recordLabel.setText(recordLines(response.record).join('\n'));
+      const goal = nextGoal(response.profile, catalog);
+      this.goalLabel.setText(goal ? `ДАЛЬШЕ: ${goal}` : '');
       this.actionLabel.setText('В УБЕЖИЩЕ');
       playSfx('sfx/reward');
-      if (response.reward_emeralds) this.burst(cx, this.rewardLabel.y - 18, Math.min(10, response.reward_emeralds));
+      if (response.reward_emeralds) this.burst(portrait ? cx : 124, this.rewardLabel.y - 18, Math.min(10, response.reward_emeralds));
       this.showAchievements(response.achievements);
     } catch (error) {
       if (!this.scene.isActive()) return;

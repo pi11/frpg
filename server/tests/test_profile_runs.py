@@ -643,3 +643,47 @@ async def test_boost_achievement_needs_a_bought_boost(api: dict[str, object]) ->
     second = (await client.post(
         f"/api/v1/runs/{boosted['run_id']}/finish", json=summary, headers=auth)).json()
     assert "loshok" in second["achievements"]
+
+
+@pytest.mark.anyio
+async def test_location_records_use_accepted_numbers_and_survive_replay(
+    api: dict[str, object],
+) -> None:
+    client: httpx.AsyncClient = api["client"]  # type: ignore[assignment]
+    factory: async_sessionmaker[AsyncSession] = api["factory"]  # type: ignore[assignment]
+    auth = headers((await client.post("/api/v1/auth/guest")).json())
+
+    async def play(seconds: int, kills: int, autopilot: bool = False) -> dict[str, object]:
+        started = (await client.post(
+            "/api/v1/runs/start",
+            json={"location_id": "shelter_outskirts", "hero_id": "wanderer"}, headers=auth,
+        )).json()
+        async with factory() as session:
+            run = await session.get(Run, UUID(started["run_id"]))
+            assert run is not None
+            run.started_at = run.started_at - wall(seconds + 5)
+            await session.commit()
+        summary = {
+            "content_hash": get_content().hash, "duration_seconds": seconds,
+            "kills_by_type": {"ghoul": kills}, "wave_reached": 1,
+            "boss_killed": False, "picked_caps": 0, "autopilot": autopilot,
+        }
+        url = f"/api/v1/runs/{started['run_id']}/finish"
+        first = (await client.post(url, json=summary, headers=auth)).json()
+        again = (await client.post(url, json=summary, headers=auth)).json()
+        assert again["record"] == first["record"]
+        assert again["reward_caps"] == first["reward_caps"]
+        return first
+
+    first = await play(100, 50)
+    assert first["record"] == {
+        "seconds": 100, "kills": 50, "previous_seconds": None, "previous_kills": None,
+    }
+    second = await play(80, 70)
+    assert second["record"] == {
+        "seconds": 80, "kills": 70, "previous_seconds": 100, "previous_kills": 50,
+    }
+    assert (await play(200, 10, autopilot=True))["record"] is None
+    third = await play(90, 20)
+    assert third["record"]["previous_seconds"] == 100
+    assert third["record"]["previous_kills"] == 70
