@@ -3,14 +3,14 @@
   "name": "Напалм",
   "description": "Заливает огнём большие участки",
   "sprite": "weapons/napalm",
-  "projectileSprite": "projectiles/bottle",
+  "projectileSprite": "projectiles/napalm",
   "fireSound": "sfx/firebomb",
   "behavior": {
     "type": "zone",
     "params": {
       "range": 200,
       "tickMs": 350,
-      "fireSprite": "fx/fire"
+      "fireSprite": "fx/napalm_fire"
     }
   },
   "levels": [

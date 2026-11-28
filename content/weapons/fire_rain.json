@@ -3,14 +3,14 @@
   "name": "Огненный ливень",
   "description": "Россыпь бутылок поджигает всё вокруг",
   "sprite": "weapons/fire_rain",
-  "projectileSprite": "projectiles/bottle",
+  "projectileSprite": "projectiles/fire_rain",
   "fireSound": "sfx/firebomb",
   "behavior": {
     "type": "zone",
     "params": {
       "range": 240,
       "tickMs": 400,
-      "fireSprite": "fx/fire"
+      "fireSprite": "fx/blue_fire"
     }
   },
   "levels": [

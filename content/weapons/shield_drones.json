@@ -3,7 +3,7 @@
   "name": "Щитовые дроны",
   "description": "Плотный рой дронов не отлетает от героя",
   "sprite": "weapons/shield_drones",
-  "projectileSprite": "projectiles/drone",
+  "projectileSprite": "projectiles/shield_drones",
   "fireSound": "sfx/drone",
   "behavior": {
     "type": "orbit",

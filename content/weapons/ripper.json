@@ -3,7 +3,7 @@
   "name": "Потрошитель",
   "description": "Две тяжёлые пилы летят далеко",
   "sprite": "weapons/ripper",
-  "projectileSprite": "projectiles/saw",
+  "projectileSprite": "projectiles/ripper",
   "fireSound": "sfx/saw",
   "behavior": {
     "type": "boomerang",

@@ -69,7 +69,7 @@ function render(atlas: Atlas | null): void {
   set('help-heavy', guns.filter((weapon) => weapon.heavy).map((weapon) =>
     card(icon(atlas, weapon.sprite), weapon.name, [
       weapon.description, `Как открыть: ${unlockText(weapon.unlock)}`,
-      `В карточках с ${weapon.minHeroLevel} уровня героя, отдельный слот`,
+      `В карточках с ${weapon.minHeroLevel} уровня героя; нужен слот тяжёлого оружия (улучшение «Лафет»)`,
     ])).join(''));
   set('help-evolutions', guns.filter((weapon) => weapon.evolved).map((weapon) => {
     const from = guns.find((base) => base.evolutions.some((path) => path.into === weapon.id));

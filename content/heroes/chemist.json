@@ -32,6 +32,7 @@
     "killHeal": 0,
     "weaponSlots": 3,
     "passiveSlots": 3,
+    "heavySlots": 0,
     "autopilot": 0,
     "headStart": 0,
     "buffDuration": 0.3,

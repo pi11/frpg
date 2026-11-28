@@ -3,7 +3,7 @@
   "name": "Рой дронов",
   "description": "Рой дронов почти без перерыва",
   "sprite": "weapons/drone_swarm",
-  "projectileSprite": "projectiles/drone",
+  "projectileSprite": "projectiles/drone_swarm",
   "fireSound": "sfx/drone",
   "behavior": {
     "type": "orbit",

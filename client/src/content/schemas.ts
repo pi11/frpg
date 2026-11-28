@@ -4,7 +4,7 @@ export const STAT_KEYS = [
   'maxHp', 'armor', 'regen', 'moveSpeed', 'damage', 'attackSpeed', 'area',
   'projectileCount', 'duration', 'pickupRadius', 'xpGain', 'luck', 'radResist',
   'critChance', 'critDamage', 'dodge', 'thorns', 'eliteDamage', 'killHeal', 'rerolls', 'revives',
-  'weaponSlots', 'passiveSlots', 'autopilot', 'headStart', 'buffDuration', 'landmarkSpeed',
+  'weaponSlots', 'passiveSlots', 'heavySlots', 'autopilot', 'headStart', 'buffDuration', 'landmarkSpeed',
 ] as const;
 
 export const StatKeySchema = z.enum(STAT_KEYS);
@@ -40,6 +40,8 @@ export const StatsSchema = z.object({
   /** Slots for ordinary weapons and perks, up to balance.run.maxWeapons / maxPassives. */
   weaponSlots: z.number().int().positive(),
   passiveSlots: z.number().int().positive(),
+  /** Heavy weapon slots, bought for emeralds, up to balance.run.maxHeavyWeapons. */
+  heavySlots: z.number().int().nonnegative(),
   /** 1 when the autopilot was bought. */
   autopilot: z.number().int().min(0).max(1),
   /** Level-ups at the start of a run. */
@@ -113,6 +115,8 @@ export const WeaponSchema = z.object({
   sprite: spriteKey('weapons'),
   projectileSprite: spriteKey('projectiles'),
   fireSound: soundKey('sfx'),
+  /** Colour of the aura or lightning (#rrggbb); evolved weapons have their own. */
+  color: z.string().regex(/^#[0-9a-f]{6}$/).optional(),
   behavior: z.object({ type: IdSchema, params: z.unknown() }).strict(),
   levels: z.array(WeaponLevelSchema).min(1).max(8),
   tags: z.array(z.string()),
@@ -441,6 +445,9 @@ export const BalanceSchema = z.object({
     maxWeapons: z.number().int().positive(),
     maxPassives: z.number().int().positive(),
     maxHeavyWeapons: z.number().int().positive(),
+    /** Global difficulty: enemy HP and every hit an enemy deals to the hero are multiplied by these. */
+    enemyHpMultiplier: z.number().positive(),
+    enemyDamageMultiplier: z.number().positive(),
     /** Hero speed above softMoveSpeed counts only by the factor. */
     softMoveSpeed: z.number().positive(),
     softMoveSpeedFactor: z.number().min(0).max(1),

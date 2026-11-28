@@ -18,10 +18,10 @@ import { keepAwake } from '../platform/wakeLock';
 import { settings } from '../settings';
 import { refillBudget, softCap } from '../systems/limits';
 import { Rng } from '../systems/rng';
-import { availableEvolutions, evolutionSource } from '../systems/evolutions';
+import { availableEvolutions, evolutionSource, type EvolutionOption } from '../systems/evolutions';
 import { COLORS, textStyle } from '../ui/theme';
 import { onLayoutChange } from '../ui/layout';
-import { levelChanges, levelStats, statBonus } from '../content/statText';
+import { evolutionChanges, levelChanges, levelStats, statBonus } from '../content/statText';
 import { WorldDecor, type ActiveLandmark } from '../systems/WorldDecor';
 import type { ResultData } from './ResultScene';
 
@@ -99,6 +99,14 @@ export interface RunData {
 }
 
 /** Presentation constants (not balance). */
+const AURA_COLOR = 0x9bff6e;
+const BOLT_COLOR = 0x649388;
+
+/** `#rrggbb` from content to a Phaser colour. */
+function hexColor(color: string | undefined, fallback: number): number {
+  return color ? Number.parseInt(color.slice(1), 16) : fallback;
+}
+
 const EFFECT_POOL_SIZE = 128;
 const FLAMES_PER_ZONE = 7;
 const HERO_DEATH_DELAY_MS = 900;
@@ -237,7 +245,11 @@ export class RunScene extends Phaser.Scene {
   /** Bought one-run boosts; their effects count like shelter upgrades. */
   private boosts: BoostDefinition[] = [];
   private orbiters = new Map<string, Phaser.GameObjects.Sprite[]>();
-  private auras = new Map<string, number>();
+  private auras = new Map<string, { radius: number; color: number }>();
+  /** Evolutions waiting for their screen; shown when the level-up or chest screen closes. */
+  private evolutionQueue: EvolutionOption[] = [];
+  /** The evolution the Evolution scene is showing. */
+  evolution: EvolutionOption | null = null;
   private mobs: SpriteMob[] = [];
   private spawnCount = 0;
   private cursors!: { UP: Phaser.Input.Keyboard.Key; DOWN: Phaser.Input.Keyboard.Key;
@@ -320,6 +332,8 @@ export class RunScene extends Phaser.Scene {
     this.checkedSecond = -1;
     this.orbiters = new Map();
     this.auras = new Map();
+    this.evolutionQueue = [];
+    this.evolution = null;
     this.mobs = [];
     this.buffs = new Map();
     this.frozenUntil = 0;
@@ -468,6 +482,9 @@ export class RunScene extends Phaser.Scene {
     this.keys = this.input.keyboard!.addKeys('W,A,S,D', false) as typeof this.keys;
     this.scene.launch('Hud');
     this.scene.bringToTop('Hud');
+    const showEvolution = (): void => this.showEvolution();
+    this.events.on(Phaser.Scenes.Events.RESUME, showEvolution);
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.events.off(Phaser.Scenes.Events.RESUME, showEvolution));
     if (this.autopilotOn) void keepAwake(true);
     playSfx('sfx/run_start');
     playTune(settings().runTune, this.location.music);
@@ -485,14 +502,14 @@ export class RunScene extends Phaser.Scene {
       randomEnemyWithin: (range) => this.randomEnemyWithin(range),
       nearestTo: (center, range, skip) => this.nearestTo(center, range, skip),
       strike: (target, damage) => this.strike(target, damage),
-      drawBolt: (path, sprite) => this.drawBolt(path, sprite),
+      drawBolt: (path, sprite, color) => this.drawBolt(path, sprite, color),
       damageInRadius: (center, radius, damage, limit) => this.damageInRadius(center, radius, damage, limit),
       spawnProjectile: (spec) => this.spawnProjectile(spec),
       spawnZone: (spec) => this.spawnZone(spec),
       scheduleBlast: (spec) => this.scheduleBlast(spec),
       drawBeam: (from, to) => { this.beams.push([from, to]); },
       placeOrbiters: (owner, sprite, positions) => this.placeOrbiters(owner, sprite, positions),
-      showAura: (owner, radius) => { this.auras.set(owner, radius); },
+      showAura: (owner, radius, color) => { this.auras.set(owner, { radius, color: hexColor(color, AURA_COLOR) }); },
     };
     this.enemyContext = {
       hero: this.hero,
@@ -895,7 +912,7 @@ export class RunScene extends Phaser.Scene {
     sprite.setVelocity(0, 0).setDepth(definition.role === 'normal' ? 0 : 6);
     const speed = definition.role === 'normal' ? this.currentWave().speedMultiplier : 1;
     const mob = sprite.getData('mob') as SpriteMob;
-    mob.reset(definition, definition.stats.hp * multiplier, speed);
+    mob.reset(definition, definition.stats.hp * multiplier * this.catalog.balance.run.enemyHpMultiplier, speed);
     if (definition.role !== 'normal') mob.lossBudget = mob.maxHp * this.maxLoss(definition);
     const walk = animationKey(definition.sprite, 'walk');
     // A frozen enemy dies with its animation paused; the pooled sprite must start clean.
@@ -1129,9 +1146,10 @@ export class RunScene extends Phaser.Scene {
   }
 
   /** Jagged lightning that fades out; the jitter is visual only and does not use the run RNG. */
-  private drawBolt(path: readonly Point[], sprite: string): void {
+  private drawBolt(path: readonly Point[], sprite: string, tint?: string): void {
     const bolt = this.add.graphics().setDepth(13);
-    for (const [width, color, alpha] of [[3, 0x649388, 0.5], [1, 0xf0e8cf, 1]] as const) {
+    const glow = hexColor(tint, BOLT_COLOR);
+    for (const [width, color, alpha] of [[tint ? 4 : 3, glow, tint ? 0.7 : 0.5], [1, 0xf0e8cf, 1]] as const) {
       bolt.lineStyle(width, color, alpha).beginPath().moveTo(path[0]!.x, path[0]!.y);
       for (let index = 1; index < path.length; index += 1) {
         const from = path[index - 1]!;
@@ -1363,9 +1381,9 @@ export class RunScene extends Phaser.Scene {
   private drawAreas(): void {
     const graphics = this.areaGraphics.clear();
     const pulse = 0.5 + 0.5 * Math.sin(this.elapsedMs / 180);
-    for (const radius of this.auras.values()) {
-      graphics.fillStyle(0x9bff6e, 0.08 + 0.05 * pulse).fillCircle(this.hero.x, this.hero.y, radius);
-      graphics.lineStyle(1, 0x9bff6e, 0.35 + 0.2 * pulse).strokeCircle(this.hero.x, this.hero.y, radius);
+    for (const { radius, color } of this.auras.values()) {
+      graphics.fillStyle(color, 0.08 + 0.05 * pulse).fillCircle(this.hero.x, this.hero.y, radius);
+      graphics.lineStyle(1, color, 0.35 + 0.2 * pulse).strokeCircle(this.hero.x, this.hero.y, radius);
     }
     if (this.shotShield) {
       // Blinks during the last two seconds so the end does not come as a surprise.
@@ -1718,16 +1736,17 @@ export class RunScene extends Phaser.Scene {
   }
 
   /** Every slot the shelter can give, for the HUD. */
-  get maxSlots(): { weapons: number; passives: number } {
-    const { maxWeapons, maxPassives } = this.catalog.balance.run;
-    return { weapons: maxWeapons, passives: maxPassives };
+  get maxSlots(): { weapons: number; heavy: number; passives: number } {
+    const { maxWeapons, maxHeavyWeapons, maxPassives } = this.catalog.balance.run;
+    return { weapons: maxWeapons, heavy: maxHeavyWeapons, passives: maxPassives };
   }
 
   /** How many weapons, heavy weapons and perks fit into one run. */
   get slots(): { weapons: number; heavy: number; passives: number } {
     const { maxWeapons, maxHeavyWeapons, maxPassives } = this.catalog.balance.run;
     return {
-      weapons: Math.min(maxWeapons, this.stat('weaponSlots')), heavy: maxHeavyWeapons,
+      weapons: Math.min(maxWeapons, this.stat('weaponSlots')),
+      heavy: Math.min(maxHeavyWeapons, this.stat('heavySlots')),
       passives: Math.min(maxPassives, this.stat('passiveSlots')),
     };
   }
@@ -1762,8 +1781,10 @@ export class RunScene extends Phaser.Scene {
     const { weapons, passives } = this.catalog;
     return availableEvolutions(weapons, this.weapons, this.ownedPassives).map((option) => {
       const target = weapons[option.into]!;
+      const source = weapons[option.from]!;
+      const power = evolutionChanges(source.levels.at(-1)!, target.levels[0]!)[0]!;
       return { kind: 'evolution', id: target.id, name: target.name, sprite: target.sprite,
-        description: `${weapons[option.from]!.name} + ${passives[option.passive]!.name}`, pairs: [] };
+        description: `${source.name} + ${passives[option.passive]!.name}\n${power}`, pairs: [] };
     });
   }
 
@@ -1804,6 +1825,21 @@ export class RunScene extends Phaser.Scene {
     return true;
   }
 
+  /** Plays the next queued evolution over the paused run; its scene resumes the run when done. */
+  private showEvolution(): void {
+    if (this.finished || !this.nextEvolution()) return;
+    this.hero.setVelocity(0, 0);
+    this.scene.launch('Evolution');
+    this.scene.bringToTop('Evolution');
+    this.scene.pause();
+  }
+
+  /** Moves the next queued evolution into `evolution`; false when none is left. */
+  nextEvolution(): boolean {
+    this.evolution = this.evolutionQueue.shift() ?? null;
+    return this.evolution !== null;
+  }
+
   /** Replaces the three cards; returns false when no rerolls are left. */
   reroll(): boolean {
     if (this.view.rerolls <= 0 || !this.choices.length) return false;
@@ -1828,6 +1864,8 @@ export class RunScene extends Phaser.Scene {
       this.weapons.delete(source.id);
       this.weapons.set(choice.id, { ...state, level: 1 });
       this.placeOrbiters(source.id, source.projectileSprite, []);
+      const path = source.evolutions.find((item) => item.into === choice.id)!;
+      this.evolutionQueue.push({ from: source.id, into: choice.id, passive: path.passive });
       playSfx('sfx/powerup');
     } else if (choice.kind === 'weapon') {
       const owned = this.weapons.get(choice.id);
@@ -1881,7 +1919,8 @@ export class RunScene extends Phaser.Scene {
       this.label('МИМО', COLORS.dim);
       return false;
     }
-    this.hurt(Math.max(1, damage - this.stat('armor')));
+    const scaled = damage * this.catalog.balance.run.enemyDamageMultiplier;
+    this.hurt(Math.max(1, scaled - this.stat('armor')));
     return true;
   }
 

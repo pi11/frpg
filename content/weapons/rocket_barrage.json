@@ -3,7 +3,7 @@
   "name": "Ракетный шквал",
   "description": "Залп самонаводящихся ракет",
   "sprite": "weapons/rocket_barrage",
-  "projectileSprite": "projectiles/rocket",
+  "projectileSprite": "projectiles/rocket_barrage",
   "fireSound": "sfx/rocket",
   "behavior": {
     "type": "rocket",

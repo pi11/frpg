@@ -25,6 +25,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 import art  # noqa: E402
+import art_evolved as evolved_art  # noqa: E402
 import art_extra as extra  # noqa: E402
 import art_heavy as heavy  # noqa: E402
 import art_heroes as heroes  # noqa: E402
@@ -282,6 +283,7 @@ def sprite_frames() -> dict[str, Image]:
     frames.update(extra.second_evolutions(frames))
     # The new cap and pink enemy spit replace the older drawings.
     frames.update(lands.frames())
+    frames.update(evolved_art.frames(frames))
     return frames
 
 

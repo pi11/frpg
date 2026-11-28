@@ -75,12 +75,13 @@ async def test_daily_claim_flow(api: dict[str, object], monkeypatch: pytest.Monk
                               json={"expected_version": 0})).status_code == 401
     assert (await client.post("/api/v1/daily/nothing/claim", json={"expected_version": 0},
                               headers=auth)).status_code == 404
-    target = quests[0]
+    # One run cannot finish a quest for several runs, so the target is any other quest.
+    target = next(quest for quest in quests if quest["id"] != "runs")
     early = await client.post(f"/api/v1/daily/{target['id']}/claim",
                               json={"expected_version": 0}, headers=auth)
     assert early.status_code == 409 and "не выполнено" in early.json()["message"]
 
-    # A huge honest-looking run finishes the first quest whatever it is.
+    # A huge honest-looking run finishes the target quest whatever it is.
     started = (await client.post("/api/v1/runs/start", json={
         "location_id": "shelter_outskirts", "hero_id": "wanderer"}, headers=auth)).json()
     async with factory() as session:

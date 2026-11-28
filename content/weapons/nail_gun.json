@@ -3,7 +3,7 @@
   "name": "Гвоздемёт",
   "description": "Очереди пробивных гвоздей",
   "sprite": "weapons/nail_gun",
-  "projectileSprite": "projectiles/bullet",
+  "projectileSprite": "projectiles/nail_gun",
   "fireSound": "sfx/shot_pistol",
   "behavior": {
     "type": "projectile",

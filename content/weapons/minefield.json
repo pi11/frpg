@@ -3,7 +3,7 @@
   "name": "Минное поле",
   "description": "Засыпает землю минами",
   "sprite": "weapons/minefield",
-  "projectileSprite": "projectiles/mine",
+  "projectileSprite": "projectiles/minefield",
   "fireSound": "sfx/mine",
   "behavior": {
     "type": "mine",

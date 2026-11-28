@@ -86,7 +86,7 @@ export class HudScene extends Phaser.Scene {
     const { slots, maxSlots } = this.run;
     const gunsY = height - (portrait ? 38 : 14);
     this.weaponSlots = this.addSlots(maxSlots.weapons, 4, gunsY, slots.weapons);
-    this.heavySlots = this.addSlots(slots.heavy, 8 + maxSlots.weapons * SLOT_SIZE, gunsY, slots.heavy, COLORS.evolution);
+    this.heavySlots = this.addSlots(maxSlots.heavy, 8 + maxSlots.weapons * SLOT_SIZE, gunsY, slots.heavy, COLORS.evolution);
     this.passiveSlots = this.addSlots(maxSlots.passives,
       portrait ? 4 : width - 4 - maxSlots.passives * SLOT_SIZE, height - 14, slots.passives);
     this.tooltip = new Tooltip(this);
@@ -264,7 +264,7 @@ export class HudScene extends Phaser.Scene {
       if (slot.item) this.tooltip.show(slot, slot.item.name, slot.item.details);
       else if (slot.locked) {
         this.tooltip.show(slot, 'Слот закрыт',
-          ['Докупается за изумруды в убежище, вкладка «Улучшения».']);
+          ['Докупается за изумруды в убежище: вкладка «За изумруды», раздел «Слоты».']);
       } else this.tooltip.show(slot, `Слот ${kind}`, ['Пусто. Выбирается при новом уровне.']);
       return;
     }

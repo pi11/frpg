@@ -68,6 +68,29 @@ describe('shared content catalog', () => {
     expect(() => validateContent({ ...rawFiles, [pistolPath]: orphan })).toThrow('has no evolution source');
   });
 
+  it('gives every evolved weapon its own projectile and a clear power gain', () => {
+    const { weapons } = getCatalog();
+    for (const base of Object.values(weapons)) {
+      for (const { into } of base.evolutions) {
+        const evolved = weapons[into]!;
+        expect(evolved.projectileSprite, into).not.toBe(base.projectileSprite);
+        const power = (level: { damage: number; shots: number; cooldownMs: number }): number =>
+          level.damage * level.shots / level.cooldownMs;
+        expect(power(evolved.levels[0]!) / power(base.levels.at(-1)!), into).toBeGreaterThan(1.4);
+      }
+    }
+  });
+
+  it('opens heavy weapon slots only for emeralds', () => {
+    const { heroes, upgrades, balance } = getCatalog();
+    for (const hero of Object.values(heroes)) expect(hero.baseStats.heavySlots, hero.id).toBe(0);
+    const slots = Object.values(upgrades).filter((upgrade) => upgrade.stat === 'heavySlots');
+    expect(slots.length).toBeGreaterThan(0);
+    for (const upgrade of slots) expect(upgrade.currency).toBe('emeralds');
+    expect(slots.reduce((sum, upgrade) => sum + upgrade.perLevel * upgrade.maxLevel, 0))
+      .toBe(balance.run.maxHeavyWeapons);
+  });
+
   it('rejects a heavy weapon with evolutions or a starting weapon sold for emeralds', () => {
     const find = (name: string): string => Object.keys(rawFiles).find((path) => path.endsWith(name))!;
     const railPath = find('rail_gun.json');

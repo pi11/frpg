@@ -3,7 +3,7 @@
   "name": "Призменный излучатель",
   "description": "Веер лучей пробивает толпу",
   "sprite": "weapons/prism_emitter",
-  "projectileSprite": "projectiles/laser",
+  "projectileSprite": "projectiles/prism_emitter",
   "fireSound": "sfx/laser",
   "behavior": {
     "type": "projectile",

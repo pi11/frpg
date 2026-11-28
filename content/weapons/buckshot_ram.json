@@ -3,7 +3,7 @@
   "name": "Картечный таран",
   "description": "Чудовищный залп в упор",
   "sprite": "weapons/buckshot_ram",
-  "projectileSprite": "projectiles/pellet",
+  "projectileSprite": "projectiles/buckshot_ram",
   "fireSound": "sfx/shot_scatter",
   "behavior": {
     "type": "projectile",

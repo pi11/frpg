@@ -3,7 +3,7 @@
   "name": "Горнило",
   "description": "Стена пламени",
   "sprite": "weapons/furnace",
-  "projectileSprite": "projectiles/flame",
+  "projectileSprite": "projectiles/furnace",
   "fireSound": "sfx/flame",
   "behavior": {
     "type": "projectile",

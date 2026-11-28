@@ -3,7 +3,7 @@
   "name": "Снайперский луч",
   "description": "Один луч прошивает всю толпу",
   "sprite": "weapons/sniper_beam",
-  "projectileSprite": "projectiles/laser",
+  "projectileSprite": "projectiles/sniper_beam",
   "fireSound": "sfx/laser",
   "behavior": {
     "type": "projectile",

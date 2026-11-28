@@ -3,8 +3,9 @@
   "name": "Сварочная дуга",
   "description": "Короткие молнии почти без перерыва",
   "sprite": "weapons/arc_welder",
-  "projectileSprite": "projectiles/spark",
+  "projectileSprite": "projectiles/arc_welder",
   "fireSound": "sfx/tesla",
+  "color": "#ffd84a",
   "behavior": {
     "type": "chain",
     "params": {

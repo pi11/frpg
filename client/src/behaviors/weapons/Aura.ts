@@ -17,6 +17,6 @@ export class AuraWeaponBehavior implements WeaponBehavior<AuraParams> {
   }
 
   update(context: CombatContext, weapon: WeaponDefinition, level: WeaponLevel): void {
-    context.showAura(weapon.id, level.radius! * (1 + context.stat('area')));
+    context.showAura(weapon.id, level.radius! * (1 + context.stat('area')), weapon.color);
   }
 }

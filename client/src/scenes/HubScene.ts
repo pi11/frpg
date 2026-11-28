@@ -835,7 +835,7 @@ export class HubScene extends Phaser.Scene {
       `Эволюция: ${weapons[into]!.name} (перк «${passives[passive]!.name}»)`).join('\n');
     this.el('hub-weapons').innerHTML = section('Обычное оружие', byOpen(guns.filter((weapon) => !weapon.heavy && !weapon.evolved))
       .map((weapon) => row(weapon, evolutions(weapon))))
-      + section('Тяжёлое оружие', heavy.map((weapon) => row(weapon, `Встречается в забеге с ${weapon.minHeroLevel} уровня`)));
+      + section('Тяжёлое оружие', heavy.map((weapon) => row(weapon, `С ${weapon.minHeroLevel} уровня героя, нужен слот «Лафет»`)));
     const perks = Object.values(passives);
     const note = (perk: PassiveDefinition): string =>
       `${statBonus(perk.stat, perk.perLevel, perk.mod)} за уровень, уровней: ${perk.maxLevel}`;

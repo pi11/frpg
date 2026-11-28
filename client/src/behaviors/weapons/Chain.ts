@@ -36,7 +36,7 @@ export class ChainWeaponBehavior implements WeaponBehavior<ChainParams> {
         damage *= params.falloff;
         target = context.nearestTo(at, params.jumpRange * reach, hit);
       }
-      if (path.length > 1) context.drawBolt(path, weapon.projectileSprite);
+      if (path.length > 1) context.drawBolt(path, weapon.projectileSprite, weapon.color);
       struck += hit.size;
     }
     return struck ? 'fired' : 'skip';

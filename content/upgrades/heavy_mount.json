@@ -1,0 +1,14 @@
+{
+  "id": "heavy_mount",
+  "name": "Лафет",
+  "category": "slots",
+  "currency": "emeralds",
+  "stat": "heavySlots",
+  "mod": "flat",
+  "perLevel": 1,
+  "maxLevel": 2,
+  "cost": {
+    "base": 20,
+    "growth": 2
+  }
+}

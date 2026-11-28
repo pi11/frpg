@@ -3,8 +3,9 @@
   "name": "Сердце реактора",
   "description": "Огромное жгучее поле",
   "sprite": "weapons/reactor_core",
-  "projectileSprite": "projectiles/rad",
+  "projectileSprite": "projectiles/reactor_core",
   "fireSound": "sfx/aura",
+  "color": "#ffd84a",
   "behavior": {
     "type": "aura",
     "params": {}

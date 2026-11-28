@@ -3,8 +3,9 @@
   "name": "Грозовой контур",
   "description": "Сразу несколько длинных молний",
   "sprite": "weapons/storm_core",
-  "projectileSprite": "projectiles/spark",
+  "projectileSprite": "projectiles/storm_core",
   "fireSound": "sfx/tesla",
+  "color": "#b98cff",
   "behavior": {
     "type": "chain",
     "params": {

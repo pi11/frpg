@@ -3,8 +3,9 @@
   "name": "Ядерный ореол",
   "description": "Тесное поле, но жжёт втрое сильнее",
   "sprite": "weapons/rad_halo",
-  "projectileSprite": "projectiles/rad",
+  "projectileSprite": "projectiles/rad_halo",
   "fireSound": "sfx/aura",
+  "color": "#c58cff",
   "behavior": {
     "type": "aura",
     "params": {}

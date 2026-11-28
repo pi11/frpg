@@ -3,7 +3,7 @@
   "name": "Огненное кольцо",
   "description": "Пламя бьёт во все стороны разом",
   "sprite": "weapons/fire_ring",
-  "projectileSprite": "projectiles/flame",
+  "projectileSprite": "projectiles/fire_ring",
   "fireSound": "sfx/flame",
   "behavior": {
     "type": "projectile",

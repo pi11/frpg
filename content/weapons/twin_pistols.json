@@ -3,7 +3,7 @@
   "name": "Парные пистолеты",
   "description": "Два ствола бьют веером без устали",
   "sprite": "weapons/twin_pistols",
-  "projectileSprite": "projectiles/bullet",
+  "projectileSprite": "projectiles/twin_pistols",
   "fireSound": "sfx/shot_pistol",
   "behavior": {
     "type": "projectile",

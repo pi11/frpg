@@ -103,7 +103,7 @@ export interface CombatContext {
   nearestTo(center: Point, range: number, skip: ReadonlySet<Point>): Point | null;
   /** Damage one enemy returned by the searches above. */
   strike(target: Point, damage: number): void;
-  drawBolt(path: readonly Point[], sprite: string): void;
+  drawBolt(path: readonly Point[], sprite: string, color?: string): void;
   /** Damage every enemy (and crate) inside the circle; returns how many were hit. */
   damageInRadius(center: Point, radius: number, damage: number, limit?: HitLimit): number;
   spawnProjectile(spec: ProjectileSpec): void;
@@ -114,8 +114,8 @@ export interface CombatContext {
   drawBeam(from: Point, to: Point): void;
   /** Show one orbiting sprite per position for this owner; an empty list hides them. */
   placeOrbiters(owner: string, sprite: string, positions: readonly Point[]): void;
-  /** Draw (radius > 0) or hide (0) an aura ring around the hero. */
-  showAura(owner: string, radius: number): void;
+  /** Draw (radius > 0) or hide (0) an aura ring around the hero, in the weapon's colour. */
+  showAura(owner: string, radius: number, color?: string): void;
 }
 
 export interface WeaponState {

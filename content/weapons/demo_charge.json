@@ -3,7 +3,7 @@
   "name": "Подрывной заряд",
   "description": "Редкие, но страшные взрывы",
   "sprite": "weapons/demo_charge",
-  "projectileSprite": "projectiles/mine",
+  "projectileSprite": "projectiles/demo_charge",
   "fireSound": "sfx/mine",
   "behavior": {
     "type": "mine",

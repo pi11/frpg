@@ -3,7 +3,7 @@
   "name": "Циркулярный вихрь",
   "description": "Пилы летят во все стороны",
   "sprite": "weapons/buzz_storm",
-  "projectileSprite": "projectiles/saw",
+  "projectileSprite": "projectiles/buzz_storm",
   "fireSound": "sfx/saw",
   "behavior": {
     "type": "boomerang",

@@ -3,7 +3,7 @@
   "name": "Умная боеголовка",
   "description": "Одна огромная ракета находит цель",
   "sprite": "weapons/smart_warhead",
-  "projectileSprite": "projectiles/rocket",
+  "projectileSprite": "projectiles/smart_warhead",
   "fireSound": "sfx/rocket",
   "behavior": {
     "type": "rocket",

@@ -8,6 +8,7 @@ export const STAT_LABELS: Record<StatKey, string> = {
   revives: 'возрождение', critDamage: 'урон крита', dodge: 'уклонение', thorns: 'урон шипов',
   headStart: 'уровень на старте', buffDuration: 'время усилений',
   landmarkSpeed: 'скорость взлома', autopilot: 'автопилот', weaponSlots: 'слот оружия', passiveSlots: 'слот перка',
+  heavySlots: 'слот тяжёлого оружия',
   eliteDamage: 'урон боссам', killHeal: 'здоровье за убийство',
 };
 
@@ -62,4 +63,18 @@ export function heroTraits(hero: HeroDefinition, basic: HeroDefinition): { good:
     if (difference) (difference > 0 ? good : bad).push(statBonus(key, difference));
   }
   return { good, bad };
+}
+
+/** Damage per second of one level, for comparing an evolution with its base weapon. */
+function levelPower(level: WeaponLevel): number {
+  return level.damage * level.shots / level.cooldownMs;
+}
+
+/**
+ * What an evolution changes, for the evolution screen: the power ratio first (`сила ×2,1`),
+ * then every changed number as `урон 20>24`.
+ */
+export function evolutionChanges(from: WeaponLevel, to: WeaponLevel): string[] {
+  const ratio = Math.round(levelPower(to) / levelPower(from) * 10) / 10;
+  return [`сила ×${String(ratio).replace('.', ',')}`, ...levelChanges(from, to, LEVEL_FIELDS.length)];
 }
