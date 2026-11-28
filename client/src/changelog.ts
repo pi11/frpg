@@ -1,7 +1,8 @@
 /**
- * What changed for players, newest first. Every commit adds a version: the third number grows,
- * a big change (new locations, new systems) raises the second one. The first entry is the game
- * version shown in the settings; client/package.json carries the same number.
+ * What changed for players, newest first. Every commit raises the version in client/package.json
+ * (the third number; a big change such as new locations raises the second one), but only changes
+ * that matter to players get an entry here, so versions may be skipped. Hidden achievements are
+ * never named or described: an entry only says that new ones were added.
  */
 export interface Release {
   version: string;
@@ -18,7 +19,7 @@ export const CHANGELOG: readonly Release[] = [
     title: 'Кнопки внизу и цены',
     changes: [
       'На телефоне кнопки паузы и полного экрана в забеге переехали вниз направо и больше не закрывают здоровье и уровень героя.',
-      'Скрытые достижения за аккаунт: привязать почту, привязать Telegram и войти по ключу.',
+      'Новые скрытые достижения.',
       'Автопилот стоит 75 изумрудов вместо 15.',
       'Тяжёлое оружие стало втрое дороже: от 18 до 60 изумрудов.',
     ],
@@ -29,7 +30,7 @@ export const CHANGELOG: readonly Release[] = [
     title: 'Помощь и список изменений',
     changes: [
       'Страница «Помощь»: об игре, управление, как устроен забег, советы, а также герои, оружие с эволюциями, перки, усиления и локации — с иконками.',
-      'Страница «Что нового» со всеми версиями. Номер версии и ссылки на обе страницы — в убежище, вкладка «Настройки».',
+      'Страница «Что нового». Номер версии и ссылки на обе страницы — в убежище, вкладка «Настройки».',
     ],
   },
   {
@@ -37,8 +38,8 @@ export const CHANGELOG: readonly Release[] = [
     date: '27.11.2026',
     title: 'Плавное движение',
     changes: [
-      'Герой больше не дёргается при движении по диагонали: камера держит его на целых пикселях.',
-      'Движение плавное и на мониторах 120–144 Гц: физика делает шаг на каждом кадре, а не 48 раз в секунду.',
+      'Герой больше не дёргается при движении по диагонали.',
+      'Движение плавное и на мониторах 120–144 Гц.',
     ],
   },
   {
@@ -49,7 +50,7 @@ export const CHANGELOG: readonly Release[] = [
       'Новые локации после Ядовитых топей: Военная база, Чёрный лес, Подземелье, Ледяной перевал и Великая пустыня. У каждой своя земля, декор, постройки, музыка, враги, мини-босс и босс.',
       'Новые боссы: Стальной генерал, Хозяин леса, Крысиный король, Королева стужи и Песчаный левиафан.',
       'Усиления на один забег за изумруды (вкладка «За изумруды», раздел «На забег»): стимулятор, бронежилет, запасное сердце, мешок для крышек, шпаргалка, кроличья лапка, реактивные ботинки.',
-      'Достижения новых локаций и новые скрытые достижения — например, «Лошок».',
+      'Достижения новых локаций и новые скрытые достижения.',
       'После цен и наград в изумрудах стоит значок изумруда.',
       'Плевки врагов теперь розовые, а не зелёные, как опыт.',
       'Новая крышка.',
@@ -59,4 +60,5 @@ export const CHANGELOG: readonly Release[] = [
   },
 ];
 
-export const VERSION = CHANGELOG[0]!.version;
+/** Version of this build (client/package.json). */
+export const VERSION = __APP_VERSION__;
