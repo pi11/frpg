@@ -10,9 +10,10 @@ from app.models.auth import (
     User,
 )
 from app.models.base import Base
+from app.models.changelog import ChangelogPost
 from app.models.run import Run
 
 __all__ = [
-    "AdminAction", "AuthIdentity", "Base", "LoginToken", "Profile", "RecoveryKey",
+    "AdminAction", "AuthIdentity", "Base", "ChangelogPost", "LoginToken", "Profile", "RecoveryKey",
     "RefreshToken", "Run", "TelegramLoginRequest", "User",
 ]

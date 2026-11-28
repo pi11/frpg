@@ -70,6 +70,12 @@ rsync -a --include='*.html' --exclude='*' client/dist/ "$web/"
 find "$web/assets" -maxdepth 1 -type f -mtime +30 -print0 | while IFS= read -r -d '' file; do
   [ -e "client/dist/assets/${file##*/}" ] || rm -f -- "$file"
 done
+# New «Что нового» versions to the Telegram channel (TELEGRAM_CHANNEL_ID); a failure does not
+# undo the deploy, the next deploy posts what is still missing.
+systemd-run --quiet --wait --pipe --collect --uid=wasteland \
+  --property=EnvironmentFile="$env_file" --property=WorkingDirectory="$app/server" \
+  "$app/server/.venv/bin/python" -m app.services.changelog post \
+  || echo "changelog post failed; retry: python -m app.services.changelog post" >&2
 echo; echo "deployed $(as_app git rev-parse --short HEAD)"
 }
 
